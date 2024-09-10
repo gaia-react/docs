@@ -68,4 +68,5 @@ The entire linting setup is included in the project folder, for you to customize
 
 ## Component-Driven Development
 
-Storybook is included with GAIA, and it's a great way to develop components in isolation. It's a great way to develop components in isolation, and to see how they look and behave in different states. It's also a great way to document your components, and to share them with your team.
+Storybook is included with GAIA. It's a great way to develop components in isolation, to see how they look and behave in different states, and to test them to make sure they work as expected in all those different states.
+
