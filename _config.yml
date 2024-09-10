@@ -1,8 +1,27 @@
-title: Just the Docs Template
-description: A starter template for a Jeykll site using the Just the Docs theme!
+title: GAIA Framework
+description: GAIA Framework documentation
 theme: just-the-docs
 
-url: https://just-the-docs.github.io
+url: https://gaia-react.github.io/docs/
+favicon_ico: /assets/favicon/favicon.ico
+logo: /assets/images/gaia-logo.svg
 
 aux_links:
-  Template Repository: https://github.com/just-the-docs/just-the-docs-template
+  GAIA Framework: https://github.com/gaia-react/remix
+
+aux_links_new_tab: true
+
+color_scheme: gaia
+
+footer_content: "Copyright &copy; 2024 GAIA Framework. Released under <a href=\"https://github.com/just-the-docs/just-the-docs/tree/main/LICENSE.txt\">GPL-3.0 license.</a>"
+
+permalink: pretty
+
+baseurl: ""
+
+enable_copy_code_button: true
+
+heading_anchors: true
+
+back_to_top: true
+back_to_top_text: "Back to top"

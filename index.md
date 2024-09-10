@@ -1,35 +1,163 @@
 ---
 title: Home
 layout: home
+nav_order: 1
+has_children: false
 ---
 
-This is a *bare-minimum* template to create a Jekyll site that uses the [Just the Docs] theme. You can easily set the created site to be published on [GitHub Pages] – the [README] file explains how to do that, along with other details.
+# GAIA Framework Docs
 
-If [Jekyll] is installed on your computer, you can also build and preview the created site *locally*. This lets you test changes before committing them, and avoids waiting for GitHub Pages.[^1] And you will be able to deploy your local build to a different platform than GitHub Pages.
+GAIA is a **fully comprehensive** framework for building modern React web applications.
 
-More specifically, the created site:
+It comes with **EVERYTHING** you need, fully configured and ready to go.
 
-- uses a gem-based approach, i.e. uses a `Gemfile` and loads the `just-the-docs` gem
-- uses the [GitHub Pages / Actions workflow] to build and publish the site on GitHub Pages
+The Developer Experience (DX) is designed to be top-notch.
 
-Other than that, you're free to customize sites that you create with this template, however you like. You can easily change the versions of `just-the-docs` and Jekyll it uses, as well as adding further plugins.
+- Automated and robust code quality tools are all set up, keeping your code clean and tech debt to a minimum.
+- Best practices are baked into the source code examples for you to follow.
+- Utilities, hooks, authentication, components, services, styles, tests, stories, and other code examples are all included to help you get started quickly.
+- Unit, integration, visual regression, and end-to-end tests are set up.
+- While GAIA comes with recommended packages, conventions, and settings, you're free to change or remove them to suit your needs!
 
-[Browse our documentation][Just the Docs] to learn more about how to use this theme.
+GAIA has many great project features built-in:
 
-To get started with creating a site, simply:
+- Built with [Remix](https://remix.run/), the best full-stack React framework for the modern web
+- Internationalization via [remix-i18next](https://github.com/sergiodxa/remix-i18next) with sample files already in place
+- [TailwindCSS](https://tailwindcss.com/) for styling, along with CSS Module support
+- [Zod](https://zod.dev/) for data validation and types
+- Robust ESLint ruleset along with [Prettier](https://prettier.io/) and [Stylelint](https://stylelint.io/)
+- [Husky](https://typicode.github.io/husky/) and [Lint-Staged](https://github.com/lint-staged/lint-staged) for pre-commit checks
+- A complete test suite with [Vitest](https://vitest.dev), [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/), and [PlayWright](https://playwright.dev/docs/intro)
+- [Storybook](https://storybook.js.org/) and [Chromatic](https://chromatic.com/), with a [Remix Stub](https://remix.run/docs/en/main/utils/create-remix-stub) decorator included
+- [Mock Service Worker](https://mswjs.io/) with working handlers, and [msw/data](https://github.com/mswjs/data) for data mocking
+- [FontAwesome](https://fontawesome.com/) icons
+- [RVF](https://www.rvf-js.io/) for form management and validation
+- Working authentication example with [remix-auth](https://remix.run/resources/remix-auth)
+- A wrapper around fetch that simplifies API calls
+- Many example components, ready for you to use and modify
+- Useful utility functions and hooks
+- Light and dark mode support
+- And much more!
 
-1. click "[use this template]" to create a GitHub repository
-2. go to Settings > Pages > Build and deployment > Source, and select GitHub Actions
+No matter what your skill level or experience, GAIA will make your life and your code better.
 
-If you want to maintain your docs in the `docs` directory of an existing project repo, see [Hosting your docs from an existing project repo](https://github.com/just-the-docs/just-the-docs-template/blob/main/README.md#hosting-your-docs-from-an-existing-project-repo) in the template README.
+## Is this associated with the GAIA Flash Framework?
 
-----
+**Yes!**
 
-[^1]: [It can take up to 10 minutes for changes to your site to publish after you push the changes to GitHub](https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll/creating-a-github-pages-site-with-jekyll#creating-your-site).
+The GAIA Flash Framework revolutionized Flash website development and became the most popular Flash framework in the world (second only to Adobe Flex, which was focused on enterprise applications). It was used to build over 100,000 Flash sites and relied upon by every major digital agency worldwide.
 
-[Just the Docs]: https://just-the-docs.github.io/just-the-docs/
-[GitHub Pages]: https://docs.github.com/en/pages
-[README]: https://github.com/just-the-docs/just-the-docs-template/blob/main/README.md
-[Jekyll]: https://jekyllrb.com
-[GitHub Pages / Actions workflow]: https://github.blog/changelog/2022-07-27-github-pages-custom-github-actions-workflows-beta/
-[use this template]: https://github.com/just-the-docs/just-the-docs-template/generate
+This GAIA Framework is its spiritual successor. It has been reborn as a React framework. Like its predecessor, it's designed to be the most comprehensive and easy-to-use React framework available.
+
+## Installation
+
+Make sure you have [Node.js](https://nodejs.org/en/) >=20.17.0 LTS installed, preferably via [nvm](https://github.com/nvm-sh/nvm).
+
+All you need to do is run this installation command and get to work.
+
+
+```sh
+npx create-remix@latest --template gaia-react/remix
+```
+
+You can choose to install packages when prompted, or do it manually.
+
+### Install packages
+
+```sh
+npm install
+```
+
+## Development
+
+Duplicate the `.env.example` file and name it `.env`
+
+### Storybook
+
+```sh
+npm run storybook
+```
+
+### Remix
+
+```sh
+npm run dev
+```
+
+### Styling
+
+This template comes with [Tailwind CSS](https://tailwindcss.com/) configured, with some configuration and utilities, which you can change to suit your project.
+
+See the [Vite docs on css](https://vitejs.dev/guide/features.html#css) for more information.
+
+### Icons
+
+[FontAwesome](https://fontawesome.com/) is included. You're free to change it if you like.
+
+### i18n
+
+[Remix-i18next](https://github.com/sergiodxa/remix-i18next) is configured with examples.
+
+Storybook is already configured with react-i18n support.
+
+## Testing
+
+GAIA comes with a full testing suite already configured.
+
+### Unit and Integration
+
+- [vitest](https://vitest.dev/)
+- [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
+
+```sh
+  npm t
+  // or
+  npm run test
+```
+
+### Visual Regression
+
+[Chromatic](https://chromatic.com)
+
+You'll need to set your `CHROMATIC_PROJECT_TOKEN` env variable on your CI.
+
+### E2E
+
+[PlayWright](https://playwright.dev/docs/intro)
+
+```sh
+npx playwright test
+```
+
+Interactive mode:
+
+```sh
+npx playwright test --ui
+```
+
+## Deployment
+
+GAIA comes with the default Remix deployment configuration. You can change this to whatever deployment process you prefer.
+
+Here's the basic Remix deployment process:
+
+```sh
+npm run build
+```
+
+Then run the app in production mode:
+
+```sh
+npm start
+```
+
+You'll need to pick a host to deploy it to. Jacob Paris wrote a [great article](https://www.jacobparis.com/content/where-to-host-remix) on where to host your Remix app.
+
+### DIY
+
+If you're familiar with deploying Node applications, the built-in Remix app server is production-ready.
+
+Make sure to deploy the output of `npm run build`
+
+- `build/server`
+- `build/client`
