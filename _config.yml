@@ -1,5 +1,5 @@
-title: GAIA Framework
-description: GAIA Framework documentation
+title: GAIA React
+description: GAIA React Template documentation
 theme: just-the-docs
 
 url: https://gaia-react.github.io/docs/
@@ -7,13 +7,13 @@ favicon_ico: /assets/favicon/favicon.ico
 logo: /assets/images/gaia-logo.svg
 
 aux_links:
-  GAIA Framework: https://github.com/gaia-react/remix
+  GitHub: https://github.com/gaia-react/remix
 
 aux_links_new_tab: true
 
 color_scheme: gaia
 
-footer_content: "Copyright &copy; 2024 GAIA Framework. Released under <a href=\"https://github.com/just-the-docs/just-the-docs/tree/main/LICENSE.txt\">GPL-3.0 license.</a>"
+footer_content: "Copyright &copy; 2024 GAIA React. Released under <a href=\"https://github.com/just-the-docs/just-the-docs/tree/main/LICENSE.txt\">GPL-3.0 license.</a>"
 
 permalink: pretty
 

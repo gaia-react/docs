@@ -5,9 +5,11 @@ nav_order: 1
 has_children: false
 ---
 
-# GAIA Framework Docs
+# GAIA React Documentation
 
-GAIA is a **fully comprehensive** framework for building modern React web applications.
+GAIA React is a **fully comprehensive** template for building modern React web applications.
+
+It is designed to be the best possible starting point for any professional React project.
 
 It comes with **EVERYTHING** you need, fully configured and ready to go.
 
@@ -19,7 +21,7 @@ The Developer Experience (DX) is designed to be top-notch.
 - Unit, integration, visual regression, and end-to-end tests are set up.
 - While GAIA comes with recommended packages, conventions, and settings, you're free to change or remove them to suit your needs!
 
-GAIA has many great project features built-in:
+GAIA React has many great project features built-in:
 
 - Built with [Remix](https://remix.run/), the best full-stack React framework for the modern web
 - Internationalization via [remix-i18next](https://github.com/sergiodxa/remix-i18next) with sample files already in place
@@ -33,131 +35,37 @@ GAIA has many great project features built-in:
 - [FontAwesome](https://fontawesome.com/) icons
 - [RVF](https://www.rvf-js.io/) for form management and validation
 - Working authentication example with [remix-auth](https://remix.run/resources/remix-auth)
-- A wrapper around fetch that simplifies API calls
+- A convenient and flexible wrapper around fetch that simplifies API calls
 - Many example components, ready for you to use and modify
 - Useful utility functions and hooks
-- Light and dark mode support
+- Dark mode support
 - And much more!
 
 No matter what your skill level or experience, GAIA will make your life and your code better.
 
-## Is this associated with the GAIA Flash Framework?
+## Background
 
-**Yes!**
+GAIA React is the spiritual successor to the GAIA Flash Framework, which was the most popular Flash framework in the world. It was used to build over 100,000 Flash sites and relied upon by every major digital agency worldwide. GAIA was known for its comprehensive feature set, ease of use, and robustness. It was designed to make Flash development easier and more efficient, and it succeeded in that goal.
 
-The GAIA Flash Framework revolutionized Flash website development and became the most popular Flash framework in the world (second only to Adobe Flex, which was focused on enterprise applications). It was used to build over 100,000 Flash sites and relied upon by every major digital agency worldwide.
-
-This GAIA Framework is its spiritual successor. It has been reborn as a React framework. Like its predecessor, it's designed to be the most comprehensive and easy-to-use React framework available.
-
-## Installation
-
-Make sure you have [Node.js](https://nodejs.org/en/) >=20.17.0 LTS installed, preferably via [nvm](https://github.com/nvm-sh/nvm).
-
-All you need to do is run this installation command and get to work.
+GAIA React has been in development for over 3 years, with multiple developers on different teams contributing to its development. It has been used in production on multiple projects, and has been refined and improved over time.
 
 
-```sh
-npx create-remix@latest --template gaia-react/remix
-```
+## Why GAIA?
 
-You can choose to install packages when prompted, or do it manually.
+Back in the Flash days, almost all projects were greenfield, and Flash engineers had many opportunities every year to build projects from scratch. This gave us a lot of practice learning the hard way what worked and what didn't. We got to experiment with design patterns. We didn't have npm, we had to build everything ourselves. And we got to do it over and over again.
 
-### Install packages
+Nowadays, there are very few opportunities for engineers to practice and learn from building greenfield projects. Most projects are maintenance projects, where you're working on someone else's code, and your ability to make fundamental changes can be limited. In the worst cases, the main thing you're learning is how to cope with a code base that has too much tech debt.
 
-```sh
-npm install
-```
+GAIA React is the culmination of years of experience building greenfield projects. It is a great way to learn best practices, and to see how a modern React project should be structured and organized.
 
-## Development
+## Philosophy
 
-Duplicate the `.env.example` file and name it `.env`
+A big part of GAIA is its robust linting and testing setup. We believe that the best way to work on a team or together and produce cohesive well-written, easy-to-read and easy-to-maintain code. GAIA's linting has fix-on-save functionality that automatically takes care of things so you and your fellow developers can focus on what really matters.
 
-### Storybook
+Following [Prettier's philosophy](https://prettier.io/docs/en/why-prettier), GAIA comes with automatic code formatting and styling, with best-practice linting rules which keep code clean and consistent across your entire team.
 
-```sh
-npm run storybook
-```
+The entire linting setup is included in the project folder, for you to customize to your liking. Detailed information about the linting setup can be found in the [Code Quality](/tech-stack/code-quality) section.
 
-### Remix
+## Component-Driven Development
 
-```sh
-npm run dev
-```
-
-### Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) configured, with some configuration and utilities, which you can change to suit your project.
-
-See the [Vite docs on css](https://vitejs.dev/guide/features.html#css) for more information.
-
-### Icons
-
-[FontAwesome](https://fontawesome.com/) is included. You're free to change it if you like.
-
-### i18n
-
-[Remix-i18next](https://github.com/sergiodxa/remix-i18next) is configured with examples.
-
-Storybook is already configured with react-i18n support.
-
-## Testing
-
-GAIA comes with a full testing suite already configured.
-
-### Unit and Integration
-
-- [vitest](https://vitest.dev/)
-- [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
-
-```sh
-  npm t
-  // or
-  npm run test
-```
-
-### Visual Regression
-
-[Chromatic](https://chromatic.com)
-
-You'll need to set your `CHROMATIC_PROJECT_TOKEN` env variable on your CI.
-
-### E2E
-
-[PlayWright](https://playwright.dev/docs/intro)
-
-```sh
-npx playwright test
-```
-
-Interactive mode:
-
-```sh
-npx playwright test --ui
-```
-
-## Deployment
-
-GAIA comes with the default Remix deployment configuration. You can change this to whatever deployment process you prefer.
-
-Here's the basic Remix deployment process:
-
-```sh
-npm run build
-```
-
-Then run the app in production mode:
-
-```sh
-npm start
-```
-
-You'll need to pick a host to deploy it to. Jacob Paris wrote a [great article](https://www.jacobparis.com/content/where-to-host-remix) on where to host your Remix app.
-
-### DIY
-
-If you're familiar with deploying Node applications, the built-in Remix app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-- `build/server`
-- `build/client`
+Storybook is included with GAIA, and it's a great way to develop components in isolation. It's a great way to develop components in isolation, and to see how they look and behave in different states. It's also a great way to document your components, and to share them with your team.
