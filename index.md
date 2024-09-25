@@ -24,18 +24,18 @@ The Developer Experience (DX) is designed to be top-notch.
 GAIA React has many great features built-in:
 
 - Built with [Remix](https://remix.run/), the best full-stack React framework for the modern web
-- Internationalization via [remix-i18next](https://github.com/sergiodxa/remix-i18next) with sample files already in place
 - [TailwindCSS](https://tailwindcss.com/) for styling, along with CSS Module support
-- [Zod](https://zod.dev/) for data validation and types
+- [Zod](https://zod.dev/) for data validation
 - Robust ESLint ruleset along with [Prettier](https://prettier.io/) and [Stylelint](https://stylelint.io/)
-- [Husky](https://typicode.github.io/husky/) and [Lint-Staged](https://github.com/lint-staged/lint-staged) for pre-commit checks
-- A complete test suite with [Vitest](https://vitest.dev), [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/), and [PlayWright](https://playwright.dev/docs/intro)
+- [Husky](https://typicode.github.io/husky/) and [Lint-Staged](https://github.com/lint-staged/lint-staged) for pre-commit checks to ensure code quality
+- A complete testing suite with [Vitest](https://vitest.dev), [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/), and [PlayWright](https://playwright.dev/docs/intro)
 - [Storybook](https://storybook.js.org/) and [Chromatic](https://chromatic.com/), with a [Remix Stub](https://remix.run/docs/en/main/utils/create-remix-stub) decorator included
 - [Mock Service Worker](https://mswjs.io/) with working handlers, and [msw/data](https://github.com/mswjs/data) for data mocking
-- [FontAwesome](https://fontawesome.com/) icons
-- [RVF](https://www.rvf-js.io/) for form management and validation
-- Working authentication example with [remix-auth](https://remix.run/resources/remix-auth)
+- [remix-auth](https://remix.run/resources/remix-auth) with a working authentication example
 - Toast notifications with [remix-toast](https://remix.run/resources/remix-toast) and [react-toastify](https://fkhadra.github.io/react-toastify/introduction)
+- Internationalization via [remix-i18next](https://github.com/sergiodxa/remix-i18next) with sample files already in place
+- [RVF](https://www.rvf-js.io/) for form management and validation
+- [FontAwesome](https://fontawesome.com/) icons
 - A convenient and flexible wrapper around fetch that simplifies API calls
 - Many example components, ready for you to use and modify
 - Useful utility functions and hooks
@@ -49,7 +49,6 @@ No matter what your skill level or experience, GAIA will make your life and your
 GAIA React is the spiritual successor to the GAIA Flash Framework, which was the most popular Flash framework in the world. It was used to build over 100,000 Flash sites and relied upon by every major digital agency worldwide. GAIA was known for its comprehensive feature set, ease of use, and robustness. It was designed to make Flash development easier and more efficient, and it succeeded in that goal.
 
 GAIA React has been in development for over 4 years, with multiple developers on different teams contributing to its development. It has been used in production on multiple projects, and has been refined and improved over time.
-
 
 ## Why GAIA?
 
