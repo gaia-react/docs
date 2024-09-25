@@ -21,7 +21,7 @@ The Developer Experience (DX) is designed to be top-notch.
 - Unit, integration, visual regression, and end-to-end tests are set up.
 - While GAIA comes with recommended packages, conventions, and settings, you're free to change or remove them to suit your needs!
 
-GAIA React has many great project features built-in:
+GAIA React has many great features built-in:
 
 - Built with [Remix](https://remix.run/), the best full-stack React framework for the modern web
 - Internationalization via [remix-i18next](https://github.com/sergiodxa/remix-i18next) with sample files already in place
@@ -35,6 +35,7 @@ GAIA React has many great project features built-in:
 - [FontAwesome](https://fontawesome.com/) icons
 - [RVF](https://www.rvf-js.io/) for form management and validation
 - Working authentication example with [remix-auth](https://remix.run/resources/remix-auth)
+- Toast notifications with [remix-toast](https://remix.run/resources/remix-toast) and [react-toastify](https://fkhadra.github.io/react-toastify/introduction)
 - A convenient and flexible wrapper around fetch that simplifies API calls
 - Many example components, ready for you to use and modify
 - Useful utility functions and hooks
@@ -47,26 +48,26 @@ No matter what your skill level or experience, GAIA will make your life and your
 
 GAIA React is the spiritual successor to the GAIA Flash Framework, which was the most popular Flash framework in the world. It was used to build over 100,000 Flash sites and relied upon by every major digital agency worldwide. GAIA was known for its comprehensive feature set, ease of use, and robustness. It was designed to make Flash development easier and more efficient, and it succeeded in that goal.
 
-GAIA React has been in development for over 3 years, with multiple developers on different teams contributing to its development. It has been used in production on multiple projects, and has been refined and improved over time.
+GAIA React has been in development for over 4 years, with multiple developers on different teams contributing to its development. It has been used in production on multiple projects, and has been refined and improved over time.
 
 
 ## Why GAIA?
 
-Back in the Flash days, almost all projects were greenfield, and Flash engineers had many opportunities every year to build projects from scratch. This gave us a lot of practice learning the hard way what worked and what didn't. We got to experiment with design patterns. We didn't have npm, we had to build everything ourselves. And we got to do it over and over again.
+Back in the Flash days, almost all projects were greenfield, and Flash engineers had many opportunities every year to build projects from scratch. This gave us a lot of practice learning the hard way what worked and what didn't. We didn't have npm, we had to build everything ourselves everytime. And we got to do it over and over again.
 
-Nowadays, there are very few opportunities for engineers to practice and learn from building greenfield projects. Most projects are maintenance projects, where you're working on someone else's code, and your ability to make fundamental changes can be limited. In the worst cases, the main thing you're learning is how to cope with a code base that has too much tech debt.
+Nowadays, there are few opportunities for engineers to practice and learn from building greenfield projects. Most projects are maintenance projects, where you're working on someone else's code, and your ability to make fundamental changes can be limited. In the worst cases, the main thing you're learning is how to cope with a project that has too much tech debt.
 
-GAIA React is the culmination of years of experience building greenfield projects. It is a great way to learn best practices, and to see how a modern React project should be structured and organized.
+GAIA React is the culmination of years of experience building greenfield projects. It is a great way to learn best practices and how a modern React project should be structured, organized, and sufficiently enforced to ensure technical debt is kept to a minimum.
 
 ## Philosophy
 
-A big part of GAIA is its robust linting and testing setup. We believe that the best way to work on a team or together and produce cohesive well-written, easy-to-read and easy-to-maintain code. GAIA's linting has fix-on-save functionality that automatically takes care of things so you and your fellow developers can focus on what really matters.
+GAIA is built upon the philosophy that the best way to produce cohesive well-written, easy-to-read and easy-to-maintain code, regardless of skill level, is having automated tooling to maintain code quality. GAIA's robust linting setup has fix-on-save functionality that automatically keeps code clean and high quality so you and your fellow developers can focus on what really matters.
 
-Following [Prettier's philosophy](https://prettier.io/docs/en/why-prettier), GAIA comes with automatic code formatting and styling, with best-practice linting rules which keep code clean and consistent across your entire team.
-
-The entire linting setup is included in the project folder, for you to customize to your liking. Detailed information about the linting setup can be found in the [Code Quality](/tech-stack/code-quality) section.
+All the linting configuration files are included. You can leave it as-is, or customize to your preferences. Detailed information about the linting setup can be found in the [Code Quality](/tech-stack/code-quality) section.
 
 ## Component-Driven Development
 
-Storybook is included with GAIA. It's a great way to develop components in isolation, to see how they look and behave in different states, and to test them to make sure they work as expected in all those different states.
+[Storybook](https://storybook.js.org/) is included with GAIA to facilitate [Component-Driven Development](https://www.componentdriven.org/) which is a proven methodology for building web applications. It involves breaking down the UI into small, reusable components that can be developed, tested, and documented in isolation. This makes it easier to build, maintain, and scale applications.
+
+Check out the [Testing](/tech-stack/testing) section for more information.
 
