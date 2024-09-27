@@ -28,7 +28,7 @@ npm install
 
 ### Setup Fix on Save in your IDE
 
-Follow these [instructions](/tech-stack/code-quality/#setup-fix-on-save).
+Follow these [instructions](/docs/tech-stack/code-quality/#setup-fix-on-save).
 
 ## Development
 
