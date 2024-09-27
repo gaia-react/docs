@@ -62,11 +62,11 @@ GAIA React is the culmination of years of experience building greenfield project
 
 GAIA is built upon the philosophy that the best way to produce cohesive well-written, easy-to-read and easy-to-maintain code, regardless of skill level, is having automated tooling to maintain code quality. GAIA's robust linting setup has fix-on-save functionality that automatically keeps code clean and high quality so you and your fellow developers can focus on what really matters.
 
-All the linting configuration files are included. You can leave it as-is, or customize to your preferences. Detailed information about the linting setup can be found in the [Code Quality](/tech-stack/code-quality) section.
+All the linting configuration files are included. You can leave it as-is, or customize to your preferences. Detailed information about the linting setup can be found in the [Code Quality](/docs/tech-stack/code-quality) section.
 
 ## Component-Driven Development
 
 [Storybook](https://storybook.js.org/) is included with GAIA to facilitate [Component-Driven Development](https://www.componentdriven.org/) which is a proven methodology for building web applications. It involves breaking down the UI into small, reusable components that can be developed, tested, and documented in isolation. This makes it easier to build, maintain, and scale applications.
 
-Check out the [Testing](/tech-stack/testing) section for more information.
+Check out the [Testing](/docs/tech-stack/testing) section for more information.
 
