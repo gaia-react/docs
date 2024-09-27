@@ -26,9 +26,13 @@ npx create-remix@latest --template gaia-react/remix
 npm install
 ```
 
+### Setup Fix on Save in your IDE
+
+Follow these [instructions](/tech-stack/code-quality/#setup-fix-on-save).
+
 ## Development
 
-Duplicate the `.env.example` file and name it `.env`
+Duplicate the `.env.example` file and name it `.env` (if you skipped this step during installation).
 
 ### Storybook
 
