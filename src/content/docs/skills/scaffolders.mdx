@@ -1,0 +1,70 @@
+---
+title: Scaffolders
+description: Skills that scaffold new components, hooks, routes, and services from project templates.
+sidebar:
+  order: 2
+---
+
+Four skills that generate new files following the project's conventions. Each one confirms a few details, runs a `gaia scaffold` command, and verifies the output with `pnpm typecheck`.
+
+The skills are the user-facing surface. They wrap the bundled `gaia scaffold` CLI so you don't memorize flags. Run them by describing what you want; the skill prompts for anything missing.
+
+## `new-component`
+
+Scaffolds a React component as a folder under `app/components/` (or a sub-folder you specify) with `index.tsx`, an optional Storybook story, and a Vitest test scaffold.
+
+**Confirms:** name (PascalCase), parent directory (default `app/components`), props (or "none"), include a story (default yes).
+
+**Triggers** when you ask to create a component, scaffold a card, make a button, or add a new component.
+
+**Example phrasing:** "create a PriceCard component", "scaffold a button under app/components/Form", "make a new component called UserAvatar with a name and url prop".
+
+Underlying CLI: `gaia scaffold component <Name> [--no-story] [--parent <dir>] [--props "a:string,b:number"]`.
+
+Source: `.claude/skills/new-component/SKILL.md`.
+
+## `new-hook`
+
+Scaffolds a custom React hook with a Vitest test file.
+
+**Confirms:** name (must start with `use`), params, return type.
+
+**Triggers** when you ask to create a hook, make a `useFoo` hook, scaffold a custom React hook, or add a hook under `app/hooks`. Also triggers when describing reusable React state or effect logic that warrants extraction into a named `use*` hook.
+
+**Example phrasing:** "make a useCountdown hook", "scaffold useDebouncedValue with a value and delay parameter", "extract this into a useFormSubmission hook".
+
+Underlying CLI: `gaia scaffold hook <useFoo> [--params "a:string,b:number"] [--returns "ReturnType"]`.
+
+Source: `.claude/skills/new-hook/SKILL.md`.
+
+## `new-route`
+
+Scaffolds a new route with its page component, test, story, and optional i18n keys. Files land in `app/routes/<group>+/<name>.tsx` plus `app/pages/<Group>/<PageName>/index.tsx`. The route file stays a thin shell (`loader`, `action`, `meta`, Zod schemas, one-line default export); UI lives in the page component.
+
+**Confirms:** name (kebab-case), group (`_public+` or `_session+`), and which of `--loader`, `--action`, `--i18n` to include.
+
+**Triggers** when you ask to create a route, add a new page, scaffold a path like `/dashboard`, or wire up a new route under `_public+` or `_session+`.
+
+**Example phrasing:** "add a /pricing page in _public+", "scaffold /settings/profile under _session+ with a loader and action", "create a new route /forgot-password with i18n".
+
+Underlying CLI: `gaia scaffold route <name> --group <_public+|_session+> [--loader] [--action] [--i18n] [--json]`.
+
+Source: `.claude/skills/new-route/SKILL.md`.
+
+## `new-service`
+
+Scaffolds an API service: request functions, Zod parsers, URL constants, types, and (optionally) MSW mock handlers. Files land under `app/services/gaia/<name>/` with matching mocks under `test/mocks/<name>/`.
+
+**Confirms:** name (kebab-case), endpoints (subset of `get`, `post`, `put`, `delete`), schema as `name:type` pairs, include MSW mocks.
+
+**Triggers** when you ask to add a service, create the API for a resource, scaffold a new GAIA service, or wire up CRUD for a resource.
+
+**Example phrasing:** "add a projects service with get and post", "scaffold a users API with id, email, and a status enum", "wire up CRUD for tasks with mocks".
+
+Underlying CLI: `gaia scaffold service <name> --endpoints "get,post,put,delete" --schema "id:string,name:string,status:enum(active,archived)" [--mocks] [--json]`.
+
+Schema types: `string`, `number`, `boolean`, `datetime`, `enum(a,b,...)`. Append `?` to mark a field optional.
+
+The skill stops short of wiring the service into a consuming page or hook. That step stays manual so you can decide where the service belongs.
+
+Source: `.claude/skills/new-service/SKILL.md`.

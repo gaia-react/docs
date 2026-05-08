@@ -1,0 +1,40 @@
+---
+title: Slash commands
+description: Top-level slash commands for GAIA projects. /gaia-init, /setup-gaia, and the /gaia router.
+sidebar:
+  order: 1
+---
+
+GAIA ships two top-level slash commands at the root of `.claude/commands/`. Both are first-run setup. Day-to-day work runs through the [`/gaia`](/gaia/) router skill.
+
+## /gaia-init
+
+One-shot bootstrap for a fresh project from the GAIA template. Renames the project, strips GAIA branding, configures i18n (or strips it out), wires the statusline, installs Claude tools and plugins, registers spec-kit, and resets the wiki to a clean slate.
+
+Run once, on the project the maintainer just created with `npx create-gaia`. Idempotent: failed steps resume from `.gaia/init-state.json` via `gaia init resume`.
+
+The [`/gaia-init` walkthrough](/getting-started/gaia-init/) covers every prompt and what it sets.
+
+## /setup-gaia
+
+Per-machine setup for a clone of an already-initialized GAIA project. Installs the same Claude tools and plugins, registers spec-kit, sets the statusline executable bit, copies `.env.example` to `.env`. Idempotent: completed steps are recorded in `.gaia/local/setup-state.json` via `gaia setup mark-step`.
+
+Run once per developer, per clone. The statusline displays `Run /setup-gaia` until it has been completed.
+
+The [`/setup-gaia` walkthrough](/getting-started/setup-gaia/) covers every step and how to resume on failure.
+
+The slash command name intentionally does not start with `gaia-`, so it does not pollute the `/gaia` autocomplete namespace. That namespace is reserved for the day-to-day workflows.
+
+## /gaia (router)
+
+`/gaia` is itself a router skill, not a top-level command. It dispatches to GAIA's day-to-day workflows:
+
+- [`/gaia plan`](/gaia/plan/)
+- [`/gaia spec`](/gaia/spec/)
+- [`/gaia audit`](/gaia/audit/)
+- `/gaia handoff`
+- `/gaia pickup`
+- `/gaia forensics`
+- `/gaia wiki` (with sub-args `sync`, `consolidate`, `lint`)
+
+See the [`/gaia` router page](/gaia/) for the full sub-route map and help text.

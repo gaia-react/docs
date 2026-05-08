@@ -1,0 +1,66 @@
+---
+title: CI workflows
+description: Contributor-only GitHub Actions workflows. Release, CLI tests, distribution harness, and forensics triage.
+sidebar:
+  order: 5
+---
+
+Four CI workflows are excluded from the adopter tarball by `.gaia/release-exclude`. They run only on the GAIA template repo's clone. The other three workflows (`chromatic.yml`, `tests.yml`, `code-review-audit.yml`) ship to adopters and are out of scope here.
+
+## release.yml
+
+Triggers on `v*.*.*` tag pushes. Builds and publishes the adopter tarball.
+
+The job sequence:
+
+1. **Checkout** at the tag with full git history.
+2. **Derive version** from the tag ref.
+3. **Verify `.gaia/VERSION` matches the tag.** Fails the workflow if they diverge, so a stray tag cannot publish.
+4. **Extract the CHANGELOG section** for the release. Fails if the version's heading is missing.
+5. **Verify the manifest is fresh** to confirm `.gaia/manifest.json` reflects the current file set. Catches stale manifests.
+6. **Stage the release tree.** Drives the file set from `git ls-files` so untracked artifacts stay out, then filters `.gaia/release-exclude` patterns. Copies the surviving files into `/tmp/gaia-<tag>/` with `rsync`.
+7. **Bundle-time scrub** of the staging directory: `gaia:maintainer-only` blocks are stripped and leak checks run.
+8. **Verify runtime dependencies** against the staged tree.
+9. **Distribution test gate** runs `.gaia/tests/distribution/run-all.sh` against an independently-staged tree (Layers 0+1+2). Halts the release if any scenario fails.
+10. **Build the tarball** as `gaia-<tag>.tar.gz`.
+11. **Create the GitHub Release** with the extracted CHANGELOG section as release notes.
+
+The pre-publish distribution gate uses the org `CLAUDE_CODE_OAUTH_TOKEN` secret. A broken release cannot publish: the gate runs before `gh release create`.
+
+## cli-tests.yml
+
+Triggers on both `push` to `main` and `pull_request` against `main`. The job is gated to `pull_request` events via a job-level `if:` condition; push events keep the required status check green on merge commits without rerunning anything. Runs the Vitest suite under `.gaia/cli/`.
+
+PRs that don't touch `.gaia/cli/**` or this workflow file report green without installing or running anything. The path filter is `dorny/paths-filter`.
+
+When the filter triggers, the job:
+
+1. Sets up pnpm (pinned to v4.4.0 because v6 surfaces an `ERR_PNPM_IGNORED_BUILDS` regression on the `pnpm -C .gaia/cli install --frozen-lockfile` invocation).
+2. Sets up Node from `.node-version` with pnpm cache keyed to `.gaia/cli/pnpm-lock.yaml`.
+3. Installs CLI dependencies with `--frozen-lockfile`.
+4. Runs `pnpm -C .gaia/cli typecheck`.
+5. Runs `pnpm -C .gaia/cli test --run`.
+
+The required-check posture is intentional: contributors who don't touch the CLI source see the check as required-and-green without paying the install cost.
+
+## distribution.yml
+
+Triggers only on `workflow_dispatch`. Used to run the `.gaia/tests/distribution/` harness on a feature branch for ad-hoc verification of harness changes themselves.
+
+The production gate against the harness lives inside `release.yml`. There is no automatic trigger on this workflow on purpose: `release.published` fires after publish (too late to gate a release), and `pull_request` is unsafe for forks.
+
+The workflow does not use `pull_request_target`. That trigger exposes secrets to fork PRs, which would let any contributor exfiltrate `CLAUDE_CODE_OAUTH_TOKEN`.
+
+The job verifies the bundled `.gaia/cli/gaia` is present and executable, then runs `bash .gaia/tests/distribution/run-all.sh` with a 15-minute timeout.
+
+## forensics-triage.yml
+
+Triggers on issue events (`opened`, `labeled`) when the issue carries the `gaia-forensics` label. Runs autonomous Claude Code triage against the issue.
+
+Permissions are scoped per-job: `issues: write`, `contents: write`, `pull-requests: write`, `actions: read`, `id-token: write`. Concurrency is keyed per-issue.
+
+The workflow has helpers under `.github/forensics/`: scope checks, classifier prompts, fixtures, and bats tests. All of `.github/forensics/` is contributor-only and excluded from the adopter tarball.
+
+Steps include an idempotency early-exit (skip if `gaia-triaged` is already on the issue), classification, optional apply-fix path that runs the project quality gate, and a final fallback step that ensures `gaia-triaged` lands on the issue regardless of path.
+
+The workflow is on the canonical denylist: future autonomous triage runs must not modify it. The workflow's `check-scope.sh` rejects any attempt to edit any path under `.github/workflows/`. Self-modifying triage is a security boundary violation.

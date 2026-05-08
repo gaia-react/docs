@@ -1,6 +1,2131 @@
 {
   "version": 1,
-  "captured_at": null,
-  "gaia_commit": null,
-  "items": []
+  "captured_at": "2026-05-09T00:00:00Z",
+  "gaia_commit": "c08efa5ba1a9b6b55515c97741ef1a0749163f77",
+  "items": [
+    {
+      "kind": "agent",
+      "path": ".claude/agents/code-review-audit.md",
+      "name": "code-review-audit",
+      "description": "Comprehensive code review, security audit, performance analysis, and architectural assessment. Goes beyond linting and type-checking to identify vulnerabilities, bottlenecks, code smells, anti-patterns, and refactoring opportunities. Mandatory before PR merge.",
+      "audience": "adopter",
+      "content_hash": "2c654065221923ad503f41f7dfe24742b6fa2788f55a23759b718337e0ffc4ee",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/index.ts",
+      "name": "_internal-fetch-coaching",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "6e1e2f5f468a7722f268850cafe5f5e3f29f67d6fb3b5a6595863f1a53d35345",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/init/index.ts",
+      "name": "gaia init configure-i18n",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "5f143760e7658d86f15f00e2a25b1a35636dd8757bd29619976b789acea039bd",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/init/index.ts",
+      "name": "gaia init finalize",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "5f143760e7658d86f15f00e2a25b1a35636dd8757bd29619976b789acea039bd",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/init/index.ts",
+      "name": "gaia init rename",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "5f143760e7658d86f15f00e2a25b1a35636dd8757bd29619976b789acea039bd",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/init/index.ts",
+      "name": "gaia init resume",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "5f143760e7658d86f15f00e2a25b1a35636dd8757bd29619976b789acea039bd",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/init/index.ts",
+      "name": "gaia init strip-branding",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "5f143760e7658d86f15f00e2a25b1a35636dd8757bd29619976b789acea039bd",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/init/index.ts",
+      "name": "gaia init wire-statusline",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "5f143760e7658d86f15f00e2a25b1a35636dd8757bd29619976b789acea039bd",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/mentorship/index.ts",
+      "name": "gaia mentorship _internal-assert-memory-rules",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "9282671c084574dd1cf7c39f92bd04a3e1d091cc1b44077895eab30f47a60de4",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/mentorship/index.ts",
+      "name": "gaia mentorship _internal-provision-dirs",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "9282671c084574dd1cf7c39f92bd04a3e1d091cc1b44077895eab30f47a60de4",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/mentorship/index.ts",
+      "name": "gaia mentorship _internal-write-config",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "9282671c084574dd1cf7c39f92bd04a3e1d091cc1b44077895eab30f47a60de4",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/mentorship/index.ts",
+      "name": "gaia mentorship analytics disable",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "9282671c084574dd1cf7c39f92bd04a3e1d091cc1b44077895eab30f47a60de4",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/mentorship/index.ts",
+      "name": "gaia mentorship analytics dry-run",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "9282671c084574dd1cf7c39f92bd04a3e1d091cc1b44077895eab30f47a60de4",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/mentorship/index.ts",
+      "name": "gaia mentorship analytics enable",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "9282671c084574dd1cf7c39f92bd04a3e1d091cc1b44077895eab30f47a60de4",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/mentorship/index.ts",
+      "name": "gaia mentorship disable",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "9282671c084574dd1cf7c39f92bd04a3e1d091cc1b44077895eab30f47a60de4",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/mentorship/index.ts",
+      "name": "gaia mentorship enable",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "9282671c084574dd1cf7c39f92bd04a3e1d091cc1b44077895eab30f47a60de4",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/mentorship/index.ts",
+      "name": "gaia mentorship purge",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "9282671c084574dd1cf7c39f92bd04a3e1d091cc1b44077895eab30f47a60de4",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/mentorship/index.ts",
+      "name": "gaia mentorship status",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "9282671c084574dd1cf7c39f92bd04a3e1d091cc1b44077895eab30f47a60de4",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/release/index.ts",
+      "name": "gaia release bump",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "3fde38adc09b341916baea8ff8a4df1cbd4419295378a7b6c185545425f40db8",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/release/index.ts",
+      "name": "gaia release changelog",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "3fde38adc09b341916baea8ff8a4df1cbd4419295378a7b6c185545425f40db8",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/release/index.ts",
+      "name": "gaia release commit-and-tag",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "3fde38adc09b341916baea8ff8a4df1cbd4419295378a7b6c185545425f40db8",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/release/index.ts",
+      "name": "gaia release manifest",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "3fde38adc09b341916baea8ff8a4df1cbd4419295378a7b6c185545425f40db8",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/release/index.ts",
+      "name": "gaia release preflight",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "3fde38adc09b341916baea8ff8a4df1cbd4419295378a7b6c185545425f40db8",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/release/index.ts",
+      "name": "gaia release runtime-deps",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "3fde38adc09b341916baea8ff8a4df1cbd4419295378a7b6c185545425f40db8",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/release/index.ts",
+      "name": "gaia release scrub",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "3fde38adc09b341916baea8ff8a4df1cbd4419295378a7b6c185545425f40db8",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/release/index.ts",
+      "name": "gaia release scrub-wiki",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "3fde38adc09b341916baea8ff8a4df1cbd4419295378a7b6c185545425f40db8",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/scaffold/index.ts",
+      "name": "gaia scaffold component",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "13534bd4dbe632c85c6953004115029cb5c6d1201b8c86b34de1681f51bb25eb",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/scaffold/index.ts",
+      "name": "gaia scaffold hook",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "13534bd4dbe632c85c6953004115029cb5c6d1201b8c86b34de1681f51bb25eb",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/scaffold/index.ts",
+      "name": "gaia scaffold route",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "13534bd4dbe632c85c6953004115029cb5c6d1201b8c86b34de1681f51bb25eb",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/scaffold/index.ts",
+      "name": "gaia scaffold service",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "13534bd4dbe632c85c6953004115029cb5c6d1201b8c86b34de1681f51bb25eb",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/setup/index.ts",
+      "name": "gaia setup finalize",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "5c1c4a691aa4e902e38215ada43493b203e0809e2360a25ee90f751090787559",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/setup/index.ts",
+      "name": "gaia setup link-worktree",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "5c1c4a691aa4e902e38215ada43493b203e0809e2360a25ee90f751090787559",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/setup/index.ts",
+      "name": "gaia setup mark-step",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "5c1c4a691aa4e902e38215ada43493b203e0809e2360a25ee90f751090787559",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/setup/index.ts",
+      "name": "gaia setup status",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "5c1c4a691aa4e902e38215ada43493b203e0809e2360a25ee90f751090787559",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/telemetry/index.ts",
+      "name": "gaia telemetry compute-profile",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "87e07a573a092a4b43f05e1624a7ded2baa1d57993ca79baa97cf8c16e523207",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/telemetry/index.ts",
+      "name": "gaia telemetry emit",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "87e07a573a092a4b43f05e1624a7ded2baa1d57993ca79baa97cf8c16e523207",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/telemetry/index.ts",
+      "name": "gaia telemetry parse-stdin",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "87e07a573a092a4b43f05e1624a7ded2baa1d57993ca79baa97cf8c16e523207",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/update/index.ts",
+      "name": "gaia update merge",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "0c36fb07642d4fc76c5657b659cd53dd2375766b4e2508bed6b7a8f0181a1205",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/wiki/index.ts",
+      "name": "gaia wiki commit-classify",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "95e6f47bffac27eabc4fcb1ba90e99686b044aa3968a0c50f7da90b4333d9514",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/wiki/index.ts",
+      "name": "gaia wiki dead-paths",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "95e6f47bffac27eabc4fcb1ba90e99686b044aa3968a0c50f7da90b4333d9514",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/wiki/index.ts",
+      "name": "gaia wiki log-prepend",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "95e6f47bffac27eabc4fcb1ba90e99686b044aa3968a0c50f7da90b4333d9514",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/wiki/index.ts",
+      "name": "gaia wiki near-collisions",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "95e6f47bffac27eabc4fcb1ba90e99686b044aa3968a0c50f7da90b4333d9514",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/wiki/index.ts",
+      "name": "gaia wiki orphans",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "95e6f47bffac27eabc4fcb1ba90e99686b044aa3968a0c50f7da90b4333d9514",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/wiki/index.ts",
+      "name": "gaia wiki page-index",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "95e6f47bffac27eabc4fcb1ba90e99686b044aa3968a0c50f7da90b4333d9514",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/wiki/index.ts",
+      "name": "gaia wiki state",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "95e6f47bffac27eabc4fcb1ba90e99686b044aa3968a0c50f7da90b4333d9514",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/wiki/index.ts",
+      "name": "gaia wiki state-bump",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "95e6f47bffac27eabc4fcb1ba90e99686b044aa3968a0c50f7da90b4333d9514",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/wiki/index.ts",
+      "name": "gaia wiki state-init",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "95e6f47bffac27eabc4fcb1ba90e99686b044aa3968a0c50f7da90b4333d9514",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/wiki/index.ts",
+      "name": "gaia wiki sync land",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "95e6f47bffac27eabc4fcb1ba90e99686b044aa3968a0c50f7da90b4333d9514",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "command",
+      "path": ".claude/commands/gaia-init.md",
+      "name": "gaia-init",
+      "description": "Initialize a new project from the GAIA React template \u2014 renames, strips GAIA branding, configures i18n, installs Claude skills/plugins.",
+      "audience": "adopter",
+      "content_hash": "782cda410656c0edca408d4d6757877c07dc8a3b4f4fdb0f45693130aaf6286d",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "command",
+      "path": ".claude/commands/gaia-release.md",
+      "name": "gaia-release",
+      "description": "Cut a new GAIA release \u2014 bump version, graduate CHANGELOG, regenerate manifest, open release PR, then tag on merge. Maintainer-only.",
+      "audience": "contributor",
+      "content_hash": "dff68ad2172fe7434ab248aa89067176e94375422f4e691a542bc263bd2ef5c6",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "command",
+      "path": ".claude/commands/health-audit.md",
+      "name": "health-audit",
+      "description": "Maintainer-only autonomous health audit + auto-heal loop. Runs N=3 fresh-team audit-fix-audit cycles with circuit breakers, reports A+/A/A\u2212 verdict or escalates.",
+      "audience": "contributor",
+      "content_hash": "94f6d1544083df20378d70c56082ba0352ec4239d71063ce93344eb89c3da881",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "command",
+      "path": ".claude/commands/setup-gaia.md",
+      "name": "setup-gaia",
+      "description": "One-shot per-machine setup for a cloned GAIA project. Installs tools, plugins, spec-kit; bootstraps .env; opts into mentorship. Idempotent \u2014 safe to re-run.",
+      "audience": "adopter",
+      "content_hash": "b65a46ee5169428febc4b21125f19d9991dbd4818d0fd7c8f1c729778665527f",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "hook",
+      "path": ".claude/hooks/audit-stamp-trailer.sh",
+      "name": "audit-stamp-trailer.sh",
+      "description": "audit-stamp-trailer.sh \u2014 write the GAIA-Audit commit trailer on HEAD.",
+      "audience": "adopter",
+      "content_hash": "c7ef9dac85a7ca69d5d7d7ddaa5b94a58ef70b0157e227c257e24142c8472517",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "hook",
+      "path": ".claude/hooks/block-bare-test.sh",
+      "name": "block-bare-test.sh",
+      "description": "Block bare `pnpm test` / `npm test` (and `run test` variants) without `--run` \u2014",
+      "audience": "adopter",
+      "content_hash": "cf00fa92c5fb256a093db5014af13cb0723192b46d7afc14b861fb4a2b2e29d6",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "hook",
+      "path": ".claude/hooks/block-env-write.sh",
+      "name": "block-env-write.sh",
+      "description": "PreToolUse Edit/Write hook: deny writes targeting `.env` files.",
+      "audience": "adopter",
+      "content_hash": "7c092ca4ccf4a025537c4e2e296422cea207445af9f9d8e05a0a15c4e10910fc",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "hook",
+      "path": ".claude/hooks/block-eslint-config-edit.sh",
+      "name": "block-eslint-config-edit.sh",
+      "description": "Block modifications to eslint.config.{js,cjs,mjs,ts} at any path.",
+      "audience": "adopter",
+      "content_hash": "a20cb9ff28f8651b2c0a7448c0b56e20b03d1e816149433f728dbfacccd6fbc0",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "hook",
+      "path": ".claude/hooks/block-lockfile-edit.sh",
+      "name": "block-lockfile-edit.sh",
+      "description": "PreToolUse Edit/Write hook: deny direct edits to package lockfiles.",
+      "audience": "adopter",
+      "content_hash": "c15be2bba7c058e0917a6c47cba553f09d5788b40a4f55f6c19bd46875ffbc73",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "hook",
+      "path": ".claude/hooks/block-main-destructive-git.sh",
+      "name": "block-main-destructive-git.sh",
+      "description": "PreToolUse Bash hook: block commits to main/master and force-push to main/master.",
+      "audience": "adopter",
+      "content_hash": "87461a3cb35d906498ee6d6b732fa2147a376514d5148c94445ea0700b152a5a",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "hook",
+      "path": ".claude/hooks/block-rm-rf.sh",
+      "name": "block-rm-rf.sh",
+      "description": "PreToolUse Bash hook: deny dangerous `rm -rf` invocations.",
+      "audience": "adopter",
+      "content_hash": "f9f366a66905dba9f9a90465474f31302356a8146a7ef39af1e7bce3a71f8164",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "hook",
+      "path": ".claude/hooks/block-secrets-write.sh",
+      "name": "block-secrets-write.sh",
+      "description": "PreToolUse Edit/Write hook: deny writes that contain obvious secrets.",
+      "audience": "adopter",
+      "content_hash": "52800bf52a0c92dcf707846ad42ce85c95f3f87f1697e59aba0e39658089d8de",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "hook",
+      "path": ".claude/hooks/block-vitest-globals-tsconfig.sh",
+      "name": "block-vitest-globals-tsconfig.sh",
+      "description": "Block adding vitest/globals to tsconfig.json",
+      "audience": "adopter",
+      "content_hash": "b554cf5a5e5fe961f74b7da0007a9ec38f508f5dcc9bdf5f904fc3cc79b03bbd",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "hook",
+      "path": ".claude/hooks/check-i18n-strings.sh",
+      "name": "check-i18n-strings.sh",
+      "description": "Advisory check: warn about potential hardcoded strings in JSX.",
+      "audience": "adopter",
+      "content_hash": "fae62d18f5ec6ad55c9be999bfbd321b32e2d9c9601c8dc658690598fcdd6574",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "hook",
+      "path": ".claude/hooks/check-story-exists.sh",
+      "name": "check-story-exists.sh",
+      "description": "Advisory check: remind to add Storybook story for new components",
+      "audience": "adopter",
+      "content_hash": "aafaf02b560d8095bc781505a508fdbb32beb79c27064abed4147864d3d7ed58",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "hook",
+      "path": ".claude/hooks/intercept-init.sh",
+      "name": "intercept-init.sh",
+      "description": "Redirect the built-in /init command to /gaia-init on this template.",
+      "audience": "adopter",
+      "content_hash": "bee4266d7a06e3b1e7a0f965ef7df4faf40fd89e26a9160052e93e161c6e608e",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "hook",
+      "path": ".claude/hooks/pr-merge-audit-check.sh",
+      "name": "pr-merge-audit-check.sh",
+      "description": "PreToolUse Bash hook: BLOCK `gh pr merge` until a code-review-audit marker",
+      "audience": "adopter",
+      "content_hash": "e3930156e7ece9ae8d2e98bff74079a9a0f56fe219dcd567f6871baf68259e00",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "hook",
+      "path": ".claude/hooks/telemetry-task-postuse.sh",
+      "name": "telemetry-task-postuse.sh",
+      "description": "PostToolUse Task hook: extract structured-trailer events from the agent's",
+      "audience": "adopter",
+      "content_hash": "0a8258ad361b7d3f6a3eaffe8ca2ab906ce4c423f9d9f08a45f2c14da8c59377",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "hook",
+      "path": ".claude/hooks/wiki-commit-nudge.sh",
+      "name": "wiki-commit-nudge.sh",
+      "description": "PostToolUse hook on Bash matching `git commit`. Inject a one-line nudge",
+      "audience": "adopter",
+      "content_hash": "6e20bdeadf0ec91fb8f8cd9919d63931772ada102319b0f6326efe42ecf8d66b",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "hook",
+      "path": ".claude/hooks/wiki-drift-check.sh",
+      "name": "wiki-drift-check.sh",
+      "description": "UserPromptSubmit hook: detect drift between wiki/.state.json and HEAD,",
+      "audience": "adopter",
+      "content_hash": "b690ae0290e3b01cffa1d1ff1c8f67ab56fe9ab687ffe4de1ca8d0159675b237",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "hook",
+      "path": ".claude/hooks/wiki-session-start.sh",
+      "name": "wiki-session-start.sh",
+      "description": "GAIA-owned wiki hook. Upstream contract: claude-obsidian/hooks/hooks.json::SessionStart",
+      "audience": "adopter",
+      "content_hash": "2825c894b44a75b332f35de2523e193b577289c326938adc7ab0d0f86ead648e",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "hook",
+      "path": ".claude/hooks/wiki-session-stop.sh",
+      "name": "wiki-session-stop.sh",
+      "description": "GAIA-owned Stop hook (merged: session-stop + safety-net).",
+      "audience": "adopter",
+      "content_hash": "8e1ce59d612dbc06352e9574f2b48876251821e2de2a73cfa85695e1ef9d280c",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "hook",
+      "path": ".claude/hooks/wiki-squash-autocommits.sh",
+      "name": "wiki-squash-autocommits.sh",
+      "description": "GAIA-owned wiki hook. Upstream contract: claude-obsidian/hooks/hooks.json::PostToolUse (auto-commit per Write|Edit)",
+      "audience": "adopter",
+      "content_hash": "1aca0d807e7023d637b17c3db03b6c08789c24fdb96328af4260aa1a315cf8bb",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "rule",
+      "path": ".claude/rules/accessibility.md",
+      "name": "accessibility",
+      "description": "Accessibility",
+      "audience": "adopter",
+      "content_hash": "89f5e20e5c451b73e3af8c5979da467e022e26c7744383a29972a7e1ce1d382b",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "rule",
+      "path": ".claude/rules/api-service.md",
+      "name": "api-service",
+      "description": "API Service Pattern",
+      "audience": "adopter",
+      "content_hash": "e89cd84388867108950f2b17a8c9bf758994eaea2454678d89eb29eb746857a7",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "rule",
+      "path": ".claude/rules/code-search.md",
+      "name": "code-search",
+      "description": "Code Search",
+      "audience": "adopter",
+      "content_hash": "536ec7192095816e38a854e87998a8572d236fa58d4b7f1adfc4a9a7d8efea0e",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "rule",
+      "path": ".claude/rules/coding-guidelines.md",
+      "name": "coding-guidelines",
+      "description": "Coding Guidelines",
+      "audience": "adopter",
+      "content_hash": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "rule",
+      "path": ".claude/rules/i18n.md",
+      "name": "i18n",
+      "description": "Internationalization (i18n)",
+      "audience": "adopter",
+      "content_hash": "ed131d2ef25cd93d7db1dff55d17ff23650a0b2605a81aa4f038709b7884531f",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "rule",
+      "path": ".claude/rules/instruction-files.md",
+      "name": "instruction-files",
+      "description": "Template-Distributed File Paths",
+      "audience": "adopter",
+      "content_hash": "9a5b4efe4fde62eee2c6ca96de66b398fc623c25b5d1b7951fb75177bd5d8ccc",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "rule",
+      "path": ".claude/rules/knip.md",
+      "name": "knip",
+      "description": "Knip \u2014 Dead Code Detection",
+      "audience": "adopter",
+      "content_hash": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "rule",
+      "path": ".claude/rules/playwright.md",
+      "name": "playwright",
+      "description": "Playwright E2E Conventions",
+      "audience": "adopter",
+      "content_hash": "076f10294a0619ef4a061b25c00772def37d4556f55f5eb5e231d7267b3d5f60",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "rule",
+      "path": ".claude/rules/quality-gate.md",
+      "name": "quality-gate",
+      "description": "Quality Gate",
+      "audience": "adopter",
+      "content_hash": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "rule",
+      "path": ".claude/rules/routes.md",
+      "name": "routes",
+      "description": "Route & Page Conventions",
+      "audience": "adopter",
+      "content_hash": "3bad5675aa7c207dffcbe4215b052f1267c2b840fdc867de095abba21bed3fbf",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "rule",
+      "path": ".claude/rules/shell-cwd.md",
+      "name": "shell-cwd",
+      "description": "Shell CWD",
+      "audience": "adopter",
+      "content_hash": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "rule",
+      "path": ".claude/rules/state-pattern.md",
+      "name": "state-pattern",
+      "description": "State Pattern",
+      "audience": "adopter",
+      "content_hash": "4d0dd9b541f88c4cd165610bc44dffe90129d24b14ba6a54b8bb9472d796ce32",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "rule",
+      "path": ".claude/rules/storybook.md",
+      "name": "storybook",
+      "description": "Storybook Conventions",
+      "audience": "adopter",
+      "content_hash": "73fb760cdf4209d65712374da1e71fe4143a1ae85288ea53ede9550c80278601",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "rule",
+      "path": ".claude/rules/tailwind.md",
+      "name": "tailwind",
+      "description": "Tailwind Conventions",
+      "audience": "adopter",
+      "content_hash": "d86ab326bf4dea4807f01db0844485414baa23d9544cd801dd4798b924867763",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "rule",
+      "path": ".claude/rules/wiki-style.md",
+      "name": "wiki-style",
+      "description": "Wiki & Comment Style",
+      "audience": "adopter",
+      "content_hash": "bf54b6efbc32509c8e7d4309aad61a3eeb4c4c73df89cc59f24432f414f70f6b",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "skill",
+      "path": ".claude/skills/eslint-fixes/SKILL.md",
+      "name": "eslint-fixes",
+      "description": "Resolve specific ESLint errors and warnings that appear in this project. Use when fixing lint failures, ESLint reported issues, or autofix conflicts (e.g. no-void, canonical/export-specifier-newline vs prettier, no-shadow trailing underscores, sonarjs/deprecation, you-dont-need-lodash-underscore, testing-library/prefer-screen-queries, testing-library/await-async-events, jest-dom/prefer-*).",
+      "audience": "adopter",
+      "content_hash": "83d6f2e23cf1090676385c81a419dddc875faa183c8ec80ab5ab8d209b53b134",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "skill",
+      "path": ".claude/skills/gaia/SKILL.md",
+      "name": "gaia",
+      "description": "GAIA workflow router. Dispatches to the user-invoked GAIA workflows - plan (task orchestration), spec (Socratic SPEC artifact), handoff (session handoff doc), pickup (resume from handoff), audit (knowledge audit), forensics (bug report bridge), wiki (sync/consolidate/lint chain). Trigger on `/gaia <subcommand>` or natural-language asks like \"kick off a plan\", \"write a handoff\", \"pick up where we left off\", \"audit the knowledge stores\", \"sync the wiki\".",
+      "audience": "adopter",
+      "content_hash": "e516fe6be42e43eaf4af430f5e8a7c23f8f3a74616775f74d4b7eb1ac5f0291d",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "skill",
+      "path": ".claude/skills/new-component/SKILL.md",
+      "name": "new-component",
+      "description": "Scaffold a new React component with optional Storybook story and Vitest test files. Use this skill whenever the user asks to \"create a component\", \"make a button\", \"scaffold a card\", \"add a new component\", or asks for a new file under `app/components/` following the project's component pattern (PascalCase folder, index.tsx, tests/).",
+      "audience": "adopter",
+      "content_hash": "a25ce53accf439464122f1cc63e174eada33c07183b6a4ef4ae9df3fdf4d30c9",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "skill",
+      "path": ".claude/skills/new-hook/SKILL.md",
+      "name": "new-hook",
+      "description": "Scaffold a new custom React hook with a Vitest test file. Use this skill whenever the user asks to \"create a hook\", \"make a useFoo hook\", \"scaffold a custom React hook\", \"add a hook under app/hooks\", or describes a piece of reusable React state/effect logic that warrants extraction into a named `use*` hook.",
+      "audience": "adopter",
+      "content_hash": "7982468af5d92db8cff68b8652006196feb2b6375e177010080e2f3af0cc3972",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "skill",
+      "path": ".claude/skills/new-route/SKILL.md",
+      "name": "new-route",
+      "description": "Scaffold a new route with its page component, test, story, and optional i18n keys. Use this skill whenever the user asks to \"create a route\", \"add a new page\", \"scaffold /dashboard\", \"wire up a new route under _public+ or _session+\", or anything that implies adding a file under `app/routes/` with a matching `app/pages/{Group}/{PageName}/` folder.",
+      "audience": "adopter",
+      "content_hash": "6684cbbf9ae3271902bca2f06cd2853b568c45d47c01265ffb5f0df0802f424a",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "skill",
+      "path": ".claude/skills/new-service/SKILL.md",
+      "name": "new-service",
+      "description": "Scaffold a new API service with request functions, Zod schemas, URL constants, and optional MSW mock handlers. Use this skill whenever the user asks to \"add a service\", \"create the projects API\", \"scaffold a new GAIA service\", \"wire up CRUD for users\", or anything implying a new folder under `app/services/gaia/{name}/` with parsers/types/requests + matching `test/mocks/{name}/` collections.",
+      "audience": "adopter",
+      "content_hash": "f70b515a9f2daa361b2bd5e1231f81a7f2a573a9b675c283d67c9c31da2d659c",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "skill",
+      "path": ".claude/skills/playwright-cli/SKILL.md",
+      "name": "playwright-cli",
+      "description": "Automates browser interactions for web testing, form filling, screenshots, and data extraction. Use when the user needs to navigate websites, interact with web pages, fill forms, take screenshots, test web applications, or extract information from web pages.",
+      "audience": "adopter",
+      "content_hash": "ad14eca4bd0d8b01b0257e77b1f2226271cc5098616da66f296670672616f6f8",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "skill",
+      "path": ".claude/skills/react-code/SKILL.md",
+      "name": "react-code",
+      "description": "Patterns and conventions for writing and editing React code, including components and hooks. Use this skill whenever writing or reviewing React components, hooks (useEffect, useCallback, useState), event handlers, or component extraction decisions. Also trigger when debugging stale closures, infinite re-renders, or unnecessary re-renders caused by memoization issues.",
+      "audience": "adopter",
+      "content_hash": "fa1c1984ef2074953f1b080c8494ba585fb26f75464707eb12f12aea51e85904",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "skill",
+      "path": ".claude/skills/skeleton-loaders/SKILL.md",
+      "name": "skeleton-loaders",
+      "description": "For building skeleton loading states that are pixel-perfect matches of real content. Use this skill whenever adding loading states to components, building skeletons for async data, handling pending loader states in route transitions, or implementing the shimmer animation pattern. Also trigger when the user asks about preventing layout shift during data fetching.",
+      "audience": "adopter",
+      "content_hash": "c34f3838166a2838526a7e4865468c81c34a232d40a7161b5a6e4b45d6eb7ed3",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "skill",
+      "path": ".claude/skills/tailwind/SKILL.md",
+      "name": "tailwind",
+      "description": "Patterns and conventions for all Tailwind styling. Use this skill whenever writing Tailwind class names, combining conditional classes, building component variants, or choosing between twJoin and twMerge. Also trigger when the user asks about custom values, defining @theme tokens or CSS variables, naming color/spacing tokens, rem vs px, responsive breakpoints, or avoiding template literal class strings.",
+      "audience": "adopter",
+      "content_hash": "63c2f4378b05b08f70d16425204062b36a725ca4fb24ae6a6c1151944783f7ce",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "skill",
+      "path": ".claude/skills/tdd/SKILL.md",
+      "name": "tdd",
+      "description": "Test-driven development with red-green-refactor loop. Use when user wants to build features or fix bugs using TDD, mentions \"red-green-refactor\", wants integration tests, or asks for test-first development.",
+      "audience": "adopter",
+      "content_hash": "82d0b02600f97f8666bad7abfeec60beb25da61dc855cb882b330b917400094f",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "skill",
+      "path": ".claude/skills/typescript/SKILL.md",
+      "name": "typescript",
+      "description": "Patterns and conventions for all TypeScript code. Use this skill whenever writing or reviewing TypeScript \u2014 naming identifiers, typing exports, choosing between type and interface, using Zod schemas, structuring function parameters, or enforcing code patterns like avoiding switch statements and enums.",
+      "audience": "adopter",
+      "content_hash": "b393f5bf5c7b8225adcee6c4fccd22851ff127402138621f9a112681b90a18cf",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "skill",
+      "path": ".claude/skills/update-deps/SKILL.md",
+      "name": "update-deps",
+      "description": "Autonomous Dependabot - auto-discover outdated packages, audit overrides, apply migrations for major bumps, resolve conflicts, run quality gate. Trigger when the user clicks the statusline `Run /update-deps` indicator or asks \"update dependencies\", \"bump deps\", \"run dependabot\".",
+      "audience": "adopter",
+      "content_hash": "f727cf7a3f625af33f10ce92ed723b23c926daf43eae0ea27da8ac9098792945",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "skill",
+      "path": ".claude/skills/update-gaia/SKILL.md",
+      "name": "update-gaia",
+      "description": "Pull the latest GAIA release into this project without clobbering customizations. Three-way merge per file using .gaia/manifest.json classes. Trigger when the user clicks the statusline `Run /update-gaia` indicator or asks \"update GAIA\", \"pull the latest GAIA\", \"apply the new GAIA release\".",
+      "audience": "adopter",
+      "content_hash": "ee8ca841bf8941b2bf5a3f349d749dbba49c496d58bbd97e0e2399b397f49f65",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "spec-kit-cmd",
+      "path": ".specify/extensions/gaia/commands/constitution-check.md",
+      "name": "speckit.gaia.constitution-check",
+      "description": "Verify .specify/memory/constitution.md has no placeholder text before /speckit.specify runs.",
+      "audience": "adopter",
+      "content_hash": "c27e449ca22d255de77775ac82111e0c7d51e85852ea6f91a0656f9017ecca01",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "spec-kit-cmd",
+      "path": ".specify/extensions/gaia/commands/lint.md",
+      "name": "speckit.gaia.lint",
+      "description": "Immutability lint over a saved SPEC artifact: frontmatter, frozen UAT-NNN ids, no placeholders.",
+      "audience": "adopter",
+      "content_hash": "591535fc4bbb75d7ca462861a097e38ff1fd023025703128fa3c5332d95166d1",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "spec-kit-cmd",
+      "path": ".specify/extensions/gaia/commands/self-review.md",
+      "name": "speckit.gaia.self-review",
+      "description": "Pre-gate-2 self-review pass; surfaces drift, ambiguity, and pending clarifications before save.",
+      "audience": "adopter",
+      "content_hash": "4b2e53da05557ec529af7d86b6b9ebd78d25c728094e218e21284ccacfb2bad9",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "spec-kit-cmd",
+      "path": ".specify/extensions/gaia/commands/spec.md",
+      "name": "speckit.gaia.spec",
+      "description": "GAIA Socratic discovery wrapper around /speckit.specify and /speckit.clarify.",
+      "audience": "adopter",
+      "content_hash": "570a6bbca95c88674405a54937229e7754009032415888d0c83311238c7b089f",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "spec-kit-cmd",
+      "path": ".specify/extensions/gaia/commands/spec-close.md",
+      "name": "speckit.gaia.spec-close",
+      "description": "Close a SPEC after implementation+merge: optional drain of deferred wiki-promote, then archive/delete/keep prompt for the local SPEC artifact.",
+      "audience": "adopter",
+      "content_hash": "215a96ee13baa8946118f9016f003acb390f9b14bd4a59de6735d711a19714a1",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "spec-kit-cmd",
+      "path": ".specify/extensions/gaia/commands/uat-write.md",
+      "name": "speckit.gaia.uat-write",
+      "description": "before_implement hook: render PO-authored UATs into Playwright e2e specs at .playwright/e2e/spec-NNN/.",
+      "audience": "adopter",
+      "content_hash": "7ad11049e522ffdcaa34edbd3378603b92304e5d4662cbfa46c43cba077db09f",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "spec-kit-cmd",
+      "path": ".specify/extensions/gaia/commands/wiki-promote.md",
+      "name": "speckit.gaia.wiki-promote",
+      "description": "Promote merged SPEC content into the GAIA wiki.",
+      "audience": "adopter",
+      "content_hash": "a49b11dbc4445930c0e93411578d765076ecd079861507779bdfb616ce9533bb",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "sub-route",
+      "path": ".claude/skills/gaia/references/audit.md",
+      "name": "/gaia audit",
+      "description": "/gaia audit",
+      "audience": "adopter",
+      "content_hash": "95f9b65aeb85c7c9813eefdab2b924a9072a96c637e8fcc93d84c25b656f09ab",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "sub-route",
+      "path": ".claude/skills/gaia/references/forensics.md",
+      "name": "/gaia forensics",
+      "description": "/gaia forensics",
+      "audience": "adopter",
+      "content_hash": "44e08a25ef3840d6b23160ef10043b6f0379e4a2f0e5de958f20d07fc9926aaa",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "sub-route",
+      "path": ".claude/skills/gaia/references/handoff.md",
+      "name": "/gaia handoff",
+      "description": "/gaia handoff",
+      "audience": "adopter",
+      "content_hash": "61c4a17d330cfa3e6bd3ac13af3608907705ce13a02505af7dae01f5a4688bdb",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "sub-route",
+      "path": ".claude/skills/gaia/references/pickup.md",
+      "name": "/gaia pickup",
+      "description": "/gaia pickup",
+      "audience": "adopter",
+      "content_hash": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "sub-route",
+      "path": ".claude/skills/gaia/references/plan.md",
+      "name": "/gaia plan",
+      "description": "/gaia plan",
+      "audience": "adopter",
+      "content_hash": "9e63177bdfea74493d8ed5a3ca9672a8ee8b812710f02697f96187615ccbabe4",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "sub-route",
+      "path": ".claude/skills/gaia/references/spec.md",
+      "name": "/gaia spec",
+      "description": "/gaia spec",
+      "audience": "adopter",
+      "content_hash": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "sub-route",
+      "path": ".claude/skills/gaia/references/wiki.md",
+      "name": "/gaia wiki",
+      "description": "/gaia wiki",
+      "audience": "adopter",
+      "content_hash": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "sub-route",
+      "path": ".claude/skills/gaia/references/wiki/consolidate.md",
+      "name": "/gaia wiki consolidate",
+      "description": "wiki-consolidate playbook",
+      "audience": "adopter",
+      "content_hash": "497ef750d4b5b084de0f92c5c22495c8554d60fee9bb34c081423d9d5050b1f2",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "sub-route",
+      "path": ".claude/skills/gaia/references/wiki/lint.md",
+      "name": "/gaia wiki lint",
+      "description": "wiki-lint playbook",
+      "audience": "adopter",
+      "content_hash": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "sub-route",
+      "path": ".claude/skills/gaia/references/wiki/sync.md",
+      "name": "/gaia wiki sync",
+      "description": "wiki-sync playbook",
+      "audience": "adopter",
+      "content_hash": "bbd089f8ab70238286a7169012cf2b8b3e618dd3aa55360f9fff6018505d73c3",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/README.md",
+      "name": "wiki/README.md",
+      "description": "GAIA React: LLM Wiki",
+      "audience": "mixed",
+      "content_hash": "888bc745837f9f70f0a6a9d4406b9960fd4a50c42376290e84c433e2e8949582",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/components/Form Choices.md",
+      "name": "wiki/components/Form Choices.md",
+      "description": "Form Choices",
+      "audience": "adopter",
+      "content_hash": "f3645fa47d96cc51d01b09512100e6d6488272c08925fb2b07ed7f73ac3814f9",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/components/Form Field.md",
+      "name": "wiki/components/Form Field.md",
+      "description": "Form Field",
+      "audience": "adopter",
+      "content_hash": "b4047e5342cdd042deb2ba567d3279ab0c563f1aa120924edcd8c4c009893897",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/components/Form Layout.md",
+      "name": "wiki/components/Form Layout.md",
+      "description": "Form Layout",
+      "audience": "adopter",
+      "content_hash": "7a2949cd1f6415a4c494df6dd07924f3086b719065d3c26551b1947462e97fd2",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/components/Form Select.md",
+      "name": "wiki/components/Form Select.md",
+      "description": "Form Select",
+      "audience": "adopter",
+      "content_hash": "bf7ae57b864f61e9e0c2453fc2ade1acb519f2c0588ec3030e9ddaa8b1c267c2",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/components/Form Text Inputs.md",
+      "name": "wiki/components/Form Text Inputs.md",
+      "description": "Form Text Inputs",
+      "audience": "adopter",
+      "content_hash": "761d49fa3c8807c423357fc6eba0e88a08fcefdc67c238258bf98bf1d073dc82",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/components/Form YearMonthDay.md",
+      "name": "wiki/components/Form YearMonthDay.md",
+      "description": "Form YearMonthDay",
+      "audience": "adopter",
+      "content_hash": "284fefe3daec323dc5f220ee4339534a2730c0e0caa8260216ad091e7b52b4de",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/API Service Pattern.md",
+      "name": "wiki/concepts/API Service Pattern.md",
+      "description": "API Service Pattern",
+      "audience": "adopter",
+      "content_hash": "fe87920a39a95dcdcb08b70696117134015a3283e3a20e3913a867989a5eca1b",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Accessibility.md",
+      "name": "wiki/concepts/Accessibility.md",
+      "description": "Accessibility",
+      "audience": "adopter",
+      "content_hash": "6436fe3f12aeb0dc15bd554905050cf4706566d25b2dc7d567cc64caf86e62fe",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Agentic Design.md",
+      "name": "wiki/concepts/Agentic Design.md",
+      "description": "Agentic Design",
+      "audience": "adopter",
+      "content_hash": "882c1432a36f053705caa2b6cca23fa48b14e3a11b6294c14d98226483d78dcd",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Chromatic Opt-Out.md",
+      "name": "wiki/concepts/Chromatic Opt-Out.md",
+      "description": "Chromatic Opt-Out",
+      "audience": "adopter",
+      "content_hash": "eb9b3e3d7c2d59e88ae6a5a47245fe955e56cfad4afcd9c261646aca1f7186b8",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Claude Hooks.md",
+      "name": "wiki/concepts/Claude Hooks.md",
+      "description": "Claude Hooks",
+      "audience": "adopter",
+      "content_hash": "cb6dc6a0267c027627dfea3fbc1d2ce3eaa287ef2dd9ced8453c0d40509a9f93",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Claude Integration Conventions.md",
+      "name": "wiki/concepts/Claude Integration Conventions.md",
+      "description": "Claude Integration Conventions",
+      "audience": "adopter",
+      "content_hash": "1272c7b260d49281606bae8f597e0264fb6657d1a16620a856de1395d9fabb57",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Claude Skills.md",
+      "name": "wiki/concepts/Claude Skills.md",
+      "description": "Claude Skills",
+      "audience": "adopter",
+      "content_hash": "c97f7f29ce15ef3a687190c34512aeaf2c9ee6f291e5dd6bc092a535c5ec43f0",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Code Review Audit Agent.md",
+      "name": "wiki/concepts/Code Review Audit Agent.md",
+      "description": "Code Review Audit Agent",
+      "audience": "adopter",
+      "content_hash": "11812fd4a972392d378870d0f2c52d381eb43b06ba68917c8a04c7f2f42fb4dc",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Code Review Audit CI.md",
+      "name": "wiki/concepts/Code Review Audit CI.md",
+      "description": "Code Review Audit CI",
+      "audience": "adopter",
+      "content_hash": "984bba6393bc85c7e13af4c19de5628d2f4f6f3609fdc6a1b855c11869a105f6",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Coding Guidelines.md",
+      "name": "wiki/concepts/Coding Guidelines.md",
+      "description": "Coding Guidelines",
+      "audience": "adopter",
+      "content_hash": "3b8b8f6e925226e1ae9cc87109a11220149da4818c812f5b2e45c0a999ae68d4",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Component Testing.md",
+      "name": "wiki/concepts/Component Testing.md",
+      "description": "Component Testing",
+      "audience": "adopter",
+      "content_hash": "1392b847332804f50916720f06a82c45995d992bd7b10f9fa7cb9b78f8e9d87e",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/ESLint Fixes.md",
+      "name": "wiki/concepts/ESLint Fixes.md",
+      "description": "ESLint Fixes",
+      "audience": "adopter",
+      "content_hash": "67bcc33bad9a828c9079fa9044f866993a83a459d9550f487e07a19de7f6e593",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Forensics.md",
+      "name": "wiki/concepts/Forensics.md",
+      "description": "Forensics",
+      "audience": "adopter",
+      "content_hash": "c0712894a6cb7cf5c3dac3f4ae402c10142ea4901f4d4a0524bf7c80a5a8b890",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/GAIA Audit.md",
+      "name": "wiki/concepts/GAIA Audit.md",
+      "description": "GAIA Audit",
+      "audience": "adopter",
+      "content_hash": "fc1206baedca1d47fe808540b162bc9efbde59abec03f3d299d841154e8d60e6",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/GAIA Handoff.md",
+      "name": "wiki/concepts/GAIA Handoff.md",
+      "description": "GAIA Handoff",
+      "audience": "adopter",
+      "content_hash": "8404fa71d8e1d70b27f5eea938add9dbf1201df25f8d22f6650f2bce065f60c9",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/GAIA Philosophy.md",
+      "name": "wiki/concepts/GAIA Philosophy.md",
+      "description": "GAIA Philosophy",
+      "audience": "adopter",
+      "content_hash": "913876d84452597c821823e9112bfa82e71222f6c323ab266d77bb1afb79d35f",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/GAIA Pickup.md",
+      "name": "wiki/concepts/GAIA Pickup.md",
+      "description": "GAIA Pickup",
+      "audience": "adopter",
+      "content_hash": "ce3a700ed7976202210d9cc95583c822f6f9d4b108b0f44fe663d8653d7f78ca",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/GAIA Plan.md",
+      "name": "wiki/concepts/GAIA Plan.md",
+      "description": "GAIA Plan",
+      "audience": "adopter",
+      "content_hash": "309979d32a2f9691bf89f1e98e5fd42f1f76884722737c38a3d692d2454cf517",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/GAIA Spec.md",
+      "name": "wiki/concepts/GAIA Spec.md",
+      "description": "GAIA Spec",
+      "audience": "adopter",
+      "content_hash": "c5d8a9bb88180d40f0b4577e63658befb14af55930f69d9a7a5b55930ca533b4",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Git Workflow.md",
+      "name": "wiki/concepts/Git Workflow.md",
+      "description": "Git Workflow",
+      "audience": "adopter",
+      "content_hash": "62e515fee6c288774eca89f50555219cd533aa4f05ff5f6c66bc0d886f946c51",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Init Workflow.md",
+      "name": "wiki/concepts/Init Workflow.md",
+      "description": "Init Workflow",
+      "audience": "adopter",
+      "content_hash": "3c0638fb2ed26b9a3dd7be4be263fb065fdddeeafac11c05ab5038a660646bda",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/PR Merge Workflow.md",
+      "name": "wiki/concepts/PR Merge Workflow.md",
+      "description": "PR Merge Workflow",
+      "audience": "adopter",
+      "content_hash": "4f3f5e004642ab6b48ea3b73ac7fea21a8f7c63c790d5211c7d5b53d317919a8",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Pre-commit Hooks.md",
+      "name": "wiki/concepts/Pre-commit Hooks.md",
+      "description": "Pre-commit Hooks",
+      "audience": "adopter",
+      "content_hash": "def9738703c84a48055bb5f13b517c0e163f4589cb06785388cca599fad26b18",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Release Workflow.md",
+      "name": "wiki/concepts/Release Workflow.md",
+      "description": "Release Workflow",
+      "audience": "contributor",
+      "content_hash": "52f597636f88dc0d8dec3f29b8a825f5dd1febc48bd2937d4a5faa43d66076b4",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Serena Integration.md",
+      "name": "wiki/concepts/Serena Integration.md",
+      "description": "Serena Integration",
+      "audience": "adopter",
+      "content_hash": "87d63de897151d7cb4cccfc5f82ea329df048d7d1a54095b25b1d964f86bfbe1",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Task Orchestration.md",
+      "name": "wiki/concepts/Task Orchestration.md",
+      "description": "Task Orchestration",
+      "audience": "adopter",
+      "content_hash": "42fec10c022061e6eeae31f3e0ffaeae4a45940f8673945fa943894e5893492c",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Telemetry.md",
+      "name": "wiki/concepts/Telemetry.md",
+      "description": "Telemetry",
+      "audience": "adopter",
+      "content_hash": "4f12ee8de20349eadc23a0ed0b3f643333f33520c5a85c987f39128ee6292dc7",
+      "excluded_from_docs": true
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Test Runner.md",
+      "name": "wiki/concepts/Test Runner.md",
+      "description": "Test Runner Rule",
+      "audience": "adopter",
+      "content_hash": "9a357c11ab95fad2f7fe167d17053efbdca1697e17dec4322517072cbb487e66",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Update Merge.md",
+      "name": "wiki/concepts/Update Merge.md",
+      "description": "Update Merge",
+      "audience": "adopter",
+      "content_hash": "666fed252b783b5b2aefdcd2a8966aac74cb06c3dcbbc9eeb826344be298d91b",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Update Workflow.md",
+      "name": "wiki/concepts/Update Workflow.md",
+      "description": "Update Workflow",
+      "audience": "adopter",
+      "content_hash": "33c699fe54686d67b1b26d98d06e384b43b0c84a045165fef985510537510a0d",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Wiki Consolidate.md",
+      "name": "wiki/concepts/Wiki Consolidate.md",
+      "description": "Wiki Consolidate",
+      "audience": "adopter",
+      "content_hash": "e5e5454f87c7ea66c07b601e89b1c58adcbd1c3a26dff7424d2e125770e74ee5",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Wiki Sync.md",
+      "name": "wiki/concepts/Wiki Sync.md",
+      "description": "Wiki Sync",
+      "audience": "adopter",
+      "content_hash": "5dfad5866d3df75ba7e89b731ebc8d8df0d22d63cd662beec75d4d93bcbfba12",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/decisions/Bundle-time Scrub.md",
+      "name": "wiki/decisions/Bundle-time Scrub.md",
+      "description": "Bundle-time Scrub",
+      "audience": "contributor",
+      "content_hash": "726ff8e348268ae43c1ab923013390895fff03e8ba6bc909ca5945ba273b2f79",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/decisions/Co-located Tests Folder.md",
+      "name": "wiki/decisions/Co-located Tests Folder.md",
+      "description": "Decision: Co-located `tests/` Subfolder",
+      "audience": "adopter",
+      "content_hash": "37404be25f8dc716beb7b229f497e0fdee57c9228f4c1daa4c60d9f1b73a466c",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/decisions/Dark Mode Modernization.md",
+      "name": "wiki/decisions/Dark Mode Modernization.md",
+      "description": "Decision: Modernize Dark Mode (Cookie + Client Hints)",
+      "audience": "adopter",
+      "content_hash": "aa3623a3fd9be6f0685a3112b77d6f26b0b934c91d145f810da120241eef52a6",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/decisions/DragonScale Opt-Out.md",
+      "name": "wiki/decisions/DragonScale Opt-Out.md",
+      "description": "Decision: DragonScale Opt-Out",
+      "audience": "adopter",
+      "content_hash": "a7fa16bfd616c4e51f2f886c8eb2fb81b411a4efe6a743d7c26e19a12bdba8a4",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/decisions/Forensics Triage Workflow.md",
+      "name": "wiki/decisions/Forensics Triage Workflow.md",
+      "description": "Decision: Forensics Triage Workflow",
+      "audience": "contributor",
+      "content_hash": "cdfa80db7b4f1ad6c4bd579ce85ea7c7aaa3f61756bef75f7eb36226990d1b33",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/decisions/No Component Library.md",
+      "name": "wiki/decisions/No Component Library.md",
+      "description": "Decision: No Component Library",
+      "audience": "adopter",
+      "content_hash": "1fd12d7c70211b0faa61e00a259f6c0d3e52e6bd3ecf1cf0b9ef4c900c1115b5",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/decisions/Quality Gate.md",
+      "name": "wiki/decisions/Quality Gate.md",
+      "description": "Decision: Mandatory Quality Gate",
+      "audience": "adopter",
+      "content_hash": "9a11dc223a4e53b927020a33484e7a75e7e9bd4d3dbd9909314829e3f4ef3447",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/decisions/Thin Routes.md",
+      "name": "wiki/decisions/Thin Routes.md",
+      "description": "Decision: Thin Routes, Fat Pages",
+      "audience": "adopter",
+      "content_hash": "20b4a79107f2d05bda210cff4400d958b6c214ada80eb9ad2cd3db7a42c44470",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/decisions/TypeScript Language Files.md",
+      "name": "wiki/decisions/TypeScript Language Files.md",
+      "description": "Decision: TypeScript Language Files Over JSON",
+      "audience": "adopter",
+      "content_hash": "dd06cdcc41d489958c3a89aee48ea873c342b130ef19a3834881bb69917da2ae",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/decisions/Wiki Management.md",
+      "name": "wiki/decisions/Wiki Management.md",
+      "description": "Wiki Management",
+      "audience": "adopter",
+      "content_hash": "7ef0dca2da792c7cebdc6690b7b5505a26db73e8f648fa4f9a685a5c60740fef",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/decisions/composeStory Pattern.md",
+      "name": "wiki/decisions/composeStory Pattern.md",
+      "description": "Decision: Test Components via Storybook `composeStory`",
+      "audience": "adopter",
+      "content_hash": "5a393d78f1a5bf54873b69f325a52cb52fe3edb5e3006f2a54abf07f615842f9",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/decisions/pnpm.md",
+      "name": "wiki/decisions/pnpm.md",
+      "description": "Decision: pnpm as the Package Manager",
+      "audience": "adopter",
+      "content_hash": "fa265a0d810b118d7b7d56bd015c4174bf4b2a0e60c50ae37f65ae4fe708dd6e",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/decisions/spec-kit Extension Strategy.md",
+      "name": "wiki/decisions/spec-kit Extension Strategy.md",
+      "description": "spec-kit Extension Strategy",
+      "audience": "adopter",
+      "content_hash": "c9f796816930be4ef5fe4d3d6c362b9b54f677c5ba39dd32e9a3c173dad4a69a",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/dependencies/Chromatic.md",
+      "name": "wiki/dependencies/Chromatic.md",
+      "description": "Chromatic",
+      "audience": "adopter",
+      "content_hash": "9c2b1cdd5f25f72cba8cf73c09b132c094d33b2e52a4c8a4560d33cfe2afdd67",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/dependencies/Conform.md",
+      "name": "wiki/dependencies/Conform.md",
+      "description": "Conform",
+      "audience": "adopter",
+      "content_hash": "44ae11256f7e4da566dc5c2b9436ba47bc1bf9372b3c2c9bfbf06c1e20d602bc",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/dependencies/Husky.md",
+      "name": "wiki/dependencies/Husky.md",
+      "description": "Husky + lint-staged",
+      "audience": "adopter",
+      "content_hash": "a711d029981ab47015cebc33f59063e7f513a2b04e3a25a0b53abcc3122c1d0e",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/dependencies/Ky.md",
+      "name": "wiki/dependencies/Ky.md",
+      "description": "Ky",
+      "audience": "adopter",
+      "content_hash": "e97cbd19e5660015fcde3f8c426e236b74e022814d7cd4135d04b7f0a4ab27f6",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/dependencies/MSW.md",
+      "name": "wiki/dependencies/MSW.md",
+      "description": "MSW",
+      "audience": "adopter",
+      "content_hash": "a7a132cbd0d9887013a744d8cf28290e08c72436c75955d2b18a5f56a387a381",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/dependencies/Playwright.md",
+      "name": "wiki/dependencies/Playwright.md",
+      "description": "Playwright",
+      "audience": "adopter",
+      "content_hash": "59d6be01d594cc2a938db75d901a46c49d57ae0810a236599d39e3719ce721eb",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/dependencies/React Router 7.md",
+      "name": "wiki/dependencies/React Router 7.md",
+      "description": "React Router 7",
+      "audience": "adopter",
+      "content_hash": "7c4ae988a49fded7cddd3031452deab238a70157399946e662473838f7dcab73",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/dependencies/React Testing Library.md",
+      "name": "wiki/dependencies/React Testing Library.md",
+      "description": "React Testing Library",
+      "audience": "adopter",
+      "content_hash": "b1a5cf93eab7fd9923c365afb924825330877363a95b7487f9b25af94daf658d",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/dependencies/Serena.md",
+      "name": "wiki/dependencies/Serena.md",
+      "description": "Serena",
+      "audience": "adopter",
+      "content_hash": "4592979349184e2e265fc483733b90f421ac41bceb12c28337c2956fe56f25f1",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/dependencies/Storybook.md",
+      "name": "wiki/dependencies/Storybook.md",
+      "description": "Storybook",
+      "audience": "adopter",
+      "content_hash": "80086f11cdeb02dd87fc70badf357a571c46412544ee18d4a3f9e87a9541476a",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/dependencies/Tailwind.md",
+      "name": "wiki/dependencies/Tailwind.md",
+      "description": "Tailwind",
+      "audience": "adopter",
+      "content_hash": "70a1747925a47b6ee797b2e3f6ad7bbba49e8bf2506fdb25dade43e31f80d6a1",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/dependencies/Vitest.md",
+      "name": "wiki/dependencies/Vitest.md",
+      "description": "Vitest",
+      "audience": "adopter",
+      "content_hash": "fed2aa1a1f00e1f03bb6b5b8a7803c4f473ba8a12b3d166997746d21b32ae4c0",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/dependencies/Zod.md",
+      "name": "wiki/dependencies/Zod.md",
+      "description": "Zod",
+      "audience": "adopter",
+      "content_hash": "38a03dd255ec86b8b7cd01a220ec8b2dd25a6f40df3770bd5fad9a993f5cec47",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/dependencies/gaia-lint.md",
+      "name": "wiki/dependencies/gaia-lint.md",
+      "description": "@gaia-react/lint",
+      "audience": "adopter",
+      "content_hash": "c7e22cfd1e2b0c334d111fb1643e6930c59c58749fcdee24a0a55aa6247a30cd",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/dependencies/i18next.md",
+      "name": "wiki/dependencies/i18next.md",
+      "description": "i18next",
+      "audience": "adopter",
+      "content_hash": "b74a80f78e2710aaa465bcfae588e130ec9926d8abc32d1651f3b2b4851be71b",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/dependencies/knip.md",
+      "name": "wiki/dependencies/knip.md",
+      "description": "knip",
+      "audience": "adopter",
+      "content_hash": "c03940ffa21051dff65ac1bdc1ca514b55559257b4477422ef08acdd62b4ee72",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/dependencies/react-icons.md",
+      "name": "wiki/dependencies/react-icons.md",
+      "description": "react-icons",
+      "audience": "adopter",
+      "content_hash": "b7103ef03702ceb5addec8896a0a170d3a948777cb2c81ab4a49789fd9ab85a1",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/dependencies/remix-flat-routes.md",
+      "name": "wiki/dependencies/remix-flat-routes.md",
+      "description": "remix-flat-routes",
+      "audience": "adopter",
+      "content_hash": "a83037c5dc7cfede139bf5cff0a8e189687b8ae4ab53709abcb7529d499e6fef",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/dependencies/remix-i18next.md",
+      "name": "wiki/dependencies/remix-i18next.md",
+      "description": "remix-i18next",
+      "audience": "adopter",
+      "content_hash": "e7b05124c138b95028c8c58f20c6fc187c3cfb31e39e4d17cbf1ec79a0796e50",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/dependencies/remix-toast.md",
+      "name": "wiki/dependencies/remix-toast.md",
+      "description": "remix-toast + Sonner",
+      "audience": "adopter",
+      "content_hash": "70bcdd8abdcb0620add3dc726630dba14ab0356a8b3439607b7b199aa48bac36",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/dependencies/spec-kit.md",
+      "name": "wiki/dependencies/spec-kit.md",
+      "description": "spec-kit",
+      "audience": "adopter",
+      "content_hash": "059e4474d5e1e2893bac908f9fdfa9d730689628bfd7794353444a6e0b090520",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/entities/GAIA.md",
+      "name": "wiki/entities/GAIA.md",
+      "description": "GAIA",
+      "audience": "contributor",
+      "content_hash": "45905837b31831575a132cac37ea091e5f6f4fb65b0bd8156c6a4dc80e51f6c5",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/entities/Steven Sacks.md",
+      "name": "wiki/entities/Steven Sacks.md",
+      "description": "Steven Sacks",
+      "audience": "contributor",
+      "content_hash": "977e03dfbd741d906164fc836413ff512f05f3f0bbfbd631b866623b1c9e1119",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/flows/Form Submit Flow.md",
+      "name": "wiki/flows/Form Submit Flow.md",
+      "description": "Form Submit Flow",
+      "audience": "adopter",
+      "content_hash": "36d5eae5cdf39eb77e3a2179dfbbc859b4cc710e62ec32da20f6d113b1957370",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/flows/Language Flow.md",
+      "name": "wiki/flows/Language Flow.md",
+      "description": "Language Flow",
+      "audience": "adopter",
+      "content_hash": "866014c5fc2a4dadea015ea6649869e2773c7d84262e0d752bc21d33c3e6903f",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/flows/Theme Flow.md",
+      "name": "wiki/flows/Theme Flow.md",
+      "description": "Theme Flow (Dark Mode)",
+      "audience": "adopter",
+      "content_hash": "1e11561b80fe27a40992bb3fe9394f359e69b8dc492a6a536f54613f2f225b20",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/hot.md",
+      "name": "wiki/hot.md",
+      "description": "Recent Context",
+      "audience": "adopter",
+      "content_hash": "45cc97f880c48627555e16afb6691974a1a8c0b2e5f33e3edcb02732146b1468",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/index.md",
+      "name": "wiki/index.md",
+      "description": "Index",
+      "audience": "mixed",
+      "content_hash": "b6f5f63e0fef2cfdaa3f755b670d612fe3f752feccd97d528d49ab3b55a27c6d",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/log.md",
+      "name": "wiki/log.md",
+      "description": "Log",
+      "audience": "adopter",
+      "content_hash": "da7144961847fd2b96a84967bd2957b85d52501c71dd975fdf506f7dd6366e16",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/meta/consolidate-report-2026-05-07.md",
+      "name": "wiki/meta/consolidate-report-2026-05-07.md",
+      "description": "Consolidate Report \u2014 2026-05-07",
+      "audience": "contributor",
+      "content_hash": "e58a051ea0d07978941e1e9afe4768791dff11e5643d5a4e8c7ebf47cee42522",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/meta/consolidate-report-2026-05-08.md",
+      "name": "wiki/meta/consolidate-report-2026-05-08.md",
+      "description": "Consolidate Report \u2014 2026-05-08",
+      "audience": "contributor",
+      "content_hash": "1c49b0b0fc1cbe38a32f21b35290ad9e6bd4a80e6607969710009355ea3b5098",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/meta/dashboard.md",
+      "name": "wiki/meta/dashboard.md",
+      "description": "Wiki Dashboard",
+      "audience": "contributor",
+      "content_hash": "4e2d4ff31315d91651d7d4cba922db0eb252909d1d967f0a13a8d9cfef3c48e9",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/meta/lint-report-2026-04-21.md",
+      "name": "wiki/meta/lint-report-2026-04-21.md",
+      "description": "Wiki Lint Report \u2014 2026-04-21",
+      "audience": "contributor",
+      "content_hash": "ba9ff888e56dfa83acfa0f061d077bd950b2ae481271609f1ea9a49fa6aa368d",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/meta/lint-report-2026-04-26.md",
+      "name": "wiki/meta/lint-report-2026-04-26.md",
+      "description": "Wiki Lint Report \u2014 2026-04-26",
+      "audience": "contributor",
+      "content_hash": "c95d42f963053bb272e7886f6c5dd6bec09cfb31560289a1b058b2f05acbe19d",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/meta/lint-report-2026-04-27.md",
+      "name": "wiki/meta/lint-report-2026-04-27.md",
+      "description": "Wiki Lint Report \u2014 2026-04-27",
+      "audience": "contributor",
+      "content_hash": "d6c6be57eb8dae5d7c0a75e87c9df126a48af5d0efc39c54e8d462de1df4e789",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/meta/lint-report-2026-05-01.md",
+      "name": "wiki/meta/lint-report-2026-05-01.md",
+      "description": "Wiki Lint Report \u2014 2026-05-01",
+      "audience": "contributor",
+      "content_hash": "311620a33ea61526e7bb1f9337a77e8a026dfcc7c1c8057675b69a5506f26020",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/meta/lint-report-2026-05-03.md",
+      "name": "wiki/meta/lint-report-2026-05-03.md",
+      "description": "Lint Report: 2026-05-03",
+      "audience": "contributor",
+      "content_hash": "ae8ed11aac52983ac4b0b626d984d7996132464a3c837ae4f31e154a9fe75938",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/meta/lint-report-2026-05-04.md",
+      "name": "wiki/meta/lint-report-2026-05-04.md",
+      "description": "Lint Report: 2026-05-04",
+      "audience": "contributor",
+      "content_hash": "937e9aca477d5b57dba6ebd07fa7c069c76862f53d6e893296460a7dd89b00bb",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/meta/lint-report-2026-05-06.md",
+      "name": "wiki/meta/lint-report-2026-05-06.md",
+      "description": "Lint Report: 2026-05-06",
+      "audience": "contributor",
+      "content_hash": "031432cfa6487fa40fa6c6d3e4ffaa79420de38c97e93a56f070dd86985a6245",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/meta/lint-report-2026-05-07.md",
+      "name": "wiki/meta/lint-report-2026-05-07.md",
+      "description": "Lint Report: 2026-05-07",
+      "audience": "contributor",
+      "content_hash": "f7e9567ccdad08cdeae01a303d9ff38e1f0f436e64c01867a9f50280f7c121c2",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/meta/lint-report-2026-05-08.md",
+      "name": "wiki/meta/lint-report-2026-05-08.md",
+      "description": "Lint Report: 2026-05-08",
+      "audience": "contributor",
+      "content_hash": "d92d89b79f72fe41f48ac73b915febd25eae4d5c3467f4ee1dcba12d90dadf50",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/modules/CLI Scaffolding.md",
+      "name": "wiki/modules/CLI Scaffolding.md",
+      "description": "CLI Scaffolding",
+      "audience": "adopter",
+      "content_hash": "8218176d232427b13f3143b46e2144ce08a58df379fcfaf660b940ea5823515f",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/modules/Claude Integration.md",
+      "name": "wiki/modules/Claude Integration.md",
+      "description": "Claude Integration",
+      "audience": "adopter",
+      "content_hash": "e70cff0f904b135c85e43dcf5cc0ae9e38c70d698f4ea1960f6c1f57fefe95b9",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/modules/Components.md",
+      "name": "wiki/modules/Components.md",
+      "description": "Components",
+      "audience": "adopter",
+      "content_hash": "031bc6681a2c8333ff7a83c55ccfc4f8acc36311550770127230dc8cd18aace8",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/modules/Folder Structure.md",
+      "name": "wiki/modules/Folder Structure.md",
+      "description": "Folder Structure",
+      "audience": "adopter",
+      "content_hash": "665b8424e9f157fb81452782d7dd7da909132ccf278b65c68501e3dad579d9d1",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/modules/Form Components.md",
+      "name": "wiki/modules/Form Components.md",
+      "description": "Form Components",
+      "audience": "adopter",
+      "content_hash": "29b846671c9874f2cbb0186ecef88b126bce6fc2fa52b64e20fd7dcf08e64776",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/modules/Hooks.md",
+      "name": "wiki/modules/Hooks.md",
+      "description": "Hooks",
+      "audience": "adopter",
+      "content_hash": "cd2f09ca9a61c888773127191a19ae48bda38a09789440f0555268450e1d2d54",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/modules/MSW Handlers.md",
+      "name": "wiki/modules/MSW Handlers.md",
+      "description": "MSW (Mock Service Worker)",
+      "audience": "adopter",
+      "content_hash": "feb701104fcd7c1203bd9244feef10ed56bf6b0617f3337096ef67e24fa960c4",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/modules/Middleware.md",
+      "name": "wiki/modules/Middleware.md",
+      "description": "Middleware",
+      "audience": "adopter",
+      "content_hash": "6df2567693c3242e1d1d76662cfeb1be6dbff71ec01c1c42b93b21bb506dadac",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/modules/Pages.md",
+      "name": "wiki/modules/Pages.md",
+      "description": "Pages",
+      "audience": "adopter",
+      "content_hash": "1492c9d6ca4e66922d56ff77a48e676defffaf3bb05f6b4ab25e275704db5252",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/modules/Routing.md",
+      "name": "wiki/modules/Routing.md",
+      "description": "Routing",
+      "audience": "adopter",
+      "content_hash": "c150a7c29873623d0677d46c3eb4b0ab677f2ff564b2335ba98e44b878bd0b30",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/modules/Services.md",
+      "name": "wiki/modules/Services.md",
+      "description": "Services",
+      "audience": "adopter",
+      "content_hash": "2bffc0c07be9d23dc80654ed256eee8a03c17c064f412268b864e234ee59925d",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/modules/Sessions.md",
+      "name": "wiki/modules/Sessions.md",
+      "description": "Sessions",
+      "audience": "adopter",
+      "content_hash": "d9365dd1f7351bdd4e3b78ffcb895328e8f6140b22fb29f79ee3d08882b08ccc",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/modules/State.md",
+      "name": "wiki/modules/State.md",
+      "description": "State",
+      "audience": "adopter",
+      "content_hash": "767bc7bc6f7babeca110642527c30309cf60d2df0b7cd3fd0962ee397395fc0a",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/modules/Storybook Stories.md",
+      "name": "wiki/modules/Storybook Stories.md",
+      "description": "Storybook Stories",
+      "audience": "adopter",
+      "content_hash": "0dac55584ebc642b89e98e2ebb11c71ab965d7a062172ca6ace66b0b38873c1e",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/modules/Styles.md",
+      "name": "wiki/modules/Styles.md",
+      "description": "Styles",
+      "audience": "adopter",
+      "content_hash": "38ae72680bcbe979f07897b544c7f7af3046ecc57a060a91517041aa9660431f",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/modules/Testing.md",
+      "name": "wiki/modules/Testing.md",
+      "description": "Testing",
+      "audience": "adopter",
+      "content_hash": "97eb4b201393a17ee9339f57ba06c363860a6c3b47a760ce1cf182fd2af00599",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/modules/Utils.md",
+      "name": "wiki/modules/Utils.md",
+      "description": "Utils",
+      "audience": "adopter",
+      "content_hash": "cdb7c210c543d3eaf7eeab908b002fc1db5a2ce72fb71f762aaee5be17c021bd",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/modules/i18n.md",
+      "name": "wiki/modules/i18n.md",
+      "description": "i18n",
+      "audience": "adopter",
+      "content_hash": "efe3b2a41a1e0e390cd1fed364080646a7a3a56935145726fef8040fc9c633ca",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/overview.md",
+      "name": "wiki/overview.md",
+      "description": "GAIA React",
+      "audience": "adopter",
+      "content_hash": "9f488147cd2377ad7bc09a1c0e1e629759fd69d0707ed84b3c608fa768a54327",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "workflow",
+      "path": ".github/workflows/chromatic.yml",
+      "name": "chromatic.yml",
+      "description": "Chromatic",
+      "audience": "adopter",
+      "content_hash": "e1df407b716e0b0bbb3fcb1d3de35e759b5702c47a2f672c09671fed6342fe38",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "workflow",
+      "path": ".github/workflows/cli-tests.yml",
+      "name": "cli-tests.yml",
+      "description": "CLI Tests",
+      "audience": "contributor",
+      "content_hash": "472c5a8ae51e4343f01952b3c75e2eae1c1544e0212eb6748dcc8255f75c7619",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "workflow",
+      "path": ".github/workflows/code-review-audit.yml",
+      "name": "code-review-audit.yml",
+      "description": "Code Review Audit",
+      "audience": "adopter",
+      "content_hash": "e520bfee77a32002d9798212b5b3fb36e06a3ecbcd0e55c9bb67358125e626d1",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "workflow",
+      "path": ".github/workflows/distribution.yml",
+      "name": "distribution.yml",
+      "description": "Distribution",
+      "audience": "contributor",
+      "content_hash": "ab91eb12a6c8ac0c4620baec5f44cb599db17280def33e673ca8df4cade37af3",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "workflow",
+      "path": ".github/workflows/forensics-triage.yml",
+      "name": "forensics-triage.yml",
+      "description": "Forensics Triage",
+      "audience": "contributor",
+      "content_hash": "08fa217b28adb5225e6134989fd3c1ef64e1e84e3cd5c3b8b297ca8033eeacc1",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "workflow",
+      "path": ".github/workflows/release.yml",
+      "name": "release.yml",
+      "description": "Release",
+      "audience": "contributor",
+      "content_hash": "3c4055208c2de07e1b91f291170e9dddd7289e2465df6064e9383dffe0a204a0",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "workflow",
+      "path": ".github/workflows/tests.yml",
+      "name": "tests.yml",
+      "description": "Tests",
+      "audience": "adopter",
+      "content_hash": "d67abed1b7f5c197377f5bd026ce05bc80e28bc753212b790f91ec065d614f59",
+      "excluded_from_docs": false
+    }
+  ]
 }

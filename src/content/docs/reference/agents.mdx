@@ -1,0 +1,49 @@
+---
+title: Agents
+description: Reference for the subagents GAIA ships with Claude Code.
+sidebar:
+  order: 3
+---
+
+Agents are subagents Claude Code can spawn from the main conversation. Each agent runs in its own isolated context, performs a focused task, and reports back a single result. Agents are defined as Markdown files at `.claude/agents/*.md` with frontmatter that names the agent, describes when to invoke it, and pins a model.
+
+For Claude Code's own subagent documentation, see [the Subagents reference on docs.claude.com](https://docs.claude.com/en/docs/claude-code/sub-agents).
+
+## code-review-audit
+
+Path: `.claude/agents/code-review-audit.md`. Model: `sonnet`.
+
+Comprehensive code review, security audit, performance analysis, and architectural assessment. Goes beyond what ESLint and TypeScript catch by reasoning about intent, data flow, and architectural fit. **Mandatory before any PR merge.**
+
+### When to invoke
+
+- Before merging a PR. The `pr-merge-audit-check` hook blocks `gh pr merge` until the agent has produced a clean run for the current HEAD.
+- After a substantial change or refactor, when verification beyond the quality gate is warranted.
+- On request, for a focused review of the current branch.
+
+### What it reviews
+
+- **Security**: injection paths, auth/authorization gaps, secret exposure, CSRF/SSRF, data leakage through loaders, timing attacks.
+- **Performance**: N+1 patterns, unnecessary re-renders, bundle size, SSR cost in loaders, network waterfalls.
+- **Architecture**: separation of concerns, single responsibility, dependency direction, state placement, module-level duplication.
+- **Robustness**: missing validation, race conditions, null safety, error states, boundary conditions.
+- **Accessibility**: keyboard reachability, semantic HTML, focus management, ARIA usage.
+- **Maintainability**: magic values, dead code, coupling, comment quality.
+
+The main agent handles cross-cutting reasoning. Specialist subagents (React patterns, TypeScript / architecture, translation) run in parallel for line-level rule compliance, alongside `react-doctor` and `pnpm knip --reporter json`.
+
+### Output
+
+The agent produces a structured report:
+
+- **Summary**: overview, overall quality, top findings.
+- **Critical Issues (Must Fix)**: security and bugs that block merge. Each finding gives `path:line`, the issue, and a concrete fix.
+- **Important Issues (Should Fix)**: performance and architectural concerns at scale. Same shape.
+- **Suggestions (Consider Fixing)**: refactoring and minor improvements.
+- **What's Done Well**: included only when there are concrete patterns worth reinforcing.
+
+### Audit marker and trailer
+
+When the report is clean (no Critical Issues, all Important Issues resolved in the working tree), the agent stamps HEAD with a `GAIA-Audit:` commit trailer and writes a marker file at `.gaia/local/audit/<HEAD-sha>.ok`. The marker unblocks `gh pr merge` locally; the trailer travels with the commit through the network so CI can recognize an already-audited tree and skip its own audit run.
+
+If findings remain, the agent does not write the marker. Address findings, commit, and re-invoke the agent on the new HEAD.

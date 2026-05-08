@@ -1,0 +1,88 @@
+---
+title: Install
+description: Scaffold a new GAIA project with npx create-gaia.
+sidebar:
+  order: 1
+---
+
+GAIA ships as a release tarball pulled by an `npx` scaffolder. One command lays down a React Router 7 application wired for a Claude-native workflow, runs `pnpm install`, and hands the project to Claude Code for the rest of setup.
+
+## Prerequisites
+
+- Node 22.19 or later. Check with `node --version`.
+- A working terminal.
+- Claude Code installed and reachable as `claude` on your `PATH`. Optional but strongly recommended; the scaffolder auto-launches Claude into the new directory if it can find the binary.
+
+`pnpm` is not required up front. When `pnpm install` runs (the default), `create-gaia` bootstraps pnpm via Corepack if missing, falling back to `npm install -g pnpm`. With `--no-install`, no bootstrap is attempted.
+
+## Run the scaffolder
+
+```bash
+npx create-gaia@latest my-app
+```
+
+`my-app` becomes the project directory. It must be empty or not yet exist; the scaffolder refuses to write into a non-empty directory.
+
+What happens, in order:
+
+1. Resolve the latest GAIA release tag from the GitHub releases API.
+2. Download the release tarball.
+3. Extract it into `my-app/` (strip-components 1, so the tarball's top-level folder collapses into the project root).
+4. Write the version stamp to `.gaia/VERSION`.
+5. Run `git init` and create a single `chore: scaffold from GAIA <version>` commit.
+6. Run `pnpm install`.
+7. Launch Claude Code in the new directory and run `/gaia-init` automatically.
+
+If `claude` is not on your `PATH`, the scaffolder prints the manual next steps and stops cleanly. You can launch Claude yourself afterward.
+
+### Flags
+
+| Flag | Behavior |
+|---|---|
+| `--version vX.Y.Z` | Pin to a specific GAIA release. Default: latest from GitHub releases. |
+| `--no-install` | Skip `pnpm install`. |
+| `--no-git` | Skip `git init` and the initial commit. |
+| `--no-claude` | Skip auto-launching Claude Code. The scaffolder prints manual next steps instead. |
+
+### Pinning to a specific version
+
+```bash
+npx create-gaia@latest my-app --version v1.0.5
+```
+
+Useful when you want every project on a team to start from the same GAIA baseline.
+
+## What you get
+
+The scaffold ships clean. No example pages, no auth, no demo content. Just the workflow plus a working build.
+
+Top-level layout:
+
+- `app/`: application source. React Router 7, TypeScript, Tailwind v4.
+- `wiki/`: Obsidian-flavored knowledge base. Project memory that travels with the repo.
+- `.claude/`: commands, hooks, rules, skills, and agents that drive Claude Code.
+- `.gaia/`: the bundled GAIA CLI binary, statusline scripts, templates, and per-project state.
+- `.specify/`: spec-kit extension and preset that back the `/gaia spec` workflow (registered after `/gaia-init`).
+- `package.json`: pinned to `pnpm@10.33.0` via the `packageManager` field. Node `>=22.19.0` via `engines.node`.
+- Standard configs: `tsconfig.json`, `eslint.config.mjs`, `vite.config.ts`, `vitest.config.ts`, `playwright.config.ts`, `react-router.config.ts`.
+
+The `package.json` declares the bundled CLI binary at `.gaia/cli/gaia`. Slash commands in `.claude/commands/` shell out to it for deterministic operations like scaffolding components, refreshing the wiki, and stepping through init.
+
+## Next
+
+When Claude Code launches, follow the [`/gaia-init` walkthrough](/getting-started/gaia-init/).
+
+If you skipped Claude with `--no-claude`, run:
+
+```bash
+cd my-app
+claude --dangerously-skip-permissions
+```
+
+Then in Claude Code:
+
+```
+/gaia-init
+```
+
+For per-machine setup of an existing GAIA clone (a project a teammate already initialized), see [`/setup-gaia`](/getting-started/setup-gaia/).

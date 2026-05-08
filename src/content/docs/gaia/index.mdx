@@ -1,0 +1,39 @@
+---
+title: /gaia router
+description: Sub-routes available under /gaia for day-to-day GAIA workflows.
+sidebar:
+  order: 1
+---
+
+`/gaia` is the entry point for GAIA's day-to-day workflows. It is a router skill: the first whitespace-separated token of the invocation selects a sub-route, and the rest of the input is forwarded to that sub-route.
+
+The skill itself lives at `.claude/skills/gaia/SKILL.md`. Each sub-route's instructions live at `.claude/skills/gaia/references/<sub>.md`.
+
+## Sub-routes
+
+| Sub-route | What it does |
+| --- | --- |
+| [`/gaia plan`](/gaia/plan/) | Plan a feature using task orchestration. Produces a plan directory with task docs, an orchestrator runbook, and a kickoff prompt for a fresh session. |
+| [`/gaia spec`](/gaia/spec/) | Run a Socratic discovery loop and save an immutable SPEC artifact. Optionally chains into `/gaia plan`. |
+| [`/gaia audit`](/gaia/audit/) | Audit memory, rules, and wiki for duplication, stale entries, and over-budget auto-loads. Produces a report and applies it. |
+| [`/gaia handoff`](/gaia/handoff-pickup/) | Generate a session handoff document so context can transfer to a fresh session. |
+| [`/gaia pickup`](/gaia/handoff-pickup/) | Restore context from the most recent handoff. |
+| [`/gaia forensics`](/gaia/forensics/) | Capture a redacted, classified bug report from a surfaced issue. |
+| [`/gaia wiki`](/gaia/wiki/) | Wiki maintenance. With no sub-arg, runs the full chain: `sync`, then `consolidate`, then `lint`. Each can also be invoked individually. |
+
+## Help text
+
+Invoking `/gaia` with no argument (or with an unrecognized one) prints the help message:
+
+```
+Usage: /gaia <subcommand> [args]
+
+  plan [description]               Plan a feature using task orchestration
+  spec [description]               Socratic discovery to author an immutable SPEC artifact
+  spec auto [description]          Non-interactive: agent answers Socratic questions, mirrors to GitHub issue, chains to /gaia plan
+  handoff [notes]                  Generate a session handoff document
+  pickup                           Restore context from the most recent handoff
+  audit [--apply]                  Audit memory + wiki and apply changes (--apply: re-apply existing report only)
+  forensics [description]          Capture a redacted, classified, file-able bug report
+  wiki [sync|consolidate|lint]     Wiki maintenance (full chain if no sub-arg)
+```
