@@ -100,3 +100,33 @@ header.header,
 .page > header {
 	border-bottom: 1px solid var(--gaia-line);
 }
+
+/* Narrow the "On this page" right column and let main content stretch to
+   fill the rest. Starlight defaults the right column to ~half the leftover
+   viewport plus the left sidebar width, and caps content at 67.5rem. */
+@media (min-width: 72rem) {
+	.right-sidebar-container {
+		width: 17rem;
+	}
+
+	[data-has-sidebar][data-has-toc] .main-pane {
+		width: calc(100% - 17rem);
+	}
+}
+
+/* Let the main content pane fill its column (drop the 67.5rem cap). */
+.content-panel .sl-container {
+	max-width: none;
+}
+
+/* Right TOC: fit the inner container to its parent so long entries wrap,
+   and give the right edge breathing room. Full padding shorthand to ensure
+   the override sticks against the layered default. */
+.right-sidebar-panel {
+	padding: 1rem 1.75rem 1rem 1rem;
+}
+
+.right-sidebar-panel .sl-container {
+	width: auto;
+	max-width: 100%;
+}
