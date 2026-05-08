@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "additionalDirectories": [
+      "/Users/stevensacks/Development/gaia-react/studio/branding/",
+      "/Users/stevensacks/Development/gaia-react/gaia/"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(**/secrets/*)",
+      "Read(**/*credential*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)"
+    ]
+  }
+}

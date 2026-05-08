@@ -17,5 +17,10 @@ pnpm-debug.log*
 .env
 .env.production
 
-# macOS-specific files
+# IDEs
+.idea
+.vscode
 .DS_Store
+
+# Playwright CLI session artifacts
+.playwright-cli/

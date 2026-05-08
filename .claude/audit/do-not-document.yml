@@ -1,0 +1,72 @@
+# do-not-document.yml
+#
+# Exclusion list for source-survey. Items listed here exist in the GAIA source
+# at ~/Development/gaia-react/gaia/ but must NEVER appear in public docs at
+# ~/Development/gaia-react/docs/src/content/docs/, including under contributors/.
+#
+# This is distinct from .gaia/release-exclude (path-level shipping rules) and
+# from gaia:maintainer-only block markers (block-level shipping rules). Those
+# two mechanisms separate adopter docs from contributor docs. THIS file
+# additionally blocks contributor docs from documenting deliberately
+# obscure surface (obscurity-by-design).
+#
+# Source-survey treats matched items as EXCLUDED in drift reports rather than
+# NEW or REMOVED, so the user knows we're skipping them on purpose.
+#
+# Schema (one entry per item):
+#   - path: <source path or glob; relative to gaia/ root or absolute>
+#     reason: <one-line justification>
+#     added: <YYYY-MM-DD>
+#
+# Match semantics:
+#   - Paths are matched as glob patterns (fnmatch-style: *, **, ?).
+#   - A pattern matches any source surface item whose `path` field starts with
+#     the pattern after gaia/ is stripped, OR whose `name` field contains the
+#     pattern as a substring (used for CLI subcommand names like _internal-*).
+#   - Patterns ending in `/` or containing `**` are directory globs.
+#
+# Extending this file:
+#   - Add new entries with the schema above.
+#   - Pre-existing entries below are obscurity-by-design per audit findings in
+#     PR #97. Do not remove them without an explicit decision in studio/.
+
+exclusions:
+  - path: .gaia/cli/src/mentorship/display-rule.ts
+    reason: obscurity-by-design (mentorship display rule contract is protected; documenting it defeats the protection)
+    added: 2026-05-08
+
+  - path: .gaia/cli/src/mentorship/display-rule-memory.ts
+    reason: obscurity-by-design (companion to display-rule.ts; same protection rationale)
+    added: 2026-05-08
+
+  - path: "**/telemetry/mentorship/events-*.jsonl"
+    reason: obscurity-by-design (protected telemetry stream path shape; the path pattern itself signposts what to scrape)
+    added: 2026-05-08
+
+  - path: "~/.claude/projects/*/gaia/telemetry/mentorship/**"
+    reason: obscurity-by-design (per-user mentorship telemetry directory; user-side path, never document)
+    added: 2026-05-08
+
+  - name: _internal-*
+    reason: obscurity-by-design (CLI subcommand names beginning with _internal- signal the protected category by their name; surfacing them in docs reveals the protected boundary)
+    added: 2026-05-08
+
+  - name: gaia release*
+    reason: Steven-only — release subcommands belong to the maintainer, not to adopters or contributors. The binary technically ships the surface, but documenting any of preflight / bump / changelog / scrub-wiki / manifest / scrub / runtime-deps / commit-and-tag is wrong audience. Possible upstream release-exclude gap; out of docs scope to fix.
+    added: 2026-05-08
+
+  - name: gaia telemetry*
+    reason: deferred — telemetry surface ships to adopters but documenting it now does more harm than good (the streams are still settling, and surfacing them invites premature scraping). May surface in contributor docs later if telemetry becomes a contributor-improvement target. Re-evaluate if/when that decision lands.
+    added: 2026-05-08
+
+  - path: wiki/concepts/Telemetry.md
+    reason: deferred — same rationale as gaia telemetry* (paired exclusion to keep the wiki concept page out of drift reports while telemetry is undocumented).
+    added: 2026-05-08
+
+  - path: .claude/hooks/telemetry-task-postuse.sh
+    reason: deferred — same rationale as gaia telemetry* (the hook is the in-process emit surface; documenting it discloses what telemetry-emit does and when).
+    added: 2026-05-08
+
+  - name: gaia mentorship*
+    reason: deferred — quiet-launch decision. Mentorship is the consumer of telemetry pattern detection; documenting status / enable / disable invites attention to the adaptation system before it's ready for it. Re-evaluate when the quiet-launch posture lifts.
+    added: 2026-05-08

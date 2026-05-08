@@ -1,0 +1,102 @@
+/* GAIA palette — mirrors website/src/styles.css @theme tokens. */
+:root {
+	--gaia-canvas: #141413;
+	--gaia-surface: #1f1e1d;
+	--gaia-surface-raised: #262624;
+	--gaia-ink: #faf9f5;
+	--gaia-ink-dim: #b0aea5;
+	--gaia-muted: #87867f;
+	--gaia-accent: #d97757;
+	--gaia-accent-2: #c96442;
+	--gaia-accent-soft: #efa58e;
+	--gaia-line: #3d3d3a;
+	--gaia-line-soft: #2e2e2b;
+
+	--gaia-font-display: 'Fraunces', Georgia, serif;
+	--gaia-font-body: ui-sans-serif, system-ui, sans-serif;
+	--gaia-font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* Force dark scheme — website is dark-only, docs should match. */
+:root {
+	color-scheme: dark;
+}
+
+/* Map GAIA tokens onto Starlight's CSS variables. */
+:root,
+:root[data-theme='dark'],
+:root[data-theme='light'] {
+	--sl-color-accent-low: #3a1d12;
+	--sl-color-accent: var(--gaia-accent);
+	--sl-color-accent-high: var(--gaia-accent-soft);
+
+	--sl-color-white: var(--gaia-ink);
+	--sl-color-gray-1: #ebe9e0;
+	--sl-color-gray-2: #d3d1c8;
+	--sl-color-gray-3: var(--gaia-ink-dim);
+	--sl-color-gray-4: var(--gaia-muted);
+	--sl-color-gray-5: var(--gaia-line);
+	--sl-color-gray-6: var(--gaia-line-soft);
+	--sl-color-black: var(--gaia-canvas);
+
+	--sl-color-bg: var(--gaia-canvas);
+	--sl-color-bg-nav: rgba(20, 20, 19, 0.85);
+	--sl-color-bg-sidebar: var(--gaia-canvas);
+	--sl-color-bg-inline-code: var(--gaia-surface);
+	--sl-color-bg-accent: var(--gaia-accent);
+
+	--sl-color-text: var(--gaia-ink-dim);
+	--sl-color-text-accent: var(--gaia-accent);
+	--sl-color-text-invert: var(--gaia-canvas);
+
+	--sl-color-hairline: var(--gaia-line);
+	--sl-color-hairline-light: var(--gaia-line-soft);
+	--sl-color-hairline-shade: var(--gaia-line);
+
+	--sl-font: var(--gaia-font-body);
+	--sl-font-mono: var(--gaia-font-mono);
+
+	--sl-nav-height: 4rem;
+}
+
+@media (min-width: 50rem) {
+	:root {
+		--sl-nav-height: 4rem;
+	}
+}
+
+/* Display font for headings — matches website. */
+h1,
+h2,
+h3 {
+	font-family: var(--gaia-font-display);
+	font-weight: 300;
+	letter-spacing: -0.02em;
+	line-height: 1.15;
+}
+
+/* Site-wide body matches website. */
+body {
+	background-color: var(--gaia-canvas);
+	color: var(--gaia-ink);
+	font-family: var(--gaia-font-body);
+}
+
+/* Header backdrop blur — mirror website's translucent bar. */
+.header {
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	background-color: rgba(20, 20, 19, 0.85);
+}
+
+/* Zero Starlight's outer header padding — padding lives on the inner container instead,
+   so max-width centering + explicit padding both stack toward the correct left offset. */
+header.header {
+	--sl-nav-pad-x: 0;
+}
+
+/* Subtle bottom hairline on the nav, matching the website. */
+header.header,
+.page > header {
+	border-bottom: 1px solid var(--gaia-line);
+}
