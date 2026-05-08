@@ -1,0 +1,91 @@
+---
+title: /gaia wiki
+description: Maintain the project wiki. Sync, consolidate, and lint.
+sidebar:
+  order: 7
+---
+
+`/gaia wiki` is the wiki-maintenance router. The wiki at `wiki/` exists for Claude, not for human reading. Its job is to keep a current, structured project context Claude can read on demand instead of re-inferring the same facts from source code on every request. That re-inference is the token sink the wiki eliminates.
+
+## Why the wiki exists
+
+Without it, every session that needs to reason about a service, a hook contract, or a past architectural decision pays for it twice: once when the source was written, again when Claude reads the source to answer a question. The wiki captures the load-bearing facts once and stays current as commits land. Claude reads the wiki, not the source, for orientation.
+
+Adopters interact with the wiki through `/gaia wiki` (sync, consolidate, lint). The contents are not meant to be browsed or hand-edited.
+
+## Sub-commands
+
+```
+/gaia wiki [sync|consolidate|lint]
+```
+
+| Argument | Behavior |
+| --- | --- |
+| `sync` | Evaluate commits since the last sync. Update wiki pages where warranted. No chaining. |
+| `consolidate` | Cross-page redundancy and contradiction audit. Surfaces findings with action prompts. No chaining. |
+| `lint` | Health check: orphans, dead links, drift severity, narrative-reference scrub. No chaining. |
+| (no argument) | Full chain: sync, then consolidate if the gate trips, then lint. |
+
+## /gaia wiki sync
+
+Walks every commit between the wiki's last evaluated SHA and HEAD. For each commit, decides whether the wiki needs an update. Edits pages, logs decisions, advances state.
+
+The classifier runs in two passes. The first pass classifies commits as `WORTHY` or `SKIP` deterministically (subject patterns, file patterns, file count). The second pass reads the diff for `WORTHY` commits only and edits the affected wiki pages.
+
+State lives in `wiki/.state.json`:
+
+- `last_evaluated_sha`: the commit sync most recently classified up to.
+- `last_evaluated_at`: when that classification ran.
+- `last_consolidated_sha`: owned by consolidate. Sync preserves it.
+
+If drift exceeds 30 commits, sync asks before processing the full range. You can opt to sync the recent 20 only and re-anchor.
+
+Sync ends with a one-line trigger: `CONSOLIDATE_TRIGGERED: true|false`. Used by the full-chain mode to decide whether consolidate runs next.
+
+## /gaia wiki consolidate
+
+Detects redundancy and contradiction across the wiki. Four passes:
+
+- **Same-subject across SPECs.** Pairs of pages in the same domain with matching titles or matching provenance gaps. The newer page is canonical; the older becomes a supersession candidate.
+- **Reversed decisions.** Decision pages whose body negates an older decision page (`replaces`, `supersedes`, `deprecated in favor of`, etc.). The older page is flagged for retirement.
+- **Near-collision slugs.** Pairs within Levenshtein distance 2, or where one slug is a prefix of the other.
+- **Subject-orphaned pages.** Pages with zero inbound wikilinks, no body-title matches in `wiki/concepts/` or `wiki/modules/`, and no edits in 90 days.
+
+For each finding, consolidate prompts you per finding: `Apply`, `Keep both`, or `Skip`. `Apply` performs the merge or retire action. `Keep both` writes a `consolidation_ack` flag on the canonical page so the finding does not re-surface. `Skip` defers to the next run.
+
+Consolidate does not commit. Applied edits stage; sync (or your manual commit) lands them. The `wiki-commit-nudge` hook prompts a sync commit after your next `git commit`.
+
+## /gaia wiki lint
+
+Health check. Wraps the upstream `claude-obsidian:wiki-lint` skill and appends three GAIA-specific checks:
+
+- **#11 Wiki drift check.** Reports how many commits behind HEAD the wiki is. Severity: `none`, `low`, `medium`, `high`. High severity surfaces with a `WIKI DRIFT:` prefix.
+- **#12 Dead repo-relative paths.** Backticked paths in wiki body prose that no longer exist on disk (e.g. a hook removed in a refactor still cited in a concept page).
+- **#13 UAT/SPEC narrative-ref drift.** Narrative `UAT-NNN` and concrete `SPEC-NNN` references that should not appear in instruction files. Filters structural matches (template examples, CLI flags, code literals) from narrative ones (section headers, prose).
+
+Reports land at `wiki/meta/lint-report-YYYY-MM-DD.md`. The `wiki/meta/` directory is created locally on first lint run.
+
+## Full chain (no argument)
+
+```
+/gaia wiki
+```
+
+Runs sync. Reads the `CONSOLIDATE_TRIGGERED` line from sync's summary. If true, runs consolidate. Then runs lint.
+
+The order matters: consolidate may move, rename, or archive pages, so lint runs last to check the true post-state. If sync exits on the re-anchor path or a partial-sync interruption, the chain stops; the wiki is in a known-incomplete state and consolidate against an unreachable past makes no sense.
+
+## Hooks that read state
+
+Three hooks consume `wiki/.state.json` in read-only mode:
+
+- `wiki-drift-check`: surfaces drift severity on your first prompt of each session.
+- `wiki-commit-nudge`: suggests a sync after commits that look wiki-relevant.
+- `wiki-session-stop`: checks for uncommitted wiki changes and whether sync state advanced, then prompts accordingly.
+
+These never write the state file. Only sync and consolidate do.
+
+## Related
+
+- [/gaia](/gaia/): router overview.
+- [/gaia plan](/gaia/plan/): multi-step orchestration. Large plans typically end with a wiki sync.

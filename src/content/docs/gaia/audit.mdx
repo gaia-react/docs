@@ -1,0 +1,103 @@
+---
+title: /gaia audit
+description: Audit memory, rules, and wiki for duplication, stale entries, and over-budget auto-loads. Produces a report and applies it.
+---
+
+`/gaia audit` reviews the project's knowledge stores (machine-local memory, project rules, wiki, auto-loaded `CLAUDE.md` files) for duplication, stale entries, and bloated auto-loads. It runs in two stages: a research stage produces a report, then an apply stage executes the report mechanically.
+
+The wiki is the source of truth. Memory is machine-local only. Auto-loaded files carry a token cost on every session, so the audit pushes detail behind lazy wikilinks and keeps the auto-loaded surface as a pointer set.
+
+## When to use it
+
+Run `/gaia audit` periodically: after a stretch of new feature work, when `CLAUDE.md` or `wiki/hot.md` feels heavy, or when the same fact seems to live in two places.
+
+Wiki-internal duplication and broken-link repair are out of scope here. Those belong to `/gaia wiki consolidate` and `/gaia wiki lint`.
+
+## How to invoke
+
+Default. Research, then apply:
+
+```
+/gaia audit
+```
+
+Apply only. Re-execute the most recent report:
+
+```
+/gaia audit --apply
+```
+
+Use `--apply` when an earlier run produced a report but drift caused some actions to skip; fix the drift, then re-apply. Reports older than 24 hours are refused. Generate a fresh one in that case.
+
+## What gets audited
+
+| Store | Path | Auto-loaded? |
+| --- | --- | --- |
+| Machine-local project memory | `~/.claude/projects/<project>/memory/` | `MEMORY.md` (first 200 lines) |
+| Machine-local agent memory | `~/.claude/agent-memory/` | Per-agent, on demand |
+| Project agent memory | `.claude/agent-memory/` | Per-agent, on demand |
+| Project root `CLAUDE.md` | `CLAUDE.md` | Yes, every session |
+| Wiki hot cache | `wiki/hot.md` | Yes, every session |
+| Wiki domain pages | `wiki/<domain>/` | On demand |
+| Project rules | `.claude/rules/*.md` | Yes when `paths:` frontmatter matches |
+| Nested `CLAUDE.md` | `**/CLAUDE.md` (e.g. monorepo packages) | Yes when cwd matches |
+
+The audit checks each entry for cross-store duplication and classifies it as:
+
+- **DUPLICATE**: fact already canonical in the wiki; mark for deletion.
+- **PROMOTE**: durable knowledge only in memory; propose moving to a specific wiki page.
+- **KEEP-LOCAL**: genuinely machine-local (personal preference, machine path, unique dev env); keep as-is.
+- **STALE**: references a file, branch, or feature no longer present; mark for deletion.
+
+Then it computes auto-load budgets:
+
+| File | Budget |
+| --- | --- |
+| `wiki/hot.md` | ≤200 words |
+| `CLAUDE.md` (root) | ≤400 words |
+| Any nested `CLAUDE.md` | ≤400 words |
+| Any single `.claude/rules/*.md` | ≤200 lines |
+
+Anything over budget is flagged with a proposed fix: inline facts moved to the wiki, duplicated sections consolidated, or oversized files split into narrower ones.
+
+## The two-stage flow
+
+**Stage 1: research (Sonnet).** Reads the stores, classifies entries, computes budgets, writes a report at `.gaia/local/audit/KNOWLEDGE-{YYYY-MM-DD-HHMM}.md`. Snapshots `git status --short` and `git rev-parse HEAD` into the report's frontmatter so stage 2 can detect drift. Mutates nothing outside `.gaia/local/audit/`.
+
+**Stage 2: apply (Haiku).** Reads the most recent report. Re-resolves project root, memory dir, and agent memory dir; if they differ from the report's frontmatter, stops with a clear error. Verifies each action's drift signal: SHA-256 of the target file, or a verbatim snippet that must appear in current content. Applies the action verbatim, or skips with a recorded reason. Never improvises.
+
+The split exists for technical reasons (different reasoning loads, drift-check between stages), not as a user-confirmation gate. Calling `/gaia audit` is the intent to apply.
+
+## Action types
+
+| Action | What it does |
+| --- | --- |
+| `delete` | Remove a memory or rules file whose facts are canonical in the wiki, gated on the file's SHA-256 matching what the report saw. |
+| `delete-entry` | Remove a specific block (e.g. a heading section in `MEMORY.md`) by verbatim match. |
+| `promote` | Move durable knowledge from memory to a named wiki page. Performs the target action (`append_section`, `insert_after_heading`, or `create_new`), prepends a log entry to `wiki/log.md`, appends an index entry to `wiki/index.md`, then deletes the source if the action says to. |
+| `replace` | Shrink inline content in an auto-loaded file to a wikilink. The current block must match byte-for-byte; the replacement is typically a single wikilink line. |
+
+Stage 2 applies actions in order: `replace` → `delete-entry` → `promote` → `delete`. Earlier shrinks never reference content that later actions touch; deletes come last so pointers do not go stale before they are used.
+
+## Drift handling
+
+Each action ships with a drift signal: either `expect_sha256` (file-level) or a verbatim `before:` / `expect:` snippet. Stage 2 checks the signal before applying:
+
+- Match: apply, flip the checkbox to `[x]`.
+- Mismatch: skip, flip to `[~]` with reason `sha drift` or `snippet drift`.
+- Error during apply: flip to `[!]` with the error.
+- Target missing: `[!]` with `target missing`.
+
+Files dirty in git that appear as targets get marked `SKIP (dirty)` before any action runs. Dirty-file protection is preventive, not diagnostic.
+
+## After the run
+
+The output is a working-tree diff, not a commit. Stage 2 never runs `git add` or `git commit`. Review the diff and commit if satisfied.
+
+The skill prunes its own report directory: keeps the newest five reports unconditionally, then deletes anything older than 30 days beyond that floor.
+
+## Related
+
+`/gaia audit` is distinct from the `code-review-audit` agent. The agent reviews code changes on a branch before merge for security, performance, and correctness. `/gaia audit` reviews knowledge stores for duplication and bloat. Different inputs, different outputs, different audiences.
+
+For wiki-internal redundancy (multiple wiki pages saying the same thing) and broken wikilinks, use `/gaia wiki consolidate` and `/gaia wiki lint` respectively.

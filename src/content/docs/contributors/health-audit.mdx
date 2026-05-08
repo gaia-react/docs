@@ -1,0 +1,58 @@
+---
+title: Health audit
+description: /health-audit runs an autonomous audit, fix, and re-audit loop against the GAIA template repo with circuit breakers and escalation criteria.
+sidebar:
+  order: 3
+---
+
+`/health-audit` is the autonomous audit + auto-heal loop for the GAIA template repo. It is contributor-only. The slash command file (`.claude/commands/health-audit.md`) and the supporting infrastructure under `.gaia/cli/health/` are excluded from the adopter tarball.
+
+Adopters audit their own app via the `code-review-audit` agent. They never run `/health-audit`.
+
+## What it does
+
+`/health-audit` runs up to three audit-fix-audit cycles. Each cycle:
+
+1. Spawns a fresh Triager.
+2. The Triager runs the Audit Team in parallel across buckets A-D.
+3. Findings get written to `.gaia/local/audit/c<N>/findings.json`.
+4. If clean (zero findings + Bucket D reports A+ readiness), the cycle exits with grade A+.
+5. Otherwise, the Triager classifies findings, compares fingerprints against the previous cycle to detect oscillation, and dispatches Fixers in lane-aware parallel.
+6. Fixers complete; the Triager reports post-fix state; the team shuts down; the next cycle starts.
+
+A fresh Triager per cycle prevents prior-cycle findings from bleeding into verification.
+
+## Where the runbook lives
+
+The orchestrator reads `.gaia/cli/health/runbook.md` end-to-end before running. The runbook codifies role structure, bucket definitions, fixer lane mapping, model selection, circuit breakers, and escalation criteria. The taxonomy of findings lives at `.gaia/cli/health/taxonomy.md`.
+
+Both files are excluded from the adopter tarball via the `.gaia/cli/health/` directory rule in `.gaia/release-exclude`.
+
+## Circuit breakers
+
+A Fixer dispatch pauses for human-confirm if the proposed fix:
+
+- Touches more than 100 lines.
+- Modifies `.gaia/release-exclude`.
+- Modifies `.claude/rules/`.
+- Removes a check from `.gaia/release-scrub.yml`.
+- Edits `.gaia/cli/health/taxonomy.md` "Decided / not findings" entries.
+
+If the human refuses the fix, the orchestrator escalates.
+
+## Reports
+
+On a clean exit the orchestrator prints:
+
+```
+HEALTH AUDIT: A+
+Cycles: <N>
+Findings closed: <count> (per cycle: <breakdown>)
+Artifacts: cleaned (.gaia/local/audit/c* removed)
+```
+
+On escalation it preserves all `c*/` directories and prints the outstanding findings with fingerprints and the escalation reason (max-loops hit, oscillation detected, circuit breaker tripped, unclassified finding, or fixer unable to fix).
+
+## When contributors run it
+
+Run `/health-audit` against the template repo before cutting a release, after merging changes that touched the CLI source or shipped Claude surface, or when investigating drift between the template and its own internal rules.

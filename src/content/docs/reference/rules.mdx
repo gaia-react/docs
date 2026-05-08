@@ -1,0 +1,35 @@
+---
+title: Rules
+description: Reference for the path-scoped rule files GAIA loads into Claude's context.
+sidebar:
+  order: 2
+---
+
+Rules live at `.claude/rules/*.md`. Each rule is a short Markdown file that Claude loads into context when the work touches a matching path. The `instruction-files` rule itself enforces the convention: paths inside template-distributed files must be repo-relative, never absolute, so they resolve correctly on every machine.
+
+A rule's frontmatter `paths:` field is the gate. When Claude edits or reads a file matching one of those globs, the rule body is included automatically. Rules without a `paths:` field are always loaded.
+
+## Always loaded
+
+| Rule | What it enforces |
+|---|---|
+| `coding-guidelines` | File-naming conventions (PascalCase components, camelCase hooks, kebab-case other), simplicity-first, surgical changes, goal-driven execution, mandatory TDD, mandatory quality-gate run before commit. |
+| `knip` | When and when not to run `pnpm knip`; the audit agent runs it pre-merge, manual runs only after a refactor, deletion, or dependency replacement. |
+| `quality-gate` | Run the steps in `wiki/decisions/Quality Gate.md` before any commit that touches source, unless nothing in the gate's scope is staged. |
+| `shell-cwd` | No `cd` in Bash tool calls; use absolute paths. A persistent `cd` breaks the relative-path hooks registered in `settings.json`. |
+
+## Path-scoped
+
+| Rule | What it enforces | Paths |
+|---|---|---|
+| `accessibility` | Keyboard reachability, alt text, focus management on modals, semantic HTML over ARIA roles, color never the sole indicator. | `app/components/**`, `app/pages/**` |
+| `api-service` | Pointer to the API Service Pattern wiki page and the `new-service` skill; no inline rules. | `app/services/**`, `test/mocks/**` |
+| `code-search` | Prefer Serena's MCP tools for symbol-level queries on TS/TSX; fall back to Read+grep for prose, comments, and files outside `app/**`/`test/**`. | `app/**/*.ts`, `app/**/*.tsx`, `test/**/*.ts`, `test/**/*.tsx` |
+| `i18n` | Every user-facing string comes from `t()`; one `useTranslation()` per component; namespace conventions and key file layout under `app/languages/en/`. | `app/pages/**`, `app/components/**`, `app/languages/**` |
+| `instruction-files` | All paths in template-distributed files under `.claude/` must be repo-relative; provides an audit grep for absolute-path leaks. | `.claude/**` |
+| `playwright` | E2E spec layout, semantic selectors over CSS, web-first assertions only, hydration helper before interaction, MSW behavior in dev, parallelism and CI settings. | `.playwright/**`, `playwright.config.*` |
+| `routes` | Pointer to thin-route conventions in the wiki and the `new-route` skill; route files stay loader/action-only. | `app/routes/**`, `app/pages/**` |
+| `state-pattern` | Context creation lives in `app/state/`; naming conventions for Provider/`useX`/`useMaybeX`; never export the Context; provider composition via `app/state/index.tsx`. | `app/state/**` |
+| `storybook` | Story file location and typing, slash-separated titles, decorator order, fullscreen layout with `wrap: 'p-4'` for padding, variant-name table, Chromatic dark-mode handling. | `app/**/*.stories.tsx`, `.storybook/**` |
+| `tailwind` | Tailwind v4 only (config in `app/styles/tailwind.css`, no `tailwind.config.ts`); semantic `@utility` tokens over raw paired classes; no arbitrary hex colors in `[]`. | `app/**/*.tsx`, `app/**/*.css` |
+| `wiki-style` | Present-tense prose; no UAT/SPEC/PR/commit references in body prose; no historical phrasing; ships an audit grep for violations. | `wiki/**/*.md`, `app/**/*.{ts,tsx,js,jsx,css}`, `.claude/{skills,commands,agents,rules}/**/*.md`, `.claude/hooks/**/*.sh`, `.specify/extensions/gaia/{README.md,commands,lib,rules,templates}/**` |

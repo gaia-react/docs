@@ -1,0 +1,28 @@
+---
+title: Releases
+description: Audience and scope for /gaia-release. The release workflow exists in the template repo but is excluded from the adopter tarball.
+sidebar:
+  order: 2
+---
+
+`/gaia-release` cuts a new release of the GAIA template itself. It is invoked by Steven only. The slash command and its supporting `gaia-maintainer` binary are stripped from the adopter tarball by `.gaia/release-exclude`, so adopters never see this surface.
+
+## Why contributors should know it exists
+
+Contributors who modify CLI source, hooks, rules, or shipped wiki content land in trees that a release will eventually package. The release flow validates those trees in three ways:
+
+- **Manifest regeneration**. `.gaia/manifest.json` lists every file in the adopter tarball with a class (`owned`, `shared`, or `wiki-owned`). The classification rules live in `.gaia/cli/src/release/manifest.ts`. The on-disk manifest is the source of truth that `/update-gaia` consumers read.
+- **Bundle-time scrub**. The release workflow stages a tree from `git ls-files`, subtracts `.gaia/release-exclude` patterns, then runs the scrub against the staging directory. The scrub strips `gaia:maintainer-only` blocks and runs leak checks before the tarball is built.
+- **Distribution test gate**. The release workflow runs `.gaia/tests/distribution/run-all.sh` against an independently-staged tree before the tarball uploads. A broken release halts before `gh release create` runs.
+
+If a change touches surface the release flow validates, expect the next release to surface any drift.
+
+## What runs the release end-to-end
+
+The CI counterpart is [release.yml](/contributors/ci/#releaseyml). It runs on `v*.*.*` tags, re-stages the tree, re-validates the staged tree and verifies runtime dependencies, runs the distribution test gate, builds the tarball, and creates the GitHub Release.
+
+`main` is protected. The release commit lands on a `release/v<version>` branch, goes through a PR, and the tag is created on the merge commit after it lands on `main`.
+
+## Detailed runbook
+
+The end-to-end runbook lives in the template source at `.claude/commands/gaia-release.md`. It is not reproduced here.

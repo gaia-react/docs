@@ -1,0 +1,112 @@
+---
+title: CLI surface
+description: Reference for the gaia binary subcommands invoked by skills, hooks, and slash commands. Source layout for contributors working on the CLI.
+sidebar:
+  order: 4
+---
+
+The `gaia` binary is the bundled CLI that ships with the adopter tarball at `.gaia/cli/gaia`. Adopters do not invoke it directly in normal use. Skills, hooks, and slash commands invoke it for them.
+
+Contributors working on the CLI source need the surface map. Source lives under `.gaia/cli/src/` (contributor-only, excluded from the adopter tarball). The bundle is rebuilt by `pnpm --filter @gaia-react/cli bundle`.
+
+## Build layout
+
+Two binaries get bundled:
+
+- `.gaia/cli/gaia`: adopter binary. Entry point: `src/index.ts`. Ships in the tarball.
+- `.gaia/cli/gaia-maintainer`: maintainer binary. Entry point: `src/index.maintainer.ts`. Excluded from the tarball.
+
+The adopter binary's `src/index.ts` does not import any maintainer-only handler, so esbuild tree-shakes maintainer surface out of the adopter bundle.
+
+## Top-level subcommands
+
+All subcommands print a help block on `--help`, `-h`, or `help`. Source path links point at the per-subcommand router under `.gaia/cli/src/`.
+
+### `gaia init`
+
+Source: `.gaia/cli/src/init/index.ts`
+
+Per-step handlers consumed by `/gaia-init`. Each handler reads and writes `.gaia/init-state.json` so the slash command can resume on failure.
+
+```
+gaia init strip-branding --title <T>
+gaia init configure-i18n --locales <list> --strip <bool>
+gaia init rename --title <T> --kebab <K>
+gaia init wire-statusline --mode <global|project|skip>
+gaia init finalize
+gaia init resume [--from-step <N>]
+```
+
+### `gaia scaffold`
+
+Source: `.gaia/cli/src/scaffold/index.ts`
+
+Code generators invoked by the `new-component`, `new-hook`, `new-route`, and `new-service` skills. Each generator reads templates from `.gaia/cli/src/scaffold/templates/`.
+
+```
+gaia scaffold component <Name>
+gaia scaffold hook <useFoo>
+gaia scaffold route <name>
+gaia scaffold service <name>
+```
+
+### `gaia setup`
+
+Source: `.gaia/cli/src/setup/index.ts`
+
+Per-machine clone setup primitives invoked by `/setup-gaia`. The slash command orchestrates externally-shelled installs (React Doctor, Playwright CLI, Serena MCP, plugins, spec-kit) and calls these primitives to record progress in `.gaia/local/setup-state.json`.
+
+```
+gaia setup status [--json]
+gaia setup mark-step <step>
+gaia setup finalize [--force]
+gaia setup link-worktree [--json]
+```
+
+### `gaia update`
+
+Source: `.gaia/cli/src/update/index.ts`
+
+Wired by the `/update-gaia` skill for the deterministic byte-level merge step.
+
+```
+gaia update merge --baseline <dir> --latest <dir> --manifest <path> [--json]
+```
+
+The skill drives tarball fetching and user-facing prompts; the CLI handles per-manifest-entry classification and three-way file compare so the skill never reads bytes per entry.
+
+### `gaia wiki`
+
+Source: `.gaia/cli/src/wiki/index.ts`
+
+Wiki-state primitives consumed by the `/gaia wiki` skill family (`sync`, `consolidate`, `lint`). The primitives are deterministic; the slash commands orchestrate them.
+
+```
+gaia wiki state [--json]
+gaia wiki commit-classify --since <sha> [--json]
+gaia wiki state-init <sha>
+gaia wiki state-bump <field> <value>
+gaia wiki log-prepend --sha <h> --decision <D> --reason "..."
+gaia wiki page-index [--json]
+gaia wiki orphans
+gaia wiki near-collisions [--max-distance N]
+gaia wiki dead-paths [--json]
+gaia wiki sync land [--branch-aware]
+```
+
+`state-init <sha>` refuses if `wiki/.state.json` already exists. `state-bump` performs an atomic single-field update. `sync land` lands staged wiki changes via the correct branch strategy.
+
+## Where to find tests
+
+Per-subcommand test files sit alongside the source: `component.test.ts` next to `component.ts`, etc. The test runner is Vitest. Run from the CLI workspace:
+
+```bash
+pnpm -C .gaia/cli typecheck
+pnpm -C .gaia/cli test --run
+```
+
+Test fixtures live under `.gaia/cli/test-fixtures/`.
+
+## Surfaces excluded from this reference
+
+Some namespaces in the source are deliberately undocumented in public contributor docs and are not listed above. They remain visible in the source itself; this page intentionally does not enumerate them.

@@ -1,0 +1,35 @@
+---
+title: Contributors
+description: Reference for people working on the GAIA template repo itself. Covers surface that does not ship to adopters.
+sidebar:
+  order: 1
+---
+
+This section covers GAIA surface that exists in the template repo but does not ship to adopters. Audience: Steven and any outside contributors working on the GAIA template itself.
+
+If you ran `npx create-gaia my-app` and got a scaffolded project, this section is not for you. Stay in the adopter docs.
+
+## Adopter / contributor split
+
+GAIA distinguishes two audiences and routes its surface accordingly. Two release mechanisms strip contributor-only material from the adopter tarball:
+
+1. **Path-level exclusion**. Entire files and directories listed in `.gaia/release-exclude` never enter the tarball produced by the GitHub Release workflow. Examples: `.claude/commands/gaia-release.md`, `.gaia/cli/src/`, `.gaia/cli/health/`, `wiki/entities/`, `wiki/meta/`.
+2. **Block-level exclusion**. Content between `<!-- gaia:maintainer-only:start -->` and `<!-- gaia:maintainer-only:end -->` markers inside files that DO ship. The shipped file is a subset of the source.
+
+Both pass through the bundle-time scrub during release. The on-disk `.gaia/release-exclude` is the authoritative manifest of path-level rules.
+
+## What's in this section
+
+- [`/gaia-release`](/contributors/release/): audience scope and what releases produce. The detailed runbook is internal to the maintainer.
+- [`/health-audit`](/contributors/health-audit/): autonomous health audit and auto-heal loop with circuit breakers.
+- [CLI surface](/contributors/cli/): `gaia` binary subcommands that contributors invoke directly, plus where their source lives.
+- [CI workflows](/contributors/ci/): `release.yml`, `cli-tests.yml`, `distribution.yml`, `forensics-triage.yml`.
+- [Contributor wiki content](/contributors/wiki/): `wiki/entities/`, `wiki/meta/`, and the `gaia:maintainer-only` block convention.
+
+## Source-of-truth pointers
+
+- `.gaia/release-exclude`: path-level exclusion manifest
+- `gaia/.gaia/cli/src/`: CLI source
+- `gaia/.gaia/cli/health/runbook.md`: health audit runbook
+- `gaia/wiki/entities/`, `gaia/wiki/meta/`: contributor wiki content
+- `gaia/.github/workflows/`: CI workflows (mix of contributor-only and adopter-shipped)

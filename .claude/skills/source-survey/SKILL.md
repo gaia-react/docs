@@ -27,7 +27,8 @@ This skill does not write docs. It reports drift so the user can decide what to 
 ## Outputs
 
 - A structured markdown report printed to the conversation.
-- A *suggested* updated snapshot (printed as a fenced JSON block). Do not write it. Tell the user how to commit it.
+- A structured markdown report printed to the conversation.
+- The updated snapshot written directly to `~/Development/gaia-react/docs/.claude/audit/source-state.json` via script or Write tool. Never print the JSON to chat.
 
 ## Procedure
 
@@ -292,23 +293,13 @@ hash rule: frontmatter + first 40 body lines (sha256)
 - <one-line description of an item the survey couldn't classify with confidence>
 ```
 
-### Step 8 — Print the suggested next snapshot
+### Step 8 — Write the snapshot to disk
 
-Append to the report:
+Write the updated snapshot JSON directly to `~/Development/gaia-react/docs/.claude/audit/source-state.json`. Do NOT print the JSON to chat. Use a script (bash/python) or the Write tool. Confirm to the user with a single line: `snapshot written: N items → docs/.claude/audit/source-state.json`
 
-```
-## suggested next snapshot
-```
+### Step 9 — Tell the user it's done
 
-Then a fenced JSON block matching the snapshot schema with the current items. Do NOT write to disk.
-
-### Step 9 — Tell the user how to commit
-
-End with this exact line, swapping in the actual command if the user has already wired one:
-
-```
-To accept this snapshot, copy the JSON block above to ~/Development/gaia-react/docs/.claude/audit/source-state.json. Re-running source-survey with no source change must produce identical output.
-```
+End with one line confirming the file was written and the gaia commit it was captured against.
 
 ## Idempotency rules
 

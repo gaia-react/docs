@@ -1,0 +1,119 @@
+---
+title: /gaia forensics
+description: Turn a GAIA workflow misfire into a redacted, classified bug report ready to file.
+sidebar:
+  order: 6
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+`/gaia forensics` turns a GAIA workflow misfire (a failed `/gaia-init`, a stuck `/update-gaia`, a quality-gate refusal, an unexpected hook block) into a structured, redacted bug report. Read-only end-to-end: it inspects state, never modifies, installs, or remediates.
+
+## When to use it
+
+Run it when something GAIA-related goes wrong and you want to file a useful issue without manually scrubbing paths and tokens out of your logs. Good fit for:
+
+- Init or update workflows that bailed mid-run.
+- Hooks that blocked a commit or tool call you expected to pass.
+- Wiki-sync, scaffold, or quality-gate failures.
+- Dev server problems traced to GAIA configuration.
+
+If the failure is in your own application code, this is the wrong tool. Forensics is scoped to GAIA's own surface.
+
+## Invocation
+
+```
+/gaia forensics [optional one-line description]
+```
+
+With an argument, the description is used verbatim. Without an argument, forensics asks one open-ended clarifying question (`What went wrong? Describe what you were doing, what you expected, and what happened.`) and waits for your reply.
+
+## What it does
+
+Forensics runs in nine read-only steps:
+
+1. **Capture.** Reads a fixed set of state files: GAIA version, Node, pnpm, Claude Code version, branch, dirty status, plus class-specific state files (different per failure category). Bodies from `app/` and `wiki/` are never captured. `.env*` and `node_modules/` are excluded. Long files are truncated.
+2. **Classify.** Walks a fixed taxonomy of eight classes (`init`, `update`, `wiki-sync`, `quality-gate`, `hook`, `scaffold`, `dev-server`, `other`) and matches signal phrases against your description. Cites the matched phrase and named state file as evidence.
+3. **Diagnose.** Decides whether the failure is a user-config issue (wrong Node version, missing env var, dirty working tree blocking a workflow) or a probable bug. User-config wins when both signals fire: the environment is the more likely cause.
+4. **Redact.** Runs the assembled report body through one redaction pass: project-root strip, machine-leak fallback, seven token-pattern sweeps, env-var value scrub, then a sanity recheck. If a credential-shaped string survives the recheck, forensics halts rather than emitting a partially redacted body.
+5. **Render.** Emits a strict-schema report with frontmatter (class, GAIA version, created date, optional issue URL) and four fixed sections: `## Symptom`, `## Classification`, `## Capture`, `## Reproduction context`.
+6. **Save.** Writes to `.gaia/local/forensics/<timestamp>-<class>.md`. The timestamp is ISO-8601 compact UTC.
+7. **Branch on diagnosis.** User-config failures: prints remediation steps inline, exits. Probable bugs: continues to the issue-filing offer.
+8. **Offer to file.** If `gh` is installed, asks once whether to file an issue on `gaia-react/gaia` with the `gaia-forensics` label. If `gh` is not installed, prints the local report path and exits.
+9. **Confirm.** Prints a final line with the report path and (if filed) the issue URL.
+
+## Strict body schema
+
+The report body has fixed section headers and order. Phase-2 automation parses these without LLM fallback, so the schema is load-bearing:
+
+```markdown
+---
+class: <init|update|wiki-sync|quality-gate|hook|scaffold|dev-server|other>
+gaia_version: <semver>
+created: <YYYY-MM-DD>
+gh_issue_url?: <url>
+---
+
+## Symptom
+<one-paragraph user description, redacted>
+
+## Classification
+class: <tag>
+evidence: <verbatim user phrase> + <named state file>
+
+## Capture
+gaia_version: <semver>
+node: <version>
+pnpm: <version>
+claude_code: <version>
+branch: <name>
+dirty: <true|false>
+class_state_files:
+  - <repo-relative path>: <one-line summary>
+
+## Reproduction context
+<plain prose: what you were doing, what you expected, what happened>
+```
+
+The body posted to a GitHub issue is the post-frontmatter portion (`## Symptom` through the end), byte-identical to the local file body.
+
+## Hard constraints
+
+<Aside type="caution">
+These four rules are non-negotiable. They apply to every code path.
+</Aside>
+
+- **Read-only end-to-end.** Forensics inspects state. It never modifies, installs, fetches, or remediates.
+- **Write surface allowlist.** Writes go to one user-visible directory: `.gaia/local/forensics/` for the report. No other path is writable.
+- **Uniform redaction.** The local file body and the GitHub issue body pass through the same single redaction pass. The two bodies are byte-identical post-redaction.
+- **Strict body schema.** Frontmatter fields, section headers, and section order are fixed. Drift breaks downstream triage.
+
+## Example flow
+
+```
+> /gaia forensics quality-gate refused to merge after I bumped a package
+```
+
+Forensics captures state, classifies as `quality-gate`, reads the relevant state files, redacts the body, writes the report:
+
+```
+Report saved: .gaia/local/forensics/20260509T143022Z-quality-gate.md
+
+File a GitHub issue for this report?
+```
+
+If you say yes and `gh` is installed:
+
+```
+Report: .gaia/local/forensics/20260509T143022Z-quality-gate.md | Issue: https://github.com/gaia-react/gaia/issues/342
+```
+
+If you say no, the report stays local and you can attach it to a manual issue later.
+
+## Storage
+
+`.gaia/local/forensics/` is project-local and gitignored. Reports stay on your machine unless you explicitly file them. Old reports are not pruned automatically.
+
+## Related
+
+- [/gaia](/gaia/): router overview.
