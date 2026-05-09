@@ -5,15 +5,27 @@ sidebar:
   order: 7
 ---
 
-`/gaia wiki` is the wiki-maintenance router. The wiki at `wiki/` exists for Claude, not for human reading. Its job is to keep a current, structured project context Claude can read on demand instead of re-inferring the same facts from source code on every request. That re-inference is the token sink the wiki eliminates.
+The wiki at `wiki/` exists for Claude, not for human reading (though it is used by Claude to answer questions about the project).
 
 ## Why the wiki exists
 
-Without it, every session that needs to reason about a service, a hook contract, or a past architectural decision pays for it twice: once when the source was written, again when Claude reads the source to answer a question. The wiki captures the load-bearing facts once and stays current as commits land. Claude reads the wiki, not the source, for orientation.
+The Obsidian wiki is keeps a current, structured project context Claude can read on demand instead of re-inferring the same facts from source code on every request. That re-inference is a token sink that the wiki eliminates.
 
-Adopters interact with the wiki through `/gaia wiki` (sync, consolidate, lint). The contents are not meant to be browsed or hand-edited.
+Without it, every session that needs to reason about a service, a hook contract, or a past architectural decision pays for it twice: once when the source was written, and again when Claude reads the source to answer a question. The wiki captures the load-bearing facts once and stays current as commits land. Claude reads the wiki, not the source, for orientation, and only refers to the source code when more details are necessary.
 
-## Sub-commands
+## Upkeep
+
+Ideally, you are using GAIA CI, and let GAIA keep the wiki clean autonomously.
+
+If you're not using GAIA CI, then GAIA will keep the wiki up to date after PR merges.
+
+If you run into an issue, or it fails to run for some reason, you can call `/gaia wiki` to run it manually. This is a safe fallback, but it is not recommended as a regular practice.
+
+For teams, running it manually can cause merge conflicts downstream if multiple developers each call it on their own branches. This is why it's recommended to let GAIA handle it.
+
+## Commands
+
+There are three main commands, plus a full-chain mode that runs them in sequence. Each command is described in detail below.
 
 ```
 /gaia wiki [sync|consolidate|lint]
@@ -24,7 +36,7 @@ Adopters interact with the wiki through `/gaia wiki` (sync, consolidate, lint). 
 | `sync` | Evaluate commits since the last sync. Update wiki pages where warranted. No chaining. |
 | `consolidate` | Cross-page redundancy and contradiction audit. Surfaces findings with action prompts. No chaining. |
 | `lint` | Health check: orphans, dead links, drift severity, narrative-reference scrub. No chaining. |
-| (no argument) | Full chain: sync, then consolidate if the gate trips, then lint. |
+| (no argument) | Full chain: sync → consolidate → lint |
 
 ## /gaia wiki sync
 
@@ -87,5 +99,5 @@ These never write the state file. Only sync and consolidate do.
 
 ## Related
 
-- [/gaia](/gaia/): router overview.
-- [/gaia plan](/gaia/plan/): multi-step orchestration. Large plans typically end with a wiki sync.
+- [/gaia](/commands/): router overview.
+- [/gaia plan](/commands/plan/): multistep orchestration. Large plans typically end with a wiki sync.

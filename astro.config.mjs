@@ -32,18 +32,14 @@ export default defineConfig({
 				},
 				{
 					label: 'Commands',
-					items: [{ label: 'Overview', slug: 'commands' }],
-				},
-				{
-					label: '/gaia',
 					items: [
-						{ label: 'Overview', slug: 'gaia' },
-						{ label: '/gaia plan', slug: 'gaia/plan' },
-						{ label: '/gaia spec', slug: 'gaia/spec' },
-						{ label: '/gaia audit', slug: 'gaia/audit' },
-						{ label: '/gaia handoff and pickup', slug: 'gaia/handoff-pickup' },
-						{ label: '/gaia forensics', slug: 'gaia/forensics' },
-						{ label: '/gaia wiki', slug: 'gaia/wiki' },
+						{ label: 'Overview', slug: 'commands' },
+						{ label: '/gaia plan', slug: 'commands/plan' },
+						{ label: '/gaia spec', slug: 'commands/spec' },
+						{ label: '/gaia handoff and pickup', slug: 'commands/handoff-pickup' },
+						{ label: '/gaia audit', slug: 'commands/audit' },
+						{ label: '/gaia forensics', slug: 'commands/forensics' },
+						{ label: '/gaia wiki', slug: 'commands/wiki' },
 					],
 				},
 				{

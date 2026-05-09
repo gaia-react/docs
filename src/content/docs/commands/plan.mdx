@@ -22,7 +22,7 @@ For feature work that has not been clarified yet, run [`/gaia spec`](/gaia/spec/
 Or, with a SPEC reference (typically passed automatically by `/gaia spec`):
 
 ```
-/gaia plan SPEC-005: rework auth, see /abs/path/.gaia/local/specs/SPEC-005.md
+/gaia plan SPEC-005: rework auth, see .gaia/local/specs/SPEC-005.md
 ```
 
 If you invoke `/gaia plan` with no description, it asks for one before continuing.
@@ -66,7 +66,7 @@ Paste it into a fresh Claude Code session, started cold, to run the plan. The or
 
 ## Orchestrator vs sub-agents
 
-The orchestrator owns coordination. It runs in your active Claude Code session after you paste the kickoff prompt. It commits, pushes, opens the PR, runs quality gates between phases, dispatches sub-agents, and never edits source files itself.
+The orchestrator owns coordination. It is spawned in a fresh context after you paste the kickoff prompt. It commits, pushes, opens the PR, runs quality gates between phases, dispatches sub-agents, and never edits source files itself.
 
 Sub-agents own implementation. The orchestrator dispatches one per task per phase with a fresh-context prompt. Each sub-agent edits files, then returns a structured summary that ends with a `## Notes for orchestrator` section (findings, deviations from plan, follow-ups for after merge). Sub-agents never commit, push, or touch git.
 
@@ -78,7 +78,7 @@ Before any `gh pr merge` invocation, the orchestrator spawns the `code-review-au
 
 ## Branch policy
 
-If the orchestrator starts on `main` or `master`, it asks how to isolate the work: a feature branch in place (recommended) or a linked git worktree (experimental). On any other branch, it assumes the current branch is the work branch and proceeds.
+If the orchestrator starts on `main`, it asks how to isolate the work: a feature branch in place (recommended) or a linked git worktree (experimental). On any other branch, it assumes the current branch is the work branch and proceeds.
 
 ## Stop conditions
 
@@ -92,7 +92,7 @@ After all implementation phases pass and the final commit is pushed, the orchest
 
 After the user confirms the PR is ready to merge, the orchestrator deletes its own plan folder. If `.gaia/local/plans/` is gitignored (the GAIA default), the deletion is invisible to git and skipped from commit. Otherwise, the deletion lands as the final commit on the PR.
 
-## Worktree mode
+## Worktree mode (experimental)
 
 If the orchestrator chose worktree mode at branch policy, the post-merge phase confirms the merge via `gh pr view <N> --json state`, then calls `ExitWorktree({action: "remove", discard_changes: true})`. The merged-state confirmation is the primary signal that the work is preserved; `discard_changes: true` is correct because squash-merge produces unreachable commits on the worktree branch.
 

@@ -7,13 +7,20 @@ sidebar:
 
 import { Aside } from '@astrojs/starlight/components';
 
-`/gaia handoff` writes a self-contained handoff document so a future session can pick up cold. `/gaia pickup` reads the most recent handoff and reconstitutes context. They are paired: one closes a session, the other opens the next one.
+| Command | What it does |
+| --- | --- |
+| `/gaia handoff` | Writes a self-contained handoff document so you can clear context. |
+| `/gaia pickup` | Reads the most recent handoff and reconstitutes context. |
 
 ## When to use them
 
-Reach for `/gaia handoff` at the end of a working session, before a context break, or when state is non-obvious (in-flight feature, dirty tree, background process still running). Reach for `/gaia pickup` at the start of any session where the previous session ended with a handoff, or when switching to a new machine.
+Run `/gaia handoff` when your context starts getting "heavy". A good rule of thumb is:
+- **Opus 1M** - 20-25%
+- **Sonnet/Haiku** - 40-60%
 
-The two commands are decoupled. A handoff written on one machine, in one Claude Code session, is consumed by `/gaia pickup` in any later session on any machine that has the same project checked out.
+Then `/clear` (or exit Claude and restart).
+
+Then call `/gaia pickup` in the fresh session to continue.
 
 ## /gaia handoff
 
@@ -25,7 +32,7 @@ Pulls from three sources:
 
 - The conversation transcript (accomplishments, decisions, gaps, open questions).
 - Git state (`git rev-parse --abbrev-ref HEAD`, `git log -1 --oneline`, `git status --short`).
-- Any inline notes you pass after `handoff`.
+- You can optionally include notes inline after `handoff` to help "focus" on specific parts or the next step(s).
 
 The handoff document is written to:
 
@@ -45,10 +52,6 @@ Sections present only when there is real content. Empty sections are dropped, no
 - **Environment state**: branch, background processes, devices or simulators, test fixtures.
 - **Reference files**: `@path` cross-references so the next session can jump straight in.
 - **Next actions**: table of concrete, testable steps with rough effort estimates.
-
-### Discipline
-
-The handoff is a synthesis, not a transcript dump. Every "Next Action" must be executable without context. Every "Gap" must name a file and a diagnostic. Commit hashes, file paths, and device IDs are never fabricated; if uncertain, they are omitted.
 
 ## /gaia pickup
 
@@ -105,9 +108,4 @@ Suggested next: Audit fixture coverage at @lib/prompts/coach.fixtures.ts:1
 
 ## Storage
 
-Handoffs are project-local: `.gaia/local/` is gitignored. They never enter version control, so private notes, dirty-tree details, and device IDs stay on the machine that wrote them. Archived handoffs are not pruned automatically; clean `.gaia/local/handoff/archive/` when it grows.
-
-## Related
-
-- [/gaia plan](/gaia/plan/): multi-step orchestration. Pairs naturally with handoff for long-running plans that span sessions.
-- [/gaia](/gaia/): router overview.
+Handoffs are project-local: `.gaia/local/` is gitignored. They never enter version control, so private notes, dirty-tree details, and device IDs stay on the machine that wrote them. Archived handoffs are not pruned automatically. You should clean `.gaia/local/handoff/archive/` when it grows.

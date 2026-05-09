@@ -1,9 +1,11 @@
 ---
 title: /gaia spec
-description: Run a Socratic discovery loop and save an immutable SPEC artifact. Optionally chains into /gaia plan.
+description: Run a Socratic discovery loop and save an immutable SPEC artifact.
 ---
 
 `/gaia spec` produces an immutable SPEC artifact through a guided Socratic conversation. The artifact lands at `.gaia/local/specs/SPEC-NNN.md` and serves as the contract for [`/gaia plan`](/gaia/plan/) to decompose into work. The skill produces an artifact and stops. It does not implement anything.
+
+This is for when you want to implement a large feature or change request with multiple parts, or you want to present an idea or concept and refine it before implementation.
 
 The flow runs on top of [spec-kit](https://github.com/github/spec-kit), with GAIA-specific shape and discipline layered through a registered preset and extension.
 
@@ -15,16 +17,20 @@ For changes whose intent is already obvious (a bug fix, a refactor against a kno
 
 ## How to invoke
 
-Interactive (most common):
+### Interactive (most common)
+
+In interactive mode, the agent asks the user a series of questions to clarify the intent.
 
 ```
-/gaia spec a feature description
+/gaia spec your feature description
 ```
 
-Auto. Non-interactive: the agent answers all Socratic questions itself, mirrors to a GitHub issue, and chains to `/gaia plan`:
+### Auto mode
+
+In auto mode, the agent answers its own questions without user input. If you find that you are consistently picking the recommended option in interactive mode, or if the description is already well-formed or you just want to see what the agent produces, auto mode is a good choice.
 
 ```
-/gaia spec auto a feature description
+/gaia spec auto your feature description
 ```
 
 A description is required in auto mode. Without one, the skill aborts immediately.
@@ -86,7 +92,7 @@ Use auto mode when the description is well-formed and the cost of stopping for c
 
 Spec-kit's hooks are not shell scripts. When core invokes `/speckit-specify` (or any other core skill), it reads `.specify/extensions.yml` for the relevant event and emits an `EXECUTE_COMMAND: <id>` markdown directive into the agent's reasoning context. The agent then invokes the rendered slash command as a normal Claude skill.
 
-Five GAIA hooks fire across the SPEC lifecycle. Adopters never invoke them by hand.
+Five GAIA hooks fire across the SPEC lifecycle. Never invoke them by hand.
 
 | Event | Slash command | What it does |
 | --- | --- | --- |

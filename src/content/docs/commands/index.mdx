@@ -1,40 +1,36 @@
 ---
-title: Slash commands
-description: Top-level slash commands for GAIA projects. /gaia-init, /setup-gaia, and the /gaia router.
+title: Commands
+description: Sub-routes available under /gaia for day-to-day GAIA workflows.
 sidebar:
   order: 1
 ---
 
-GAIA ships two top-level slash commands at the root of `.claude/commands/`. Both are first-run setup. Day-to-day work runs through the [`/gaia`](/gaia/) router skill.
+`/gaia` is the entry point for GAIA's day-to-day workflows. It is technically a Claude skill router, but in practice it works like a command.
 
-## /gaia-init
+It's located in `.claude/skills/gaia/SKILL.md`.
 
-One-shot bootstrap for a fresh project from the GAIA template. Renames the project, strips GAIA branding, configures i18n (or strips it out), wires the statusline, installs Claude tools and plugins, registers spec-kit, and resets the wiki to a clean slate.
+## Workflow Commands
 
-Run once, on the project the maintainer just created with `npx create-gaia`. Idempotent: failed steps resume from `.gaia/init-state.json` via `gaia init resume`.
+| Command | What it does |
+| --- | --- |
+| [`/gaia spec`](/gaia/spec/) | Run a Q&A to write and refine specifications. |
+| [`/gaia plan`](/gaia/plan/) | Plan known features. |
+| [`/gaia handoff`](/gaia/handoff-pickup/) | Generate a session handoff document so context can transfer to a fresh session. |
+| [`/gaia pickup`](/gaia/handoff-pickup/) | Restore context from the most recent handoff. |
 
-The [`/gaia-init` walkthrough](/getting-started/gaia-init/) covers every prompt and what it sets.
+## Maintenance Commands
 
-## /setup-gaia
+| Command | What it does |
+| --- | --- |
+| [`/gaia audit`](/gaia/audit/) | Audit memory, rules, and wiki for duplication, stale entries, and unnecessary base context overhead. |
+| [`/gaia wiki`](/gaia/wiki/) | Wiki maintenance. With no sub-arg, runs the full chain: `sync`, then `consolidate`, then `lint`. Each can also be invoked individually. |
 
-Per-machine setup for a clone of an already-initialized GAIA project. Installs the same Claude tools and plugins, registers spec-kit, sets the statusline executable bit, copies `.env.example` to `.env`. Idempotent: completed steps are recorded in `.gaia/local/setup-state.json` via `gaia setup mark-step`.
+## GAIA Forensics
 
-Run once per developer, per clone. The statusline displays `Run /setup-gaia` until it has been completed.
+| Command | What it does |
+| --- | --- |
+| [`/gaia forensics`](/gaia/forensics/) | If you encounter any issues with GAIA commands, this will triage the issue and submit a bug report. |
 
-The [`/setup-gaia` walkthrough](/getting-started/setup-gaia/) covers every step and how to resume on failure.
+## Help message
 
-The slash command name intentionally does not start with `gaia-`, so it does not pollute the `/gaia` autocomplete namespace. That namespace is reserved for the day-to-day workflows.
-
-## /gaia (router)
-
-`/gaia` is itself a router skill, not a top-level command. It dispatches to GAIA's day-to-day workflows:
-
-- [`/gaia plan`](/gaia/plan/)
-- [`/gaia spec`](/gaia/spec/)
-- [`/gaia audit`](/gaia/audit/)
-- `/gaia handoff`
-- `/gaia pickup`
-- `/gaia forensics`
-- `/gaia wiki` (with sub-args `sync`, `consolidate`, `lint`)
-
-See the [`/gaia` router page](/gaia/) for the full sub-route map and help text.
+Invoking `/gaia` with no argument (or with an unrecognized one) prints a help message.

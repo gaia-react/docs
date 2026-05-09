@@ -7,18 +7,18 @@ sidebar:
 
 import { Aside } from '@astrojs/starlight/components';
 
-`/gaia forensics` turns a GAIA workflow misfire (a failed `/gaia-init`, a stuck `/update-gaia`, a quality-gate refusal, an unexpected hook block) into a structured, redacted bug report. Read-only end-to-end: it inspects state, never modifies, installs, or remediates.
+`/gaia forensics` turns a GAIA workflow misfire (a failed `/gaia xxx` command, a stuck `/update-gaia`, a quality-gate refusal, an unexpected hook block) into a structured, redacted bug report. Read-only end-to-end: it inspects state, never modifies, installs, or remediates.
 
 ## When to use it
 
-Run it when something GAIA-related goes wrong and you want to file a useful issue without manually scrubbing paths and tokens out of your logs. Good fit for:
+Run it when something GAIA-related goes wrong, and you want to file a useful issue without manually scrubbing paths and tokens out of your logs. Good fit for:
 
-- Init or update workflows that bailed mid-run.
+- GAIA workflows that bailed mid-run.
 - Hooks that blocked a commit or tool call you expected to pass.
 - Wiki-sync, scaffold, or quality-gate failures.
 - Dev server problems traced to GAIA configuration.
 
-If the failure is in your own application code, this is the wrong tool. Forensics is scoped to GAIA's own surface.
+If the failure is in your own application code, **this is the wrong tool**. Forensics is scoped to GAIA's own surface.
 
 ## Invocation
 
@@ -113,7 +113,3 @@ If you say no, the report stays local and you can attach it to a manual issue la
 ## Storage
 
 `.gaia/local/forensics/` is project-local and gitignored. Reports stay on your machine unless you explicitly file them. Old reports are not pruned automatically.
-
-## Related
-
-- [/gaia](/gaia/): router overview.

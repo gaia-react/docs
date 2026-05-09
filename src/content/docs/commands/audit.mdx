@@ -1,17 +1,15 @@
 ---
 title: /gaia audit
-description: Audit memory, rules, and wiki for duplication, stale entries, and over-budget auto-loads. Produces a report and applies it.
+description: Audit memory, rules, and wiki for duplication, stale entries, and over-budget autoloads.
 ---
 
-`/gaia audit` reviews the project's knowledge stores (machine-local memory, project rules, wiki, auto-loaded `CLAUDE.md` files) for duplication, stale entries, and bloated auto-loads. It runs in two stages: a research stage produces a report, then an apply stage executes the report mechanically.
+`/gaia audit` reviews the project's knowledge stores (machine-local memory, project rules, wiki, autoloaded `CLAUDE.md` files) for duplication, stale entries, and bloated base context noise. It runs in two stages: a research stage produces a report, then an apply stage executes the report mechanically.
 
-The wiki is the source of truth. Memory is machine-local only. Auto-loaded files carry a token cost on every session, so the audit pushes detail behind lazy wikilinks and keeps the auto-loaded surface as a pointer set.
+The wiki is the source of truth. Memory is machine-local only. Autoloaded files carry a token cost on every session, so the audit pushes detail behind lazy wikilinks and keeps the autoloaded surface as a pointer set.
 
 ## When to use it
 
-Run `/gaia audit` periodically: after a stretch of new feature work, when `CLAUDE.md` or `wiki/hot.md` feels heavy, or when the same fact seems to live in two places.
-
-Wiki-internal duplication and broken-link repair are out of scope here. Those belong to `/gaia wiki consolidate` and `/gaia wiki lint`.
+Run `/gaia audit` periodically: after a stretch of work, or when your base context size feels too large.
 
 ## How to invoke
 
@@ -98,6 +96,6 @@ The skill prunes its own report directory: keeps the newest five reports uncondi
 
 ## Related
 
-`/gaia audit` is distinct from the `code-review-audit` agent. The agent reviews code changes on a branch before merge for security, performance, and correctness. `/gaia audit` reviews knowledge stores for duplication and bloat. Different inputs, different outputs, different audiences.
+`/gaia audit` is distinct from the `code-review-audit` agent. The agent reviews code changes on a branch before merge for security, performance, and correctness. `/gaia audit` reviews knowledge stores for duplication and bloat. Different inputs, different outputs, different purposes.
 
-For wiki-internal redundancy (multiple wiki pages saying the same thing) and broken wikilinks, use `/gaia wiki consolidate` and `/gaia wiki lint` respectively.
+For wiki-internal redundancy (multiple wiki pages saying the same thing) and broken wikilinks, use `/gaia wiki`.
