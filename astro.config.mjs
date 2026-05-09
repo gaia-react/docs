@@ -23,13 +23,9 @@ export default defineConfig({
 			],
 			sidebar: [
 				{
-					label: 'Start here',
-					items: [{ label: 'Introduction', slug: 'index' }],
-				},
-				{
 					label: 'Getting started',
 					items: [
-						{ label: 'Install', slug: 'getting-started/install' },
+						{ label: 'Quick Start', slug: 'index' },
 						{ label: '/gaia-init walkthrough', slug: 'getting-started/gaia-init' },
 						{ label: '/setup-gaia walkthrough', slug: 'getting-started/setup-gaia' },
 					],
