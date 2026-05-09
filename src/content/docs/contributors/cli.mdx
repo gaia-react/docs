@@ -5,18 +5,18 @@ sidebar:
   order: 4
 ---
 
-The `gaia` binary is the bundled CLI that ships with the adopter tarball at `.gaia/cli/gaia`. Adopters do not invoke it directly in normal use. Skills, hooks, and slash commands invoke it for them.
+The `gaia` binary is the bundled CLI that ships with the end user tarball at `.gaia/cli/gaia`. End users do not invoke it directly in normal use. Skills, hooks, and slash commands invoke it for them.
 
-Contributors working on the CLI source need the surface map. Source lives under `.gaia/cli/src/` (contributor-only, excluded from the adopter tarball). The bundle is rebuilt by `pnpm --filter @gaia-react/cli bundle`.
+Contributors working on the CLI source need the surface map. Source lives under `.gaia/cli/src/` (contributor-only, excluded from the end user tarball). The bundle is rebuilt by `pnpm --filter @gaia-react/cli bundle`.
 
 ## Build layout
 
 Two binaries get bundled:
 
-- `.gaia/cli/gaia`: adopter binary. Entry point: `src/index.ts`. Ships in the tarball.
+- `.gaia/cli/gaia`: end user binary. Entry point: `src/index.ts`. Ships in the tarball.
 - `.gaia/cli/gaia-maintainer`: maintainer binary. Entry point: `src/index.maintainer.ts`. Excluded from the tarball.
 
-The adopter binary's `src/index.ts` does not import any maintainer-only handler, so esbuild tree-shakes maintainer surface out of the adopter bundle.
+The end user binary's `src/index.ts` does not import any maintainer-only handler, so esbuild tree-shakes maintainer surface out of the end user bundle.
 
 ## Top-level subcommands
 

@@ -5,9 +5,11 @@ sidebar:
   order: 3
 ---
 
-`/health-audit` is the autonomous audit + auto-heal loop for the GAIA template repo. It is contributor-only. The slash command file (`.claude/commands/health-audit.md`) and the supporting infrastructure under `.gaia/cli/health/` are excluded from the adopter tarball.
+`/health-audit` is the autonomous audit + auto-heal loop for the GAIA template repo. It is contributor-only. The slash command file (`.claude/commands/health-audit.md`) and the supporting infrastructure under `.gaia/cli/health/` are excluded from the tarball.
 
-Adopters audit their own app via the `code-review-audit` agent. They never run `/health-audit`.
+GAIA's Claude integration is graded for efficiency, safety, and correctness.
+
+The goal of `/health-audit` is to get an A+ score on the GAIA repo with 0 issues of any severity.
 
 ## What it does
 
@@ -51,7 +53,7 @@ Findings closed: <count> (per cycle: <breakdown>)
 Artifacts: cleaned (.gaia/local/audit/c* removed)
 ```
 
-On escalation it preserves all `c*/` directories and prints the outstanding findings with fingerprints and the escalation reason (max-loops hit, oscillation detected, circuit breaker tripped, unclassified finding, or fixer unable to fix).
+On escalation, it preserves all `c*/` directories and prints the outstanding findings with fingerprints and the escalation reason (max-loops hit, oscillation detected, circuit breaker tripped, unclassified finding, or fixer unable to fix).
 
 ## When contributors run it
 

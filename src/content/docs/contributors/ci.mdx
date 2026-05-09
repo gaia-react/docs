@@ -5,11 +5,11 @@ sidebar:
   order: 5
 ---
 
-Four CI workflows are excluded from the adopter tarball by `.gaia/release-exclude`. They run only on the GAIA template repo's clone. The other three workflows (`chromatic.yml`, `tests.yml`, `code-review-audit.yml`) ship to adopters and are out of scope here.
+CI workflows are excluded from the end user tarball by `.gaia/release-exclude`. They run only on the GAIA template repo's clone. The other three workflows (`chromatic.yml`, `tests.yml`, `code-review-audit.yml`) ship to end users and are out of scope here.
 
 ## release.yml
 
-Triggers on `v*.*.*` tag pushes. Builds and publishes the adopter tarball.
+Triggers on `v*.*.*` tag pushes. Builds and publishes the end user tarball.
 
 The job sequence:
 
@@ -59,7 +59,7 @@ Triggers on issue events (`opened`, `labeled`) when the issue carries the `gaia-
 
 Permissions are scoped per-job: `issues: write`, `contents: write`, `pull-requests: write`, `actions: read`, `id-token: write`. Concurrency is keyed per-issue.
 
-The workflow has helpers under `.github/forensics/`: scope checks, classifier prompts, fixtures, and bats tests. All of `.github/forensics/` is contributor-only and excluded from the adopter tarball.
+The workflow has helpers under `.github/forensics/`: scope checks, classifier prompts, fixtures, and bats tests. All of `.github/forensics/` is contributor-only and excluded from the end user tarball.
 
 Steps include an idempotency early-exit (skip if `gaia-triaged` is already on the issue), classification, optional apply-fix path that runs the project quality gate, and a final fallback step that ensures `gaia-triaged` lands on the issue regardless of path.
 

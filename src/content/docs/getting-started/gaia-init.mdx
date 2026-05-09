@@ -57,27 +57,6 @@ claude plugin marketplace add AgriciDaniel/claude-obsidian
 claude plugin install claude-obsidian@claude-obsidian-marketplace
 ```
 
-**Spec-kit.** Initialized with the GAIA extension and preset registered:
-
-```bash
-SPECKIT_PIN="v0.8.5"
-uvx --from "git+https://github.com/github/spec-kit.git@${SPECKIT_PIN}" specify init --here --ai claude --force
-yes | uvx --from "git+https://github.com/github/spec-kit.git@${SPECKIT_PIN}" specify extension add --dev .specify/extensions/gaia
-yes | uvx --from "git+https://github.com/github/spec-kit.git@${SPECKIT_PIN}" specify preset add --dev .specify/presets/gaia
-```
-
-The pin value `v0.8.5` matches the floor declared in `.specify/extensions/gaia/extension.yml` (`>=0.8.5,<0.10.0`). The command pins explicitly so SPEC authoring proceeds against a known spec-kit version.
-
-**CI integrations.** Two GitHub Actions workflows ship with GAIA:
-
-- `.github/workflows/code-review-audit.yml`: pre-merge gate that runs the `code-review-audit` agent against every PR.
-- `.github/workflows/forensics-triage.yml`: autonomous triage for issues labeled `gaia-forensics`.
-
-Both invoke Claude via `claude-code-action` and require the `CLAUDE_CODE_OAUTH_TOKEN` repo secret. `/gaia-init` asks whether to enable now or skip.
-
-- **Enable now**: prints copy-pasteable `gh` recipes you run yourself with maintainer credentials (mint the OAuth token via `claude setup-token`, store as a repo secret, mark `code-review-audit` as a required check on `main`). Ensures the `gaia-forensics` issue label exists if the project already has a GitHub remote.
-- **Skip**: moves both workflow files to `.gaia/templates/workflows/`. Copy them back to `.github/workflows/` whenever you decide to enable. `/update-gaia` reads `.gaia/manifest.json` and respects the deletion as adopter intent, so the opt-out persists across updates.
-
 ### 5. Mentorship opt-in
 
 You can choose to opt-in to GAIA's experimental [mentorship](https://gaiareact.com/mentorship/) feature.

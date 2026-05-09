@@ -63,10 +63,10 @@ export default defineConfig({
 					label: 'Contributors',
 					items: [
 						{ label: 'Overview', slug: 'contributors' },
-						{ label: 'Release', slug: 'contributors/release' },
-						{ label: 'Health audit', slug: 'contributors/health-audit' },
-						{ label: 'CLI surface', slug: 'contributors/cli' },
 						{ label: 'CI workflows', slug: 'contributors/ci' },
+						{ label: 'CLI surface', slug: 'contributors/cli' },
+						{ label: 'Health audit', slug: 'contributors/health-audit' },
+						{ label: 'Release', slug: 'contributors/release' },
 						{ label: 'Wiki internals', slug: 'contributors/wiki' },
 					],
 				},

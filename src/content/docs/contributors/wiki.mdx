@@ -1,20 +1,20 @@
 ---
 title: Contributor wiki content
-description: wiki/entities and wiki/meta are excluded from the adopter tarball. Contributor-only wiki content and the gaia:maintainer-only block convention.
+description: wiki/entities and wiki/meta are excluded from the end user tarball. Contributor-only wiki content and the gaia:maintainer-only block convention.
 sidebar:
   order: 6
 ---
 
-Two directories under `gaia/wiki/` are excluded from the adopter tarball by `.gaia/release-exclude`:
+Two directories under `gaia/wiki/` are excluded from the end user tarball by `.gaia/release-exclude`:
 
 - `wiki/entities/`: named systems, products, and people tracked across the codebase.
 - `wiki/meta/`: process and convention pages about the wiki itself.
 
 Three individual concept and decision pages are also excluded: `wiki/concepts/Release Workflow.md`, `wiki/decisions/Bundle-time Scrub.md`, and `wiki/decisions/Forensics Triage Workflow.md`.
 
-The user-facing wiki workflow (`/gaia wiki sync`, `/gaia wiki consolidate`, `/gaia wiki lint`) lives in adopter docs. This page covers content that contributors maintain on the template repo's own wiki.
+The user-facing wiki workflow (`/gaia wiki sync`, `/gaia wiki consolidate`, `/gaia wiki lint`) lives in end user docs. This page covers content that contributors maintain on the template repo's own wiki.
 
-## `wiki/entities/`
+## wiki/entities/
 
 Pages here describe named entities the GAIA team tracks. Current entries:
 
@@ -25,28 +25,28 @@ Entity pages use the `entity` type frontmatter with an `entity_type` discriminat
 
 When to add: a new entity becomes worth tracking on its own page when it gets cross-linked from concept or decision pages and when its identity is useful to disambiguate from other names. Generic concepts go under `wiki/concepts/`, not here.
 
-## `wiki/meta/`
+## wiki/meta/
 
 Pages here describe the wiki's own process. The directory currently holds wiki lint reports and consolidate reports dated by run, plus a dashboard. The reports are generated artifacts of `/gaia wiki lint` and `/gaia wiki consolidate` runs.
 
 When to add: a new meta page is appropriate when it documents how the wiki itself works (a new convention, a new dashboard, a new workflow). Generated lint and consolidate reports land here automatically; do not write them by hand.
 
-## `gaia:maintainer-only` block convention
+## gaia:maintainer-only block convention
 
-Some pages under `wiki/concepts/`, `wiki/decisions/`, `.claude/`, and `.specify/extensions/gaia/` ship to adopters but contain blocks that do not. The block convention is:
+Some pages under `wiki/concepts/`, `wiki/decisions/`, `.claude/`, and `.specify/extensions/gaia/` ship to end users but contain blocks that do not. The block convention is:
 
 ```markdown
 <!-- gaia:maintainer-only:start -->
-This block is contributor-only. It gets stripped from the adopter
+This block is contributor-only. It gets stripped from the end user
 tarball by the bundle-time scrub during release.
 <!-- gaia:maintainer-only:end -->
 ```
 
 The shipped file is a subset of the source: the markers and everything between them get removed by the scrub before the tarball builds. The literal phrase is `maintainer-only`; this is the on-disk identifier and matches the comment text in `.gaia/release-exclude` and the step name in `release.yml`. Public-facing references in the docs site use "Contributors."
 
-When to use the block convention rather than path-level exclusion: use blocks when most of a page is adopter-relevant but a section needs to stay internal. Use path-level exclusion (an entry in `.gaia/release-exclude`) when the entire file is contributor-only.
+When to use the block convention rather than path-level exclusion: use blocks when most of a page is end user-relevant but a section needs to stay internal. Use path-level exclusion (an entry in `.gaia/release-exclude`) when the entire file is contributor-only.
 
 ## Cross-references
 
-- Adopter wiki workflow: see the `/gaia wiki` skill family in adopter docs.
-- The `.gaia/release-exclude` manifest is the authoritative path-level exclusion list. Anything matched there is also skipped by `gaia-maintainer release manifest`, so the adopter manifest never references files an adopter cannot have.
+- end user wiki workflow: see the `/gaia wiki` skill family in end user docs.
+- The `.gaia/release-exclude` manifest is the authoritative path-level exclusion list. Anything matched there is also skipped by `gaia-maintainer release manifest`, so the end user manifest never references files an end user cannot have.
