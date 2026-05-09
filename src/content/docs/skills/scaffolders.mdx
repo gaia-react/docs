@@ -5,11 +5,11 @@ sidebar:
   order: 2
 ---
 
-Four skills that generate new files following the project's conventions. Each one confirms a few details, runs a `gaia scaffold` command, and verifies the output with `pnpm typecheck`.
+These skills are used by Claude when it generates new files, following the project's conventions.
 
 The skills are the user-facing surface. They wrap the bundled `gaia scaffold` CLI so you don't memorize flags. Run them by describing what you want; the skill prompts for anything missing.
 
-## `new-component`
+## New Component
 
 Scaffolds a React component as a folder under `app/components/` (or a sub-folder you specify) with `index.tsx`, an optional Storybook story, and a Vitest test scaffold.
 
@@ -23,7 +23,7 @@ Underlying CLI: `gaia scaffold component <Name> [--no-story] [--parent <dir>] [-
 
 Source: `.claude/skills/new-component/SKILL.md`.
 
-## `new-hook`
+## New Hook
 
 Scaffolds a custom React hook with a Vitest test file.
 
@@ -37,7 +37,7 @@ Underlying CLI: `gaia scaffold hook <useFoo> [--params "a:string,b:number"] [--r
 
 Source: `.claude/skills/new-hook/SKILL.md`.
 
-## `new-route`
+## New Route
 
 Scaffolds a new route with its page component, test, story, and optional i18n keys. Files land in `app/routes/<group>+/<name>.tsx` plus `app/pages/<Group>/<PageName>/index.tsx`. The route file stays a thin shell (`loader`, `action`, `meta`, Zod schemas, one-line default export); UI lives in the page component.
 
@@ -51,7 +51,7 @@ Underlying CLI: `gaia scaffold route <name> --group <_public+|_session+> [--load
 
 Source: `.claude/skills/new-route/SKILL.md`.
 
-## `new-service`
+## New Service
 
 Scaffolds an API service: request functions, Zod parsers, URL constants, types, and (optionally) MSW mock handlers. Files land under `app/services/gaia/<name>/` with matching mocks under `test/mocks/<name>/`.
 

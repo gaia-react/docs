@@ -13,15 +13,17 @@ The Obsidian wiki is keeps a current, structured project context Claude can read
 
 Without it, every session that needs to reason about a service, a hook contract, or a past architectural decision pays for it twice: once when the source was written, and again when Claude reads the source to answer a question. The wiki captures the load-bearing facts once and stays current as commits land. Claude reads the wiki, not the source, for orientation, and only refers to the source code when more details are necessary.
 
-## Upkeep
+## Usage
 
-Ideally, you are using GAIA CI, and let GAIA keep the wiki clean autonomously.
+Ideally, you enable GAIA CI and let GAIA keep the wiki clean autonomously on a schedule.
 
-If you're not using GAIA CI, then GAIA will keep the wiki up to date after PR merges.
+Without GAIA CI, the wiki doesn't update on its own. GAIA watches for drift and nudges you when it accumulates (at prompt submission and at session end). You then run `/gaia
+wiki` to bring it back in sync.
 
-If you run into an issue, or it fails to run for some reason, you can call `/gaia wiki` to run it manually. This is a safe fallback, but it is not recommended as a regular practice.
+You can always invoke `/gaia wiki` manually. With CI enabled it defers to avoid colliding with the scheduled run; pass `--force` to override.
 
-For teams, running it manually can cause merge conflicts downstream if multiple developers each call it on their own branches. This is why it's recommended to let GAIA handle it.
+For teams, manual runs on feature branches can produce wiki edits that conflict downstream when several developers invoke it in parallel. Letting CI own the writes keeps the
+chain single-writer, which is why CI is the recommended path.
 
 ## Commands
 
@@ -96,8 +98,3 @@ Three hooks consume `wiki/.state.json` in read-only mode:
 - `wiki-session-stop`: checks for uncommitted wiki changes and whether sync state advanced, then prompts accordingly.
 
 These never write the state file. Only sync and consolidate do.
-
-## Related
-
-- [/gaia](/commands/): router overview.
-- [/gaia plan](/commands/plan/): multistep orchestration. Large plans typically end with a wiki sync.

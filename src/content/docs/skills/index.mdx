@@ -5,8 +5,6 @@ sidebar:
   order: 0
 ---
 
-A skill is a self-contained bundle of patterns, conventions, and workflows that Claude loads when the conversation matches its trigger phrasing. Skills live as `SKILL.md` files with a frontmatter description; the description tells Claude *when* to load the skill.
-
 GAIA ships its skills under `.claude/skills/` in your project. Each one is a directory with a `SKILL.md` and (sometimes) supporting `references/` files that load on demand.
 
 ## Catalog
@@ -19,7 +17,7 @@ GAIA groups its skills into three categories:
 
 **Maintenance** handles upkeep on the project itself. Trigger when you bump dependencies or pull a new GAIA release. See [Maintenance](/skills/maintenance/).
 
-There's one more skill, `gaia`, that acts as a router. It exposes sub-routes like `/gaia plan`, `/gaia spec`, and `/gaia audit`. See [The /gaia router](/gaia/).
+There's one more skill, `gaia`, that in practice acts as a command. See [commands](/commands/) for more information.
 
 ## How triggering works
 
@@ -29,4 +27,4 @@ A few skills are also wired to the statusline. When `sharpen` or `update-gaia` d
 
 ## Adding your own
 
-Skills are plain markdown. Drop a new directory under `.claude/skills/<name>/` with a `SKILL.md` whose frontmatter sets `name`, `description`, and (optionally) `model:` to pin a model tier. Claude picks it up on the next session.
+Drop a new directory under `.claude/skills/<name>/` with a `SKILL.md` whose frontmatter sets `name`, `description`, and (optionally) `model:` to pin a model tier. Claude picks it up on the next session.

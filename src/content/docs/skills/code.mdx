@@ -7,9 +7,7 @@ sidebar:
 
 Seven skills that govern code generation and review. Each one loads automatically when its trigger phrasing matches the conversation. You don't invoke them by name.
 
-## Language
-
-### `typescript`
+## TypeScript
 
 Patterns and conventions for TypeScript across the project: camelCase identifiers, `type` over `interface`, explicit return types on exported functions, no enums, no `switch`, max three positional parameters, Zod's `z.literal()` over `z.enum()`, and naming guidance modeled on Apple's Swift API Design Guidelines.
 
@@ -19,7 +17,7 @@ Patterns and conventions for TypeScript across the project: camelCase identifier
 
 Source: `.claude/skills/typescript/SKILL.md`.
 
-### `react-code`
+### React Code
 
 Conventions for React components, pages, routes, hooks, and forms. Includes pre-flight gates for `useEffect`, `useCallback`, and `useState`; a form-element check that swaps native `<input>` for the project's `Form/*` components; and a translation gate that requires every user-visible string to come from `t()`. Covers component extraction thresholds and route/page architecture (`app/routes/` thin shells, `app/pages/` for UI).
 
@@ -41,7 +39,7 @@ Tailwind conventions: built-in scale first, `rem` for custom values (never `px`)
 
 Source: `.claude/skills/tailwind/SKILL.md`.
 
-### `skeleton-loaders`
+### Skeleton Loaders
 
 Build skeleton loading states that are pixel-perfect matches of the real content. Uses real HTML elements (`<p>`, `<span>`, `<h2>`, `<button>`) with the same font classes plus a shared `shimmer` class for the gradient animation; non-text elements stay as empty `<div>`s. Includes the 200ms delay pattern that suppresses skeleton flash on fast loads.
 
@@ -51,11 +49,13 @@ Build skeleton loading states that are pixel-perfect matches of the real content
 
 Source: `.claude/skills/skeleton-loaders/SKILL.md`.
 
-## Testing
+## Test Driven Development
 
-### `tdd`
+Based on Matt Pocock's excellent [TDD Skill](https://www.aihero.dev/skill-test-driven-development-claude-code), tailored for GAIA's stack and conventions.
 
-Test-driven development with a vertical-slice red-green-refactor loop. Treats horizontal slicing (write all tests first, then all code) as an anti-pattern. Tests verify behavior through public interfaces, not implementation details. Includes a per-cycle checklist and a planning step that asks for the public interface before writing the first red test.
+Test-driven development with a vertical-slice red-green-refactor loop. Treats horizontal slicing (write all tests first, then all code) as an antipattern. Tests verify behavior through public interfaces, not implementation details. Includes a per-cycle checklist and a planning step that asks for the public interface before writing the first red test.
+
+It is automatically used by Claude when working in GAIA projects.
 
 **Triggers** when building features or fixing bugs with TDD, mentioning "red-green-refactor", asking for integration tests, or asking for test-first development.
 
@@ -63,24 +63,24 @@ Test-driven development with a vertical-slice red-green-refactor loop. Treats ho
 
 Source: `.claude/skills/tdd/SKILL.md`.
 
-### `playwright-cli`
+## Playwright CLI
 
-Browser automation via the `playwright-cli` binary: navigate, click, type, screenshot, manage cookies and storage, run multiple parallel sessions, and read element refs from auto-generated snapshot files (`.playwright-cli/page-*.yml`). Falls back to `npx playwright-cli` when the global binary is not on `PATH`.
+Microsoft's official [Playwright CLI](https://github.com/microsoft/playwright-cli) skill for browser automation.
+
+Navigate, click, type, screenshot, manage cookies and storage, run multiple parallel sessions, and read element refs from auto-generated snapshot files.
 
 **Triggers** when navigating websites, interacting with web pages, filling forms, taking screenshots, testing web applications, or extracting information from web pages.
 
 **Example phrasing:** "screenshot the staging site at /pricing", "fill out the signup form on localhost:5173", "extract the headline text from this URL".
 
+You can also tell Claude directly to "use playwright for xxx".
+
 Source: `.claude/skills/playwright-cli/SKILL.md`.
 
-## Cleanup
+## ESLint Fixes
 
-### `eslint-fixes`
+Generally speaking, Claude does the right thing when it encounters ESLint errors. This skill handles some known cases where Claude has resolved specific ESLint errors incorrectly.
 
-Project-specific recipes for the ESLint rules that flare on this stack: `no-void` (use `async`/`await` instead), `canonical/export-specifier-newline` versus prettier (use inline `export const`), `no-shadow` trailing underscores, `sonarjs/deprecation` (fix the deprecation; don't suppress), `you-dont-need-lodash-underscore` (use native methods), `testing-library/prefer-screen-queries`, `testing-library/await-async-events`, `jest-dom/prefer-*`.
-
-**Triggers** when fixing lint failures, ESLint reported issues, or autofix conflicts.
-
-**Example phrasing:** "fix this no-void error", "ESLint is fighting prettier on this export", "convert these jest-dom assertions".
+If you ever find that Claude is resolving an ESLint error in an undesirable way (e.g. by disabling the rule instead of fixing the underlying issue or making things worse), you can ask Claude directly to improve the eslint-fixes skill to handle that particular ESLint error in a better way. If you do discover one, please consider [filing an issue](https://github.com/gaia-react/gaia/issues) so we can add it to the skill in GAIA itself.
 
 Source: `.claude/skills/eslint-fixes/SKILL.md`.

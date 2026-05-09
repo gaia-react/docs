@@ -7,9 +7,9 @@ sidebar:
 
 Two skills that handle upkeep on the project itself. Both are wired to the statusline. When work is pending, the statusline shows a `Run /sharpen` or `Run /update-gaia` indicator; clicking the indicator loads the skill. You can also trigger them by phrasing.
 
-## `sharpen`
+## Sharpen
 
-Autonomous Dependabot. Discovers outdated packages with `pnpm outdated --json`, audits `pnpm.overrides` for entries that are no longer needed, applies migrations for major version bumps, resolves dependency conflicts, and runs the full quality gate (`pnpm typecheck`, `pnpm lint`, `pnpm test --run`, `pnpm pw`, `pnpm build`).
+Discovers outdated packages with `pnpm outdated --json`, audits `pnpm.overrides` for entries that are no longer needed, applies migrations for major version bumps, resolves dependency conflicts, and runs the full quality gate (`pnpm typecheck`, `pnpm lint`, `pnpm test --run`, `pnpm pw`, `pnpm build`).
 
 **How it picks targets**
 
@@ -18,8 +18,6 @@ Updates are grouped so companion packages move together. For example, when any o
 After grouping, updates are classified into waves: Wave A bundles minor and patch bumps into one install, Wave B processes each major-bump group individually with its own migration guide and code edits.
 
 **Pinned versions** in `package.json` (no `^` or `~`) stay pinned to the exact target. Unpinned specs use `^<latest>`.
-
-**ESLint cap.** ESLint and `@eslint/js` are capped at the highest available `9.x`. If a `10.x` major is published, the skill still targets `9.x.y` silently. Capped packages do not appear in the report.
 
 **Triggers** when you click the statusline `Run /sharpen` indicator, or ask "update dependencies", "bump deps", "run dependabot".
 
@@ -31,7 +29,7 @@ After grouping, updates are classified into waves: Wave A bundles minor and patc
 
 Source: `.claude/skills/sharpen/SKILL.md`.
 
-## `update-gaia`
+## Update GAIA
 
 Pulls the latest GAIA release into your project without overwriting your customizations. Does a three-way comparison (your file / baseline tarball / latest tarball) per file, using ownership classes from `.gaia/manifest.json`:
 
