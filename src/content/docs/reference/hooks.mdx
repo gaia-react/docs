@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-Hooks are shell scripts Claude Code runs in response to events: when a session starts, when a prompt is submitted, before or after a tool call, and so on. Most of GAIA's hooks live at `.claude/hooks/*.sh` and are registered in `.claude/settings.json` under the `hooks` key, keyed by event name. A few helper scripts under `.gaia/scripts/` are registered the same way for events outside the standard tool-call surface.
+Most of GAIA's hooks live at `.claude/hooks/*.sh` and are registered in `.claude/settings.json` under the `hooks` key, keyed by event name. A few helper scripts under `.gaia/scripts/` are registered the same way for events outside the standard tool-call surface.
 
 Most hooks here either block dangerous tool calls outright (deny the call with a reason shown to Claude) or inject a one-line nudge into context. A few are advisory: they run, log a reminder to stderr, and exit clean.
 
