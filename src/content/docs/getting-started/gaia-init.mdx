@@ -1,30 +1,19 @@
 ---
 title: /gaia-init
-description: Initialize a new project from the GAIA template.
+description: Initialize a new GAIA project
 sidebar:
   order: 2
 ---
 
-`/gaia-init` is the first thing you run after `npx create-gaia`. It renames the project to your title, configures language support, replaces template branding, registers Claude tools and plugins, refreshes the wiki, and hands you a project that compiles, lints, and tests cleanly.
-
-`create-gaia` launches Claude Code into the new directory and runs `/gaia-init` automatically. This page documents the flow so you know what to expect.
-
-## When to use this
-
-- Right after `npx create-gaia my-app`, on the maintainer's machine. One-shot for the project's lifetime.
-- Not for clones or new machines. Other developers who clone the project run [`/setup-gaia`](/getting-started/setup-gaia/) instead.
-
-`/gaia-init` runs in whatever language you've been typing in. Source files, rules, skills, and wiki entries stay in English regardless. Only the prompts shown back to you are translated.
+`/gaia-init` is automatically run during `npx create-gaia`. It renames the project to your title, configures language support, replaces template branding, registers Claude tools and plugins, sets up the wiki, and hands you a project that compiles, lints, and tests cleanly.
 
 ## The flow
 
 ### 1. pnpm + dependencies
 
-GAIA pins `pnpm@10.33.0` in `package.json` via the `packageManager` field. The command:
-
 1. Enables pnpm via Corepack if available, otherwise installs it globally with npm.
 2. Runs `pnpm install` against the freshly extracted scaffold.
-3. Runs `/update-deps` to pull every dependency to its latest compatible version. If a package is held back, the reason is surfaced.
+3. Runs `/sharpen` to update every dependency to its latest compatible version. If a package is held back, the reason is surfaced.
 
 If install fails, the run halts with the underlying error. Address the cause and re-run `/gaia-init`.
 
@@ -32,51 +21,21 @@ If install fails, the run halts with the underlying error. Address the cause and
 
 Three sets of prompts.
 
-**Languages.** Pick the primary UI language, then any additional locales. If the project is single-language, you also choose whether to keep the i18n scaffolding wired up. Stripping i18n now is cheaper than removing it later, but adding it back later is harder than leaving it in place.
+**Project title.** Name of your project (default: `GAIA React App`).
 
-**Identity.** GitHub username for `CODEOWNERS`, project title (default: `GAIA React App`), and a kebab-case slug derived from the title.
+**Languages.** Pick the primary UI language, and any additional locales. If the project is single-language, you also choose whether to keep the i18n scaffolding or not. Stripping i18n now is cheaper than removing it later, but adding it back later is harder than leaving it in place.
 
 **Statusline mode.** `global` writes the statusline command to `~/.claude/settings.json`, `project` writes to `.claude/settings.json` only, `skip` leaves your settings alone.
 
-### 3. Deterministic init steps
+### 3. Locale scaffolding
 
-The CLI runs four idempotent subcommands, recording state in `.gaia/init-state.json`:
-
-```bash
-.gaia/cli/gaia init strip-branding --title "<Project Title>"
-.gaia/cli/gaia init configure-i18n --locales "<comma-separated list>" --strip <true|false>
-.gaia/cli/gaia init rename --title "<Project Title>" --kebab "<kebab-slug>"
-.gaia/cli/gaia init wire-statusline --mode <global|project|skip>
-```
-
-If any subcommand exits non-zero, the structured error is printed to stderr and the run halts. After fixing the cause, re-run `/gaia-init` or invoke `.gaia/cli/gaia init resume` directly. Completed steps are detected and skipped.
-
-### 4. Locale scaffolding
-
-If multiple locales were chosen, `/gaia-init` walks each non-`en` locale through the shipped instruction at `.claude/instructions/add-locale.md`. RTL languages (`ar`, `he`, `fa`, `ur`) get the right-to-left flag wired up.
+If multiple locales were chosen, it wires up non-`en` locale(s).
 
 If the project is single-language with i18n stripped, `/gaia-init` follows `.claude/instructions/remove-i18n.md` to remove the framework cleanly.
 
-### 5. Logo and CODEOWNERS
+### 4. Claude tooling
 
-- Replace `app/assets/images/gaia-logo.svg` with your own logo SVG. Storybook brand surfaces import this file directly, so no further wiring is needed.
-- `.github/CODEOWNERS` is overwritten with a single line: `* @<your-github-username>`.
-
-### 6. Environment file
-
-If `.env` does not exist, `.env.example` is renamed to `.env`. If `.env` already exists, it stays as is.
-
-### 7. Verify the build
-
-```bash
-pnpm typecheck && pnpm lint && pnpm test:ci && pnpm build
-```
-
-The chain halts on the first failure. Fix any issues before continuing.
-
-### 8. Claude tooling
-
-`/gaia-init` configures three external tools and three Claude plugins.
+`/gaia-init` configures three external tools and three Claude plugins. You don't need to call these manually. They're listed here for your reference.
 
 **Tools.** Per-machine, not tracked in the repo:
 
@@ -107,7 +66,7 @@ yes | uvx --from "git+https://github.com/github/spec-kit.git@${SPECKIT_PIN}" spe
 yes | uvx --from "git+https://github.com/github/spec-kit.git@${SPECKIT_PIN}" specify preset add --dev .specify/presets/gaia
 ```
 
-The pin value `v0.8.5` matches the floor declared in `.specify/extensions/gaia/extension.yml` (`>=0.8.5,<0.10.0`). The command pins explicitly so SPEC authoring proceeds against a known spec-kit version. After this step, `/gaia spec` and the `speckit.gaia.*` commands light up after a Claude restart.
+The pin value `v0.8.5` matches the floor declared in `.specify/extensions/gaia/extension.yml` (`>=0.8.5,<0.10.0`). The command pins explicitly so SPEC authoring proceeds against a known spec-kit version.
 
 **CI integrations.** Two GitHub Actions workflows ship with GAIA:
 
@@ -119,49 +78,22 @@ Both invoke Claude via `claude-code-action` and require the `CLAUDE_CODE_OAUTH_T
 - **Enable now**: prints copy-pasteable `gh` recipes you run yourself with maintainer credentials (mint the OAuth token via `claude setup-token`, store as a repo secret, mark `code-review-audit` as a required check on `main`). Ensures the `gaia-forensics` issue label exists if the project already has a GitHub remote.
 - **Skip**: moves both workflow files to `.gaia/templates/workflows/`. Copy them back to `.github/workflows/` whenever you decide to enable. `/update-gaia` reads `.gaia/manifest.json` and respects the deletion as adopter intent, so the opt-out persists across updates.
 
-**Statusline executable bit.** `chmod +x .gaia/statusline/*.sh`. Idempotent.
+### 5. Mentorship opt-in
 
-### 9. Optional adaptation feature
+You can choose to opt-in to GAIA's experimental [mentorship](https://gaiareact.com/mentorship/) feature.
 
-You're offered an opt-in to an optional adaptation feature. The default is "Not now"; you can enable it later. Pick whichever you prefer; init proceeds regardless.
+### 6. Wiki initialization
 
-### 10. Wiki refresh
+GAIA comes with an Obsidian wiki built-in. Read more about it here.
 
-The template ships with a wiki shaped for the upstream GAIA project. `/gaia-init` overwrites two files so your project starts with a clean context:
-
-- `wiki/hot.md`: replaced with an empty hot cache.
-- `wiki/log.md`: replaced with a single `/gaia-init | project initialized` entry.
-
-Everything else under `wiki/` stays in place as shipped reference content.
-
-### 11. Finalize
-
-```bash
-.gaia/cli/gaia init finalize
-```
-
-Removes the `/init` interceptor hook, prunes the matching entry from `.claude/settings.json`, and deletes the `/gaia-init` command file itself. The command will not appear in autocomplete after this point.
-
-## After init completes
+## After gaia-init completes
 
 You should see: `<Project Title> is ready for development. Restart Claude to pick up the new plugin and skill state.`
 
-Restart Claude Code. On the next session:
+Restart Claude Code and you're ready to start developing with GAIA.
 
-- The `/gaia` skill router is available with sub-routes for plan, spec, audit, handoff, pickup, forensics, and wiki maintenance.
-- `speckit.gaia.*` commands are registered.
-- The statusline shows project status and surfaces `/update-deps` and `/update-gaia` indicators when applicable.
-
-Run `pnpm dev` to verify the app boots locally.
+Run `pnpm dev` to run the app locally. You can ask Claude to run it for you, or run it yourself in a separate terminal.
 
 ## Resuming after a failure
 
-`/gaia-init` is idempotent. If something halts mid-run, fix the cause and re-run the slash command. Already-complete CLI steps are detected via `.gaia/init-state.json` and skipped.
-
-To force a restart from a specific step:
-
-```bash
-.gaia/cli/gaia init resume --from-step <N>
-```
-
-`<N>` is 1-indexed: `1=strip-branding`, `2=configure-i18n`, `3=rename`, `4=wire-statusline`, `5=finalize`.
+`/gaia-init` is idempotent. If something breaks mid-run, ask Claude to fix any issues and resume gaia-init. Already-completed steps are skipped.

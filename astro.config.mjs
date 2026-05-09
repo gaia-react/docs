@@ -26,8 +26,8 @@ export default defineConfig({
 					label: 'Getting started',
 					items: [
 						{ label: 'Quick Start', slug: 'index' },
-						{ label: '/gaia-init walkthrough', slug: 'getting-started/gaia-init' },
-						{ label: '/setup-gaia walkthrough', slug: 'getting-started/setup-gaia' },
+						{ label: '/gaia-init', slug: 'getting-started/gaia-init' },
+						{ label: '/setup-gaia', slug: 'getting-started/setup-gaia' },
 					],
 				},
 				{

@@ -66,7 +66,7 @@ Before citing any source path as evidence, check if it's adopter-shipped:
 GAIA's invocation surface is layered. Knowing the layering is essential to citing it correctly.
 
 - **Layer 1 — top-level slash commands** (`gaia/.claude/commands/`): adopter `/gaia-init`, `/setup-gaia`; contributor-only `/gaia-release`, `/health-audit`.
-- **Layer 2 — top-level skills** (`gaia/.claude/skills/`, all adopter-shipped): `gaia` (router), `react-code`, `typescript`, `tailwind`, `tdd`, `playwright-cli`, `eslint-fixes`, `skeleton-loaders`, `new-component`, `new-hook`, `new-route`, `new-service`, `update-deps`, `update-gaia`.
+- **Layer 2 — top-level skills** (`gaia/.claude/skills/`, all adopter-shipped): `gaia` (router), `react-code`, `typescript`, `tailwind`, `tdd`, `playwright-cli`, `eslint-fixes`, `skeleton-loaders`, `new-component`, `new-hook`, `new-route`, `new-service`, `sharpen`, `update-gaia`.
 - **Layer 3 — `/gaia` skill sub-routes** (`gaia/.claude/skills/gaia/references/`, all adopter-shipped). Invoked as `/gaia <sub>`: `plan`, `spec`, `audit`, `handoff`, `pickup`, `forensics`, `wiki sync|consolidate|lint`. NOT individual command files. These were renamed from `/wiki-*` to `/gaia wiki *` in PR #121.
 - **Layer 4 — spec-kit extension commands** (`gaia/.specify/extensions/gaia/commands/`, adopter-shipped via spec-kit v0.8.5 namespace): `/speckit.gaia.{spec, constitution-check, lint, self-review, spec-close, uat-write, wiki-promote}`.
 - **Layer 5 — bundled CLI** (`gaia/.gaia/cli/gaia` binary ships, source contributor-only). Subcommands: `scaffold`, `wiki`, `update`, `release`, `setup`, `mentorship`, `telemetry`, `init`.

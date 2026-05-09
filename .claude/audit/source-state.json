@@ -887,9 +887,9 @@
     },
     {
       "kind": "skill",
-      "path": ".claude/skills/update-deps/SKILL.md",
-      "name": "update-deps",
-      "description": "Autonomous Dependabot - auto-discover outdated packages, audit overrides, apply migrations for major bumps, resolve conflicts, run quality gate. Trigger when the user clicks the statusline `Run /update-deps` indicator or asks \"update dependencies\", \"bump deps\", \"run dependabot\".",
+      "path": ".claude/skills/sharpen/SKILL.md",
+      "name": "sharpen",
+      "description": "Autonomous Dependabot - auto-discover outdated packages, audit overrides, apply migrations for major bumps, resolve conflicts, run quality gate. Trigger when the user clicks the statusline `Run /sharpen` indicator or asks \"update dependencies\", \"bump deps\", \"run dependabot\".",
       "audience": "adopter",
       "content_hash": "f727cf7a3f625af33f10ce92ed723b23c926daf43eae0ea27da8ac9098792945",
       "excluded_from_docs": false

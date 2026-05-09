@@ -5,53 +5,22 @@ sidebar:
   order: 3
 ---
 
-`/setup-gaia` is the per-machine pass for a cloned GAIA project. The maintainer ran `/gaia-init` once when they created the project, but the per-machine state (Claude tool installs, plugin registrations, spec-kit runtime, `.env`, the statusline executable bit) does not travel in git. Every developer who clones the repo runs this once.
-
-The slash command name does not start with `gaia-` so it stays out of the `/gaia` autocomplete namespace. Those entries are user-invoked workflows, not bootstrap.
+`/setup-gaia` is the per-machine setup for a cloned GAIA project. The creator of the project ran `/gaia-init`, but the per-machine state (Claude plugins, etc.) does not travel in git. Every developer who clones the repo needs to run `/setup-gaia` once.
 
 ## When to use this
 
-- After `git clone`-ing a GAIA project for the first time on this machine.
-- Not after `npx create-gaia`. That triggers [`/gaia-init`](/getting-started/gaia-init/) instead.
-
-The statusline shows `Run /setup-gaia` until per-machine setup is complete. The indicator takes precedence over `/update-deps` and `/update-gaia`, which only surface after setup is finalized.
-
-You can also check on demand:
-
-```bash
-.gaia/cli/gaia setup status         # human-readable
-.gaia/cli/gaia setup status --json  # machine-readable
-```
-
-## Idempotence
-
-Each step records itself in `.gaia/local/setup-state.json`. A step is skipped if already recorded. Re-running `/setup-gaia` resumes from the first pending step, so it's safe to re-run as often as needed.
+- After `git clone`-ing an existing GAIA project
+- Do not use after running `npx create-gaia`.
 
 ## The flow
-
-### Pre-step: worktree self-heal
-
-If the clone is a linked git worktree, the shared-state symlinks (`setup-state.json`, `.gaia/cache/`, `.gaia/local/audit/`) may not exist yet. `/setup-gaia` runs:
-
-```bash
-.gaia/cli/gaia setup link-worktree
-```
-
-In a main checkout, this is a no-op. In a linked worktree without symlinks, it creates them and prints a one-line summary. Pre-existing plain files that conflict with the new symlink targets are backed up to `<path>.bak.<timestamp>` first.
-
-If symlink creation fails (typically a Windows permission issue), the run halts. Enable Windows Developer Mode and re-run.
-
-This step is not recorded in `setup-state.json`; the CLI's own idempotence handles the no-op case.
 
 ### Pre-step: pnpm and node_modules
 
 If `corepack` is available, pnpm is enabled at the version pinned in `package.json`. Otherwise pnpm is installed globally via npm. If `node_modules/` is missing, `pnpm install` runs.
 
-Also not recorded in `setup-state.json`. `pnpm install` is fast on a clean clone and a no-op when the lockfile is up to date.
-
 ### 1. install-tools
 
-Three external tools, identical to step 8 of [`/gaia-init`](/getting-started/gaia-init/#8-claude-tooling):
+Three external tools, identical to step 4 of [`/gaia-init`](/getting-started/gaia-init/#4-claude-tooling):
 
 - React Doctor skill
 - Playwright CLI binary
@@ -69,44 +38,10 @@ claude plugin install claude-obsidian@claude-obsidian-marketplace
 
 Already-installed plugins are no-ops.
 
-### 3. init-speckit
+### 4. Mentorship opt-in
 
-Spec-kit is pinned at the floor declared in `.specify/extensions/gaia/extension.yml`. The runtime is initialized with `--here --ai claude --force`, then the GAIA extension and preset are registered.
-
-After this step, `/gaia spec` and the `speckit.gaia.*` commands light up after a Claude restart.
-
-### 4. chmod-statusline
-
-```bash
-chmod +x .gaia/statusline/*.sh
-```
-
-The executable bit is normally tracked by git but can be lost on cross-platform clones.
-
-### 5. bootstrap-env
-
-`.env` is gitignored. If `.env` is missing and `.env.example` exists, the example is copied. If neither exists, the step is a no-op (the project may not use `.env`).
-
-### 6. Optional adaptation feature
-
-You're offered an opt-in to an optional adaptation feature. The default is "Not now"; you can enable it later. If you already have a recorded preference from a previous setup pass, this step is skipped.
-
-### 7. Finalize
-
-```bash
-.gaia/cli/gaia setup finalize
-```
-
-The CLI refuses to finalize while any step is pending.
-
-After finalize, the statusline drops the `Run /setup-gaia` indicator and starts surfacing `/update-deps` and `/update-gaia` indicators when applicable. Restart Claude Code so the new plugin and skill state are picked up.
+You can choose to opt-in to GAIA's experimental [mentorship](https://gaiareact.com/mentorship/) feature.
 
 ## Resuming after a failure
 
-Every step is individually idempotent and recorded. After fixing any failure, re-run `/setup-gaia`. Completed steps are recorded in `.gaia/local/setup-state.json` and skipped automatically on re-run.
-
-If a maintainer initialized a clone manually before `/setup-gaia` existed, they can mark setup complete without running through the steps:
-
-```bash
-.gaia/cli/gaia setup finalize --force
-```
+If you encounter any issues while `/setup-gaia` runs, ask Claude to fix it and resume.
