@@ -13,7 +13,7 @@ sidebar:
 
 1. Enables pnpm via Corepack if available, otherwise installs it globally with npm.
 2. Runs `pnpm install` against the freshly extracted scaffold.
-3. Runs `/sharpen` to update every dependency to its latest compatible version. If a package is held back, the reason is surfaced.
+3. Runs `/update-deps` to update every dependency to its latest compatible version. If a package is held back, the reason is surfaced.
 
 If install fails, the run halts with the underlying error. Address the cause and re-run `/gaia-init`.
 

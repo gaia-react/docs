@@ -5,9 +5,9 @@ sidebar:
   order: 3
 ---
 
-Two skills that handle upkeep on the project itself. Both are wired to the statusline. When work is pending, the statusline shows a `Run /sharpen` or `Run /update-gaia` indicator; clicking the indicator loads the skill. You can also trigger them by phrasing.
+Two skills that handle upkeep on the project itself. Both are wired to the statusline. When work is pending, the statusline shows a `Run /update-deps` or `Run /update-gaia` indicator; clicking the indicator loads the skill. You can also trigger them by phrasing.
 
-## Sharpen
+## Update Deps
 
 Discovers outdated packages with `pnpm outdated --json`, audits `pnpm.overrides` for entries that are no longer needed, applies migrations for major version bumps, resolves dependency conflicts, and runs the full quality gate (`pnpm typecheck`, `pnpm lint`, `pnpm test --run`, `pnpm pw`, `pnpm build`).
 
@@ -19,15 +19,15 @@ After grouping, updates are classified into waves: Wave A bundles minor and patc
 
 **Pinned versions** in `package.json` (no `^` or `~`) stay pinned to the exact target. Unpinned specs use `^<latest>`.
 
-**Triggers** when you click the statusline `Run /sharpen` indicator, or ask "update dependencies", "bump deps", "run dependabot".
+**Triggers** when you click the statusline `Run /update-deps` indicator, or ask "update dependencies", "bump deps", "run dependabot".
 
 **Gotchas**
 
 - Must run from the main checkout, not a linked worktree. The skill rejects worktree invocations early and surfaces the cached outdated count from main so you know whether action is even pending.
-- Must run from `main` or `master`, or from an existing chore branch. If on `main`, the skill creates `chore/sharpen-<timestamp>`.
+- Must run from `main` or `master`, or from an existing chore branch. If on `main`, the skill creates `chore/update-deps-<timestamp>`.
 - The final report is built from agent-returned data only. Anything filtered before installation (the ESLint cap) is silent on purpose.
 
-Source: `.claude/skills/sharpen/SKILL.md`.
+Source: `.claude/skills/update-deps/SKILL.md`.
 
 ## Update GAIA
 

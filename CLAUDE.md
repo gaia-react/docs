@@ -51,7 +51,7 @@ GAIA's invocation surface is layered. Knowing the layering is essential to docum
 - `gaia` — *router*, see Layer 3 below
 - Code skills: `react-code`, `typescript`, `tailwind`, `tdd`, `playwright-cli`, `eslint-fixes`, `skeleton-loaders`
 - Scaffolders: `new-component`, `new-hook`, `new-route`, `new-service`
-- Maintenance: `sharpen`, `update-gaia`
+- Maintenance: `update-deps`, `update-gaia`
 
 **Layer 3 — `/gaia` skill sub-routes** at `gaia/.claude/skills/gaia/references/*.md` (or `references/wiki/*.md`). Adopter-shipped. Invoked as `/gaia <sub>`:
 
