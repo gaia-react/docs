@@ -13,6 +13,7 @@ export default defineConfig({
 			customCss: ['./src/styles/theme.css'],
 			components: {
 				Header: './src/overrides/Header.astro',
+				MobileMenuFooter: './src/overrides/MobileMenuFooter.astro',
 			},
 			social: [
 				{
