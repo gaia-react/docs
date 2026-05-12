@@ -8,7 +8,7 @@ const WEB = 'https://gaiareact.com';
 const NAV = [
 	{ href: `${WEB}/why/`, label: 'Why GAIA' },
 	{ href: `${WEB}/features/`, label: 'Features' },
-	{ href: '/', label: 'Docs' },
+	{ href: '/', label: 'Docs', active: true },
 	{ href: `${WEB}/about/`, label: 'About' },
 ];
 
@@ -25,7 +25,12 @@ const shouldRenderSearch =
 
 		<nav class="gaia-header__nav" aria-label="Main navigation">
 			{NAV.map((item) => (
-				<a class="gaia-header__nav-link" href={item.href}>
+				<a
+					class="gaia-header__nav-link"
+					class:list={[{ 'gaia-header__nav-link--active': item.active }]}
+					href={item.href}
+					aria-current={item.active ? 'page' : undefined}
+				>
 					{item.label}
 				</a>
 			))}
@@ -105,6 +110,9 @@ const shouldRenderSearch =
 		transition: color 150ms;
 	}
 	.gaia-header__nav-link:hover {
+		color: var(--gaia-accent, #d97757);
+	}
+	.gaia-header__nav-link--active {
 		color: var(--gaia-accent, #d97757);
 	}
 

@@ -14,6 +14,7 @@ export default defineConfig({
 			components: {
 				Header: './src/overrides/Header.astro',
 				MobileMenuFooter: './src/overrides/MobileMenuFooter.astro',
+				PageSidebar: './src/overrides/PageSidebar.astro',
 			},
 			social: [
 				{
