@@ -11,6 +11,9 @@ export default defineConfig({
 			title: 'GAIA Docs',
 			description: 'Documentation for GAIA. Order and focus for Claude Code.',
 			customCss: ['./src/styles/theme.css'],
+			editLink: {
+				baseUrl: 'https://github.com/gaia-react/docs/edit/main/src/content/docs/',
+			},
 			components: {
 				Header: './src/overrides/Header.astro',
 				MobileMenuFooter: './src/overrides/MobileMenuFooter.astro',
