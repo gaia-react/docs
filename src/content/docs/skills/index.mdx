@@ -1,6 +1,6 @@
 ---
 title: Skills
-description: GAIA's skill catalog. Code patterns, scaffolders, and maintenance routines that load when you ask for them.
+description: GAIA's skill catalog. Code patterns and scaffolders that load when you ask for them.
 sidebar:
   order: 0
 ---
@@ -9,13 +9,11 @@ GAIA ships its skills under `.claude/skills/` in your project. Each one is a dir
 
 ## Catalog
 
-GAIA groups its skills into three categories:
+GAIA groups its skills into two categories:
 
 **Code skills** govern how code is written and reviewed. Trigger when you write or edit TypeScript, React, Tailwind, tests, or browser automation. See [Code skills](/skills/code/).
 
 **Scaffolders** generate new files from templates. Trigger when you ask to create a component, hook, route, or service. See [Scaffolders](/skills/scaffolders/).
-
-**Maintenance** handles upkeep on the project itself. Trigger when you bump dependencies or pull a new GAIA release. See [Maintenance](/skills/maintenance/).
 
 There's one more skill, `gaia`, that in practice acts as a command. See [commands](/commands/) for more information.
 
@@ -23,7 +21,7 @@ There's one more skill, `gaia`, that in practice acts as a command. See [command
 
 Each `SKILL.md` has a `description:` field that lists the phrasings and situations that load the skill. The skills do not run on every prompt; they activate when the description matches what you said. You don't invoke them by name. Saying "scaffold a card called PriceCard" loads `new-component`. Saying "the typecheck is angry about a stale closure" loads `react-code`.
 
-A few skills are also wired to the statusline. When `update-deps` or `update-gaia` detect pending work, the statusline shows a `Run /update-deps` or `Run /update-gaia` indicator; clicking the indicator loads the skill.
+A few skills are also wired to the statusline. When [`/update-deps`](/commands/update-deps/) or [`/update-gaia`](/commands/update-gaia/) detect pending work, the statusline shows a `Run /update-deps` or `Run /update-gaia` indicator; clicking the indicator loads the skill.
 
 ## Adding your own
 

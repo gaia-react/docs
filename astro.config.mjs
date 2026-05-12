@@ -46,6 +46,8 @@ export default defineConfig({
 						{ label: '/gaia audit', slug: 'commands/audit' },
 						{ label: '/gaia forensics', slug: 'commands/forensics' },
 						{ label: '/gaia wiki', slug: 'commands/wiki' },
+						{ label: '/update-deps', slug: 'commands/update-deps' },
+						{ label: '/update-gaia', slug: 'commands/update-gaia' },
 					],
 				},
 				{
@@ -54,7 +56,6 @@ export default defineConfig({
 						{ label: 'Overview', slug: 'skills' },
 						{ label: 'Code skills', slug: 'skills/code' },
 						{ label: 'Scaffolders', slug: 'skills/scaffolders' },
-						{ label: 'Maintenance', slug: 'skills/maintenance' },
 					],
 				},
 				{

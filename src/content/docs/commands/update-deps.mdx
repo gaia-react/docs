@@ -1,0 +1,57 @@
+---
+title: /update-deps
+description: Bump outdated packages group-by-group, run migrations for major-version bumps, and validate the full quality gate.
+---
+
+`/update-deps` discovers outdated packages, applies migrations for major-version bumps, and validates the project through the full quality gate. It is wired to the statusline: when work is pending, the statusline shows a `Run /update-deps` indicator that loads the skill when clicked.
+
+## When to use it
+
+Run `/update-deps` when the statusline signals pending work, or any time you want to bring dependencies current. For routine maintenance on a stable project, this replaces manual `pnpm outdated` inspection.
+
+## How to invoke
+
+Click the `Run /update-deps` statusline indicator, or trigger by phrasing:
+
+- "update dependencies"
+- "bump deps"
+- "run dependabot"
+
+## How it picks targets
+
+Updates are grouped so companion packages move together. When any package in a group is outdated, the entire group ships in the same install. Groups include:
+
+`react-router`, `react`, `tailwindcss`, `storybook`, `vitest`, `playwright`, `eslint`, `testing-library`, `typescript`, `i18next`, `msw`, `vite`, `zod-conform`, `fontawesome`, `stylelint`, `prettier`, `husky`
+
+Packages outside any group form singleton groups.
+
+## Waves
+
+After grouping, updates are classified into two waves:
+
+- **Wave A** — minor and patch bumps, bundled into one install.
+- **Wave B** — major-version bumps, each group processed individually with its own migration guide and code edits.
+
+## Pinned versions
+
+Packages pinned in `package.json` (no `^` or `~`) stay pinned to the exact target. Unpinned specs use `^<latest>`.
+
+## Quality gate
+
+After applying updates, the skill runs the full quality gate:
+
+```
+pnpm typecheck
+pnpm lint
+pnpm test --run
+pnpm pw
+pnpm build
+```
+
+## Gotchas
+
+- Must run from the main checkout, not a linked worktree. The skill rejects worktree invocations early and surfaces the cached outdated count from main so you know whether action is even pending.
+- Must run from `main` or `master`, or from an existing chore branch. If on `main`, the skill creates `chore/update-deps-<timestamp>`.
+- The final report is built from agent-returned data only. Anything filtered before installation (the ESLint cap) is silent on purpose.
+
+Source: `.claude/skills/update-deps/SKILL.md`.

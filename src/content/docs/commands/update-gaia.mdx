@@ -1,0 +1,60 @@
+---
+title: /update-gaia
+description: Pull the latest GAIA release into your project without overwriting your customizations.
+---
+
+`/update-gaia` pulls the latest GAIA release into your project using a three-way merge strategy. It compares your file, the baseline tarball your project was installed from, and the latest tarball — applying updates where GAIA owns content and surfacing conflicts where you do. It is wired to the statusline: when a new release is available, the statusline shows a `Run /update-gaia` indicator that loads the skill when clicked.
+
+## When to use it
+
+Run `/update-gaia` when the statusline signals a new release is available, or any time you want to pull in the latest GAIA improvements.
+
+## How to invoke
+
+Click the `Run /update-gaia` statusline indicator, or trigger by phrasing:
+
+- "update GAIA"
+- "pull the latest GAIA"
+- "apply the new GAIA release"
+
+## Ownership classes
+
+The three-way merge is governed by ownership classes defined in `.gaia/manifest.json`:
+
+| Class | Who controls it | On drift |
+| --- | --- | --- |
+| `owned` | GAIA fully. Overwritten silently when unchanged from baseline. | Prompts if you have local changes. |
+| `shared` | GAIA seeds, you customize. | Emits a `.gaia-merge/<path>.patch` for manual resolution. |
+| `wiki-owned` | GAIA-seeded wiki pages (concepts, decisions, modules). Same as `shared`. | Emits a patch for manual resolution. |
+| adopter-owned (implicit) | Anything not in the manifest, plus sentinels like `wiki/hot.md`, `wiki/log.md`, `CHANGELOG.md`, `.gaia/VERSION`, `.gaia/manifest.json`. | Never touched. |
+
+## What it does
+
+1. Reads `.gaia/VERSION` to determine the baseline.
+2. Resolves the latest release tag via `gh release list --repo gaia-react/gaia` (falls back to the GitHub API).
+3. Shows the release notes and asks you to confirm.
+4. Downloads the baseline and latest tarballs into `.gaia/cache/` (gitignored).
+5. Runs `gaia update merge` to compute the three-way diff per file.
+6. Walks any conflicts with you one at a time; reads `.gaia-merge/<path>.patch` for each.
+7. Prompts before deleting any file that the latest release removed.
+8. Writes the new version to `.gaia/VERSION` and copies the latest manifest into `.gaia/manifest.json`.
+9. Prints a summary with counts (overwritten, added, skipped, conflicts, deleted, backed up).
+
+Backups land in `.gaia-backup/<timestamp>/`. Conflict patches land in `.gaia-merge/`.
+
+## After the run
+
+Review patches in `.gaia-merge/`, run the quality gate, and inspect `git diff` before committing. The skill does not auto-commit. When satisfied:
+
+```
+git commit -m "chore: update GAIA to <tag>"
+```
+
+## Gotchas
+
+- Must run from the main checkout, not a linked worktree. The skill rejects worktree invocations early.
+- Must run from `main` or `master`, or from an existing chore branch. If on `main`, the skill creates `chore/update-gaia-<timestamp>`.
+- Refuses to downgrade. If `.gaia/VERSION` is ahead of the latest release, the skill warns and exits.
+- Requires a baseline tarball. If your installed version predates the manifest mechanism, the skill stops and tells you to cherry-pick manually.
+
+Source: `.claude/skills/update-gaia/SKILL.md`.
