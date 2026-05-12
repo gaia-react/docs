@@ -11,6 +11,8 @@ export default defineConfig({
 			title: 'GAIA Docs',
 			description: 'Documentation for GAIA. Order and focus for Claude Code.',
 			customCss: ['./src/styles/theme.css'],
+			// Keep our bespoke src/pages/404.astro; don't let Starlight inject its own.
+			disable404Route: true,
 			editLink: {
 				baseUrl: 'https://github.com/gaia-react/docs/edit/main/src/content/docs/',
 			},
@@ -44,6 +46,7 @@ export default defineConfig({
 						{ label: '/gaia spec', slug: 'commands/spec' },
 						{ label: '/gaia handoff and pickup', slug: 'commands/handoff-pickup' },
 						{ label: '/gaia audit', slug: 'commands/audit' },
+						{ label: '/gaia fitness', slug: 'commands/fitness' },
 						{ label: '/gaia forensics', slug: 'commands/forensics' },
 						{ label: '/gaia wiki', slug: 'commands/wiki' },
 						{ label: '/update-deps', slug: 'commands/update-deps' },

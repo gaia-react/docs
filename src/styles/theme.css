@@ -119,6 +119,12 @@ header.header,
 	max-width: none;
 }
 
+/* Keep inline code in table cells on one line — command names like
+   `/gaia fitness` should never break across the space. */
+.sl-markdown-content table code {
+	white-space: nowrap;
+}
+
 /* Right TOC: fit the inner container to its parent so long entries wrap,
    and give the right edge breathing room. Full padding shorthand to ensure
    the override sticks against the layered default. */

@@ -13,17 +13,18 @@ It's located in `.claude/skills/gaia/SKILL.md`.
 
 | Command | What it does |
 | --- | --- |
-| [`/gaia spec`](/gaia/spec/) | Run a Q&A to write and refine specifications. |
-| [`/gaia plan`](/gaia/plan/) | Plan known features. |
-| [`/gaia handoff`](/gaia/handoff-pickup/) | Generate a session handoff document so context can transfer to a fresh session. |
-| [`/gaia pickup`](/gaia/handoff-pickup/) | Restore context from the most recent handoff. |
+| [`/gaia spec`](/commands/spec/) | Run a Q&A to write and refine specifications. |
+| [`/gaia plan`](/commands/plan/) | Plan known features. |
+| [`/gaia handoff`](/commands/handoff-pickup/) | Generate a session handoff document so context can transfer to a fresh session. |
+| [`/gaia pickup`](/commands/handoff-pickup/) | Restore context from the most recent handoff. |
 
 ## Maintenance Commands
 
 | Command | What it does |
 | --- | --- |
-| [`/gaia audit`](/gaia/audit/) | Audit memory, rules, and wiki for duplication, stale entries, and unnecessary base context overhead. |
-| [`/gaia wiki`](/gaia/wiki/) | Wiki maintenance. With no sub-arg, runs the full chain: `sync`, then `consolidate`, then `lint`. Each can also be invoked individually. |
+| [`/gaia audit`](/commands/audit/) | Audit memory, rules, and wiki for duplication, stale entries, and unnecessary base context overhead. |
+| [`/gaia fitness`](/commands/fitness/) | Health check and auto-heal for the Claude integration surface. Triage, heal, verify, with a letter grade. |
+| [`/gaia wiki`](/commands/wiki/) | Wiki maintenance. With no arguments, runs the full chain. Each can also be invoked individually. |
 
 ## Update Commands
 
@@ -36,7 +37,7 @@ It's located in `.claude/skills/gaia/SKILL.md`.
 
 | Command | What it does |
 | --- | --- |
-| [`/gaia forensics`](/gaia/forensics/) | If you encounter any issues with GAIA commands, this will triage the issue and submit a bug report. |
+| [`/gaia forensics`](/commands/forensics/) | If you encounter any issues with GAIA commands, this will triage the issue and submit a bug report. |
 
 ## Help message
 
