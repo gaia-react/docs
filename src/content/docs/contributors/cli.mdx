@@ -54,7 +54,7 @@ gaia scaffold service <name>
 
 Source: `.gaia/cli/src/setup/index.ts`
 
-Per-machine clone setup primitives invoked by `/setup-gaia`. The slash command orchestrates externally-shelled installs (React Doctor, Playwright CLI, Serena MCP, plugins, spec-kit) and calls these primitives to record progress in `.gaia/local/setup-state.json`.
+Per-machine clone setup primitives invoked by `/setup-cloned-gaia-project`. The slash command orchestrates externally-shelled installs (React Doctor, Playwright CLI, Serena MCP, plugins, spec-kit) and calls these primitives to record progress in `.gaia/local/setup-state.json`.
 
 ```
 gaia setup status [--json]

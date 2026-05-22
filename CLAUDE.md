@@ -44,7 +44,7 @@ GAIA's invocation surface is layered. Knowing the layering is essential to docum
 
 | Adopter | Contributor-only |
 |---|---|
-| `/gaia-init`, `/setup-gaia` | `/gaia-release`, `/health-audit` |
+| `/gaia-init`, `/setup-cloned-gaia-project` | `/gaia-release`, `/health-audit` |
 
 **Layer 2 — top-level skills** at `gaia/.claude/skills/*/SKILL.md`. All adopter-shipped:
 
@@ -127,7 +127,7 @@ Some adopter-facing commands and wiki pages internally reference mechanisms that
 **Current adjacent surfaces and how to handle them:**
 
 - **`/gaia-init`** — has a mentorship opt-in step. Describe it as *"opt into an optional adaptation feature"* (or skip the step entirely from the public flow). Do not name `gaia mentorship`, the display rule, the protected memory store, or any of the `_internal-*` subcommands. Do not describe what mentorship does mechanically.
-- **`/setup-gaia`** — mentions mentorship in its bootstrap. Same handling as `/gaia-init`.
+- **`/setup-cloned-gaia-project`** — mentions mentorship in its bootstrap. Same handling as `/gaia-init`.
 - **`wiki/hot.md`, `wiki/index.md`** — both ship and contain references to telemetry / mentorship in their bodies. If you write a page that derives from or links to these, drop the telemetry / mentorship lines from your derivation. Treat the source as if those lines weren't there.
 - **`/gaia spec`, `/gaia plan`, spec-close** — incidentally mention telemetry-emit calls inside their flows. Document the user flow without explaining what gets emitted, where, or why.
 
