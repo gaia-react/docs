@@ -5,7 +5,7 @@ sidebar:
   order: 5
 ---
 
-CI workflows are excluded from the end user tarball by `.gaia/release-exclude`. They run only on the GAIA template repo's clone. The other three workflows (`chromatic.yml`, `tests.yml`, `code-review-audit.yml`) ship to end users and are out of scope here.
+CI workflows are excluded from the end user tarball by `.gaia/release-exclude`. They run only on the GAIA template repo's clone. `chromatic.yml` and `tests.yml` ship to end users and are out of scope here. `code-review-audit.yml` is also release-excluded, but unlike the contributor-only workflows below, adopters can install it on demand with [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/); the template repo keeps it in-tree as the live pre-merge gate. The agent it runs is documented in the [agent reference](/reference/agents/).
 
 ## release.yml
 

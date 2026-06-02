@@ -86,7 +86,7 @@ CLI source (`.gaia/cli/src/`, `__tests__/`, `test-fixtures/`, `health/`) is cont
 | Hooks (`.claude/hooks/*.sh`) | All currently shipped (block-* / check-* / wiki-* / audit-stamp-trailer / pr-merge-audit-check / telemetry-task-postuse / intercept-init) | none |
 | Rules (`.claude/rules/*.md`) | 16 top-level (accessibility, api-service, code-search, coding-guidelines, i18n, instruction-files, knip, playwright, quality-gate, routes, shell-cwd, state-pattern, storybook, tailwind, wiki-style) | `.claude/rules/_internal/` (convention exists, dir currently empty) |
 | Agents (`.claude/agents/`) | `code-review-audit` | none currently |
-| CI workflows (`.github/workflows/`) | `chromatic.yml`, `tests.yml`, `code-review-audit.yml`, `forensics-triage.yml` | `release.yml`, `cli-tests.yml`, `distribution.yml` |
+| CI workflows (`.github/workflows/`) | `chromatic.yml`, `tests.yml` | `release.yml`, `cli-tests.yml`, `audit-ci-tests.yml`, `distribution.yml`, `forensics-triage.yml`. `code-review-audit.yml` is release-excluded too but installs on demand via `/setup-gaia-ci`. |
 | Wiki (`gaia/wiki/`) | most of `modules/`, `concepts/`, `decisions/` | `entities/`, `meta/`, `concepts/Release Workflow.md`, `decisions/Bundle-time Scrub.md`, plus any block inside `<!-- gaia:maintainer-only:start/end -->` markers |
 | Templates | `.gaia/templates/README.md` (regenerated for adopters at scaffold) | repo `README.md`, `CHANGELOG.md`, `LICENSE`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SUPPORTERS.md` |
 

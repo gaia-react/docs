@@ -18,7 +18,9 @@ GAIA CI installs four maintenance workflows that run on a cron schedule, open la
 | `gaia-ci-pnpm-audit.yml` | Weekly | Runs `pnpm audit` and opens a security PR for high and critical findings |
 | `gaia-ci-stale-branches.yml` | Monthly | Deletes branches merged more than 30 days ago |
 
-Each workflow is generated from `.gaia/automation.json`. You can change the mode for any tool (`ci` / `local` / `off`) by running `/setup-gaia-ci --reconfigure`.
+Each cron workflow is generated from `.gaia/automation.json`. You can change the mode for any tool (`ci` / `local` / `off`) by running `/setup-gaia-ci --reconfigure`.
+
+`/setup-gaia-ci` also installs `code-review-audit.yml`, the pre-merge audit gate. It is not one of the cron tools: it has no `ci` / `local` / `off` mode and installs unconditionally, even when no cron tool runs in CI. It reads its configuration from `.gaia/audit-ci.yml` at runtime, and the bot token you set below authenticates it (either token type works). See the [`code-review-audit` agent reference](/reference/agents/) for what it checks.
 
 ## Prerequisites
 
@@ -59,7 +61,7 @@ Paste the token when prompted. It is piped directly to `gh secret set` and never
 
 ### 6. Workflow generation
 
-The command generates `.github/workflows/gaia-ci-*.yml` from `.gaia/automation.json`, then triggers one `workflow_dispatch` run on the first generated workflow to confirm it boots correctly.
+The command generates `.github/workflows/gaia-ci-*.yml` from `.gaia/automation.json` and installs `.github/workflows/code-review-audit.yml`, the pre-merge audit gate. The audit gate installs unconditionally, even when no cron tool runs in CI mode. The command then triggers one `workflow_dispatch` run on the first generated workflow to confirm it boots correctly.
 
 If the verification run fails, you can retry, abandon (deletes the generated files, leaves `setup_complete: false`), or commit anyway if you have confirmed the failure is a transient infrastructure issue.
 
