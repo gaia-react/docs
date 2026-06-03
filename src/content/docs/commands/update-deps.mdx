@@ -29,8 +29,12 @@ Packages outside any group form singleton groups.
 
 After grouping, updates are classified into two waves:
 
-- **Wave A** — minor and patch bumps, bundled into one install.
-- **Wave B** — major-version bumps, each group processed individually with its own migration guide and code edits.
+- **Wave A**: minor and patch bumps, bundled into one install.
+- **Wave B**: major-version bumps, each group processed individually with its own migration guide and code edits.
+
+## The CLI primitive behind it
+
+The deterministic parts (discovering outdated packages, applying the group rules, and classifying each group into Wave A or B) run through the bundled CLI: `gaia update-deps run --emit-updates <path>` writes the grouped, wave-classified set to a JSON file. The skill calls it for those steps and layers the migrations and quality gate on top. The same primitive backs the `gaia-ci-update-deps` workflow that [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/) can install, so scheduled and interactive runs agree on what is outdated.
 
 ## Pinned versions
 

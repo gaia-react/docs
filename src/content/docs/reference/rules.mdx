@@ -15,6 +15,7 @@ A rule's frontmatter `paths:` field is the gate. When Claude edits or reads a fi
 |---|---|
 | `coding-guidelines` | File-naming conventions (PascalCase components, camelCase hooks, kebab-case other), simplicity-first, surgical changes, goal-driven execution, mandatory TDD, mandatory quality-gate run before commit. |
 | `knip` | When and when not to run `pnpm knip`; the audit agent runs it pre-merge, manual runs only after a refactor, deletion, or dependency replacement. |
+| `pr-merge` | Before any `gh pr merge`, run the audit and marker handshake, then confirm the PR reports `MERGED` before any local branch cleanup; use `--auto` (not `--admin`) when branch protection blocks the merge. |
 | `quality-gate` | Run the steps in `wiki/decisions/Quality Gate.md` before any commit that touches source, unless nothing in the gate's scope is staged. |
 | `shell-cwd` | No `cd` in Bash tool calls; use absolute paths. A persistent `cd` breaks the relative-path hooks registered in `settings.json`. |
 
