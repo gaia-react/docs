@@ -21,7 +21,7 @@ For Claude Code's own hook documentation, see [the Hooks reference on docs.claud
 
 | Hook | What it does | Path |
 |---|---|---|
-| `wiki-session-stop` | If wiki files were committed during the session, prompts a hot-cache refresh; nags `/gaia wiki sync` when commits land but `wiki/.state.json` did not advance. | `.claude/hooks/wiki-session-stop.sh` |
+| `wiki-session-stop` | If wiki files were committed during the session, prompts a hot-cache refresh; nags `/gaia-wiki sync` when commits land but `wiki/.state.json` did not advance. | `.claude/hooks/wiki-session-stop.sh` |
 | `wiki-squash-autocommits` | Squashes the trailing run of `wiki: auto-commit` commits into one; on `main`, redirects the squash to a `wiki/*` branch and merges via PR. | `.claude/hooks/wiki-squash-autocommits.sh` |
 
 ## UserPromptSubmit

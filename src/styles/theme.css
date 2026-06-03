@@ -120,7 +120,7 @@ header.header,
 }
 
 /* Keep inline code in table cells on one line — command names like
-   `/gaia fitness` should never break across the space. */
+   `/gaia-wiki sync` should never break across the space. */
 .sl-markdown-content table code {
 	white-space: nowrap;
 }

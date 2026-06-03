@@ -1,30 +1,28 @@
 ---
 title: Commands
-description: Sub-routes available under /gaia for day-to-day GAIA workflows.
+description: GAIA's day-to-day workflows, each a discrete /gaia-* slash command or skill.
 sidebar:
   order: 1
 ---
 
-`/gaia` is the entry point for GAIA's day-to-day workflows. It is technically a Claude skill router, but in practice it works like a command.
-
-It's located in `.claude/skills/gaia/SKILL.md`.
+GAIA's day-to-day workflows are discrete slash entries that show up in autocomplete as you type `/gaia-`. Five are commands (`/gaia-plan`, `/gaia-spec`, `/gaia-audit`, `/gaia-fitness`, `/gaia-forensics`). Three are skills (`/gaia-wiki`, `/gaia-handoff`, `/gaia-pickup`) that also respond to plain-English requests, not just the slash form.
 
 ## Workflow Commands
 
 | Command | What it does |
 | --- | --- |
-| [`/gaia spec`](/commands/spec/) | Run a Q&A to write and refine specifications. |
-| [`/gaia plan`](/commands/plan/) | Plan known features. |
-| [`/gaia handoff`](/commands/handoff-pickup/) | Generate a session handoff document so context can transfer to a fresh session. |
-| [`/gaia pickup`](/commands/handoff-pickup/) | Restore context from the most recent handoff. |
+| [`/gaia-spec`](/commands/spec/) | Run a Q&A to write and refine specifications. |
+| [`/gaia-plan`](/commands/plan/) | Plan known features. |
+| [`/gaia-handoff`](/commands/handoff-pickup/) | Generate a session handoff document so context can transfer to a fresh session. |
+| [`/gaia-pickup`](/commands/handoff-pickup/) | Restore context from the most recent handoff. |
 
 ## Maintenance Commands
 
 | Command | What it does |
 | --- | --- |
-| [`/gaia audit`](/commands/audit/) | Audit memory, rules, and wiki for duplication, stale entries, and unnecessary base context overhead. |
-| [`/gaia fitness`](/commands/fitness/) | Health check and auto-heal for the Claude integration surface. Triage, heal, verify, with a letter grade. |
-| [`/gaia wiki`](/commands/wiki/) | Wiki maintenance. With no arguments, runs the full chain. Each can also be invoked individually. |
+| [`/gaia-audit`](/commands/audit/) | Audit memory, rules, and wiki for duplication, stale entries, and unnecessary base context overhead. |
+| [`/gaia-fitness`](/commands/fitness/) | Health check and auto-heal for the Claude integration surface. Triage, heal, verify, with a letter grade. |
+| [`/gaia-wiki`](/commands/wiki/) | Wiki maintenance. With no arguments, runs the full chain. Each can also be invoked individually. |
 
 ## Update Commands
 
@@ -37,8 +35,8 @@ It's located in `.claude/skills/gaia/SKILL.md`.
 
 | Command | What it does |
 | --- | --- |
-| [`/gaia forensics`](/commands/forensics/) | If you encounter any issues with GAIA commands, this will triage the issue and submit a bug report. |
+| [`/gaia-forensics`](/commands/forensics/) | If you encounter any issues with GAIA commands, this will triage the issue and submit a bug report. |
 
-## Help message
+## No-argument behavior
 
-Invoking `/gaia` with no argument (or with an unrecognized one) prints a help message.
+Each entry has a sensible default when called with no arguments. `/gaia-wiki` runs the full chain (sync, consolidate, lint). `/gaia-audit` runs research then apply. `/gaia-plan`, `/gaia-spec`, and `/gaia-forensics` prompt for or infer what they need before continuing.

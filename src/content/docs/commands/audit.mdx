@@ -1,28 +1,28 @@
 ---
-title: /gaia audit
+title: /gaia-audit
 description: Audit memory, rules, and wiki for duplication, stale entries, and over-budget autoloads.
 ---
 
-`/gaia audit` reviews the project's knowledge stores (machine-local memory, project rules, wiki, autoloaded `CLAUDE.md` files) for duplication, stale entries, and bloated base context noise. It runs in two stages: a research stage produces a report, then an apply stage executes the report mechanically.
+`/gaia-audit` reviews the project's knowledge stores (machine-local memory, project rules, wiki, autoloaded `CLAUDE.md` files) for duplication, stale entries, and bloated base context noise. It runs in two stages: a research stage produces a report, then an apply stage executes the report mechanically.
 
 The wiki is the source of truth. Memory is machine-local only. Autoloaded files carry a token cost on every session, so the audit pushes detail behind lazy wikilinks and keeps the autoloaded surface as a pointer set.
 
 ## When to use it
 
-Run `/gaia audit` periodically: after a stretch of work, or when your base context size feels too large.
+Run `/gaia-audit` periodically: after a stretch of work, or when your base context size feels too large.
 
 ## How to invoke
 
 Default. Research, then apply:
 
 ```
-/gaia audit
+/gaia-audit
 ```
 
 Apply only. Re-execute the most recent report:
 
 ```
-/gaia audit --apply
+/gaia-audit --apply
 ```
 
 Use `--apply` when an earlier run produced a report but drift caused some actions to skip; fix the drift, then re-apply. Reports older than 24 hours are refused. Generate a fresh one in that case.
@@ -64,7 +64,7 @@ Anything over budget is flagged with a proposed fix: inline facts moved to the w
 
 **Stage 2: apply (Haiku).** Reads the most recent report. Re-resolves project root, memory dir, and agent memory dir; if they differ from the report's frontmatter, stops with a clear error. Verifies each action's drift signal: SHA-256 of the target file, or a verbatim snippet that must appear in current content. Applies the action verbatim, or skips with a recorded reason. Never improvises.
 
-The split exists for technical reasons (different reasoning loads, drift-check between stages), not as a user-confirmation gate. Calling `/gaia audit` is the intent to apply.
+The split exists for technical reasons (different reasoning loads, drift-check between stages), not as a user-confirmation gate. Calling `/gaia-audit` is the intent to apply.
 
 ## Action types
 
@@ -96,6 +96,6 @@ The skill prunes its own report directory: keeps the newest five reports uncondi
 
 ## Related
 
-`/gaia audit` is distinct from the `code-review-audit` agent. The agent reviews code changes on a branch before merge for security, performance, and correctness. `/gaia audit` reviews knowledge stores for duplication and bloat. Different inputs, different outputs, different purposes.
+`/gaia-audit` is distinct from the `code-review-audit` agent. The agent reviews code changes on a branch before merge for security, performance, and correctness. `/gaia-audit` reviews knowledge stores for duplication and bloat. Different inputs, different outputs, different purposes.
 
-For wiki-internal redundancy (multiple wiki pages saying the same thing) and broken wikilinks, use `/gaia wiki`.
+For wiki-internal redundancy (multiple wiki pages saying the same thing) and broken wikilinks, use `/gaia-wiki`.

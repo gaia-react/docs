@@ -1,5 +1,5 @@
 ---
-title: /gaia wiki
+title: /gaia-wiki
 description: Maintain the project wiki. Sync, consolidate, and lint.
 sidebar:
   order: 7
@@ -17,10 +17,11 @@ Without it, every session that needs to reason about a service, a hook contract,
 
 Ideally, you enable GAIA CI and let GAIA keep the wiki clean autonomously on a schedule.
 
-Without GAIA CI, the wiki doesn't update on its own. GAIA watches for drift and nudges you when it accumulates (at prompt submission and at session end). You then run `/gaia
-wiki` to bring it back in sync.
+Without GAIA CI, the wiki doesn't update on its own. GAIA watches for drift and nudges you when it accumulates (at prompt submission and at session end). You then run `/gaia-wiki` to bring it back in sync.
 
-You can always invoke `/gaia wiki` manually. With CI enabled it defers to avoid colliding with the scheduled run; pass `--force` to override.
+You can always invoke `/gaia-wiki` manually. With CI enabled it defers to avoid colliding with the scheduled run; pass `--force` to override.
+
+`/gaia-wiki` is a skill, so it also runs on plain-English asks like "sync the wiki", "consolidate the wiki", or "lint the wiki", not just the slash form.
 
 For teams, manual runs on feature branches can produce wiki edits that conflict downstream when several developers invoke it in parallel. Letting CI own the writes keeps the
 chain single-writer, which is why CI is the recommended path.
@@ -30,7 +31,7 @@ chain single-writer, which is why CI is the recommended path.
 There are three main commands, plus a full-chain mode that runs them in sequence. Each command is described in detail below.
 
 ```
-/gaia wiki [sync|consolidate|lint]
+/gaia-wiki [sync|consolidate|lint]
 ```
 
 | Argument | Behavior |
@@ -40,7 +41,7 @@ There are three main commands, plus a full-chain mode that runs them in sequence
 | `lint` | Health check: orphans, dead links, drift severity, narrative-reference scrub. No chaining. |
 | (no argument) | Full chain: sync → consolidate → lint |
 
-## /gaia wiki sync
+## /gaia-wiki sync
 
 Walks every commit between the wiki's last evaluated SHA and HEAD. For each commit, decides whether the wiki needs an update. Edits pages, logs decisions, advances state.
 
@@ -56,7 +57,7 @@ If drift exceeds 30 commits, sync asks before processing the full range. You can
 
 Sync ends with a one-line trigger: `CONSOLIDATE_TRIGGERED: true|false`. Used by the full-chain mode to decide whether consolidate runs next.
 
-## /gaia wiki consolidate
+## /gaia-wiki consolidate
 
 Detects redundancy and contradiction across the wiki. Four passes:
 
@@ -69,7 +70,7 @@ For each finding, consolidate prompts you per finding: `Apply`, `Keep both`, or 
 
 Consolidate does not commit. Applied edits stage; sync (or your manual commit) lands them. The `wiki-commit-nudge` hook prompts a sync commit after your next `git commit`.
 
-## /gaia wiki lint
+## /gaia-wiki lint
 
 Health check. Wraps the upstream `claude-obsidian:wiki-lint` skill and appends three GAIA-specific checks:
 
@@ -82,7 +83,7 @@ Reports land at `wiki/meta/lint-report-YYYY-MM-DD.md`. The `wiki/meta/` director
 ## Full chain (no argument)
 
 ```
-/gaia wiki
+/gaia-wiki
 ```
 
 Runs sync. Reads the `CONSOLIDATE_TRIGGERED` line from sync's summary. If true, runs consolidate. Then runs lint.

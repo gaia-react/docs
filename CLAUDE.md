@@ -36,7 +36,7 @@ GAIA has two audiences and the docs must keep them strictly separate:
 
 **The inverse rule (softer):** a contributor docs page should not duplicate what's already in the adopter docs. Cross-link instead.
 
-## GAIA's actual surface (verified 2026-05-08, but volatile — re-check before publishing)
+## GAIA's actual surface (verified 2026-06-03, but volatile — re-check before publishing)
 
 GAIA's invocation surface is layered. Knowing the layering is essential to documenting it correctly.
 
@@ -44,23 +44,24 @@ GAIA's invocation surface is layered. Knowing the layering is essential to docum
 
 | Adopter | Contributor-only |
 |---|---|
-| `/gaia-init`, `/setup-cloned-gaia-project` | `/gaia-release`, `/health-audit` |
+| `/gaia-init`, `/setup-cloned-gaia-project`, `/setup-gaia-ci`, plus the workflow commands `/gaia-plan`, `/gaia-spec`, `/gaia-audit`, `/gaia-fitness`, `/gaia-forensics` | `/gaia-release`, `/health-audit` |
 
 **Layer 2 — top-level skills** at `gaia/.claude/skills/*/SKILL.md`. All adopter-shipped:
 
-- `gaia` — *router*, see Layer 3 below
+- Workflow skills: `gaia-wiki` (wiki maintenance), `gaia-handoff`, `gaia-pickup` (context transfer). They autocomplete as `/gaia-wiki | /gaia-handoff | /gaia-pickup` and stay agent / natural-language invocable (that's why they're skills, not commands).
 - Code skills: `react-code`, `typescript`, `tailwind`, `tdd`, `playwright-cli`, `eslint-fixes`, `skeleton-loaders`
 - Scaffolders: `new-component`, `new-hook`, `new-route`, `new-service`
 - Maintenance: `update-deps`, `update-gaia`
 
-**Layer 3 — `/gaia` skill sub-routes** at `gaia/.claude/skills/gaia/references/*.md` (or `references/wiki/*.md`). Adopter-shipped. Invoked as `/gaia <sub>`:
+**Layer 3 — workflow reference instructions** at `gaia/.claude/skills/gaia/references/*.md` (or `references/wiki/*.md`). Adopter-shipped. PR #277 (merged 2026-06-03) deleted the old `gaia` router `SKILL.md` and split its sub-routes into the discrete Layer 1 commands and Layer 2 skills above; the `references/*` files survive as the dispatch targets (workflow logic unchanged), but they are no longer invoked as `/gaia <sub>`:
 
-- `/gaia plan` — orchestrator + per-task subagents
-- `/gaia spec` — frozen-UAT spec workflow with operational primitives
-- `/gaia audit` — codebase audit
-- `/gaia handoff`, `/gaia pickup` — context transfer
-- `/gaia forensics` — bug-report bridge with redacting/classifying flow
-- `/gaia wiki sync | consolidate | lint` (or no arg = full chain) — wiki maintenance. Renamed from `/wiki-*` in PR #121 to dodge `claude-obsidian:wiki-lint` plugin collision.
+- `/gaia-plan` → `references/plan.md` — orchestrator + per-task subagents
+- `/gaia-spec` → `references/spec.md` — frozen-UAT spec workflow with operational primitives (`auto <desc>` for non-interactive)
+- `/gaia-audit` → `references/audit.md` — knowledge-store audit (`--apply` re-runs the apply stage)
+- `/gaia-fitness` → `references/fitness.md` — Claude-integration health check and auto-heal
+- `/gaia-forensics` → `references/forensics.md` — bug-report bridge with redacting/classifying flow
+- `/gaia-handoff`, `/gaia-pickup` → `references/handoff.md`, `references/pickup.md` — context transfer
+- `/gaia-wiki sync | consolidate | lint` (or no arg = full chain) → `references/wiki.md` — wiki maintenance. The wiki workflow was renamed from `/wiki-*` in PR #121 to dodge the `claude-obsidian:wiki-lint` plugin collision.
 
 **Layer 4 — spec-kit extension commands** at `gaia/.specify/extensions/gaia/commands/*.md`. Adopter-shipped, registered through spec-kit (v0.8.5) namespace `speckit.gaia.*`:
 
@@ -112,7 +113,7 @@ The `studio/` vault is the singular location for voice/branding/positioning know
 
 Studio's `VOICE.md` covers marketing, docs, and in-app strings together. For docs specifically:
 
-- **Reference register, not pitch register.** Procedural and declarative. "Run `/gaia audit` to check the current branch." Not "Unleash the power of `/gaia audit`."
+- **Reference register, not pitch register.** Procedural and declarative. "Run `/gaia-audit` to check the current branch." Not "Unleash the power of `/gaia-audit`."
 - **Voice rules still apply.** No em dashes anywhere. No AI tells (delve, tapestry, leveraging, seamless, robust, powerful). No borrowed-field jargon (substrate, paradigm, ecosystem, fabric). Grep for `—` before publishing.
 - **Concrete over vague.** Real command names, real flags, real file paths, real numbers. Not "various options."
 - **Code blocks are honest.** Examples should run. If a snippet won't work as written, it doesn't belong.
@@ -129,7 +130,7 @@ Some adopter-facing commands and wiki pages internally reference mechanisms that
 - **`/gaia-init`** — has a mentorship opt-in step. Describe it as *"opt into an optional adaptation feature"* (or skip the step entirely from the public flow). Do not name `gaia mentorship`, the display rule, the protected memory store, or any of the `_internal-*` subcommands. Do not describe what mentorship does mechanically.
 - **`/setup-cloned-gaia-project`** — mentions mentorship in its bootstrap. Same handling as `/gaia-init`.
 - **`wiki/hot.md`, `wiki/index.md`** — both ship and contain references to telemetry / mentorship in their bodies. If you write a page that derives from or links to these, drop the telemetry / mentorship lines from your derivation. Treat the source as if those lines weren't there.
-- **`/gaia spec`, `/gaia plan`, spec-close** — incidentally mention telemetry-emit calls inside their flows. Document the user flow without explaining what gets emitted, where, or why.
+- **`/gaia-spec`, `/gaia-plan`, spec-close** — incidentally mention telemetry-emit calls inside their flows. Document the user flow without explaining what gets emitted, where, or why.
 
 **The registry is `docs/.claude/audit/do-not-document.yml`.** Before writing about any adopter command, hook, skill, or wiki page, check whether any deferred / obscured name appears in the source you're documenting. If yes, the page needs muting at write time. The `docs-audit` agent will also flag this on review, but writers should catch it first.
 

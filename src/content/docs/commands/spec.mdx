@@ -1,9 +1,9 @@
 ---
-title: /gaia spec
+title: /gaia-spec
 description: Run a Socratic discovery loop and save an immutable SPEC artifact.
 ---
 
-`/gaia spec` produces an immutable SPEC artifact through a guided Socratic conversation. The artifact lands at `.gaia/local/specs/SPEC-NNN.md` and serves as the contract for [`/gaia plan`](/commands/plan/) to decompose into work. The skill produces an artifact and stops. It does not implement anything.
+`/gaia-spec` produces an immutable SPEC artifact through a guided Socratic conversation. The artifact lands at `.gaia/local/specs/SPEC-NNN.md` and serves as the contract for [`/gaia-plan`](/commands/plan/) to decompose into work. The skill produces an artifact and stops. It does not implement anything.
 
 This is for when you want to implement a large feature or change request with multiple parts, or you want to present an idea or concept and refine it before implementation.
 
@@ -11,9 +11,9 @@ The flow runs on top of [spec-kit](https://github.com/github/spec-kit), with GAI
 
 ## When to use it
 
-Run `/gaia spec` for any feature where the boundaries are not yet clear. It is the right entry point when the description has more questions than answers, or when multiple readings of the same prompt produce different intents.
+Run `/gaia-spec` for any feature where the boundaries are not yet clear. It is the right entry point when the description has more questions than answers, or when multiple readings of the same prompt produce different intents.
 
-For changes whose intent is already obvious (a bug fix, a refactor against a known interface, a copy edit), skip directly to [`/gaia plan`](/commands/plan/).
+For changes whose intent is already obvious (a bug fix, a refactor against a known interface, a copy edit), skip directly to [`/gaia-plan`](/commands/plan/).
 
 ## How to invoke
 
@@ -22,7 +22,7 @@ For changes whose intent is already obvious (a bug fix, a refactor against a kno
 In interactive mode, the agent asks the user a series of questions to clarify the intent.
 
 ```
-/gaia spec your feature description
+/gaia-spec your feature description
 ```
 
 ### Auto mode
@@ -30,7 +30,7 @@ In interactive mode, the agent asks the user a series of questions to clarify th
 In auto mode, the agent answers its own questions without user input. If you find that you are consistently picking the recommended option in interactive mode, or if the description is already well-formed or you just want to see what the agent produces, auto mode is a good choice.
 
 ```
-/gaia spec auto your feature description
+/gaia-spec auto your feature description
 ```
 
 A description is required in auto mode. Without one, the skill aborts immediately.
@@ -53,7 +53,7 @@ A handful of mechanics are used by multiple steps:
 - **Per-topic revisit counter.** Tracks how many times the user has chosen "push deeper" on a given topic. On the third revisit, the prompt swaps to settle, defer, or push deeper anyway. Prevents one topic from consuming the whole session.
 - **Five-question cap.** Spec-kit's `/clarify` primitive caps the loop at five total questions per session. The wrapper inherits this cap and never invokes `/clarify` twice to extend it.
 - **Discuss-this escape.** Any closed-set question can drop into a plain Q&A discussion. On settlement, the outcome folds into `clarifications.answered[]` and the structured loop resumes on the next topic.
-- **Save partial and resume later.** Every closed-set question offers this escape. It writes the draft cache and exits. Re-invoking `/gaia spec` resumes from the right step.
+- **Save partial and resume later.** Every closed-set question offers this escape. It writes the draft cache and exits. Re-invoking `/gaia-spec` resumes from the right step.
 
 ## The flow
 
@@ -67,11 +67,11 @@ A handful of mechanics are used by multiple steps:
 8. **Gate 2.** Plain prompt: confirm the full rendered artifact, or revise.
 9. **Canonical save.** Writes `.gaia/local/specs/SPEC-NNN.md` and deletes the working-draft cache. The `after_specify` hook fires `/speckit-gaia-lint` for immutability checks. Cycles 1 and 2 surface failures; cycle 3 prompts to step back to gate 2, defer remaining findings, or push another fix.
 10. **Optional GitHub issue mirror.** If opted in at step 2, `gh-mirror.sh` creates the issue and stamps the URL into frontmatter. Skips silently when `gh` is not authenticated, Issues are disabled, or the viewer lacks write permission.
-11. **Chain to `/gaia plan`.** `AskUserQuestion`: trigger `/gaia plan` now or defer. On yes, the skill enters a multi-plan dispatch loop. Each plan runs in its own `general-purpose` Agent so the wrapper context stays bounded across plan count.
+11. **Chain to `/gaia-plan`.** `AskUserQuestion`: trigger `/gaia-plan` now or defer. On yes, the skill enters a multi-plan dispatch loop. Each plan runs in its own `general-purpose` Agent so the wrapper context stays bounded across plan count.
 
 ## Auto mode
 
-`/gaia spec auto <description>` produces a SPEC end-to-end without prompts:
+`/gaia-spec auto <description>` produces a SPEC end-to-end without prompts:
 
 - Both gates auto-confirm via internal self-check.
 - Closed-set Socratic questions auto-pick the recommended option.
@@ -79,7 +79,7 @@ A handful of mechanics are used by multiple steps:
 - Per-topic exhaustion auto-advances; the third-revisit prompt auto-settles.
 - Pending clarifications auto-defer with a static auto-mode rationale.
 - The GitHub issue mirror is forced on.
-- The chain to `/gaia plan` is automatic and produces exactly one plan covering the full SPEC.
+- The chain to `/gaia-plan` is automatic and produces exactly one plan covering the full SPEC.
 
 Use auto mode when the description is well-formed and the cost of stopping for clarifications outweighs the cost of a reviewer auditing the deferred items afterward.
 
@@ -102,8 +102,8 @@ Five GAIA hooks fire across the SPEC lifecycle. Never invoke them by hand.
 | `before_implement` | `/speckit-gaia-uat-write` | Renders frozen UATs into Playwright e2e specs at `.playwright/e2e/<spec-dir>/`, leaving a red-state harness before implementation begins. |
 | `after_implement` | `/speckit-gaia-wiki-promote` | Promotes merged-PR content into the project wiki under `wiki/<subdomain>/`. Defers if the implementing PR has not merged yet. |
 
-The chain-trigger to `/gaia plan` lives inline at step 11 of the flow, not as a hook. Disposition of the SPEC artifact (archive, delete, keep) happens through `/gaia spec close <SPEC-NNN>` after the implementing PR merges.
+The chain-trigger to `/gaia-plan` lives inline at step 11 of the flow, not as a hook. Disposition of the SPEC artifact (archive, delete, keep) happens through `/gaia-spec close <SPEC-NNN>` after the implementing PR merges.
 
 ## Related
 
-After save, [`/gaia plan`](/commands/plan/) is the natural next step. The chain-trigger at step 11 dispatches it automatically when accepted.
+After save, [`/gaia-plan`](/commands/plan/) is the natural next step. The chain-trigger at step 11 dispatches it automatically when accepted.

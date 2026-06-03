@@ -1,22 +1,22 @@
 ---
-title: /gaia fitness
+title: /gaia-fitness
 description: Health check and auto-heal for your project's Claude integration. Triage, heal, verify, with a letter grade.
 ---
 
-`/gaia fitness` checks the health of your project's Claude integration and repairs what it safely can. One invocation, no flags: calling `/gaia fitness` is the statement of intent to be fit. It runs three phases in sequence: triage, heal, verify, and reports a per-category and overall grade from F up to A+.
+`/gaia-fitness` checks the health of your project's Claude integration and repairs what it safely can. One invocation, no flags: calling `/gaia-fitness` is the statement of intent to be fit. It runs three phases in sequence: triage, heal, verify, and reports a per-category and overall grade from F up to A+.
 
-It checks the Claude *surface* (hooks, skill/command/agent frontmatter, rule files, `CLAUDE.md`, `.claude/settings.json`, GAIA itself, and wiki structure), not your application code. For app code review before merge, use the `code-review-audit` agent. For knowledge-store bloat and duplication, use [`/gaia audit`](/commands/audit/).
+It checks the Claude *surface* (hooks, skill/command/agent frontmatter, rule files, `CLAUDE.md`, `.claude/settings.json`, GAIA itself, and wiki structure), not your application code. For app code review before merge, use the `code-review-audit` agent. For knowledge-store bloat and duplication, use [`/gaia-audit`](/commands/audit/).
 
 ## When to use it
 
-Run `/gaia fitness` after editing under `.claude/`, such as modifying or adding new commands, skills, agents, hooks, etc.
+Run `/gaia-fitness` after editing under `.claude/`, such as modifying or adding new commands, skills, agents, hooks, etc.
 
 You can also call it after pulling a GAIA update with [`/update-gaia`](/commands/update-gaia/) if you made any customizations to GAIA, or periodically as a routine check.
 
 ## How to invoke
 
 ```
-/gaia fitness
+/gaia-fitness
 ```
 
 No flags. No arguments.
@@ -35,7 +35,7 @@ Triage dispatches seven category checks in parallel. Each produces a set of find
 | GAIA-install fitness | Whether the GAIA install is intact and consistent. |
 | Wiki fitness | Wiki structure: state file, manifest, orphans, dead repo-relative paths. |
 
-The checks are recall-oriented and over-flag on purpose. Before grading, `/gaia fitness` adjudicates each finding against the actual repo and drops the false positives (an unfamiliar-but-valid hook event, a permission pair that only looks redundant, and so on). What survives gets graded.
+The checks are recall-oriented and over-flag on purpose. Before grading, `/gaia-fitness` adjudicates each finding against the actual repo and drops the false positives (an unfamiliar-but-valid hook event, a permission pair that only looks redundant, and so on). What survives gets graded.
 
 ## Grading
 
@@ -62,17 +62,17 @@ An `A` should be considered a clean bill of health.
 
 Where the fixes land depends on which branch you are on when you run it:
 
-- **On the default branch** (`main`), with at least one fixable finding: `/gaia fitness` creates and switches to a new branch named `chore/gaia-fitness-<timestamp>` before applying anything, so `main` stays untouched.
+- **On the default branch** (`main`), with at least one fixable finding: `/gaia-fitness` creates and switches to a new branch named `chore/gaia-fitness-<timestamp>` before applying anything, so `main` stays untouched.
 - **On any other branch**, with at least one fixable finding: it heals in place on your current branch.
 - **No fixable findings** (including a clean A+ run): no branch is created, `HEAD` stays put, nothing changes.
 
 ## Unsafe repo state
 
-Before any heal-phase change, `/gaia fitness` checks whether the repo is safe to mutate. If `HEAD` is detached, or a rebase, merge, cherry-pick, or bisect is in progress, it switches to a triage-only path: it runs the checks, prints the grades, tells you heal was skipped and why, gives the resolution steps (for example, `git rebase --abort` or `git checkout <branch>`), and stops. No working-tree change, no branch.
+Before any heal-phase change, `/gaia-fitness` checks whether the repo is safe to mutate. If `HEAD` is detached, or a rebase, merge, cherry-pick, or bisect is in progress, it switches to a triage-only path: it runs the checks, prints the grades, tells you heal was skipped and why, gives the resolution steps (for example, `git rebase --abort` or `git checkout <branch>`), and stops. No working-tree change, no branch.
 
 ## After the run
 
-`/gaia fitness` prints a findings list grouped by the seven categories, one line per finding:
+`/gaia-fitness` prints a findings list grouped by the seven categories, one line per finding:
 
 ```
 - [severity] `file:line` — remediation
@@ -84,9 +84,9 @@ Then, depending on what happened:
 
 - **A branch was created.** Review with `git diff main`, commit when satisfied, or discard with `git checkout main && git branch -D chore/gaia-fitness-<timestamp>`.
 - **Healed in place.** Review with `git diff`, commit when satisfied, or discard with `git checkout -- .`.
-- **Triage-only.** Re-run `/gaia fitness` after you have resolved the unsafe state.
+- **Triage-only.** Re-run `/gaia-fitness` after you have resolved the unsafe state.
 - **Zero findings.** Nothing to do.
 
 ## Related
 
-`/gaia fitness` checks the Claude integration surface. For knowledge-store duplication and autoload budgets, use [`/gaia audit`](/commands/audit/). For wiki-internal redundancy and broken wikilinks, use [`/gaia wiki`](/commands/wiki/). For your application code on a branch before merge, use the [`code-review-audit` agent](/reference/agents/).
+`/gaia-fitness` checks the Claude integration surface. For knowledge-store duplication and autoload budgets, use [`/gaia-audit`](/commands/audit/). For wiki-internal redundancy and broken wikilinks, use [`/gaia-wiki`](/commands/wiki/). For your application code on a branch before merge, use the [`code-review-audit` agent](/reference/agents/).
