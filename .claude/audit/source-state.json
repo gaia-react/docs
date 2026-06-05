@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "captured_at": "2026-06-03T00:00:00Z",
-  "gaia_commit": "3ab9e1b2532c7b8f3da8e088307111a84d180c22",
+  "captured_at": "2026-06-05T00:00:00Z",
+  "gaia_commit": "1984425dc43037b16ef43585b08f9180a9de5c08",
   "items": [
     {
       "kind": "agent",
@@ -9,7 +9,7 @@
       "name": "code-review-audit",
       "description": "Comprehensive code review, security audit, performance analysis, and architectural assessment. Goes beyond linting and type-checking to identify vulnerabilities, bottlenecks, code smells, anti-patterns, and refactoring opportunities. Mandatory before PR merge.",
       "audience": "adopter",
-      "content_hash": "01daadf542857e409be9229709625571fc7ca5969ccf85fdf64281297700d011",
+      "content_hash": "f8213e8f533b507a57a863bf303029aead4df981bc2b658f4ebafa4c4f9631a2",
       "excluded_from_docs": false
     },
     {
@@ -18,7 +18,7 @@
       "name": "_internal-fetch-coaching",
       "description": null,
       "audience": "adopter",
-      "content_hash": "77905e8f2d194566a92e32a026742f473d6c7ec1df0037224d552c4579993cfe",
+      "content_hash": "3886ec4d8870e4562bd9fa75e03d8d993248d20b638838c8bc5a414a26a4e9d7",
       "excluded_from_docs": true
     },
     {
@@ -117,7 +117,7 @@
       "name": "gaia ci-revert is-cap-reached",
       "description": null,
       "audience": "adopter",
-      "content_hash": "42e588da1d6ef836e45f1352ee19dc8a2ba6d5fd2f219fd67b97fce3d46c5213",
+      "content_hash": "1b40e5de09233d2b24379eb7c88fc61c8e3a865a870e1cd04532185995ac2cf0",
       "excluded_from_docs": false
     },
     {
@@ -126,7 +126,7 @@
       "name": "gaia ci-revert mark-failed",
       "description": null,
       "audience": "adopter",
-      "content_hash": "42e588da1d6ef836e45f1352ee19dc8a2ba6d5fd2f219fd67b97fce3d46c5213",
+      "content_hash": "1b40e5de09233d2b24379eb7c88fc61c8e3a865a870e1cd04532185995ac2cf0",
       "excluded_from_docs": false
     },
     {
@@ -135,7 +135,7 @@
       "name": "gaia ci-revert open",
       "description": null,
       "audience": "adopter",
-      "content_hash": "42e588da1d6ef836e45f1352ee19dc8a2ba6d5fd2f219fd67b97fce3d46c5213",
+      "content_hash": "1b40e5de09233d2b24379eb7c88fc61c8e3a865a870e1cd04532185995ac2cf0",
       "excluded_from_docs": false
     },
     {
@@ -144,7 +144,7 @@
       "name": "gaia ci-stale-check",
       "description": null,
       "audience": "adopter",
-      "content_hash": "70f9b5e8e8748d20794c6ae8fbe07d50025f1a245755618630083922672413da",
+      "content_hash": "6b594dd06af11192d62c211f96ef329fa9a798b7ec71d6c4063694a533a5e38d",
       "excluded_from_docs": false
     },
     {
@@ -459,7 +459,7 @@
       "name": "gaia setup-ci check-admin",
       "description": null,
       "audience": "adopter",
-      "content_hash": "334898a0a22ced234b32141bbad38fafeaeca1598ffc1a9894342b8758fb9233",
+      "content_hash": "6d316819d5b5c695c6dfe12a861a6640a42bfb79f2b1910b52c9066a2133c892",
       "excluded_from_docs": false
     },
     {
@@ -468,7 +468,7 @@
       "name": "gaia setup-ci check-audit-drift",
       "description": null,
       "audience": "adopter",
-      "content_hash": "334898a0a22ced234b32141bbad38fafeaeca1598ffc1a9894342b8758fb9233",
+      "content_hash": "6d316819d5b5c695c6dfe12a861a6640a42bfb79f2b1910b52c9066a2133c892",
       "excluded_from_docs": false
     },
     {
@@ -477,7 +477,7 @@
       "name": "gaia setup-ci check-drift",
       "description": null,
       "audience": "adopter",
-      "content_hash": "334898a0a22ced234b32141bbad38fafeaeca1598ffc1a9894342b8758fb9233",
+      "content_hash": "6d316819d5b5c695c6dfe12a861a6640a42bfb79f2b1910b52c9066a2133c892",
       "excluded_from_docs": false
     },
     {
@@ -486,7 +486,7 @@
       "name": "gaia setup-ci detect-remote",
       "description": null,
       "audience": "adopter",
-      "content_hash": "334898a0a22ced234b32141bbad38fafeaeca1598ffc1a9894342b8758fb9233",
+      "content_hash": "6d316819d5b5c695c6dfe12a861a6640a42bfb79f2b1910b52c9066a2133c892",
       "excluded_from_docs": false
     },
     {
@@ -495,7 +495,7 @@
       "name": "gaia setup-ci dismiss-personal",
       "description": null,
       "audience": "adopter",
-      "content_hash": "334898a0a22ced234b32141bbad38fafeaeca1598ffc1a9894342b8758fb9233",
+      "content_hash": "6d316819d5b5c695c6dfe12a861a6640a42bfb79f2b1910b52c9066a2133c892",
       "excluded_from_docs": false
     },
     {
@@ -504,7 +504,7 @@
       "name": "gaia setup-ci enable-delete-branch",
       "description": null,
       "audience": "adopter",
-      "content_hash": "334898a0a22ced234b32141bbad38fafeaeca1598ffc1a9894342b8758fb9233",
+      "content_hash": "6d316819d5b5c695c6dfe12a861a6640a42bfb79f2b1910b52c9066a2133c892",
       "excluded_from_docs": false
     },
     {
@@ -513,7 +513,7 @@
       "name": "gaia setup-ci finalize",
       "description": null,
       "audience": "adopter",
-      "content_hash": "334898a0a22ced234b32141bbad38fafeaeca1598ffc1a9894342b8758fb9233",
+      "content_hash": "6d316819d5b5c695c6dfe12a861a6640a42bfb79f2b1910b52c9066a2133c892",
       "excluded_from_docs": false
     },
     {
@@ -522,7 +522,7 @@
       "name": "gaia setup-ci opt-out-team",
       "description": null,
       "audience": "adopter",
-      "content_hash": "334898a0a22ced234b32141bbad38fafeaeca1598ffc1a9894342b8758fb9233",
+      "content_hash": "6d316819d5b5c695c6dfe12a861a6640a42bfb79f2b1910b52c9066a2133c892",
       "excluded_from_docs": false
     },
     {
@@ -531,7 +531,7 @@
       "name": "gaia setup-ci set-secret",
       "description": null,
       "audience": "adopter",
-      "content_hash": "334898a0a22ced234b32141bbad38fafeaeca1598ffc1a9894342b8758fb9233",
+      "content_hash": "6d316819d5b5c695c6dfe12a861a6640a42bfb79f2b1910b52c9066a2133c892",
       "excluded_from_docs": false
     },
     {
@@ -540,7 +540,7 @@
       "name": "gaia setup-ci status",
       "description": null,
       "audience": "adopter",
-      "content_hash": "334898a0a22ced234b32141bbad38fafeaeca1598ffc1a9894342b8758fb9233",
+      "content_hash": "6d316819d5b5c695c6dfe12a861a6640a42bfb79f2b1910b52c9066a2133c892",
       "excluded_from_docs": false
     },
     {
@@ -549,7 +549,7 @@
       "name": "gaia setup-ci verify-run",
       "description": null,
       "audience": "adopter",
-      "content_hash": "334898a0a22ced234b32141bbad38fafeaeca1598ffc1a9894342b8758fb9233",
+      "content_hash": "6d316819d5b5c695c6dfe12a861a6640a42bfb79f2b1910b52c9066a2133c892",
       "excluded_from_docs": false
     },
     {
@@ -558,7 +558,7 @@
       "name": "gaia setup-ci warn-existing-tools",
       "description": null,
       "audience": "adopter",
-      "content_hash": "334898a0a22ced234b32141bbad38fafeaeca1598ffc1a9894342b8758fb9233",
+      "content_hash": "6d316819d5b5c695c6dfe12a861a6640a42bfb79f2b1910b52c9066a2133c892",
       "excluded_from_docs": false
     },
     {
@@ -567,7 +567,7 @@
       "name": "gaia setup-ci write-tool-mode",
       "description": null,
       "audience": "adopter",
-      "content_hash": "334898a0a22ced234b32141bbad38fafeaeca1598ffc1a9894342b8758fb9233",
+      "content_hash": "6d316819d5b5c695c6dfe12a861a6640a42bfb79f2b1910b52c9066a2133c892",
       "excluded_from_docs": false
     },
     {
@@ -576,7 +576,7 @@
       "name": "gaia telemetry compute-profile",
       "description": null,
       "audience": "adopter",
-      "content_hash": "9a28d6b15d7dfca91f07f69e4d0916f12c6859b77f7f4521276e62152c8d8f03",
+      "content_hash": "02ebb343549c98377e3c20c7ce6585f1c69b85bdad2f3547e9184c45bb50dfee",
       "excluded_from_docs": true
     },
     {
@@ -585,7 +585,7 @@
       "name": "gaia telemetry emit",
       "description": null,
       "audience": "adopter",
-      "content_hash": "9a28d6b15d7dfca91f07f69e4d0916f12c6859b77f7f4521276e62152c8d8f03",
+      "content_hash": "02ebb343549c98377e3c20c7ce6585f1c69b85bdad2f3547e9184c45bb50dfee",
       "excluded_from_docs": true
     },
     {
@@ -594,7 +594,7 @@
       "name": "gaia telemetry parse-stdin",
       "description": null,
       "audience": "adopter",
-      "content_hash": "9a28d6b15d7dfca91f07f69e4d0916f12c6859b77f7f4521276e62152c8d8f03",
+      "content_hash": "02ebb343549c98377e3c20c7ce6585f1c69b85bdad2f3547e9184c45bb50dfee",
       "excluded_from_docs": true
     },
     {
@@ -621,7 +621,7 @@
       "name": "gaia wiki commit-classify",
       "description": null,
       "audience": "adopter",
-      "content_hash": "6fded1f8bdb6e9a4026e71bb1cf1426f191e3582046028146977719d4743cc48",
+      "content_hash": "b4a4165ad2c28a7a80fa0b8eb47f38bb12832c09821c56739be27bba5555b27b",
       "excluded_from_docs": false
     },
     {
@@ -630,7 +630,7 @@
       "name": "gaia wiki dead-paths",
       "description": null,
       "audience": "adopter",
-      "content_hash": "6fded1f8bdb6e9a4026e71bb1cf1426f191e3582046028146977719d4743cc48",
+      "content_hash": "b4a4165ad2c28a7a80fa0b8eb47f38bb12832c09821c56739be27bba5555b27b",
       "excluded_from_docs": false
     },
     {
@@ -639,7 +639,25 @@
       "name": "gaia wiki diff-size",
       "description": null,
       "audience": "adopter",
-      "content_hash": "6fded1f8bdb6e9a4026e71bb1cf1426f191e3582046028146977719d4743cc48",
+      "content_hash": "b4a4165ad2c28a7a80fa0b8eb47f38bb12832c09821c56739be27bba5555b27b",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/wiki/index.ts",
+      "name": "gaia wiki empty-sections",
+      "description": "Headings with no content before the next heading.",
+      "audience": "adopter",
+      "content_hash": "b4a4165ad2c28a7a80fa0b8eb47f38bb12832c09821c56739be27bba5555b27b",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "cli-subcommand",
+      "path": ".gaia/cli/src/wiki/index.ts",
+      "name": "gaia wiki frontmatter",
+      "description": "Pages missing required frontmatter (type, status).",
+      "audience": "adopter",
+      "content_hash": "b4a4165ad2c28a7a80fa0b8eb47f38bb12832c09821c56739be27bba5555b27b",
       "excluded_from_docs": false
     },
     {
@@ -648,7 +666,7 @@
       "name": "gaia wiki log-prepend",
       "description": null,
       "audience": "adopter",
-      "content_hash": "6fded1f8bdb6e9a4026e71bb1cf1426f191e3582046028146977719d4743cc48",
+      "content_hash": "b4a4165ad2c28a7a80fa0b8eb47f38bb12832c09821c56739be27bba5555b27b",
       "excluded_from_docs": false
     },
     {
@@ -657,7 +675,7 @@
       "name": "gaia wiki near-collisions",
       "description": null,
       "audience": "adopter",
-      "content_hash": "6fded1f8bdb6e9a4026e71bb1cf1426f191e3582046028146977719d4743cc48",
+      "content_hash": "b4a4165ad2c28a7a80fa0b8eb47f38bb12832c09821c56739be27bba5555b27b",
       "excluded_from_docs": false
     },
     {
@@ -666,7 +684,7 @@
       "name": "gaia wiki orphans",
       "description": null,
       "audience": "adopter",
-      "content_hash": "6fded1f8bdb6e9a4026e71bb1cf1426f191e3582046028146977719d4743cc48",
+      "content_hash": "b4a4165ad2c28a7a80fa0b8eb47f38bb12832c09821c56739be27bba5555b27b",
       "excluded_from_docs": false
     },
     {
@@ -675,7 +693,7 @@
       "name": "gaia wiki page-index",
       "description": null,
       "audience": "adopter",
-      "content_hash": "6fded1f8bdb6e9a4026e71bb1cf1426f191e3582046028146977719d4743cc48",
+      "content_hash": "b4a4165ad2c28a7a80fa0b8eb47f38bb12832c09821c56739be27bba5555b27b",
       "excluded_from_docs": false
     },
     {
@@ -684,7 +702,7 @@
       "name": "gaia wiki state",
       "description": null,
       "audience": "adopter",
-      "content_hash": "6fded1f8bdb6e9a4026e71bb1cf1426f191e3582046028146977719d4743cc48",
+      "content_hash": "b4a4165ad2c28a7a80fa0b8eb47f38bb12832c09821c56739be27bba5555b27b",
       "excluded_from_docs": false
     },
     {
@@ -693,7 +711,7 @@
       "name": "gaia wiki state-bump",
       "description": null,
       "audience": "adopter",
-      "content_hash": "6fded1f8bdb6e9a4026e71bb1cf1426f191e3582046028146977719d4743cc48",
+      "content_hash": "b4a4165ad2c28a7a80fa0b8eb47f38bb12832c09821c56739be27bba5555b27b",
       "excluded_from_docs": false
     },
     {
@@ -702,7 +720,7 @@
       "name": "gaia wiki state-init",
       "description": null,
       "audience": "adopter",
-      "content_hash": "6fded1f8bdb6e9a4026e71bb1cf1426f191e3582046028146977719d4743cc48",
+      "content_hash": "b4a4165ad2c28a7a80fa0b8eb47f38bb12832c09821c56739be27bba5555b27b",
       "excluded_from_docs": false
     },
     {
@@ -711,7 +729,7 @@
       "name": "gaia wiki sync land",
       "description": null,
       "audience": "adopter",
-      "content_hash": "6fded1f8bdb6e9a4026e71bb1cf1426f191e3582046028146977719d4743cc48",
+      "content_hash": "b4a4165ad2c28a7a80fa0b8eb47f38bb12832c09821c56739be27bba5555b27b",
       "excluded_from_docs": false
     },
     {
@@ -720,16 +738,16 @@
       "name": "gaia-audit",
       "description": "Audit memory, wiki, and auto-loaded files for duplication, conflicting instructions, and stale content, then apply fixes. Pass --apply to re-run the apply stage against the most recent report.",
       "audience": "adopter",
-      "content_hash": "ebea7c7f96d8faabfb456d03811b35ab7c1d7ea6e3e19ff2e5c3799c6b03df55",
+      "content_hash": "a4646f13e799bd01c0c23b4dc5164d6c4d7f27d8495c6fd600105f60525d4e97",
       "excluded_from_docs": false
     },
     {
       "kind": "command",
       "path": ".claude/commands/gaia-fitness.md",
       "name": "gaia-fitness",
-      "description": "Health-check and auto-heal this project's Claude integration — triage, heal, verify — and report an F-to-A+ grade.",
+      "description": "Health-check and auto-heal this project's Claude integration, triage, heal, verify, and report an F-to-A+ grade.",
       "audience": "adopter",
-      "content_hash": "6f0bb176d19d076b4f82a5f07cf5191c678862ae344a2a466e9b92e7e0b292c3",
+      "content_hash": "1314279c64a80509a1ef0183215874ac50de1b2af83eb5591f66f21208cad0ae",
       "excluded_from_docs": false
     },
     {
@@ -738,34 +756,34 @@
       "name": "gaia-forensics",
       "description": "Turn a GAIA workflow misfire into a redacted, classified, filing-ready bug report in one read-only pass. Self-diagnoses config issues inline; files probable bugs upstream on confirmation.",
       "audience": "adopter",
-      "content_hash": "eea43238f808c5fdc55fd393e9a11063a07f3123ca79cce05ab218cd6b43cc0e",
+      "content_hash": "5e1f8b2f81a0a152c753456d6ff5d979c422121d4a4edbe026aa56e1e9e2589c",
       "excluded_from_docs": false
     },
     {
       "kind": "command",
       "path": ".claude/commands/gaia-init.md",
       "name": "gaia-init",
-      "description": "Initialize a new project from the GAIA React template — renames, strips GAIA branding, configures i18n, installs Claude skills/plugins.",
+      "description": "Initialize a new project from the GAIA React template, renames, strips GAIA branding, configures i18n, installs Claude skills/plugins.",
       "audience": "adopter",
-      "content_hash": "db192f6f0768db4aa4ea350f5e96c82e521867464de1ea272039a1e2a6888dd5",
+      "content_hash": "3883456aaf563f83fa0651ae9e71390a9f6f95ad32c186624db08df080f2e0fc",
       "excluded_from_docs": false
     },
     {
       "kind": "command",
       "path": ".claude/commands/gaia-plan.md",
       "name": "gaia-plan",
-      "description": "Plan a complex feature using GAIA's task-orchestration pattern — structures the work into fresh-context subagent phases for your approval. Does not implement.",
+      "description": "Plan a complex feature using GAIA's task-orchestration pattern, structures the work into fresh-context subagent phases for your approval. Does not implement.",
       "audience": "adopter",
-      "content_hash": "a30bc0f2e613303c8c8817ae58bcf0e55056cacae486a605677e24ca30ea5f61",
+      "content_hash": "fd49c7aae8e3c13db64291b116e00eecee4ca1dc0b599d3b045675dc8b652542",
       "excluded_from_docs": false
     },
     {
       "kind": "command",
       "path": ".claude/commands/gaia-release.md",
       "name": "gaia-release",
-      "description": "Cut a new GAIA release — bump version, graduate CHANGELOG, regenerate manifest, open release PR, then tag on merge. Maintainer-only.",
+      "description": "Cut a new GAIA release, bump version, graduate CHANGELOG, regenerate manifest, open release PR, then tag on merge. Maintainer-only.",
       "audience": "contributor",
-      "content_hash": "b20aa0c166b9d28ef154b757dec8409cd39cb82852e23e4844515b4cac74ad2c",
+      "content_hash": "72fe327eacf6e2d9572611d368a6bd9bb60a65610d97c0c6a8626afb356d9c25",
       "excluded_from_docs": false
     },
     {
@@ -774,7 +792,7 @@
       "name": "gaia-spec",
       "description": "Author an immutable SPEC artifact through Socratic discovery (spec-kit wrapper), then chain into /gaia-plan. Pass `auto <description>` for non-interactive mode that answers its own questions and mirrors to a GitHub issue.",
       "audience": "adopter",
-      "content_hash": "1a8a9dab7013cc32745b59c35b3870eb1581a70a7c908514ff4f8df4cf669382",
+      "content_hash": "16dd745d478238f35739e390406a049d45b2f2943f95a74589911cd20af127fa",
       "excluded_from_docs": false
     },
     {
@@ -783,50 +801,50 @@
       "name": "health-audit",
       "description": "Maintainer-only autonomous health audit + auto-heal loop. Runs N=3 fresh-team audit-fix-audit cycles with circuit breakers, reports an F-to-A+ verdict (folding in the shared Claude-integration fitness grade) or escalates.",
       "audience": "contributor",
-      "content_hash": "53cbec05a172714edd88c9717da52bee837ca021db8b2bb17cb7b34087dca01b",
+      "content_hash": "a8eabea49f36f803747e63a52f5504bc0899503f8d49699076668914b003b61c",
       "excluded_from_docs": false
     },
     {
       "kind": "command",
       "path": ".claude/commands/setup-cloned-gaia-project.md",
       "name": "setup-cloned-gaia-project",
-      "description": "One-shot per-machine setup for a cloned GAIA project. Installs tools, plugins, spec-kit; bootstraps .env; opts into mentorship. Idempotent — safe to re-run.",
+      "description": "One-shot per-machine setup for a cloned GAIA project. Installs tools, plugins, spec-kit; bootstraps .env; opts into mentorship. Idempotent, safe to re-run.",
       "audience": "adopter",
-      "content_hash": "20e0772b02e5bc5b2fe62d3255eff92b64927801e87d77a3b0a27b34bbd65870",
+      "content_hash": "8f55331ad7893e3fa243ffb7042885ac8fd960b2177587b85c43a6faa5e37ee5",
       "excluded_from_docs": false
     },
     {
       "kind": "command",
       "path": ".claude/commands/setup-gaia-ci.md",
       "name": "setup-gaia-ci",
-      "description": "Wire up GAIA CI workflows on GitHub. Run after first git push origin main. Idempotent — re-runs short-circuit; --reconfigure rotates tokens and re-selects tools.",
+      "description": "Wire up GAIA CI workflows on GitHub. Run after first git push origin main. Idempotent, re-runs short-circuit; --reconfigure rotates tokens and re-selects tools.",
       "audience": "adopter",
-      "content_hash": "eed538cd274cfcf72cc46c5f2292da1544ffefc8fc672073d4c212343f0b1d4c",
+      "content_hash": "2038be7b5ee4b4ad74b5c5e65ef33abb62b02c4025a8a936a68f41e54d202c95",
       "excluded_from_docs": false
     },
     {
       "kind": "hook",
       "path": ".claude/hooks/audit-stamp-trailer.sh",
       "name": "audit-stamp-trailer.sh",
-      "description": "audit-stamp-trailer.sh — write the GAIA-Audit commit trailer on HEAD.",
+      "description": null,
       "audience": "adopter",
-      "content_hash": "ec786c7bbadc24def5ac2554497f3307a7e0fc1cf81b3cdf7823198c81ec4763",
+      "content_hash": "baeae3b6e0007c555acb0d85aa28e6b13198dbcded47d454f72db594c4c4ad07",
       "excluded_from_docs": false
     },
     {
       "kind": "hook",
       "path": ".claude/hooks/block-bare-test.sh",
       "name": "block-bare-test.sh",
-      "description": "Block bare `pnpm test` / `npm test` (and `run test` variants) without `--run` —",
+      "description": null,
       "audience": "adopter",
-      "content_hash": "ddc8e6de5607330a86c1b7db531a070a7ab4c2295407f62a6a40406e02567f0e",
+      "content_hash": "bc63cfdf17bd8a7d6712e726dd8937e08a89823ba87d71af4ba3cddd9310dafd",
       "excluded_from_docs": false
     },
     {
       "kind": "hook",
       "path": ".claude/hooks/block-env-write.sh",
       "name": "block-env-write.sh",
-      "description": "PreToolUse Edit/Write hook: deny writes targeting `.env` files.",
+      "description": null,
       "audience": "adopter",
       "content_hash": "678a58957998a1e0c22c0e785bb9d933eb73f0712bcc5fc9f655d547aa3361b2",
       "excluded_from_docs": false
@@ -835,7 +853,7 @@
       "kind": "hook",
       "path": ".claude/hooks/block-eslint-config-edit.sh",
       "name": "block-eslint-config-edit.sh",
-      "description": "Block modifications to eslint.config.{js,cjs,mjs,ts} at any path.",
+      "description": null,
       "audience": "adopter",
       "content_hash": "e6675b7cb26af1cae095fe1b57991252887c3ea0a1a4fead77c80a015c27181f",
       "excluded_from_docs": false
@@ -844,34 +862,43 @@
       "kind": "hook",
       "path": ".claude/hooks/block-lockfile-edit.sh",
       "name": "block-lockfile-edit.sh",
-      "description": "PreToolUse Edit/Write hook: deny direct edits to package lockfiles.",
+      "description": null,
       "audience": "adopter",
-      "content_hash": "954e774d554e785ebe4f339b83399558481b6d140b6155435b2ef98b73e90d37",
+      "content_hash": "5059a03ae4e3a362522703f8738b2b13aa5c45e49cce6b83362c6b88755d9570",
       "excluded_from_docs": false
     },
     {
       "kind": "hook",
       "path": ".claude/hooks/block-main-destructive-git.sh",
       "name": "block-main-destructive-git.sh",
-      "description": "PreToolUse Bash hook: block commits to main/master and force-push to main/master.",
+      "description": null,
       "audience": "adopter",
-      "content_hash": "f691cf0933133009fef1548a35fa7762e8ac2a7564cef05469916a928b5f60a0",
+      "content_hash": "763dd1b32cfac206e54558e6bd00a4dd119513a5be182a9bba62e08d101d5f40",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "hook",
+      "path": ".claude/hooks/block-no-verify.sh",
+      "name": "block-no-verify.sh",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "8224cc4e2e7b8fd49846eebf4ffa075187704cbcbd8d1ec9b97c554e6f938d8d",
       "excluded_from_docs": false
     },
     {
       "kind": "hook",
       "path": ".claude/hooks/block-rm-rf.sh",
       "name": "block-rm-rf.sh",
-      "description": "PreToolUse Bash hook: deny dangerous `rm -rf` invocations.",
+      "description": null,
       "audience": "adopter",
-      "content_hash": "b272e3fd24e89b71ed23783565b3692edf1109e061796bef544d89eac9bdcf26",
+      "content_hash": "876d755adf60c5659255f43cbcd9b872eb04a24f549c4a87357bfc1764fb5e3b",
       "excluded_from_docs": false
     },
     {
       "kind": "hook",
       "path": ".claude/hooks/block-secrets-write.sh",
       "name": "block-secrets-write.sh",
-      "description": "PreToolUse Edit/Write hook: deny writes that contain obvious secrets.",
+      "description": null,
       "audience": "adopter",
       "content_hash": "9cd17699fd43a9cd00d2d32f5f50e3c2b0b998bc17d515eddc082257ae1eaa08",
       "excluded_from_docs": false
@@ -880,16 +907,25 @@
       "kind": "hook",
       "path": ".claude/hooks/block-vitest-globals-tsconfig.sh",
       "name": "block-vitest-globals-tsconfig.sh",
-      "description": "Block adding vitest/globals to tsconfig.json",
+      "description": null,
       "audience": "adopter",
       "content_hash": "0a9e235b114393fbc49d35a775c4762dfeac7be56060f1083e0a3ec0a10e3672",
       "excluded_from_docs": false
     },
     {
       "kind": "hook",
+      "path": ".claude/hooks/capture-red-observations.sh",
+      "name": "capture-red-observations.sh",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "e2c33f23e9ac9a3c7f1dcb5d64ea32db7ba4904bb4d278a3e603b40f112f8f6f",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "hook",
       "path": ".claude/hooks/check-i18n-strings.sh",
       "name": "check-i18n-strings.sh",
-      "description": "Advisory check: warn about potential hardcoded strings in JSX.",
+      "description": null,
       "audience": "adopter",
       "content_hash": "7620e140933c8739ca56bbac111f3f9b4820a9bcdbc9e33696a1265da3824c72",
       "excluded_from_docs": false
@@ -898,7 +934,7 @@
       "kind": "hook",
       "path": ".claude/hooks/check-story-exists.sh",
       "name": "check-story-exists.sh",
-      "description": "Advisory check: remind to add Storybook story for new components",
+      "description": null,
       "audience": "adopter",
       "content_hash": "7e2dd46c8e8ccbb605e2064879a4893e71f442bb6f1149d98584bc8290f602cb",
       "excluded_from_docs": false
@@ -907,52 +943,61 @@
       "kind": "hook",
       "path": ".claude/hooks/intercept-init.sh",
       "name": "intercept-init.sh",
-      "description": "Redirect the built-in /init command to /gaia-init on this template.",
+      "description": null,
       "audience": "adopter",
-      "content_hash": "3f163c72d171c2b87ce084b94d41484d6e270b2fcb6cce8b0d308bdbcf8a5068",
+      "content_hash": "91befea795ab9311a80c740f11af3ea69ae405ba75195ccda2ed1ad5b455b202",
       "excluded_from_docs": false
     },
     {
       "kind": "hook",
       "path": ".claude/hooks/pr-merge-audit-check.sh",
       "name": "pr-merge-audit-check.sh",
-      "description": "PreToolUse Bash hook: BLOCK `gh pr merge` until proof of a passing",
+      "description": null,
       "audience": "adopter",
-      "content_hash": "d1ff9e061f6b62f52421f7c4b5b4e8d9b259881b1f2cca29a446d91e47346c4f",
+      "content_hash": "ad83f3970d641f26c177511b85475cb0147febe767a6604c7ad219d655cc177a",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "hook",
+      "path": ".claude/hooks/red-verify-commit-check.sh",
+      "name": "red-verify-commit-check.sh",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "45c18d0120d286d9557a67551c50ed621c8fca7cef6c4dde5dd83b5e517c05f3",
       "excluded_from_docs": false
     },
     {
       "kind": "hook",
       "path": ".claude/hooks/telemetry-task-postuse.sh",
       "name": "telemetry-task-postuse.sh",
-      "description": "PostToolUse Task hook: extract structured-trailer events from the agent's",
+      "description": null,
       "audience": "adopter",
-      "content_hash": "1c538a6ec9267935963e6a75ec2cc6358fbee2f2225586a9e145281cf911e5f1",
+      "content_hash": "12f64685fdfaf273b47d3dc96d4773faa922a661a84fbcdb15cb9f059e94645d",
       "excluded_from_docs": true
     },
     {
       "kind": "hook",
       "path": ".claude/hooks/wiki-commit-nudge.sh",
       "name": "wiki-commit-nudge.sh",
-      "description": "PostToolUse hook on Bash matching `git commit`. Inject a one-line nudge",
+      "description": null,
       "audience": "adopter",
-      "content_hash": "7ecc64bbb4c9c8cbdcc8558b04ca186f897a5cf8786c16ef255ef47d04b4ec90",
+      "content_hash": "ae9b39f5b54a8cf5afd1c586c58b8494e793da84a6c7bf2375122caadbdb3b49",
       "excluded_from_docs": false
     },
     {
       "kind": "hook",
       "path": ".claude/hooks/wiki-drift-check.sh",
       "name": "wiki-drift-check.sh",
-      "description": "UserPromptSubmit hook: detect drift between wiki/.state.json and HEAD,",
+      "description": null,
       "audience": "adopter",
-      "content_hash": "436f2e25c58448f36234cffb1ecbdea032c3acbb7eb17675cc9ccd103b303937",
+      "content_hash": "bb0ed860b83522f74d599969cb7346ba349891139a1f7e5c41cfb6d6d0f22908",
       "excluded_from_docs": false
     },
     {
       "kind": "hook",
       "path": ".claude/hooks/wiki-session-start.sh",
       "name": "wiki-session-start.sh",
-      "description": "GAIA-owned wiki hook. Upstream contract: claude-obsidian/hooks/hooks.json::SessionStart",
+      "description": null,
       "audience": "adopter",
       "content_hash": "52d96a0714471784c50a71796f7729699b035df100ef00bc9cbe63f9358ecc63",
       "excluded_from_docs": false
@@ -961,18 +1006,18 @@
       "kind": "hook",
       "path": ".claude/hooks/wiki-session-stop.sh",
       "name": "wiki-session-stop.sh",
-      "description": "GAIA-owned Stop hook (merged: session-stop + safety-net).",
+      "description": null,
       "audience": "adopter",
-      "content_hash": "4d7a1c493b7b57ec0b3a0003b32c887314ebfc19c61629360bb58eacdda833d6",
+      "content_hash": "9118a931cd15ef635e5bff82baf83487b9dc9c70e313b859d1a63fd6fbf66436",
       "excluded_from_docs": false
     },
     {
       "kind": "hook",
       "path": ".claude/hooks/wiki-squash-autocommits.sh",
       "name": "wiki-squash-autocommits.sh",
-      "description": "GAIA-owned wiki hook. Upstream contract: claude-obsidian/hooks/hooks.json::PostToolUse (auto-commit per Write|Edit)",
+      "description": null,
       "audience": "adopter",
-      "content_hash": "a028bede6a00174e4317675f59057174b57beda156da2700a820e8818547b37e",
+      "content_hash": "714323b380e18f2b72da97ae412b1e5dc06666148b5af325c05909d0448b44d3",
       "excluded_from_docs": false
     },
     {
@@ -981,7 +1026,7 @@
       "name": "accessibility",
       "description": "Accessibility",
       "audience": "adopter",
-      "content_hash": "3c3bd17bffc88b5f0b5d412994b41cb79295be5eb0cc5419a60bc797174b41d7",
+      "content_hash": "1b577e2a8ff122371b10a3fbe714650b51c2d0a8a3ebd7dfdd658120163a4875",
       "excluded_from_docs": false
     },
     {
@@ -999,7 +1044,7 @@
       "name": "code-search",
       "description": "Code Search",
       "audience": "adopter",
-      "content_hash": "ac2121c9c1b8ac5c9ccc8416c7360e66451f43ad00a4133c04d8ba4027d90679",
+      "content_hash": "27006e808f53716a7cf07ef6e3b9bbda767b57735f826c90cced24686a764629",
       "excluded_from_docs": false
     },
     {
@@ -1013,11 +1058,20 @@
     },
     {
       "kind": "rule",
+      "path": ".claude/rules/dep-audit.md",
+      "name": "dep-audit",
+      "description": "Dependency-CVE Advisory, pnpm audit",
+      "audience": "adopter",
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "rule",
       "path": ".claude/rules/i18n.md",
       "name": "i18n",
       "description": "Internationalization (i18n)",
       "audience": "adopter",
-      "content_hash": "0919b3ed2043c6030a54bb257be96fc22acb9e380675985e52a8be42d31038c4",
+      "content_hash": "44c79ba4d5fb3659eba0b3806b1c5493b90ce5efdc2f262af68674d2e437f448",
       "excluded_from_docs": false
     },
     {
@@ -1026,14 +1080,14 @@
       "name": "instruction-files",
       "description": "Template-Distributed File Paths",
       "audience": "adopter",
-      "content_hash": "69062f264758bf71fa6320d4b41b7d93eeabe78cc1c9e92c365071ae604885ec",
+      "content_hash": "ef4c174a976750b03731084885920336754b9adddf33db8868de533e51922575",
       "excluded_from_docs": false
     },
     {
       "kind": "rule",
       "path": ".claude/rules/knip.md",
       "name": "knip",
-      "description": "Knip — Dead Code Detection",
+      "description": "Knip, Dead Code Detection",
       "audience": "adopter",
       "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "excluded_from_docs": false
@@ -1044,7 +1098,7 @@
       "name": "playwright",
       "description": "Playwright E2E Conventions",
       "audience": "adopter",
-      "content_hash": "d6d3de28ea41847e76eb48dedfc541dfae3389dad8033bad4829cb7dbc507f37",
+      "content_hash": "1d30ba9ac80cde4532e4a078ba05705b436d1adbfd0d9287a5effd877529c73c",
       "excluded_from_docs": false
     },
     {
@@ -1089,7 +1143,7 @@
       "name": "state-pattern",
       "description": "State Pattern",
       "audience": "adopter",
-      "content_hash": "e6af91e47f1279bca92ae58aca0c232bb999b25a735ce8b930cad90c7172af5c",
+      "content_hash": "467614e6c023147cedf77e183989f70c88d07bc4d168e4ad677f0cfdda466300",
       "excluded_from_docs": false
     },
     {
@@ -1098,7 +1152,7 @@
       "name": "storybook",
       "description": "Storybook Conventions",
       "audience": "adopter",
-      "content_hash": "53f877a01c92f8b73c5f600db1b6f4a1a2f9fb27b204364e139102273fc4b259",
+      "content_hash": "4f30188aada01f63759dbe7c7538cf9c7a4a8474d274791bef3d7103901fe69e",
       "excluded_from_docs": false
     },
     {
@@ -1116,7 +1170,7 @@
       "name": "wiki-style",
       "description": "Wiki & Comment Style",
       "audience": "adopter",
-      "content_hash": "b19c93c09015e6b7f45d56ba0a069caaedde9a432fb71a5aecce69e8530109cb",
+      "content_hash": "4e3158c571842b8765b0817d7e5bf92118599d149992896f9cf0bc1310bfa9bc",
       "excluded_from_docs": false
     },
     {
@@ -1125,7 +1179,7 @@
       "name": "a11y-fixes",
       "description": "Resolve axe-core accessibility violations reported by Vitest (test/a11y.ts), Playwright (.playwright/a11y.ts), or the code-review-audit agent's a11y bucket. Use when fixing violations like color-contrast, label, label-title-only, image-alt, button-name, link-name, region, landmark-one-main, heading-order, aria-allowed-attr, aria-required-attr, aria-required-children, aria-required-parent, aria-valid-attr-value, focus-trap, tabindex, html-has-lang, document-title, duplicate-id, listitem, definition-list. Trigger on any axe rule id appearing in test output.",
       "audience": "adopter",
-      "content_hash": "224d15abbffb68786cd154ee69ef8ca31799e69cf37418d69ff751c398ad6dbb",
+      "content_hash": "d68afa8fa14598fb1fee9194a280c0b76dbcfb17e2ce5d71ad5326630cfc5938",
       "excluded_from_docs": false
     },
     {
@@ -1134,16 +1188,16 @@
       "name": "eslint-fixes",
       "description": "Resolve specific ESLint errors and warnings that appear in this project. Use when fixing lint failures, ESLint reported issues, or autofix conflicts (e.g. no-void, canonical/export-specifier-newline vs prettier, no-shadow trailing underscores, sonarjs/deprecation, you-dont-need-lodash-underscore, testing-library/prefer-screen-queries, testing-library/await-async-events, jest-dom/prefer-*).",
       "audience": "adopter",
-      "content_hash": "2965745ec5bde77fd7c0ae40bf0cfd910511c3cec259dfaa7ddebd5fc8c0b770",
+      "content_hash": "8524b87eea0cfb624fdd4cb7585791fc66c3a36e1483b606a5aca6f1289463c0",
       "excluded_from_docs": false
     },
     {
       "kind": "skill",
       "path": ".claude/skills/gaia-handoff/SKILL.md",
       "name": "gaia-handoff",
-      "description": "Generate a comprehensive GAIA session handoff document — accomplishments, decisions, current state, open questions — so context can be cleared or compacted without losing anything. Trigger on `/gaia-handoff` or natural-language asks like \"write a handoff\", \"hand off this session\", or \"document where we are before I clear context\".",
+      "description": "Generate a comprehensive GAIA session handoff document, accomplishments, decisions, current state, open questions, so context can be cleared or compacted without losing anything. Trigger on `/gaia-handoff` or natural-language asks like \"write a handoff\", \"hand off this session\", or \"document where we are before I clear context\".",
       "audience": "adopter",
-      "content_hash": "8ce9ebcc0797e839b2de53beeae6785ba41c07a92b827b6362549a9d3379f63f",
+      "content_hash": "b31612ba40de0a7e921c07e7f2e0bf79b6e944afb863bf40a42e9f7b50206de6",
       "excluded_from_docs": false
     },
     {
@@ -1159,9 +1213,9 @@
       "kind": "skill",
       "path": ".claude/skills/gaia-wiki/SKILL.md",
       "name": "gaia-wiki",
-      "description": "GAIA wiki maintenance — sync, consolidate, lint. Runs the full chain with no sub-arg, or a single stage when named (sync | consolidate | lint); append --force to override drift gating. Trigger on `/gaia-wiki <stage>` or natural-language asks like \"sync the wiki\", \"run the wiki maintenance chain\", \"consolidate the wiki\", or \"lint the wiki\".",
+      "description": "GAIA wiki maintenance, sync, consolidate, lint. Runs the full chain with no sub-arg, or a single stage when named (sync | consolidate | lint); append --force to override drift gating. Trigger on `/gaia-wiki <stage>` or natural-language asks like \"sync the wiki\", \"run the wiki maintenance chain\", \"consolidate the wiki\", or \"lint the wiki\".",
       "audience": "adopter",
-      "content_hash": "c6815cc88f1dfe6b0c516d3c0f10dbce3ada9b95aecd4d5677257aa30039fe86",
+      "content_hash": "e001f586793a0fd425cccdd7fb31b3ee953142d333597753c9e718101def4b13",
       "excluded_from_docs": false
     },
     {
@@ -1170,7 +1224,7 @@
       "name": "new-component",
       "description": "Scaffold a new React component with optional Storybook story and Vitest test files. Use this skill whenever the user asks to \"create a component\", \"make a button\", \"scaffold a card\", \"add a new component\", or asks for a new file under `app/components/` following the project's component pattern (PascalCase folder, index.tsx, tests/).",
       "audience": "adopter",
-      "content_hash": "1663f1c602b32917e3126e72b1055480e113abd95c82f675f4cfbac5ea4e95e9",
+      "content_hash": "5575989b1bd84fa2a88a8ff28645c1e7aeb78f2915ed9a953bec893871776997",
       "excluded_from_docs": false
     },
     {
@@ -1179,7 +1233,7 @@
       "name": "new-hook",
       "description": "Scaffold a new custom React hook with a Vitest test file. Use this skill whenever the user asks to \"create a hook\", \"make a useFoo hook\", \"scaffold a custom React hook\", \"add a hook under app/hooks\", or describes a piece of reusable React state/effect logic that warrants extraction into a named `use*` hook.",
       "audience": "adopter",
-      "content_hash": "7105766ba3803c8c7c8436c2028dfc4359a10154bf217fe42b149c4bb4fd017b",
+      "content_hash": "11f513ba72eefa4d43bf2d3f57a5a251ed3d6687a3878259a3fc82acc09e1b25",
       "excluded_from_docs": false
     },
     {
@@ -1188,7 +1242,7 @@
       "name": "new-route",
       "description": "Scaffold a new route with its page component, test, story, and optional i18n keys. Use this skill whenever the user asks to \"create a route\", \"add a new page\", \"scaffold /dashboard\", \"wire up a new route under _public+ or _session+\", or anything that implies adding a file under `app/routes/` with a matching `app/pages/{Group}/{PageName}/` folder.",
       "audience": "adopter",
-      "content_hash": "3be8f6650337d22dd80e7bd7f937b752055a7c4b87ef3707e6b09a2d98f4e3eb",
+      "content_hash": "a7be8023411be4cf8146230aa5715e3967f99c5dc9e0229d69d02418d1a0e8e1",
       "excluded_from_docs": false
     },
     {
@@ -1197,7 +1251,7 @@
       "name": "new-service",
       "description": "Scaffold a new API service with request functions, Zod schemas, URL constants, and optional MSW mock handlers. Use this skill whenever the user asks to \"add a service\", \"create the projects API\", \"scaffold a new GAIA service\", \"wire up CRUD for users\", or anything implying a new folder under `app/services/gaia/{name}/` with parsers/types/requests + matching `test/mocks/{name}/` collections.",
       "audience": "adopter",
-      "content_hash": "8a0ea8c96d2e46aa13da6290d72e33dd02009ccb94f1b029eb094a09746f6e97",
+      "content_hash": "5c8074bb65a11449e57f95c516ed46fe1a3973d0dffa82ed63b19b404d9b41b4",
       "excluded_from_docs": false
     },
     {
@@ -1206,7 +1260,7 @@
       "name": "playwright-cli",
       "description": "Automates browser interactions for web testing, form filling, screenshots, and data extraction. Use when the user needs to navigate websites, interact with web pages, fill forms, take screenshots, test web applications, or extract information from web pages.",
       "audience": "adopter",
-      "content_hash": "c0c9c4f64964dbfd7d57c45b42fd1cf725fc2ca1d26992d84ed1bfcd2c016d00",
+      "content_hash": "aa3fc734d7e1d5fe54a6b1f6aa7a1511a2719089680abfa5ceb005a5e94be360",
       "excluded_from_docs": false
     },
     {
@@ -1215,7 +1269,16 @@
       "name": "react-code",
       "description": "Patterns and conventions for writing and editing React code, including components and hooks. Use this skill whenever writing or reviewing React components, hooks (useEffect, useCallback, useState), event handlers, or component extraction decisions. Also trigger when debugging stale closures, infinite re-renders, or unnecessary re-renders caused by memoization issues.",
       "audience": "adopter",
-      "content_hash": "bccf1da1cf48c8c80e4bc6011179b7a105f66a0fb383a12d5743ba04dd2e9fec",
+      "content_hash": "9847f31a309569a9dfa84c558e288a4ad06f29ed017f5056aae486e0ab7f822b",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "skill",
+      "path": ".claude/skills/release-notes/SKILL.md",
+      "name": "release-notes",
+      "description": "Maintainer-only. Translate a version's GAIA CHANGELOG entries into plain-language public release notes for the marketing site (gaiareact.com). Writes a release-data `.ts` file under `../website/src/pages/changelog/releases/` plus an editorial-decisions report for human review. Use whenever the maintainer wants the adopter-facing notes for a version, e.g. \"write release notes\", \"generate the changelog page entry\", \"translate the CHANGELOG for the website\", \"what's new on the site for v1.5.0\", \"public notes for 1.4.0\", or right after cutting a release, and for one-time backfill of historical `## [x.y.z]` blocks. This is the website-notes step only. It does NOT edit `CHANGELOG.md`, it is not how you cut a release (version bump, manifest, and tag are `/gaia-release`), and it is not for an adopter's own app's release notes.",
+      "audience": "contributor",
+      "content_hash": "c64a67ec438a7bd31c004338d9e8037c9929b1401ef65ac008a926136999f78c",
       "excluded_from_docs": false
     },
     {
@@ -1224,7 +1287,7 @@
       "name": "skeleton-loaders",
       "description": "For building skeleton loading states that are pixel-perfect matches of real content. Use this skill whenever adding loading states to components, building skeletons for async data, handling pending loader states in route transitions, or implementing the shimmer animation pattern. Also trigger when the user asks about preventing layout shift during data fetching.",
       "audience": "adopter",
-      "content_hash": "a00383a85eb5eada0850f76fa5271ccda8f2b810d7a998fd3d56ea3c45f059e0",
+      "content_hash": "53d4021e2ec3b39a441900994726bc75df38adfaec2e7e328ab9471fe512044b",
       "excluded_from_docs": false
     },
     {
@@ -1233,7 +1296,7 @@
       "name": "tailwind",
       "description": "Patterns and conventions for all Tailwind styling. Use this skill whenever writing Tailwind class names, combining conditional classes, building component variants, or choosing between twJoin and twMerge. Also trigger when the user asks about custom values, defining @theme tokens or CSS variables, naming color/spacing tokens, rem vs px, responsive breakpoints, or avoiding template literal class strings.",
       "audience": "adopter",
-      "content_hash": "31b806d2e583a7dded94115346049c63f252d6d837a5814e082f6830f3494516",
+      "content_hash": "5e2273874b8a1e246e8ed7c80ff7844ad54872c9ff2db10c723de92c0b3e5193",
       "excluded_from_docs": false
     },
     {
@@ -1242,25 +1305,25 @@
       "name": "tdd",
       "description": "Test-driven development with red-green-refactor loop. Use when user wants to build features or fix bugs using TDD, mentions \"red-green-refactor\", wants integration tests, or asks for test-first development.",
       "audience": "adopter",
-      "content_hash": "08e07adffe9f53354d29fcbbec56ccdb5084493e62a0c16af92838ab85490d5f",
+      "content_hash": "fd3aa0eb3390d9b9ecd1f67a8214277042e35afb211af7f11db7143f273bcc07",
       "excluded_from_docs": false
     },
     {
       "kind": "skill",
       "path": ".claude/skills/typescript/SKILL.md",
       "name": "typescript",
-      "description": "Patterns and conventions for all TypeScript code. Use this skill whenever writing or reviewing TypeScript — naming identifiers, typing exports, choosing between type and interface, using Zod schemas, structuring function parameters, or enforcing code patterns like avoiding switch statements and enums.",
+      "description": "Patterns and conventions for all TypeScript code. Use this skill whenever writing or reviewing TypeScript, naming identifiers, typing exports, choosing between type and interface, using Zod schemas, structuring function parameters, or enforcing code patterns like avoiding switch statements and enums.",
       "audience": "adopter",
-      "content_hash": "d309252584dccff807a87fed617da6500028373432f5d585abb87081e42c0c64",
+      "content_hash": "39c9811862464bae0a3d47a8ab7510402808aa276a8255fc0df04570dbf54bac",
       "excluded_from_docs": false
     },
     {
       "kind": "skill",
       "path": ".claude/skills/update-deps/SKILL.md",
       "name": "update-deps",
-      "description": "Autonomous Dependabot — auto-discover outdated packages, audit overrides, apply migrations for major bumps, resolve conflicts, run quality gate. Trigger when the user clicks the statusline `Run /update-deps` indicator or asks \"update dependencies\", \"bump deps\", \"run dependabot\".",
+      "description": "Autonomous Dependabot, auto-discover outdated packages, audit overrides, apply migrations for major bumps, resolve conflicts, run quality gate. Trigger when the user clicks the statusline `Run /update-deps` indicator or asks \"update dependencies\", \"bump deps\", \"run dependabot\".",
       "audience": "adopter",
-      "content_hash": "3c44e0ce5efcf16042a72057e272dfc09e5be532e089988f10dae161c87af066",
+      "content_hash": "6c31163f5316748ff65805fcec88207ac4307dae1a9eb8c13824ff2a76677869",
       "excluded_from_docs": false
     },
     {
@@ -1269,23 +1332,23 @@
       "name": "update-gaia",
       "description": "Pull the latest GAIA release into this project without clobbering customizations. Three-way merge per file using .gaia/manifest.json classes. Trigger when the user clicks the statusline `Run /update-gaia` indicator or asks \"update GAIA\", \"pull the latest GAIA\", \"apply the new GAIA release\".",
       "audience": "adopter",
-      "content_hash": "bd3d4cae9cad90d56464d74bac0d39375032a50efd23c59a29e07e4a29b9e31c",
+      "content_hash": "881306337605ec3abddc614844cbea1b5030f199c0134f5bb3d280bfc4923915",
       "excluded_from_docs": false
     },
     {
       "kind": "spec-kit-cmd",
       "path": ".specify/extensions/gaia/commands/constitution-check.md",
       "name": "speckit.gaia.constitution-check",
-      "description": "Verify .specify/memory/constitution.md has no placeholder text before /speckit.specify runs.",
+      "description": "GAIA before_specify hook: constitution placeholder check + spec-kit version-pin drift detection.",
       "audience": "adopter",
-      "content_hash": "9201c7da1b05113181c6dc5fc0d5ef083b7717c6492f679a074cd0ad8b3c34fc",
+      "content_hash": "88ab004fc467cd49df1cd091a0b8701ac139dd5283e32f3b56d022fe90df36aa",
       "excluded_from_docs": false
     },
     {
       "kind": "spec-kit-cmd",
       "path": ".specify/extensions/gaia/commands/lint.md",
       "name": "speckit.gaia.lint",
-      "description": "Immutability lint over a saved SPEC artifact: frontmatter, frozen UAT-NNN ids, no placeholders.",
+      "description": "GAIA after_specify hook: immutability lint over the just-written SPEC artifact.",
       "audience": "adopter",
       "content_hash": "05b8c2cee7097a38833e0ee7cf158c7cfb120026a46e72d9d6e3df00db2b94eb",
       "excluded_from_docs": false
@@ -1294,36 +1357,36 @@
       "kind": "spec-kit-cmd",
       "path": ".specify/extensions/gaia/commands/self-review.md",
       "name": "speckit.gaia.self-review",
-      "description": "Pre-gate-2 self-review pass; surfaces drift, ambiguity, and pending clarifications before save.",
+      "description": "GAIA after_clarify hook: pre-gate-2 self-review pass on the in-progress SPEC draft.",
       "audience": "adopter",
-      "content_hash": "54c39d736b15cf053c483a1cac93d2c70157e2983dc2dab9a1faedf587b0ed36",
+      "content_hash": "02973f87cbfc2375e4fa52e9be7d000e6096b359e3b9a46000d9fa7bbb9250f9",
       "excluded_from_docs": false
     },
     {
       "kind": "spec-kit-cmd",
       "path": ".specify/extensions/gaia/commands/spec.md",
       "name": "speckit.gaia.spec",
-      "description": "GAIA Socratic discovery wrapper around /speckit.specify and /speckit.clarify.",
+      "description": "GAIA Socratic discovery wrapper around /speckit-specify and /speckit-clarify.",
       "audience": "adopter",
-      "content_hash": "b8e9334cde0c2781f4d0d9c19422ef3f166be3b76aab9dd352d9fd312075afbb",
+      "content_hash": "41123447df9a84aedcef19e7a136674e6c1e85b86d37a2b4de3446f511a80ec4",
       "excluded_from_docs": false
     },
     {
       "kind": "spec-kit-cmd",
       "path": ".specify/extensions/gaia/commands/spec-close.md",
       "name": "speckit.gaia.spec-close",
-      "description": "Close a SPEC after implementation+merge: optional drain of deferred wiki-promote, then archive/delete/keep prompt for the local SPEC artifact.",
+      "description": "Close a SPEC after implementation+merge. Optional drain of deferred wiki-promote, then disposition prompt (archive / delete / keep) for the local SPEC artifact.",
       "audience": "adopter",
-      "content_hash": "f7b599041877358b6308da23d221edfc2341c0e9f557bd6ba24825db9f563e23",
+      "content_hash": "501b1b27693e54369cab6339c39c102c2976012c9da7bd74c685ada5181ceacb",
       "excluded_from_docs": false
     },
     {
       "kind": "spec-kit-cmd",
       "path": ".specify/extensions/gaia/commands/uat-write.md",
       "name": "speckit.gaia.uat-write",
-      "description": "before_implement hook: render PO-authored UATs into Playwright e2e specs at .playwright/e2e/spec-NNN/.",
+      "description": "GAIA before_implement hook: render PO-authored UATs into Playwright e2e specs at .playwright/e2e/spec-NNN/.",
       "audience": "adopter",
-      "content_hash": "da31a147b629c7a6457453d83a58dea294059f2179196d5e53574b1137000238",
+      "content_hash": "73682b988bac6e56bcd49c45a36e4b7b14ad57dfe00c487dd57ce4a56f45e641",
       "excluded_from_docs": false
     },
     {
@@ -1332,50 +1395,50 @@
       "name": "speckit.gaia.wiki-promote",
       "description": "Promote merged SPEC content into the GAIA wiki.",
       "audience": "adopter",
-      "content_hash": "40f6b4a595e49b27caba55e2180e0debae34813388f6b3b671b3976ab60f68dc",
+      "content_hash": "0d813e6b39a7b96bfd0f902ee1bd7c42985c4c7e90ba95675bac5cf8669596fa",
       "excluded_from_docs": false
     },
     {
       "kind": "sub-route",
       "path": ".claude/skills/gaia/references/audit.md",
       "name": "/gaia audit",
-      "description": "**Do not execute the playbook yourself in the current conversation.** Dispatch subagents via the `Agent` tool. Each subagent runs in isolated context.",
+      "description": "/gaia-audit",
       "audience": "adopter",
-      "content_hash": "4ae7ddc84e467ad688739efdae8960515f7e5bbf9e6d2fc19acc3efe5a1eab49",
+      "content_hash": "bf1ff5d5d44e0ae23c174a206cf8d7e7e48fc2d754d1ef55f2ae7d4f7c5be5c8",
       "excluded_from_docs": false
     },
     {
       "kind": "sub-route",
       "path": ".claude/skills/gaia/references/fitness.md",
       "name": "/gaia fitness",
-      "description": "`/gaia-fitness` is the Claude-integration health check + auto-heal. One invocation, no flag required — calling `/gaia-fitness` is the statement of intent to be fit. It runs three phases in sequence: triage → heal → verify.",
+      "description": "/gaia-fitness",
       "audience": "adopter",
-      "content_hash": "d5605431be58f1d38f85ce8776bc35f589419ece6a4f65320ab60a5a362d9ac6",
+      "content_hash": "a3c17c54b41d52657d1e89630d42b70cbfda3e0a77fc883866d9375d8428d717",
       "excluded_from_docs": false
     },
     {
       "kind": "sub-route",
       "path": ".claude/skills/gaia/references/forensics.md",
       "name": "/gaia forensics",
-      "description": "Turn a GAIA workflow misfire into a redacted, classified, filing-ready bug report in one invocation. Read-only end-to-end: no remediation, no autofix, no state mutation.",
+      "description": "/gaia-forensics",
       "audience": "adopter",
-      "content_hash": "3255fa216b445c7c67097188222dc6d37fb72e01ed818165cafc63e3f0ac7381",
+      "content_hash": "f234c2eebd9c07b7755963b4dfe8b5ec63320c411d76b923520e600ebf740260",
       "excluded_from_docs": false
     },
     {
       "kind": "sub-route",
       "path": ".claude/skills/gaia/references/handoff.md",
       "name": "/gaia handoff",
-      "description": "Write a self-contained handoff doc so the next session can pick up cold without re-reading this conversation.",
+      "description": "/gaia-handoff",
       "audience": "adopter",
-      "content_hash": "0fce6d7b6c071d7954d5cc980702fa8600518614e36354185b1e5a779ff04575",
+      "content_hash": "6770dde315f94105a81bb0a7f0a751f806e7a40822b112a1374e7d170ab34910",
       "excluded_from_docs": false
     },
     {
       "kind": "sub-route",
       "path": ".claude/skills/gaia/references/pickup.md",
       "name": "/gaia pickup",
-      "description": "Rebuild \"where did we leave off\" at session start and suggest the next action.",
+      "description": "/gaia-pickup",
       "audience": "adopter",
       "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "excluded_from_docs": false
@@ -1384,16 +1447,16 @@
       "kind": "sub-route",
       "path": ".claude/skills/gaia/references/plan.md",
       "name": "/gaia plan",
-      "description": "Plan a complex feature using the task orchestration pattern. Do not implement anything.",
+      "description": "/gaia-plan",
       "audience": "adopter",
-      "content_hash": "2d3daad8d3fb522ca820b3a4f4ec4ee935e4c0bf79f9a8994bfb0d43982feac1",
+      "content_hash": "6ca5e93bd38331dc979c8e2bc355b1b77557d90fc6ca68c1d436002ae9d9d2bb",
       "excluded_from_docs": false
     },
     {
       "kind": "sub-route",
       "path": ".claude/skills/gaia/references/spec.md",
       "name": "/gaia spec",
-      "description": "Socratic discovery wrapper around spec-kit. Produces an immutable SPEC artifact at `.gaia/local/specs/SPEC-NNN/SPEC.md` and prompts to chain into `/gaia-plan`. Do not implement anything — this skill produces an artifact and stops.",
+      "description": "/gaia-spec",
       "audience": "adopter",
       "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "excluded_from_docs": false
@@ -1402,7 +1465,7 @@
       "kind": "sub-route",
       "path": ".claude/skills/gaia/references/wiki.md",
       "name": "/gaia wiki",
-      "description": "Wiki-maintenance router. Sub-commands run individually or chain end-to-end.",
+      "description": "/gaia-wiki",
       "audience": "adopter",
       "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "excluded_from_docs": false
@@ -1411,25 +1474,25 @@
       "kind": "sub-route",
       "path": ".claude/skills/gaia/references/wiki/consolidate.md",
       "name": "/gaia wiki consolidate",
-      "description": "Dispatched by the `/gaia-wiki` router (`references/wiki.md` → \"Consolidate\"). Detection runs in a Sonnet subagent; apply/state/report run in the parent.",
+      "description": "wiki-consolidate playbook",
       "audience": "adopter",
-      "content_hash": "b8173955f634a16f35076ead24f1f643ad47c4f122c76b1622c836b0c68d6657",
+      "content_hash": "22f078744907fd72456da8be2a44802b7446743bfdfa5fac5e07355ba658ffb9",
       "excluded_from_docs": false
     },
     {
       "kind": "sub-route",
       "path": ".claude/skills/gaia/references/wiki/lint.md",
       "name": "/gaia wiki lint",
-      "description": "Dispatched by the `/gaia-wiki` router (`references/wiki.md` → \"Lint\"). Runs in a Haiku subagent context.",
+      "description": "wiki-lint playbook",
       "audience": "adopter",
-      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content_hash": "5d1ba52cf9420bc7a92cf27238281f3bc55cec25faf15a2fafa8f083c7dd4501",
       "excluded_from_docs": false
     },
     {
       "kind": "sub-route",
       "path": ".claude/skills/gaia/references/wiki/sync.md",
       "name": "/gaia wiki sync",
-      "description": "Dispatched by the `/gaia-wiki` router (`references/wiki.md` → \"Sync\"). Runs in a Haiku subagent context.",
+      "description": "wiki-sync playbook",
       "audience": "adopter",
       "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "excluded_from_docs": false
@@ -1440,7 +1503,7 @@
       "name": "wiki/README.md",
       "description": "GAIA React: LLM Wiki",
       "audience": "mixed",
-      "content_hash": "fad90a3c76688027628e339e971272a1bbc6c054c2813156662b9f8cfb9f599b",
+      "content_hash": "80cb6e533001ddd511b44667a32d0cbea7ea52a49bd251b6bc1c383d488a48c7",
       "excluded_from_docs": false,
       "marker_blocks": [
         [
@@ -1459,7 +1522,7 @@
       "name": "wiki/components/Form Choices.md",
       "description": "Form Choices",
       "audience": "adopter",
-      "content_hash": "dd6cdebeb3aa0f13907e6b59bb1197ae144c446396c6e3a71e5dce40802afd4e",
+      "content_hash": "2fb7ac49ada39e573af47872a5617674013a26e85229688689c8e094fb3b792a",
       "excluded_from_docs": false
     },
     {
@@ -1468,7 +1531,7 @@
       "name": "wiki/components/Form Field.md",
       "description": "Form Field",
       "audience": "adopter",
-      "content_hash": "fdd7ee201bab9a769fd34c7b6e6804d5f481989620656aa381e02be7c963c2ed",
+      "content_hash": "bb4bc8d2e73096ed14f9e8261ed6ad9cb52d1d4036c9fc3d201fe18b0045e4a6",
       "excluded_from_docs": false
     },
     {
@@ -1477,7 +1540,7 @@
       "name": "wiki/components/Form Layout.md",
       "description": "Form Layout",
       "audience": "adopter",
-      "content_hash": "b8369cce41b19588fc645aa8cedc06c10a18847280b815c53be165e1848be573",
+      "content_hash": "7657eb728be5e1441b96945618666fdc810a48b80ac499b5c2822595ed5d702f",
       "excluded_from_docs": false
     },
     {
@@ -1486,7 +1549,7 @@
       "name": "wiki/components/Form Select.md",
       "description": "Form Select",
       "audience": "adopter",
-      "content_hash": "b979fd9507ebd750d6eb66e2bc409b30e2dfe1d147b46223547edbb524b8b3ae",
+      "content_hash": "506fc7a5c17cf2d029a0040a0676987ab5399d7ae1053c1558ae95ebdfa10636",
       "excluded_from_docs": false
     },
     {
@@ -1495,7 +1558,7 @@
       "name": "wiki/components/Form Text Inputs.md",
       "description": "Form Text Inputs",
       "audience": "adopter",
-      "content_hash": "2b7c5221c0a735c962d1a1c891ec3ef1ef962f408c469c3d13c5f0d43db005be",
+      "content_hash": "2e09a7c16350afae039a6f1a0f91821c4739ac5d5c5af880cbe2089bbace19d2",
       "excluded_from_docs": false
     },
     {
@@ -1504,7 +1567,7 @@
       "name": "wiki/components/Form YearMonthDay.md",
       "description": "Form YearMonthDay",
       "audience": "adopter",
-      "content_hash": "a1cb10038a8277ee69f6b3f1b2b35dfe9a136cac64e0d1589f7fa91291c0d979",
+      "content_hash": "f090729bb4564fcf754e9c16f4a17de58e63989a6874d3607f634fb941a244b3",
       "excluded_from_docs": false
     },
     {
@@ -1513,7 +1576,7 @@
       "name": "wiki/concepts/API Service Pattern.md",
       "description": "API Service Pattern",
       "audience": "adopter",
-      "content_hash": "51dcd2b969d4f63771a3b5aec9031417a88e7ddd08c303a494d718c5bad457bd",
+      "content_hash": "b1dff6ec95645fe5789119890a955bda6bbfdd7acd07bc4ce76672def211f782",
       "excluded_from_docs": false
     },
     {
@@ -1522,7 +1585,7 @@
       "name": "wiki/concepts/Accessibility.md",
       "description": "Accessibility",
       "audience": "adopter",
-      "content_hash": "5168654eae58562f3ea56f9a771cced0c0213c6480923c36aa1618e46286afab",
+      "content_hash": "c7e49fdca13cefdedd430edcb28a8aa0873d32d14cf17b54dcad3a352145dfac",
       "excluded_from_docs": false
     },
     {
@@ -1549,7 +1612,7 @@
       "name": "wiki/concepts/Claude Hooks.md",
       "description": "Claude Hooks",
       "audience": "adopter",
-      "content_hash": "641851318fa8aa6b5db261565c58f5b6901fde92cd946d14a7bb053bf4899af5",
+      "content_hash": "f4aee5f3b165dddc44ea4c18f66c4fd29a09789c8c3741cc9b80a3af473c5fed",
       "excluded_from_docs": false
     },
     {
@@ -1558,7 +1621,7 @@
       "name": "wiki/concepts/Claude Integration Conventions.md",
       "description": "Claude Integration Conventions",
       "audience": "adopter",
-      "content_hash": "125e28ac073a37b37e03da72e1dba6dfd429b915b505d761ab76f2f4140d8f67",
+      "content_hash": "baad4c0fb45f3917a1b80920219e23393b5e55e6015220dd26e868960b10e6e1",
       "excluded_from_docs": false
     },
     {
@@ -1567,7 +1630,7 @@
       "name": "wiki/concepts/Claude Skills.md",
       "description": "Claude Skills",
       "audience": "adopter",
-      "content_hash": "81f92388d44869a38c981b510fa03b0c7de671dfaaa45263191165cfb8642202",
+      "content_hash": "c4e3b933e8f6a8687c219e5ae95233aae6937b14ce3a6e032afea4173029f4ac",
       "excluded_from_docs": false
     },
     {
@@ -1576,7 +1639,7 @@
       "name": "wiki/concepts/Code Review Audit Agent.md",
       "description": "Code Review Audit Agent",
       "audience": "adopter",
-      "content_hash": "f66227c9ef4cefdb6de4d6f224ac323d138f9af724df16c22d17690a57207de0",
+      "content_hash": "10ea4793919e047b4e796e2b1b49b33b59ee87e1511fa1475be8bdc2d69e2214",
       "excluded_from_docs": false
     },
     {
@@ -1585,7 +1648,7 @@
       "name": "wiki/concepts/Code Review Audit CI.md",
       "description": "Code Review Audit CI",
       "audience": "adopter",
-      "content_hash": "1393b3a393926c2998d28177d1ef4d57b86e0c4e202ecfda5df188f431294f08",
+      "content_hash": "c5e252bee9f81b03defde0bed498192aac1dea2c950f2ef2a3a79f472729f6ee",
       "excluded_from_docs": false
     },
     {
@@ -1603,7 +1666,7 @@
       "name": "wiki/concepts/Component Testing.md",
       "description": "Component Testing",
       "audience": "adopter",
-      "content_hash": "aeef951dbc1545aa288567f9c1903d1af4961220e5f995a7fd03c628d9da7173",
+      "content_hash": "ca035aeef658522533b498916580485edde7f38b0fe11cd63aeca65a8b49b358",
       "excluded_from_docs": false
     },
     {
@@ -1612,7 +1675,7 @@
       "name": "wiki/concepts/ESLint Fixes.md",
       "description": "ESLint Fixes",
       "audience": "adopter",
-      "content_hash": "7cdf4d4012976c635ecdb028ba4696976506898ea019a764bbfac6defae5a2e1",
+      "content_hash": "af57b4f79fe5f66fed41c8be3b2850a19ea4d18cdaf0d0388bba6acfa7fbb778",
       "excluded_from_docs": false
     },
     {
@@ -1621,7 +1684,7 @@
       "name": "wiki/concepts/Forensics.md",
       "description": "Forensics",
       "audience": "adopter",
-      "content_hash": "d38f768b7c7ae619188df20499e1fe9334d9e0a2d53a76ce65d81778a4ba4a09",
+      "content_hash": "779762f8075f188bb410cd0684d77b1212ca3d51be4e2ac4a89a082179a0189c",
       "excluded_from_docs": false
     },
     {
@@ -1630,7 +1693,7 @@
       "name": "wiki/concepts/GAIA Audit.md",
       "description": "GAIA Audit",
       "audience": "adopter",
-      "content_hash": "4f0b65912c5faaeef6c08fec5f2a4a0e0244d73a418563f42b2dda21a8ecb906",
+      "content_hash": "42af1d0c9b2785d7bbb5874c205f02c705eb7c4599692622ab96ade9380eb135",
       "excluded_from_docs": false
     },
     {
@@ -1639,7 +1702,7 @@
       "name": "wiki/concepts/GAIA Handoff.md",
       "description": "GAIA Handoff",
       "audience": "adopter",
-      "content_hash": "b6b5ca4e855ea8b48e9c2cb5e53b29a2de67edf30bfe5345916e9bdc257de136",
+      "content_hash": "f14704285acc8d3dce637eba9c19a3e66b9857ae797bfce2a4b9dbfa81b66e4a",
       "excluded_from_docs": false
     },
     {
@@ -1648,7 +1711,7 @@
       "name": "wiki/concepts/GAIA Init Workflow.md",
       "description": "GAIA Init Workflow",
       "audience": "adopter",
-      "content_hash": "aea9095375f8b4e2ffb8aa9e79ebc794daf29c848f69b164176b6028ecb69966",
+      "content_hash": "400a5ef2ba17a7187994fe8859d6c28c08c6a88ea4eee44a597c0e75e99afd18",
       "excluded_from_docs": false
     },
     {
@@ -1657,7 +1720,7 @@
       "name": "wiki/concepts/GAIA Philosophy.md",
       "description": "GAIA Philosophy",
       "audience": "adopter",
-      "content_hash": "49a61f6536eea44f67b5366a89dd299dab7744437fa094829f63ad4a11742057",
+      "content_hash": "81b8d154ebc9417f407eedb7ba6859e411c78719fa2e39ebb6f8f52e0afe4400",
       "excluded_from_docs": false
     },
     {
@@ -1666,7 +1729,7 @@
       "name": "wiki/concepts/GAIA Pickup.md",
       "description": "GAIA Pickup",
       "audience": "adopter",
-      "content_hash": "a5ccde7b5d57294dc3c78529a131c29faa18e715a7b238e86ee81b02b94e0270",
+      "content_hash": "d68a80267e35170b4ddd030af93c95599a8419b445113cd6739ac458139792af",
       "excluded_from_docs": false
     },
     {
@@ -1675,7 +1738,7 @@
       "name": "wiki/concepts/GAIA Plan.md",
       "description": "GAIA Plan",
       "audience": "adopter",
-      "content_hash": "43351372f4b04082264cc093aa786d7bf609c583c269ce96d4244ff8473e6897",
+      "content_hash": "cbb76f981b2329d3e0c27e53063c250e9fe39698a224f0827382a22933d67dab",
       "excluded_from_docs": false
     },
     {
@@ -1684,7 +1747,7 @@
       "name": "wiki/concepts/GAIA Spec.md",
       "description": "GAIA Spec",
       "audience": "adopter",
-      "content_hash": "ba24ba93c5a1452173ef8b653a8962680a8ba172347a05ad0ae1a1f336517478",
+      "content_hash": "2a7382fdace509e4d832c43261a170c884ed65ae8d8a5e1f79e83ecbeb9dbfc0",
       "excluded_from_docs": false
     },
     {
@@ -1693,7 +1756,7 @@
       "name": "wiki/concepts/Git Workflow.md",
       "description": "Git Workflow",
       "audience": "adopter",
-      "content_hash": "fae5f644537fa34caa6f48e4dc7035c253ba2eaa703d98f586456aa2bb8f17b6",
+      "content_hash": "e7fbbafcb98835ceed26cdd0dddc515d9fca25af1c248cebed06708111c94ecf",
       "excluded_from_docs": false
     },
     {
@@ -1702,7 +1765,7 @@
       "name": "wiki/concepts/Incremental CI Skipping.md",
       "description": "Incremental CI Skipping",
       "audience": "adopter",
-      "content_hash": "f8c5124afcac817a2a19f7b52235126380d174e9c7064f0f4e44e15167c2c75d",
+      "content_hash": "a5ef6cb2d62c93bbae5ff283a292f2557360f662a920cac2487285f290d607c0",
       "excluded_from_docs": false
     },
     {
@@ -1711,7 +1774,7 @@
       "name": "wiki/concepts/PR Merge Workflow.md",
       "description": "PR Merge Workflow",
       "audience": "adopter",
-      "content_hash": "f99410cf155517c0c1d6736d1e9bdfcd39efe9100dbf87d1b971f02b783cecbf",
+      "content_hash": "4eb0e06722813e1f04ebc2d660a43ac3a3f71653ccc1ec26766e1c408793f3d1",
       "excluded_from_docs": false
     },
     {
@@ -1729,7 +1792,16 @@
       "name": "wiki/concepts/Release Workflow.md",
       "description": "Release Workflow",
       "audience": "contributor",
-      "content_hash": "700dc8682e369b1421b62930ef8142afe3805089bd7414976aa037fb6a4411e9",
+      "content_hash": "138ac5082ab5138cc8b7e4ddf6f37b4dc4f4b8f5ec7202804735d9017a8f53cb",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/concepts/Release-Notes.md",
+      "name": "wiki/concepts/Release-Notes.md",
+      "description": "Maintainer-only. Translate a version's GAIA CHANGELOG entries into plain-language public release notes for the marketing site.",
+      "audience": "contributor",
+      "content_hash": "16573ca6ae691d19dd67bd11e32626e8d4c2f33b624894f2d2c6ef1498c9a508",
       "excluded_from_docs": false
     },
     {
@@ -1738,7 +1810,7 @@
       "name": "wiki/concepts/Serena Integration.md",
       "description": "Serena Integration",
       "audience": "adopter",
-      "content_hash": "c144e068ef504b0ecf88247de64b6bffe2db8691fe8561ef95a8a4a93e901f2c",
+      "content_hash": "d693ec24dabdb20b0fa9b96df80b6d3b010b3fd3441c004c5cd0b99082d68ae4",
       "excluded_from_docs": false
     },
     {
@@ -1747,7 +1819,7 @@
       "name": "wiki/concepts/Task Orchestration.md",
       "description": "Task Orchestration",
       "audience": "adopter",
-      "content_hash": "328d34bc27f213cb3a7f0e7c5183a6618801d6da30e48fbc73b5781040863e15",
+      "content_hash": "9f3a9b9099d86505ce28efad4df86a82f1aa3c191b4afb9f566a904f26618bff",
       "excluded_from_docs": false
     },
     {
@@ -1756,7 +1828,7 @@
       "name": "wiki/concepts/Telemetry.md",
       "description": "Telemetry",
       "audience": "adopter",
-      "content_hash": "9e90d940a640896b36072d3cc24fcbd3e0e5c2b054d4fe80be859fdf5c3cd44b",
+      "content_hash": "c1237fdbc3ce5cb7358ffbb61826df815aa22f22688eae7165e22c8e17209e63",
       "excluded_from_docs": true
     },
     {
@@ -1765,7 +1837,7 @@
       "name": "wiki/concepts/Test Runner.md",
       "description": "Test Runner Rule",
       "audience": "adopter",
-      "content_hash": "a99ba2594fe95203a2d173436a1b1ff79b43ac8db617c9631923e8d269e15ffe",
+      "content_hash": "43c7c9cb9e6b5e76dab2167efb49c21bd6a504631f1b0b7969dab557e070ab8d",
       "excluded_from_docs": false
     },
     {
@@ -1783,7 +1855,7 @@
       "name": "wiki/concepts/Update Workflow.md",
       "description": "Update Workflow",
       "audience": "adopter",
-      "content_hash": "b8f977ab61e2e18561a0d6db73fab58e8cac8abf0ca8738c474b27999602b620",
+      "content_hash": "a7d7fb6b830933be6c0b7156f11d76530eb978701d6da7138e7a0d81b5355b16",
       "excluded_from_docs": false
     },
     {
@@ -1792,7 +1864,7 @@
       "name": "wiki/concepts/Wiki Consolidate.md",
       "description": "Wiki Consolidate",
       "audience": "adopter",
-      "content_hash": "b966771af0c5621e459a05c59b26a7738b9eac9470626584daa917777d8ace10",
+      "content_hash": "c4568c4fee2a6ae27b5652c15c8a9a1aa2e590868d3fe1ea0f61c59f70049564",
       "excluded_from_docs": false
     },
     {
@@ -1801,7 +1873,7 @@
       "name": "wiki/concepts/Wiki Sync.md",
       "description": "Wiki Sync",
       "audience": "adopter",
-      "content_hash": "7cb563cce33d94bd4093c4e8e23f9f0935c000b7f230f978a0000a8b94f9254c",
+      "content_hash": "f298134ed31e3e1d2b0148d55356c552391ca092511bdf0b8903d9add2cb95b0",
       "excluded_from_docs": false
     },
     {
@@ -1810,7 +1882,7 @@
       "name": "wiki/decisions/Bundle-time Scrub.md",
       "description": "Bundle-time Scrub",
       "audience": "contributor",
-      "content_hash": "7ed295f8749c0400d5cb381ae37549c34825007ea2caf92b77e2f97c5582cedf",
+      "content_hash": "79ec9426e6585875784171d6e3be6e01f0f0cd538f43dca795c3edb025bf1817",
       "excluded_from_docs": false
     },
     {
@@ -1819,7 +1891,7 @@
       "name": "wiki/decisions/CLI-Binary-Split.md",
       "description": "CLI Binary Split",
       "audience": "contributor",
-      "content_hash": "8b5b450d7550b30b14636a0acb4bc7c05e2a58e82b0282f3fe89a8c414d2a82e",
+      "content_hash": "ee85c6aa8799cce21ccc1a204b437c8f8322b852c16bff80a275b8d545e4e368",
       "excluded_from_docs": false
     },
     {
@@ -1828,7 +1900,7 @@
       "name": "wiki/decisions/Claude Integration Fitness.md",
       "description": "Claude Integration Fitness",
       "audience": "adopter",
-      "content_hash": "4f55b0bf16a849c389e8b73b1c2912749163f0294e6e9c598c92690532fe0c94",
+      "content_hash": "fd2fefd702709abe5cb7f8800d21e719f073460abab6135c1787f17b8e1813af",
       "excluded_from_docs": false
     },
     {
@@ -1846,7 +1918,7 @@
       "name": "wiki/decisions/Content Security Policy.md",
       "description": "Decision: Content Security Policy",
       "audience": "adopter",
-      "content_hash": "972d5d8fa87cc0276d1643950307de54a784ee00eda3a67a69556e4331ef6d87",
+      "content_hash": "00acb6a3321ebec18ad36925cdd99b9bbff1569ba4d8f5696ac280403f9eca74",
       "excluded_from_docs": false
     },
     {
@@ -1855,7 +1927,7 @@
       "name": "wiki/decisions/Dark Mode Modernization.md",
       "description": "Decision: Modernize Dark Mode (Cookie + Client Hints)",
       "audience": "adopter",
-      "content_hash": "be788fa1e255652060bfa5788613cd497bc7e3a2a8050c621c7c5a0793497a91",
+      "content_hash": "f0b290117bd28f29db855d4baa50be7e7f4360d4220a495c4344f6e94be16893",
       "excluded_from_docs": false
     },
     {
@@ -1864,7 +1936,7 @@
       "name": "wiki/decisions/Dispatched-Check Rollup via Polling.md",
       "description": "Decision: Dispatched-Check Rollup via In-Loop Polling",
       "audience": "adopter",
-      "content_hash": "f39c5f93539d8fdb02a9a617064a165585bcc9764a74c6312c46fcf6ff56efc6",
+      "content_hash": "3f13395100cf19d4086331ac09d79c0681ef24876d42f503acc218c9a2b123d2",
       "excluded_from_docs": false
     },
     {
@@ -1873,7 +1945,7 @@
       "name": "wiki/decisions/DragonScale Opt-Out.md",
       "description": "Decision: DragonScale Opt-Out",
       "audience": "adopter",
-      "content_hash": "a1b91a2d8e25a362ce7b2b4e8b01db18b60eb3e9dbcfc9a4a520a7d885412d62",
+      "content_hash": "425b6f090c31a311c1cc557268827f0729e77ac49fd63351f8fa7c552860ae39",
       "excluded_from_docs": false
     },
     {
@@ -1882,7 +1954,7 @@
       "name": "wiki/decisions/Forensics Triage Workflow.md",
       "description": "Decision: Forensics Triage Workflow",
       "audience": "contributor",
-      "content_hash": "b24eedf4b764c0342ff86e6681c30998a9f64c3bbdba8b45dbaceafe0be33e90",
+      "content_hash": "51eae953977cd7e1f7777e915be6e95b3909f828890c26c3ea188198f61f061b",
       "excluded_from_docs": false
     },
     {
@@ -1891,7 +1963,7 @@
       "name": "wiki/decisions/No Component Library.md",
       "description": "Decision: No Component Library",
       "audience": "adopter",
-      "content_hash": "388620976039fa78cf3b869593a7a04af51f8b55498e6182703a5f8446a680ca",
+      "content_hash": "e3c7b7b04560feea35759eab2a25f63d09ff2715ddcb99f2cbd7b3122a46a63e",
       "excluded_from_docs": false
     },
     {
@@ -1900,7 +1972,16 @@
       "name": "wiki/decisions/Quality Gate.md",
       "description": "Decision: Mandatory Quality Gate",
       "audience": "adopter",
-      "content_hash": "773d0b61205d39d4218d82aff6c6a89f3d1f254e955a1ebf16750c32d1e1e6f7",
+      "content_hash": "b8208a8106803aa58ce1a3a6f75598f5e5b7462ceee1b7b6fe90f98e6eb5184f",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/decisions/TDD RED Verification.md",
+      "name": "wiki/decisions/TDD RED Verification.md",
+      "description": "TDD RED Verification",
+      "audience": "adopter",
+      "content_hash": "5b5f9f42a9c6ad8b2cf96dba34fc1dac9b4fd0de5acdf5a5e0da3927df1632bc",
       "excluded_from_docs": false
     },
     {
@@ -1909,7 +1990,7 @@
       "name": "wiki/decisions/Thin Routes.md",
       "description": "Decision: Thin Routes, Fat Pages",
       "audience": "adopter",
-      "content_hash": "8ec3cab2e4ff1e6abde58f97608c7386130c1b41783001f0858396ab4f82b1d2",
+      "content_hash": "e2a91c2bb072098310a7862fbe35fea62b7f519b6180a1bae1a359044bd1dd46",
       "excluded_from_docs": false
     },
     {
@@ -1927,7 +2008,7 @@
       "name": "wiki/decisions/Wiki Management.md",
       "description": "Wiki Management",
       "audience": "adopter",
-      "content_hash": "cc308842d40f50457a64b6e79cabc72e3b7e5cc42ab939be570650e3954a67c6",
+      "content_hash": "81b7f13809f67bbff73fa29025069823ad1e1968b829527035a4974fbe6393c6",
       "excluded_from_docs": false
     },
     {
@@ -1936,7 +2017,7 @@
       "name": "wiki/decisions/composeStory Pattern.md",
       "description": "Decision: Test Components via Storybook `composeStory`",
       "audience": "adopter",
-      "content_hash": "52153e8cbddb41a85aa18eaa689a04df5e2b86baf5531942ce0a867eb48a695d",
+      "content_hash": "6226b64ee8ab3522d185a41c921380041381e7a44333a1efdd875d77a4df0f06",
       "excluded_from_docs": false
     },
     {
@@ -1945,7 +2026,7 @@
       "name": "wiki/decisions/pnpm.md",
       "description": "Decision: pnpm as the Package Manager",
       "audience": "adopter",
-      "content_hash": "551bc1e05a30b6dcbc650637144923031e79c29bcf0123fb3dd07053cf2f9ea3",
+      "content_hash": "a4154836d8633273c9553841227f99332232aad528d5c01fcd6e6d48424f0d67",
       "excluded_from_docs": false
     },
     {
@@ -1954,7 +2035,7 @@
       "name": "wiki/decisions/spec-kit Extension Strategy.md",
       "description": "spec-kit Extension Strategy",
       "audience": "adopter",
-      "content_hash": "eedb799dd86d6a69ff58d595179b0f2a794db4b8cdb5c034ff9918b46c274b9a",
+      "content_hash": "72120546a17e1c57e5b707730d637cf112460e29019f0e6054bda246cdd2cbbf",
       "excluded_from_docs": false
     },
     {
@@ -1963,7 +2044,7 @@
       "name": "wiki/dependencies/Chromatic.md",
       "description": "Chromatic",
       "audience": "adopter",
-      "content_hash": "381d3c64ddcd91645761863f69f1cca0237a1bf3994730b33435643dbc7edf2a",
+      "content_hash": "6618978c8a00d2b93fe9e84762e4fbbeffe4be5f0d42a8ab150959e30a4c9167",
       "excluded_from_docs": false
     },
     {
@@ -1972,7 +2053,7 @@
       "name": "wiki/dependencies/Conform.md",
       "description": "Conform",
       "audience": "adopter",
-      "content_hash": "43b30c6bc0d85d36376713740dc6ef376b89ee0abdaa6ef6573cd6542e4deef8",
+      "content_hash": "578a25bf6f3467c8c15df168478ddaf4447eb626a7c94cfd9db37673614c4258",
       "excluded_from_docs": false
     },
     {
@@ -1999,7 +2080,7 @@
       "name": "wiki/dependencies/MSW.md",
       "description": "MSW",
       "audience": "adopter",
-      "content_hash": "398721d26d89314c229c6f5a8f3b6589073a780f663a6761c88f7e50b5226f29",
+      "content_hash": "4536d68cebaac10186967c1d9c25fc86a88bd00e5ef4abd0466f54602a0ed4d6",
       "excluded_from_docs": false
     },
     {
@@ -2008,7 +2089,7 @@
       "name": "wiki/dependencies/Playwright.md",
       "description": "Playwright",
       "audience": "adopter",
-      "content_hash": "f54815476ed3e3b8bc2f1d60a94265ff0ad749b8d1409ec09d1e70098804c5b8",
+      "content_hash": "0eedc2e7aaab28d188dbeea52eeadb898eeb67983e6c09bdfa6ed221ed298ede",
       "excluded_from_docs": false
     },
     {
@@ -2053,7 +2134,7 @@
       "name": "wiki/dependencies/Tailwind.md",
       "description": "Tailwind",
       "audience": "adopter",
-      "content_hash": "b8a6cadb1332e714c60aff103775e6405249619e04d971b0d55a6f3440e8ff2f",
+      "content_hash": "de698122e4b05c5fd89a2de1992043a6c3f5b11e4ddb26e0c36cd049d21184f6",
       "excluded_from_docs": false
     },
     {
@@ -2062,7 +2143,7 @@
       "name": "wiki/dependencies/Vitest.md",
       "description": "Vitest",
       "audience": "adopter",
-      "content_hash": "80b5848e0d3fa7ce188fbef68c42a399f3afb48cc97e39a78f52701d9f0db4ed",
+      "content_hash": "efd21d864a47ae9e34ac1914f253b1f453ed971b93a10469254ee82a236ba8a3",
       "excluded_from_docs": false
     },
     {
@@ -2080,7 +2161,7 @@
       "name": "wiki/dependencies/gaia-lint.md",
       "description": "@gaia-react/lint",
       "audience": "adopter",
-      "content_hash": "aa62a944c83c9037d680d237ee28f7546ea73a0cb8699256b5c6837f2f03f989",
+      "content_hash": "e17e63fc38e37c5b2d53d3afad7430db1954a572b988c64266563f8c08034718",
       "excluded_from_docs": false
     },
     {
@@ -2098,7 +2179,16 @@
       "name": "wiki/dependencies/knip.md",
       "description": "knip",
       "audience": "adopter",
-      "content_hash": "8ce6b67e39ffab7bfe6348150a0be54bfc75d5e45b41e0f09abd71afc3319b7f",
+      "content_hash": "7a9ac7c30cf8bd88b53afea19708095154d90e09e3bc337f397958298d9e709b",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/dependencies/pnpm-audit.md",
+      "name": "wiki/dependencies/pnpm-audit.md",
+      "description": "pnpm-audit",
+      "audience": "adopter",
+      "content_hash": "59594290dc0ae9e9fb6bebc4e01e0f8a90e083700609c54ce8f694d8ccf8f014",
       "excluded_from_docs": false
     },
     {
@@ -2143,7 +2233,7 @@
       "name": "wiki/dependencies/spec-kit.md",
       "description": "spec-kit",
       "audience": "adopter",
-      "content_hash": "34d36697b1da35da9db264b3e1b5ae5787f59a3e6ec2a779827bc3c50f2d6f01",
+      "content_hash": "9c6bfb947542130eb8e538a738c905a9f08d13cc45f95056620c5d6ba943edd3",
       "excluded_from_docs": false
     },
     {
@@ -2152,7 +2242,7 @@
       "name": "wiki/entities/GAIA.md",
       "description": "GAIA",
       "audience": "contributor",
-      "content_hash": "cb9da6eece00d953826369dd4fb1d907c8ee04369bed8d10d107ada69145ecbd",
+      "content_hash": "8ac9ad6cf08aa85d7e0b98cc01226500bdca82527847456ca846d87e7dd3c330",
       "excluded_from_docs": false
     },
     {
@@ -2161,7 +2251,7 @@
       "name": "wiki/entities/Steven Sacks.md",
       "description": "Steven Sacks",
       "audience": "contributor",
-      "content_hash": "e3fe296975f6dbb9b89f719d1949b380fafd5ce32e12eee823dd1857464eee65",
+      "content_hash": "3237fd76e69226ccd4f00a8ad74a15dd8e1c4c5ea0cf6562fc2a54650ff61654",
       "excluded_from_docs": false
     },
     {
@@ -2179,7 +2269,7 @@
       "name": "wiki/flows/Language Flow.md",
       "description": "Language Flow",
       "audience": "adopter",
-      "content_hash": "bda3dabf5ee362f5c0b7bc37bca0e6eeeabb0a38dcc28f1af1e00c366ce517e7",
+      "content_hash": "7b7383a72c5ab7213acf00495e1cecb7e202dbada322f5e18bef21fa4defa928",
       "excluded_from_docs": false
     },
     {
@@ -2188,7 +2278,7 @@
       "name": "wiki/flows/Theme Flow.md",
       "description": "Theme Flow (Dark Mode)",
       "audience": "adopter",
-      "content_hash": "f1db2f9d8335ed38bbec15f76d4b92dbc917768d1193b4a482322ec68157a549",
+      "content_hash": "3978d8fdb65a5ef31e5f50b91be1d0f23c143a5bdd96030da1d40a1aa83a7922",
       "excluded_from_docs": false
     },
     {
@@ -2197,7 +2287,7 @@
       "name": "wiki/hot.md",
       "description": "Recent Context",
       "audience": "adopter",
-      "content_hash": "ada8316049c1e08a8bdb424f861a89a332be2a59c51e1735f18902413fdc4b40",
+      "content_hash": "30ac1834dfca9c5f94989cd56178fb921a9b469d8968f301cbf93932c80c6e82",
       "excluded_from_docs": false
     },
     {
@@ -2206,7 +2296,7 @@
       "name": "wiki/index.md",
       "description": "Index",
       "audience": "mixed",
-      "content_hash": "54ccb1f30448ac5260774408e14092718e9501f5ffda4e4c3cdf76f05357125b",
+      "content_hash": "0accb1bbb9a598df989131c3ae22dcbd5687550eb59c4bd437e778a1c142ac48",
       "excluded_from_docs": false,
       "marker_blocks": [
         [
@@ -2214,16 +2304,20 @@
           65
         ],
         [
-          108,
-          110
+          102,
+          104
         ],
         [
-          134,
-          136
+          112,
+          114
         ],
         [
-          150,
-          155
+          138,
+          141
+        ],
+        [
+          155,
+          160
         ]
       ]
     },
@@ -2233,34 +2327,43 @@
       "name": "wiki/log.md",
       "description": "Log",
       "audience": "adopter",
-      "content_hash": "4a73ddf9204aeef5c376388100cf555e21a5bce94669972f2e6d904bf3b7c90d",
+      "content_hash": "023f3d27adb1ce94ed598265f7d5136c447319e391c470271c2efe13a3a7a50f",
       "excluded_from_docs": false
     },
     {
       "kind": "wiki-page",
       "path": "wiki/meta/consolidate-report-2026-05-07.md",
       "name": "wiki/meta/consolidate-report-2026-05-07.md",
-      "description": "Consolidate Report — 2026-05-07",
+      "description": "Consolidate Report: 2026-05-07",
       "audience": "contributor",
-      "content_hash": "fd37b0143c0accd895a847e5263448ae17781dff6a9fa3eb1d3b412679fc07c9",
+      "content_hash": "43e50ac0b54c7a62429213a41fcbd5aaf64fe77d4c12aa1b379865b63319f450",
       "excluded_from_docs": false
     },
     {
       "kind": "wiki-page",
       "path": "wiki/meta/consolidate-report-2026-05-08.md",
       "name": "wiki/meta/consolidate-report-2026-05-08.md",
-      "description": "Consolidate Report — 2026-05-08",
+      "description": "Consolidate Report: 2026-05-08",
       "audience": "contributor",
-      "content_hash": "58b7852631e12cac705a8084efdf32bd7ce3590190a24d0d5756e88cd8cc140b",
+      "content_hash": "2c486fe6bda9d0298b70f444eedb239312a7fb5b9dc355c40d0d793b39a9a3a0",
       "excluded_from_docs": false
     },
     {
       "kind": "wiki-page",
       "path": "wiki/meta/consolidate-report-2026-05-26.md",
       "name": "wiki/meta/consolidate-report-2026-05-26.md",
-      "description": "Consolidate Report — 2026-05-26",
+      "description": "Consolidate Report: 2026-05-26",
       "audience": "contributor",
-      "content_hash": "d88d8dc7182ed88fb46835bf98e7d565b7585119835237e69f31e91c549eeea5",
+      "content_hash": "39637b94b6af2b58819fbbfa5b56bd48972ef166b3a0adbca594fb94ab75516b",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/meta/consolidate-report-2026-06-04.md",
+      "name": "wiki/meta/consolidate-report-2026-06-04.md",
+      "description": "Consolidate Report: 2026-06-04",
+      "audience": "contributor",
+      "content_hash": "4d348be73a7e10a317147f5a7e331ae79df14bb9939747ab2d61ba29c362fed2",
       "excluded_from_docs": false
     },
     {
@@ -2276,36 +2379,36 @@
       "kind": "wiki-page",
       "path": "wiki/meta/lint-report-2026-04-21.md",
       "name": "wiki/meta/lint-report-2026-04-21.md",
-      "description": "Wiki Lint Report — 2026-04-21",
+      "description": "Wiki Lint Report: 2026-04-21",
       "audience": "contributor",
-      "content_hash": "a2fe57b90bf1cdce79be5d0f4412dcc6d93cb36f5fc8566ae19c1e66b17dcad0",
+      "content_hash": "ff56226e95710344658306c3d58d3715969afc55941258198279f77ecab2387c",
       "excluded_from_docs": false
     },
     {
       "kind": "wiki-page",
       "path": "wiki/meta/lint-report-2026-04-26.md",
       "name": "wiki/meta/lint-report-2026-04-26.md",
-      "description": "Wiki Lint Report — 2026-04-26",
+      "description": "Wiki Lint Report: 2026-04-26",
       "audience": "contributor",
-      "content_hash": "fc2a55dc5d85c08f33b100fa38ceb3e81c10c25c8efd07912d45d84bb0b6e0c9",
+      "content_hash": "fd107cab9cd059d3008bbbf979a274a6af3608431297394765f6ee291eb7fde0",
       "excluded_from_docs": false
     },
     {
       "kind": "wiki-page",
       "path": "wiki/meta/lint-report-2026-04-27.md",
       "name": "wiki/meta/lint-report-2026-04-27.md",
-      "description": "Wiki Lint Report — 2026-04-27",
+      "description": "Wiki Lint Report: 2026-04-27",
       "audience": "contributor",
-      "content_hash": "6191e93c600256cee670b8283508b1dabafab4386707e6d4259ccd15a4fb7947",
+      "content_hash": "aff9dead794561845f0143e0b01c69ae5fb29e375b420d58367a6bf583fe0526",
       "excluded_from_docs": false
     },
     {
       "kind": "wiki-page",
       "path": "wiki/meta/lint-report-2026-05-01.md",
       "name": "wiki/meta/lint-report-2026-05-01.md",
-      "description": "Wiki Lint Report — 2026-05-01",
+      "description": "Wiki Lint Report: 2026-05-01",
       "audience": "contributor",
-      "content_hash": "90dabc6cdb410949f8fb184e7caec6d81309247ae57aea701d784151341fb096",
+      "content_hash": "4bfa4110fd52166421929af67e7cfd785598a97c02491941cb7ffba5ddba2931",
       "excluded_from_docs": false
     },
     {
@@ -2314,7 +2417,7 @@
       "name": "wiki/meta/lint-report-2026-05-03.md",
       "description": "Lint Report: 2026-05-03",
       "audience": "contributor",
-      "content_hash": "cf479c4e0b36079d684d630681f445564f34151ceb35d918beb4a013125fb922",
+      "content_hash": "f2e86781c63a00f89da37e8d825450208674929bdb57bb95a5f256771c6a41b3",
       "excluded_from_docs": false
     },
     {
@@ -2323,7 +2426,7 @@
       "name": "wiki/meta/lint-report-2026-05-04.md",
       "description": "Lint Report: 2026-05-04",
       "audience": "contributor",
-      "content_hash": "d70cfd70f7729b263b18cade214772747f90331a06c0f0f3d03fedcfa7d0160a",
+      "content_hash": "7254f2cffc894e6ab7df1240fd08c1f30f179aa3917d1b4f8bd039382a36479a",
       "excluded_from_docs": false
     },
     {
@@ -2332,7 +2435,7 @@
       "name": "wiki/meta/lint-report-2026-05-06.md",
       "description": "Lint Report: 2026-05-06",
       "audience": "contributor",
-      "content_hash": "8a5b618f4a217dd6be8b3b19538da13b371da8c03fb98555a67c3f449ebc6bb3",
+      "content_hash": "f2a853644dda5a093427abbe86825f00b3dabdb3b96051f55576589d1de5711b",
       "excluded_from_docs": false
     },
     {
@@ -2341,7 +2444,7 @@
       "name": "wiki/meta/lint-report-2026-05-07.md",
       "description": "Lint Report: 2026-05-07",
       "audience": "contributor",
-      "content_hash": "167c31039d389ea77e225aa76efbeb0ed3f3ccfd6ec4a01b31befb9683a4ed86",
+      "content_hash": "f5635e7f259b864449d049287c9ff5bf464206be648e5ae1a18fa3e261d7a4d9",
       "excluded_from_docs": false
     },
     {
@@ -2359,7 +2462,25 @@
       "name": "wiki/meta/lint-report-2026-06-02.md",
       "description": "Lint Report: 2026-06-02",
       "audience": "contributor",
-      "content_hash": "9394c09b15091faab5769d95204325ea333d56db981fce12c8e34450b1534514",
+      "content_hash": "6458c0fc86b7a5ed215dd732aea708097dc1f6e493687dd4b56ae6f9e5d53109",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/meta/lint-report-2026-06-04.md",
+      "name": "wiki/meta/lint-report-2026-06-04.md",
+      "description": "Lint Report: 2026-06-04",
+      "audience": "contributor",
+      "content_hash": "8419b7df2d4a99dff74bc2a51fbcb495e849e3ed150684afdb4f3d95e50bff3c",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "wiki-page",
+      "path": "wiki/meta/lint-report-2026-06-05.md",
+      "name": "wiki/meta/lint-report-2026-06-05.md",
+      "description": "Lint Report: 2026-06-05",
+      "audience": "contributor",
+      "content_hash": "ec027c7932e85eba42ba28b84e9f39ee1f0f24f5b39abfbdede91e9e4cc6c826",
       "excluded_from_docs": false
     },
     {
@@ -2368,7 +2489,7 @@
       "name": "wiki/modules/CLI Scaffolding.md",
       "description": "CLI Scaffolding",
       "audience": "adopter",
-      "content_hash": "1f2c193a38f00953029a63ac7f5c77982560d5cd91ee91f00d7658235b8d7e91",
+      "content_hash": "1382aee50cb11ea0b5e7333909178ff46cd49eae244765c67520e1a1039740e8",
       "excluded_from_docs": false
     },
     {
@@ -2377,7 +2498,7 @@
       "name": "wiki/modules/Claude Integration.md",
       "description": "Claude Integration",
       "audience": "adopter",
-      "content_hash": "2ee3329d5e90a542f4525f7895851c5c8e886beeec0156ebe1678e82bcae11da",
+      "content_hash": "865c384c90b183f02817ff3104b216174faef9748234063275923b1011703cc0",
       "excluded_from_docs": false
     },
     {
@@ -2386,7 +2507,7 @@
       "name": "wiki/modules/Components.md",
       "description": "Components",
       "audience": "adopter",
-      "content_hash": "1980482db008412d2f34af015ac8c888b84e7af9981c6f9b7eef55f31d99b3ad",
+      "content_hash": "b1f6cda0ba5513d488169c304ddc767a7f4d8a4e095365cd12c9a617f8a1cfad",
       "excluded_from_docs": false
     },
     {
@@ -2395,7 +2516,7 @@
       "name": "wiki/modules/Folder Structure.md",
       "description": "Folder Structure",
       "audience": "adopter",
-      "content_hash": "99d5747705e0fe7368a77117904b36ed19e69257aef4abee350e869898e28cfc",
+      "content_hash": "4ed323c08bb2963e6891696a4c3c10bb84d4f4300cb89be11b9ccf1f25e9c741",
       "excluded_from_docs": false
     },
     {
@@ -2404,7 +2525,7 @@
       "name": "wiki/modules/Form Components.md",
       "description": "Form Components",
       "audience": "adopter",
-      "content_hash": "b0fb9ee65b1cffdd05b3c9595b04f8da8e125514954550d37f018f9556167bf7",
+      "content_hash": "715397efea581a860c88361741f7333e08717ad0d25301b87e002e687a00bfe3",
       "excluded_from_docs": false
     },
     {
@@ -2422,7 +2543,7 @@
       "name": "wiki/modules/MSW Handlers.md",
       "description": "MSW (Mock Service Worker)",
       "audience": "adopter",
-      "content_hash": "acbba9baa6e95e5d2ef0cab34fd3ed91b6ce1cd56c3cd1fc7a4f4caee16fff97",
+      "content_hash": "91fe9125355d95e0af2d3ce244adb52c80c350dcf7cc6037090624b2453423e5",
       "excluded_from_docs": false
     },
     {
@@ -2431,7 +2552,7 @@
       "name": "wiki/modules/Middleware.md",
       "description": "Middleware",
       "audience": "adopter",
-      "content_hash": "20da6fbe69ba061215dfc8bd3f3b1d1d7fa7fc2dd5927caf7d2ee524cf634d5c",
+      "content_hash": "9e1d94ed88ae0905892fb556d3bace446c51882955a1440243dec1b9e40a4348",
       "excluded_from_docs": false
     },
     {
@@ -2440,7 +2561,7 @@
       "name": "wiki/modules/Pages.md",
       "description": "Pages",
       "audience": "adopter",
-      "content_hash": "46f88476b41c4c20ae63093292e4208434cb30f3a6fd429e206361d0e0160c17",
+      "content_hash": "e834f49f6d0d478e8e1e668b299eebd88e3a9d635b136ce571914ee8a3580302",
       "excluded_from_docs": false
     },
     {
@@ -2449,7 +2570,7 @@
       "name": "wiki/modules/Routing.md",
       "description": "Routing",
       "audience": "adopter",
-      "content_hash": "1002174481d55786f13315488667481b6103c43b67dbb0f0cd83a75ec2b170c7",
+      "content_hash": "06f8bad26b51c6c8722ce7f432c6dbb6dae24315fcdc686a4b723d8af36d152c",
       "excluded_from_docs": false
     },
     {
@@ -2458,7 +2579,7 @@
       "name": "wiki/modules/Services.md",
       "description": "Services",
       "audience": "adopter",
-      "content_hash": "326cd3b5c3fb350d1fcdae10e906dc472172b49b098442ce74fa4c460989c401",
+      "content_hash": "b5a7489efc5fb6a76b1f87261309533229750c62d2a6bb3f68b55dd0502282a5",
       "excluded_from_docs": false
     },
     {
@@ -2467,7 +2588,7 @@
       "name": "wiki/modules/Sessions.md",
       "description": "Sessions",
       "audience": "adopter",
-      "content_hash": "a5c32cba18ba946d215f5c43b5e90d12339e6f64beb5a46a2a1b4b6ce0be5874",
+      "content_hash": "43accde9903553ceecc370467e5ba280e2cdac6cbc49cd49b287e376f58c1036",
       "excluded_from_docs": false
     },
     {
@@ -2476,7 +2597,7 @@
       "name": "wiki/modules/State.md",
       "description": "State",
       "audience": "adopter",
-      "content_hash": "ed7391da0a1b7c06e17e2340027cf3b0e532c67d529707f550018a4b91408777",
+      "content_hash": "25cd4b48f3cd935295104c5a4abce1c2b220cf81dd75fecaa0f777903d72e544",
       "excluded_from_docs": false
     },
     {
@@ -2485,7 +2606,7 @@
       "name": "wiki/modules/Storybook Stories.md",
       "description": "Storybook Stories",
       "audience": "adopter",
-      "content_hash": "3e7996433eac2071d0285d7f1a654b67a4fe6aec0ef9e572de5a16b9e5cd5ec5",
+      "content_hash": "d18b3810d894b22bce78aa48ae4ec1e9265641a86817df357524ecdbcb338619",
       "excluded_from_docs": false
     },
     {
@@ -2494,7 +2615,7 @@
       "name": "wiki/modules/Styles.md",
       "description": "Styles",
       "audience": "adopter",
-      "content_hash": "625c5a18cf934f5bfaf54a73595fb417c3bbacc31ae704308b9282527076477c",
+      "content_hash": "12d4ac101e39782e57709d58fb6781e87225a5e93df8b85be9f11dad1bfe4704",
       "excluded_from_docs": false
     },
     {
@@ -2503,7 +2624,7 @@
       "name": "wiki/modules/Testing.md",
       "description": "Testing",
       "audience": "adopter",
-      "content_hash": "ebb479b9c943816771abbc33d516c3844c1a02778f4c6ec7e3702625fb3f984e",
+      "content_hash": "cb64027bd758688a9acd3ee551c287d86ebc8b75ea62fb27720a874c31925edb",
       "excluded_from_docs": false
     },
     {
@@ -2512,7 +2633,7 @@
       "name": "wiki/modules/Utils.md",
       "description": "Utils",
       "audience": "adopter",
-      "content_hash": "0fd88e23da4c564b0c40b0a79385871a0e43c1c099cd5ea7156853996374cd81",
+      "content_hash": "3f6186e791ddd61b8094b4f69a539e0dde4ff21b7befb7d7c4b49b32d966f373",
       "excluded_from_docs": false
     },
     {
@@ -2521,7 +2642,7 @@
       "name": "wiki/modules/i18n.md",
       "description": "i18n",
       "audience": "adopter",
-      "content_hash": "d6c1eac601c5517548be6519c9b2af8cb8a0c022c21ac7430590f27c75959e8c",
+      "content_hash": "d308cf863ac114b8bb1c7343d6f0536fe23181764a62ae488f4033e1414c7657",
       "excluded_from_docs": false
     },
     {
@@ -2530,7 +2651,7 @@
       "name": "wiki/overview.md",
       "description": "GAIA React",
       "audience": "adopter",
-      "content_hash": "56e41b71a2d086fa07b069f37660d874f7c263d499cddfada983c0b7fb48191c",
+      "content_hash": "65f1150c22c55f7aee41fafd14c3388a19a996d48dbd80a6fced3c0cce54cc8f",
       "excluded_from_docs": false
     },
     {
@@ -2539,7 +2660,7 @@
       "name": "audit-ci-tests.yml",
       "description": "Audit CI Tests",
       "audience": "contributor",
-      "content_hash": "7386a6f20b267a6773efd7360246eb89ff4959d95c005cc47fd1204719296b10",
+      "content_hash": "161b7afee940342bcfcf5d6380dcfc6db06e08555cf2f864103ef7015bebf2aa",
       "excluded_from_docs": false
     },
     {
@@ -2557,7 +2678,7 @@
       "name": "cli-tests.yml",
       "description": "CLI Tests",
       "audience": "contributor",
-      "content_hash": "374a9fe896d6dae1607b2c5168b48ad8414d555b8894e99fee3020fded0bdc72",
+      "content_hash": "ae440887f984a78da0cef9a32742eac56aefd20834f714f28d7b25aea4583c50",
       "excluded_from_docs": false
     },
     {
@@ -2575,7 +2696,7 @@
       "name": "distribution.yml",
       "description": "Distribution",
       "audience": "contributor",
-      "content_hash": "1b86e3f30c2d5e9ea76a804a3b1b1020e62d02ed93bad614d73de4da9f7a755d",
+      "content_hash": "76049c9be969653b5b4f1cee4fa66b35ad60accfc47b836f155b1e0193af2846",
       "excluded_from_docs": false
     },
     {
@@ -2593,7 +2714,7 @@
       "name": "release.yml",
       "description": "Release",
       "audience": "contributor",
-      "content_hash": "38b50214aa17a0c850b6a92247f3f0662673cdd546c2b46a8bf0918674e31d84",
+      "content_hash": "b956e44cdccf941738525730a098e512ddcb3263a79118abe63f6ace288b72fb",
       "excluded_from_docs": false
     },
     {
@@ -2602,7 +2723,7 @@
       "name": "tests.yml",
       "description": "Tests",
       "audience": "adopter",
-      "content_hash": "c54b6962895184a4180c711562ad212b2ece9e5752f3c3933b9362bd2d41962d",
+      "content_hash": "a061a1fa4df06058657d3c6dc26b91c9eb6deb5559a7b49811db7fdde81fad93",
       "excluded_from_docs": false
     }
   ]
