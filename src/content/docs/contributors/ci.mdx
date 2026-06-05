@@ -1,6 +1,6 @@
 ---
 title: CI workflows
-description: Contributor-only GitHub Actions workflows. Release, CLI tests, distribution harness, and forensics triage.
+description: Contributor-only GitHub Actions workflows. Release, CLI tests, audit-script tests, distribution harness, forensics triage, and the on-demand automation workflows installed by /setup-gaia-ci.
 sidebar:
   order: 5
 ---
@@ -43,6 +43,14 @@ When the filter triggers, the job:
 
 The required-check posture is intentional: contributors who don't touch the CLI source see the check as required-and-green without paying the install cost.
 
+## audit-ci-tests.yml
+
+Triggers on both `push` to `main` and `pull_request` against `main`, with the job gated to `pull_request` events via a job-level `if:` condition. Runs the bats suites for the `.github/audit/` helpers that `code-review-audit.yml` consumes: `check-trailer.sh` (the skip-logic gate) and `resolve-audit-base.sh` (the incremental-review base).
+
+PRs that don't touch `.github/audit/**`, this workflow file, or `.claude/hooks/lib/repo-scope.sh` report green without installing or running anything. The path filter is `dorny/paths-filter`, mirroring `cli-tests.yml`.
+
+Adopters receive the audit scripts as GAIA-controlled code they never edit, so the suite guards only maintainer changes.
+
 ## distribution.yml
 
 Triggers only on `workflow_dispatch`. Used to run the `.gaia/tests/distribution/` harness on a feature branch for ad-hoc verification of harness changes themselves.
@@ -64,3 +72,17 @@ The workflow has helpers under `.github/forensics/`: scope checks, classifier pr
 Steps include an idempotency early-exit (skip if `gaia-triaged` is already on the issue), classification, optional apply-fix path that runs the project quality gate, and a final fallback step that ensures `gaia-triaged` lands on the issue regardless of path.
 
 The workflow is on the canonical denylist: future autonomous triage runs must not modify it. The workflow's `check-scope.sh` rejects any attempt to edit any path under `.github/workflows/`. Self-modifying triage is a security boundary violation.
+
+## On-demand automation workflows
+
+GAIA can install a set of automation workflows into an adopter's repository on demand. They are not committed to the template repo's `.github/workflows/`; their templates live in the CLI source at `.gaia/cli/src/automation/templates/workflows/` and are rendered into an adopter's repo by [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/).
+
+The installable set:
+
+- `gaia-ci-wiki.yml`: daily `/gaia-wiki` sync, consolidate, and lint chain
+- `gaia-ci-update-deps.yml`: weekly dependency updates
+- `gaia-ci-pnpm-audit.yml`: weekly `pnpm audit` security pass
+- `gaia-ci-stale-branches.yml`: monthly cleanup of long-merged branches
+- `code-review-audit.yml`: the pre-merge audit gate, installed unconditionally (not a cron tool)
+
+The cron workflows are generated from `.gaia/automation.json`, so which tools run is per-project. The [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/) reference covers the adopter flow, tool modes, and schedules. The template repo keeps its own `code-review-audit.yml` in-tree as a live gate, so the `gaia-ci-*` cron workflows are an adopter-side surface rather than workflows that run on the GAIA template itself.

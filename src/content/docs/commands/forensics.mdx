@@ -1,5 +1,5 @@
 ---
-title: /gaia forensics
+title: /gaia-forensics
 description: Turn a GAIA workflow misfire into a redacted, classified bug report ready to file.
 sidebar:
   order: 6
@@ -7,7 +7,7 @@ sidebar:
 
 import { Aside } from '@astrojs/starlight/components';
 
-`/gaia forensics` turns a GAIA workflow misfire (a failed `/gaia xxx` command, a stuck `/update-gaia`, a quality-gate refusal, an unexpected hook block) into a structured, redacted bug report. Read-only end-to-end: it inspects state, never modifies, installs, or remediates.
+`/gaia-forensics` turns a GAIA workflow misfire (a failed `/gaia-*` command, a stuck `/update-gaia`, a quality-gate refusal, an unexpected hook block) into a structured, redacted bug report. Read-only end-to-end: it inspects state, never modifies, installs, or remediates.
 
 ## When to use it
 
@@ -23,7 +23,7 @@ If the failure is in your own application code, **this is the wrong tool**. Fore
 ## Invocation
 
 ```
-/gaia forensics [optional one-line description]
+/gaia-forensics [optional one-line description]
 ```
 
 With an argument, the description is used verbatim. Without an argument, forensics asks one open-ended clarifying question (`What went wrong? Describe what you were doing, what you expected, and what happened.`) and waits for your reply.
@@ -91,7 +91,7 @@ These four rules are non-negotiable. They apply to every code path.
 ## Example flow
 
 ```
-> /gaia forensics quality-gate refused to merge after I bumped a package
+> /gaia-forensics quality-gate refused to merge after I bumped a package
 ```
 
 Forensics captures state, classifies as `quality-gate`, reads the relevant state files, redacts the body, writes the report:

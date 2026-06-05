@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-Seven skills that govern code generation and review. Each one loads automatically when its trigger phrasing matches the conversation. You don't invoke them by name.
+Eight skills that govern code generation and review. Each one loads automatically when its trigger phrasing matches the conversation. You don't invoke them by name.
 
 ## TypeScript
 
@@ -84,3 +84,13 @@ Generally speaking, Claude does the right thing when it encounters ESLint errors
 If you ever find that Claude is resolving an ESLint error in an undesirable way (e.g. by disabling the rule instead of fixing the underlying issue or making things worse), you can ask Claude directly to improve the eslint-fixes skill to handle that particular ESLint error in a better way. If you do discover one, please consider [filing an issue](https://github.com/gaia-react/gaia/issues) so we can add it to the skill in GAIA itself.
 
 Source: `.claude/skills/eslint-fixes/SKILL.md`.
+
+## Accessibility Fixes
+
+Resolve specific axe-core accessibility violations in your project. Covers the common rule failures: `color-contrast`, `label`, `image-alt`, `button-name`, `link-name`, `region`, `landmark-one-main`, `heading-order`, and the `aria-*` family. The fix patterns reach for the project's semantic Tailwind tokens and `Form/*` components, so corrections hold in both light and dark mode. General accessibility guidance lives in the `accessibility` rule; this skill handles the concrete fix once a violation is reported.
+
+**Triggers** when an axe rule id appears in test output from `test/a11y.ts` (Vitest), `.playwright/a11y.ts` (Playwright), or the `code-review-audit` agent's accessibility bucket.
+
+**Example phrasing:** "fix the color-contrast violation on the status badge", "axe says this button has no accessible name", "resolve the heading-order error".
+
+Source: `.claude/skills/a11y-fixes/SKILL.md`.

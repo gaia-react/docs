@@ -1,35 +1,35 @@
 ---
-title: /gaia plan
+title: /gaia-plan
 description: Plan a feature using task orchestration. Produces a plan directory and a kickoff prompt for a fresh orchestrator session.
 ---
 
-Plan a complex feature by decomposing it into parallel workstreams with frozen interface contracts. `/gaia plan` does not implement anything. It produces a plan directory, then hands you a single copy-paste prompt to launch a fresh orchestrator session that executes the plan.
+Plan a complex feature by decomposing it into parallel workstreams with frozen interface contracts. `/gaia-plan` does not implement anything. It produces a plan directory, then hands you a single copy-paste prompt to launch a fresh orchestrator session that executes the plan.
 
 ## When to use it
 
-Reach for `/gaia plan` when the work spans multiple files or modules, has identifiable parallel slices (UI plus service layer plus tests, or backend plus frontend plus migration), or benefits from isolating each slice in its own subagent context.
+Reach for `/gaia-plan` when the work spans multiple files or modules, has identifiable parallel slices (UI plus service layer plus tests, or backend plus frontend plus migration), or benefits from isolating each slice in its own subagent context.
 
 For one-line bug fixes or single-file edits, skip the planning ceremony and just edit.
 
-For feature work that has not been clarified yet, run [`/gaia spec`](/commands/spec/) first. It chains into `/gaia plan` after save.
+For feature work that has not been clarified yet, run [`/gaia-spec`](/commands/spec/) first. It chains into `/gaia-plan` after save.
 
 ## How to invoke
 
 ```
-/gaia plan a feature description in plain English
+/gaia-plan a feature description in plain English
 ```
 
-Or, with a SPEC reference (typically passed automatically by `/gaia spec`):
+Or, with a SPEC reference (typically passed automatically by `/gaia-spec`):
 
 ```
-/gaia plan SPEC-005: rework auth, see .gaia/local/specs/SPEC-005.md
+/gaia-plan SPEC-005: rework auth, see .gaia/local/specs/SPEC-005.md
 ```
 
-If you invoke `/gaia plan` with no description, it asks for one before continuing.
+If you invoke `/gaia-plan` with no description, it asks for one before continuing.
 
 ## What gets produced
 
-`/gaia plan` writes a plan directory at:
+`/gaia-plan` writes a plan directory at:
 
 ```
 .gaia/local/plans/<kebab-slug>/
@@ -100,4 +100,4 @@ If the orchestrator was itself dispatched into an isolated subagent context, it 
 
 ## Related
 
-- [`/gaia spec`](/commands/spec/) is the upstream of `/gaia plan`. The chain-trigger after spec save dispatches `/gaia plan` automatically when accepted.
+- [`/gaia-spec`](/commands/spec/) is the upstream of `/gaia-plan`. The chain-trigger after spec save dispatches `/gaia-plan` automatically when accepted.

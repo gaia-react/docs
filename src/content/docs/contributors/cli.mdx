@@ -79,7 +79,7 @@ The skill drives tarball fetching and user-facing prompts; the CLI handles per-m
 
 Source: `.gaia/cli/src/wiki/index.ts`
 
-Wiki-state primitives consumed by the `/gaia wiki` skill family (`sync`, `consolidate`, `lint`). The primitives are deterministic; the slash commands orchestrate them.
+Wiki-state primitives consumed by the `/gaia-wiki` skill (`sync`, `consolidate`, `lint`). The primitives are deterministic; the skill orchestrates them.
 
 ```
 gaia wiki state [--json]
@@ -91,6 +91,8 @@ gaia wiki page-index [--json]
 gaia wiki orphans
 gaia wiki near-collisions [--max-distance N]
 gaia wiki dead-paths [--json]
+gaia wiki frontmatter [--json]
+gaia wiki empty-sections [--json]
 gaia wiki sync land [--branch-aware]
 ```
 

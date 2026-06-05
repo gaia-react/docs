@@ -1,6 +1,7 @@
 ---
 import MobileTableOfContents from 'virtual:starlight/components/MobileTableOfContents';
 import TableOfContents from 'virtual:starlight/components/TableOfContents';
+import {GAIA_VERSION} from '../version';
 
 const year = new Date().getFullYear();
 ---
@@ -17,6 +18,8 @@ const year = new Date().getFullYear();
 				</div>
 			</div>
 			<div class="gaia-colophon sl-hidden lg:sl-block">
+				<span class="gaia-version">GAIA {`v${GAIA_VERSION}`}</span>
+				<span class="gaia-version-sep" aria-hidden="true">·</span>
 				<span>{`© ${year} GAIA`}</span>
 				<span aria-hidden="true">·</span>
 				<a
@@ -75,18 +78,36 @@ const year = new Date().getFullYear();
 		}
 	}
 
+	/* Mobile "On this page" toggle (rendered only below the lg breakpoint). */
+	:global(#starlight__on-this-page--mobile) {
+		padding: 0.5rem;
+	}
+
 	/* Copyright + licence anchored to the bottom of the right column. */
 	.gaia-colophon {
 		margin-top: auto;
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
-		gap: 0.375rem;
-		padding: 1.5rem var(--sl-sidebar-pad-x);
+		gap: 0 0.375rem;
+		padding: 0.5rem var(--sl-sidebar-pad-x) 0;
 		font-family: var(--gaia-font-body);
 		font-size: var(--sl-text-xs);
 		letter-spacing: 0.02em;
 		color: var(--gaia-ink-dim, #b0aea5);
+	}
+	/* Mobile: version flows inline with the copyright on one line.
+	   Desktop (right sidebar, >=72rem): version sits on its own line above. */
+	@media (min-width: 72rem) {
+		.gaia-colophon {
+			padding: 1.5rem var(--sl-sidebar-pad-x);
+		}
+		.gaia-version {
+			flex-basis: 100%;
+		}
+		.gaia-version-sep {
+			display: none;
+		}
 	}
 	.gaia-colophon a {
 		color: var(--gaia-ink-dim, #b0aea5);

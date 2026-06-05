@@ -12,7 +12,7 @@ Two directories under `gaia/wiki/` are excluded from the end user tarball by `.g
 
 Three individual concept and decision pages are also excluded: `wiki/concepts/Release Workflow.md`, `wiki/decisions/Bundle-time Scrub.md`, and `wiki/decisions/Forensics Triage Workflow.md`.
 
-The user-facing wiki workflow (`/gaia wiki sync`, `/gaia wiki consolidate`, `/gaia wiki lint`) lives in end user docs. This page covers content that contributors maintain on the template repo's own wiki.
+The user-facing wiki workflow (`/gaia-wiki sync`, `/gaia-wiki consolidate`, `/gaia-wiki lint`) lives in end user docs. This page covers content that contributors maintain on the template repo's own wiki.
 
 ## wiki/entities/
 
@@ -27,7 +27,7 @@ When to add: a new entity becomes worth tracking on its own page when it gets cr
 
 ## wiki/meta/
 
-Pages here describe the wiki's own process. The directory currently holds wiki lint reports and consolidate reports dated by run, plus a dashboard. The reports are generated artifacts of `/gaia wiki lint` and `/gaia wiki consolidate` runs.
+Pages here describe the wiki's own process. The directory currently holds wiki lint reports and consolidate reports dated by run, plus a dashboard. The reports are generated artifacts of `/gaia-wiki lint` and `/gaia-wiki consolidate` runs.
 
 When to add: a new meta page is appropriate when it documents how the wiki itself works (a new convention, a new dashboard, a new workflow). Generated lint and consolidate reports land here automatically; do not write them by hand.
 
@@ -48,5 +48,5 @@ When to use the block convention rather than path-level exclusion: use blocks wh
 
 ## Cross-references
 
-- end user wiki workflow: see the `/gaia wiki` skill family in end user docs.
+- end user wiki workflow: see the `/gaia-wiki` skill in end user docs.
 - The `.gaia/release-exclude` manifest is the authoritative path-level exclusion list. Anything matched there is also skipped by `gaia-maintainer release manifest`, so the end user manifest never references files an end user cannot have.

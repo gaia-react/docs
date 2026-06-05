@@ -30,7 +30,7 @@ Comprehensive code review, security audit, performance analysis, and architectur
 - **Accessibility**: keyboard reachability, semantic HTML, focus management, ARIA usage.
 - **Maintainability**: magic values, dead code, coupling, comment quality.
 
-The main agent handles cross-cutting reasoning. Specialist subagents (React patterns, TypeScript / architecture, translation) run in parallel for line-level rule compliance, alongside `react-doctor` and `pnpm knip --reporter json`.
+The main agent handles cross-cutting reasoning. Specialist subagents (React patterns, TypeScript / architecture, translation) run in parallel for line-level rule compliance, alongside `react-doctor`, `pnpm knip --reporter json`, and `pnpm audit --json`. The `pnpm audit` pass is the Dependency-CVE advisory: it reports high and critical findings for you to decide on and never blocks the audit marker or `gh pr merge`. See the `dep-audit` rule.
 
 ### Output
 
