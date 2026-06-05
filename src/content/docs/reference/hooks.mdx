@@ -54,13 +54,16 @@ For Claude Code's own hook documentation, see [the Hooks reference on docs.claud
 |---|---|---|
 | `block-bare-test` | Blocks bare `pnpm test` / `npm test` invocations; requires `--run` so vitest does not start watch mode. | `.claude/hooks/block-bare-test.sh` |
 | `block-main-destructive-git` | Blocks commits to `main`/`master` and force-pushes to those branches. | `.claude/hooks/block-main-destructive-git.sh` |
+| `block-no-verify` | Denies `git commit` / `git push` that carry a hook bypass (`--no-verify`, or commit-only `-n`), so the commit-time floor (typecheck, lint, test) cannot be skipped. | `.claude/hooks/block-no-verify.sh` |
 | `block-rm-rf` | Denies `rm -rf` against root, `$HOME`, cwd, unscoped globs, `.git`, `node_modules`, and any path outside a small whitelist of scratch dirs. | `.claude/hooks/block-rm-rf.sh` |
 | `pr-merge-audit-check` | Blocks `gh pr merge` until a code-review-audit marker file exists at `.gaia/local/audit/<HEAD-sha>.ok`. | `.claude/hooks/pr-merge-audit-check.sh` |
+| `red-verify-commit-check` | Blocks `git commit` when a new-at-HEAD test that now passes has no recorded failing (RED) run matching its current content. Enforces mechanical TDD: a new test must be observed failing before its passing version can land. | `.claude/hooks/red-verify-commit-check.sh` |
 
 ## PostToolUse (Bash)
 
 | Hook | What it does | Path |
 |---|---|---|
+| `capture-red-observations` | After a one-shot vitest run, re-runs the same scope with the JSON reporter and appends each genuinely-failing test to the RED-observation ledger at `.gaia/local/red-ledger/`. Observe-only: never blocks, always exits clean. Pairs with `red-verify-commit-check`. | `.claude/hooks/capture-red-observations.sh` |
 | `wiki-commit-nudge` | After every non-amend `git commit`, injects commit metadata and the current wiki drift count into context. | `.claude/hooks/wiki-commit-nudge.sh` |
 
 ## Agent-invoked (no event registration)

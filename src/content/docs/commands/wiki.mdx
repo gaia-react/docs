@@ -72,11 +72,14 @@ Consolidate does not commit. Applied edits stage; sync (or your manual commit) l
 
 ## /gaia-wiki lint
 
-Health check. Wraps the upstream `claude-obsidian:wiki-lint` skill and appends three GAIA-specific checks:
+Standalone GAIA-native health check. Each check re-derives from a `gaia wiki` CLI primitive on every run, and the report is plain markdown GAIA owns end to end. The current checks:
 
 - **#11 Wiki drift check.** Reports how many commits behind HEAD the wiki is. Severity: `none`, `low`, `medium`, `high`. High severity surfaces with a `WIKI DRIFT:` prefix.
 - **#12 Dead repo-relative paths.** Backticked paths in wiki body prose that no longer exist on disk (e.g. a hook removed in a refactor still cited in a concept page).
 - **#13 UAT/SPEC narrative-ref drift.** Narrative `UAT-NNN` and concrete `SPEC-NNN` references that should not appear in instruction files. Filters structural matches (template examples, CLI flags, code literals) from narrative ones (section headers, prose).
+- **#14 Orphan pages.** Pages no other page links to with a wikilink. A genuine orphan signals a missing cross-reference.
+- **#15 Frontmatter gaps.** Pages missing the required floor: `type` and `status`.
+- **#16 Empty sections.** Headings with no body content before the next heading.
 
 Reports land at `wiki/meta/lint-report-YYYY-MM-DD.md`. The `wiki/meta/` directory is created locally on first lint run.
 
