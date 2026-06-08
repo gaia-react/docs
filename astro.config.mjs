@@ -45,12 +45,18 @@ export default defineConfig({
 						{ label: '/gaia-plan', slug: 'commands/plan' },
 						{ label: '/gaia-spec', slug: 'commands/spec' },
 						{ label: '/gaia-handoff and pickup', slug: 'commands/handoff-pickup' },
-						{ label: '/gaia-audit', slug: 'commands/audit' },
-						{ label: '/gaia-fitness', slug: 'commands/fitness' },
 						{ label: '/gaia-forensics', slug: 'commands/forensics' },
-						{ label: '/gaia-wiki', slug: 'commands/wiki' },
 						{ label: '/update-deps', slug: 'commands/update-deps' },
 						{ label: '/update-gaia', slug: 'commands/update-gaia' },
+					],
+				},
+				{
+					label: 'Maintenance',
+					items: [
+						{ label: 'Overview', slug: 'maintenance' },
+						{ label: '/gaia-fitness', slug: 'commands/fitness' },
+						{ label: '/gaia-audit', slug: 'commands/audit' },
+						{ label: '/gaia-wiki', slug: 'commands/wiki' },
 					],
 				},
 				{

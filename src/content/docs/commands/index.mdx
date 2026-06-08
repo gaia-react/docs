@@ -20,7 +20,7 @@ GAIA's day-to-day workflows are discrete slash entries that show up in autocompl
 
 | Command | What it does |
 | --- | --- |
-| [`/gaia-audit`](/commands/audit/) | Audit memory, rules, and wiki for duplication, stale entries, and unnecessary base context overhead. |
+| [`/gaia-audit`](/commands/audit/) | Audit memory, rules, and wiki for duplication, contradictions, stale entries, and unnecessary base context overhead. |
 | [`/gaia-fitness`](/commands/fitness/) | Health check and auto-heal for the Claude integration surface. Triage, heal, verify, with a letter grade. |
 | [`/gaia-wiki`](/commands/wiki/) | Wiki maintenance. With no arguments, runs the full chain. Each can also be invoked individually. |
 
@@ -39,4 +39,4 @@ GAIA's day-to-day workflows are discrete slash entries that show up in autocompl
 
 ## No-argument behavior
 
-Each entry has a sensible default when called with no arguments. `/gaia-wiki` runs the full chain (sync, consolidate, lint). `/gaia-audit` runs research then apply. `/gaia-plan`, `/gaia-spec`, and `/gaia-forensics` prompt for or infer what they need before continuing.
+Each entry has a sensible default when called with no arguments. `/gaia-wiki` runs the full chain (sync, consolidate, lint). `/gaia-audit` researches, then asks before it applies. `/gaia-plan`, `/gaia-spec`, and `/gaia-forensics` prompt for or infer what they need before continuing.
