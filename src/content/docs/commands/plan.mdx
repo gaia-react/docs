@@ -50,7 +50,7 @@ Inside the directory:
 ## The flow
 
 1. **Description capture.** If `$ARGUMENTS` is empty, the skill asks. If a SPEC reference is detected, the SPEC itself becomes the source of truth and the dispatch summary is just a label.
-2. **Model check.** If the current session is not on Opus, the skill offers to spawn the planning agent on Opus 4.7. Plans benefit from the higher-capacity model.
+2. **Model check.** If the current session is not on Opus, the skill offers to spawn the planning agent on Opus. Plans benefit from the higher-capacity model.
 3. **Plan directory resolution.** Slug is derived (or seeded from the SPEC id), suffixed on collision, then created under `.gaia/local/plans/`.
 4. **Planner dispatch.** The skill spawns a `general-purpose` Agent restricted to writing inside the plan directory only. The planner reads `wiki/concepts/Task Orchestration.md` for the orchestration pattern, then writes the plan files directly to disk.
 5. **Verification.** The skill confirms `README.md`, `ORCHESTRATOR.md`, `KICKOFF.md`, and at least one `task-*.md` exist. If anything is missing, the failure surfaces; no silent retry.

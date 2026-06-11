@@ -67,13 +67,66 @@ gaia setup link-worktree [--json]
 
 Source: `.gaia/cli/src/update/index.ts`
 
-Wired by the `/update-gaia` skill for the deterministic byte-level merge step.
+Wired by the `/update-gaia` skill for the field-aware `pnpm-workspace.yaml` merge step (Step 7b).
 
 ```
-gaia update merge --baseline <dir> --latest <dir> --manifest <path> [--json]
+gaia update merge-workspace --baseline <file> --latest <file> --current <file> [--json]
 ```
 
-The skill drives tarball fetching and user-facing prompts; the CLI handles per-manifest-entry classification and three-way file compare so the skill never reads bytes per entry.
+A field-aware, read-only verdict oracle for `pnpm-workspace.yaml`. It parses three YAML files (baseline from the prior GAIA release, latest from the incoming tarball, current working-tree copy) and emits a JSON report of `{applied, conflicts, suggestions}`. It never writes the workspace file. The `/update-gaia` skill applies the `applied` entries with the Edit tool so comments, key order, and quote style survive. The `--json` flag switches output from the human summary to the raw JSON report.
+
+### `gaia update-deps`
+
+Source: `.gaia/cli/src/update-deps/index.ts`
+
+Dependency update primitives invoked by the `/update-deps` skill.
+
+```
+gaia update-deps run --emit-updates <path>
+gaia update-deps decline --source <path> --skip <a,b,...>
+gaia update-deps decline --clear
+```
+
+`run` discovers outdated packages, classifies them into Wave A (minor/patch) and Wave B (major), and writes a JSON payload to `<path>`. `decline` records the groups a developer skipped in the interactive preview into `.gaia/local/declined-updates.json` (gitignored, local statusline only) so the statusline nudge stops counting them. `--source` points at the payload written by `run --emit-updates`; `--skip` takes a comma-separated list of package or group names, each expanded to its whole companion group. `--clear` empties the ledger (used when the developer chose "update all").
+
+### `gaia fitness`
+
+Source: `.gaia/cli/src/fitness/index.ts`
+
+Presentation helper invoked by the `/gaia-fitness` skill to render the final report card.
+
+```
+gaia fitness render-card [--cols N]
+```
+
+Reads a `/gaia-fitness` report JSON document on stdin and writes a width-aware ASCII report card to stdout. `--cols` sets the target terminal width (default: autodetect from `process.stdout.columns`, fallback 100). The box self-sizes to the longest content line, clamped to 120 columns and to the terminal width, wrapping remediation text to fit. Categories render alphabetically. The FINDINGS block is omitted when the `findings` array is empty (clean run). The skill pipes the assembled report JSON through this command and pastes the stdout verbatim into its chat reply.
+
+### `gaia harden-tally`
+
+Source: `.gaia/cli/src/harden/tally.ts`
+
+Tallies recurring code-review-audit findings for the `/gaia-harden` policy-memory loop.
+
+```
+gaia harden-tally
+```
+
+Reads the rolling 90-day merged-PR window via `gh`, extracts each PR's machine-readable findings block, counts distinct PRs per `finding_class` at error/warning severity, drops classes already covered by a promoted rule or suppressed by the decline ledger, self-cleans stale ledger entries, and prints the candidate list as JSON to stdout. A class is a candidate when it recurs across 3 or more distinct PRs. Network failures are non-fatal: a `gh` error yields an empty candidate list rather than aborting. No flags.
+
+### `gaia harden-ledger`
+
+Source: `.gaia/cli/src/harden/ledger.ts`
+
+Machine-local decline ledger for the `/gaia-harden` policy-memory loop. The ledger is gitignored so a decline on one machine never vetoes the rule for a teammate.
+
+```
+gaia harden-ledger list
+gaia harden-ledger record --finding-class <c> --pr-count <n>
+gaia harden-ledger is-suppressed --finding-class <c> --current-pr-count <n>
+gaia harden-ledger prune --window-classes <c1,c2,...>
+```
+
+`list` prints the full ledger as JSON. `record` upserts one entry keyed by `finding_class`, snapshotting the current PR count at decline time (re-recording overwrites the timestamp and count). `is-suppressed` exits 0 (suppressed) when an entry exists and fewer than 3 distinct PRs carrying the class have merged since the decline; exits 1 (not suppressed) otherwise. `prune` removes entries whose `finding_class` is no longer in the active window, idempotently. Ledger file: `.gaia/local/harden/declines.json`.
 
 ### `gaia wiki`
 

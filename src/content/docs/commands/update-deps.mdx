@@ -3,7 +3,7 @@ title: /update-deps
 description: Bump outdated packages group-by-group, run migrations for major-version bumps, and validate the full quality gate.
 ---
 
-`/update-deps` discovers outdated packages, applies migrations for major-version bumps, and validates the project through the full quality gate. It is wired to the statusline: when work is pending, the statusline shows a `Run /update-deps` indicator that loads the skill when clicked.
+`/update-deps` discovers outdated packages, shows you a grouped preview so you can snooze anything you are not ready for, applies migrations for major-version bumps, and validates the project through the full quality gate. It is wired to the statusline: when work is pending, the statusline shows a `Run /update-deps` indicator that loads the skill when clicked.
 
 ## When to use it
 
@@ -16,6 +16,20 @@ Click the `Run /update-deps` statusline indicator, or trigger by phrasing:
 - "update dependencies"
 - "bump deps"
 - "run dependabot"
+
+## Interactive preview and snooze
+
+Before applying anything, the skill shows a grouped preview. Updates are bucketed into four sections: **Major**, **Non-semver**, **Minor**, **Patch**. Companion groups (packages that always move together) appear as a single block under the section of their most-severe member.
+
+The preview offers three choices:
+
+- **Update all** (default): apply every group. Any prior snoozes are cleared.
+- **Choose what to skip**: name the packages or groups to defer. Each name expands to its whole companion group. The remaining apply set is echoed back for confirmation. If you skip everything, the skill exits without creating a branch.
+- **Cancel**: exit with no changes and no ledger write.
+
+Skipped groups are recorded in `.gaia/local/declined-updates.json` (gitignored, local only). A snoozed group resurfaces automatically when a newer version ships or after 14 days, whichever comes first. Snoozes only quiet the statusline nudge; every future preview still shows snoozed groups as updatable, and CI ignores the ledger entirely.
+
+`CI=true` and `--scope <group>` runs skip the preview and apply the full set (or the named group) unattended.
 
 ## How it picks targets
 
@@ -32,9 +46,23 @@ After grouping, updates are classified into two waves:
 - **Wave A**: minor and patch bumps, bundled into one install.
 - **Wave B**: major-version bumps, each group processed individually with its own migration guide and code edits.
 
-## The CLI primitive behind it
+## The CLI primitives behind it
 
-The deterministic parts (discovering outdated packages, applying the group rules, and classifying each group into Wave A or B) run through the bundled CLI: `gaia update-deps run --emit-updates <path>` writes the grouped, wave-classified set to a JSON file. The skill calls it for those steps and layers the migrations and quality gate on top. The same primitive backs the `gaia-ci-update-deps` workflow that [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/) can install, so scheduled and interactive runs agree on what is outdated.
+The deterministic parts (discovering outdated packages, applying the group rules, and classifying each group into Wave A or B) run through the bundled CLI: `gaia update-deps run --emit-updates <path>` writes the grouped, wave-classified set to a JSON file. The skill calls it for those steps and layers the preview, migrations, and quality gate on top. The same primitive backs the `gaia-ci-update-deps` workflow that [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/) can install, so scheduled and interactive runs agree on what is outdated.
+
+`gaia update-deps decline` manages the snooze ledger:
+
+- `--source <path> --skip <a,b,...>`: record the named groups as snoozed. Accepts either a group name (e.g. `react-router`) or any member package name; both resolve to the whole group.
+- `--clear`: empty the ledger (used automatically when you choose "Update all").
+
+## Override audit
+
+Before Wave A runs, the skill audits every entry in the `overrides:` map in `pnpm-workspace.yaml` (pnpm 11 reads overrides here; the `pnpm.overrides` field in `package.json` is no longer honored). For each override, two tests determine whether removing it is safe:
+
+1. **Peer-dep test**: does removing it produce a `pnpm ls` peer-dep error?
+2. **Security-floor test**: does removing it introduce any new advisory that was absent from the baseline `pnpm audit` output?
+
+An override is declared obsolete only when removing it passes both tests. A peer-dep test alone would silently delete security-floor pins (CVE pins never produce a peer-dep error), so both tests are required. The audit runs again after Wave A and Wave B complete, in case a version bump elsewhere resolved the original conflict.
 
 ## Pinned versions
 
@@ -52,10 +80,15 @@ pnpm pw
 pnpm build
 ```
 
+## Wave B remediation cap
+
+For major-version bumps, the skill makes one remediation pass if the quality gate fails after applying migration changes, then re-runs the gate once. If the gate still fails after that single re-run, the entire group is reverted and logged as skipped. There is no unbounded retry loop.
+
 ## Gotchas
 
 - Must run from the main checkout, not a linked worktree. The skill rejects worktree invocations early and surfaces the cached outdated count from main so you know whether action is even pending.
 - Must run from `main` or `master`, or from an existing chore branch. If on `main`, the skill creates `chore/update-deps-<timestamp>`.
 - The final report is built from agent-returned data only. Anything filtered before installation (the ESLint cap) is silent on purpose.
+- `actionable_count` in the statusline already subtracts snoozed groups; the skill uses `total_count` internally for the actual apply set.
 
 Source: `.claude/skills/update-deps/SKILL.md`.

@@ -3,7 +3,7 @@ title: /gaia-spec
 description: Run a Socratic discovery loop and save an immutable SPEC artifact.
 ---
 
-`/gaia-spec` produces an immutable SPEC artifact through a guided Socratic conversation. The artifact lands at `.gaia/local/specs/SPEC-NNN.md` and serves as the contract for [`/gaia-plan`](/commands/plan/) to decompose into work. The skill produces an artifact and stops. It does not implement anything.
+`/gaia-spec` produces an immutable SPEC artifact through a guided Socratic conversation. The artifact lands at `.gaia/local/specs/SPEC-NNN/SPEC.md` and serves as the contract for [`/gaia-plan`](/commands/plan/) to decompose into work. The skill produces an artifact and stops. It does not implement anything.
 
 This is for when you want to implement a large feature or change request with multiple parts, or you want to present an idea or concept and refine it before implementation.
 
@@ -60,12 +60,12 @@ A handful of mechanics are used by multiple steps:
 1. **Description capture.** Open-ended prompt if not provided as arguments.
 2. **GitHub issue mirror prompt.** Single `AskUserQuestion`: skip (recommended) or mirror to a GitHub issue on save.
 3. **Resume-vs-start-new.** If an in-progress SPEC exists, the skill surfaces it (last touched, intent first line, UAT count) and asks: resume, start new, or discard the draft cache.
-4. **Initial draft.** `/speckit-specify` runs the GAIA preset's body, allocates a SPEC id, lands the artifact at `.gaia/local/specs/SPEC-NNN.md`. The `before_specify` hook (constitution check) fires automatically.
+4. **Initial draft.** `/speckit-specify` runs the GAIA preset's body, allocates a SPEC id, lands the artifact at `.gaia/local/specs/SPEC-NNN/SPEC.md`. The `before_specify` hook (constitution check) fires automatically.
 5. **Gate 1.** Plain prompt: confirm intent and UATs, or revise.
 6. **Socratic clarify loop.** `/speckit-clarify` runs, capped at five questions. Closed-set questions go through `AskUserQuestion` with the recommended option first; open-ended questions are plain prompts. Per-topic exhaustion checkpoints fire when the natural well runs dry. Research subagents dispatch for any question requiring prior-art lookup.
 7. **Self-review.** The `after_clarify` hook fires `/speckit-gaia-self-review` against the gate-1 snapshot. Findings come back classified low, medium, or high. Low and medium auto-apply; high surfaces to the user before applying. Pending clarifications block save until answered or deferred with rationale.
 8. **Gate 2.** Plain prompt: confirm the full rendered artifact, or revise.
-9. **Canonical save.** Writes `.gaia/local/specs/SPEC-NNN.md` and deletes the working-draft cache. The `after_specify` hook fires `/speckit-gaia-lint` for immutability checks. Cycles 1 and 2 surface failures; cycle 3 prompts to step back to gate 2, defer remaining findings, or push another fix.
+9. **Canonical save.** Writes `.gaia/local/specs/SPEC-NNN/SPEC.md` and deletes the working-draft cache. The `after_specify` hook fires `/speckit-gaia-lint` for immutability checks. Cycles 1 and 2 surface failures; cycle 3 prompts to step back to gate 2, defer remaining findings, or push another fix.
 10. **Optional GitHub issue mirror.** If opted in at step 2, `gh-mirror.sh` creates the issue and stamps the URL into frontmatter. Skips silently when `gh` is not authenticated, Issues are disabled, or the viewer lacks write permission.
 11. **Chain to `/gaia-plan`.** `AskUserQuestion`: trigger `/gaia-plan` now or defer. On yes, the skill enters a multi-plan dispatch loop. Each plan runs in its own `general-purpose` Agent so the wrapper context stays bounded across plan count.
 
