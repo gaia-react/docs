@@ -11,7 +11,7 @@ For Claude Code's own subagent documentation, see [the Subagents reference on do
 
 ## code-review-audit
 
-Path: `.claude/agents/code-review-audit.md`. Model: `sonnet`.
+Path: `.claude/agents/code-review-audit.md`. Model: `opus`.
 
 Comprehensive code review, security audit, performance analysis, and architectural assessment. Goes beyond what ESLint and TypeScript catch by reasoning about intent, data flow, and architectural fit. **Mandatory before any PR merge.**
 
@@ -30,7 +30,11 @@ Comprehensive code review, security audit, performance analysis, and architectur
 - **Accessibility**: keyboard reachability, semantic HTML, focus management, ARIA usage.
 - **Maintainability**: magic values, dead code, coupling, comment quality.
 
-The main agent handles cross-cutting reasoning. Specialist subagents (React patterns, TypeScript / architecture, translation) run in parallel for line-level rule compliance, alongside `react-doctor`, `pnpm knip --reporter json`, and `pnpm audit --json`. The `pnpm audit` pass is the Dependency-CVE advisory: it reports high and critical findings for you to decide on and never blocks the audit marker or `gh pr merge`. See the `dep-audit` rule.
+The review runs in two phases. In the first phase, the main agent surfaces every candidate finding tagged with severity and confidence (coverage-first: low-confidence candidates are surfaced, not silently dropped). In the second phase, each surviving Critical or Important holistic finding is handed to a fresh-context refuter subagent; the refuter overturns a finding only with concrete counter-evidence (a specific guard, a test, or a demonstration that the failure path is unreachable). The report is not written until the adversarial pass completes.
+
+The main agent owns every spawn: specialist subagents (React patterns, TypeScript / architecture, translation), oracle tools (`react-doctor`, `pnpm knip --reporter json`, `pnpm audit --json`), and the per-finding refuters. None of these spawn further (depth-1 star topology). The `pnpm audit` pass is the Dependency-CVE advisory: it reports high and critical findings for you to decide on and never blocks the audit marker or `gh pr merge`. See the `dep-audit` rule.
+
+Per-phase progress breadcrumbs (scope resolved, oracles done, holistic review done, adversarial verify done, report stamped) are written to `.gaia/local/audit/progress.log` and surfaced in the GitHub Actions step summary.
 
 ### Output
 

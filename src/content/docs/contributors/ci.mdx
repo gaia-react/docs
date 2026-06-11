@@ -35,7 +35,7 @@ PRs that don't touch `.gaia/cli/**` or this workflow file report green without i
 
 When the filter triggers, the job:
 
-1. Sets up pnpm (pinned to v4.4.0 because v6 surfaces an `ERR_PNPM_IGNORED_BUILDS` regression on the `pnpm -C .gaia/cli install --frozen-lockfile` invocation).
+1. Sets up pnpm via `pnpm/action-setup` (pinned to v6.0.5).
 2. Sets up Node from `.node-version` with pnpm cache keyed to `.gaia/cli/pnpm-lock.yaml`.
 3. Installs CLI dependencies with `--frozen-lockfile`.
 4. Runs `pnpm -C .gaia/cli typecheck`.

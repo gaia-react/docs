@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-GAIA's day-to-day workflows are discrete slash entries that show up in autocomplete as you type `/gaia-`. Five are commands (`/gaia-plan`, `/gaia-spec`, `/gaia-audit`, `/gaia-fitness`, `/gaia-forensics`). Three are skills (`/gaia-wiki`, `/gaia-handoff`, `/gaia-pickup`) that also respond to plain-English requests, not just the slash form.
+GAIA's day-to-day workflows are discrete slash entries that show up in autocomplete as you type `/gaia-`. Six are commands (`/gaia-plan`, `/gaia-spec`, `/gaia-audit`, `/gaia-fitness`, `/gaia-forensics`, `/gaia-harden`). Three are skills (`/gaia-wiki`, `/gaia-handoff`, `/gaia-pickup`) that also respond to plain-English requests, not just the slash form.
 
 ## Workflow Commands
 
@@ -22,6 +22,7 @@ GAIA's day-to-day workflows are discrete slash entries that show up in autocompl
 | --- | --- |
 | [`/gaia-audit`](/commands/audit/) | Audit memory, rules, and wiki for duplication, contradictions, stale entries, and unnecessary base context overhead. |
 | [`/gaia-fitness`](/commands/fitness/) | Health check and auto-heal for the Claude integration surface. Triage, heal, verify, with a letter grade. |
+| [`/gaia-harden`](/commands/harden/) | Human-gated Policy-Memory Loop. Reviews recurring code-review-audit findings and drafts the lowest-context-weight enforcement form for your approval. |
 | [`/gaia-wiki`](/commands/wiki/) | Wiki maintenance. With no arguments, runs the full chain. Each can also be invoked individually. |
 
 ## Update Commands
@@ -39,4 +40,4 @@ GAIA's day-to-day workflows are discrete slash entries that show up in autocompl
 
 ## No-argument behavior
 
-Each entry has a sensible default when called with no arguments. `/gaia-wiki` runs the full chain (sync, consolidate, lint). `/gaia-audit` researches, then asks before it applies. `/gaia-plan`, `/gaia-spec`, and `/gaia-forensics` prompt for or infer what they need before continuing.
+Each entry has a sensible default when called with no arguments. `/gaia-wiki` runs the full chain (sync, consolidate, lint). `/gaia-audit` researches, then asks before it applies. `/gaia-harden` defaults to its interactive review mode. `/gaia-plan`, `/gaia-spec`, and `/gaia-forensics` prompt for or infer what they need before continuing.

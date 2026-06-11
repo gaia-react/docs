@@ -24,7 +24,7 @@ The three-way merge is governed by ownership classes defined in `.gaia/manifest.
 | Class | Who controls it | On drift |
 | --- | --- | --- |
 | `owned` | GAIA fully. Overwritten silently when unchanged from baseline. | Prompts if you have local changes. |
-| `shared` | GAIA seeds, you customize. | Emits a `.gaia-merge/<path>.patch` for manual resolution. |
+| `shared` | GAIA seeds, you customize. | Emits a `.gaia-merge/<path>.patch` for manual resolution. Exception: `package.json` and `pnpm-workspace.yaml` get field-aware key-level merges instead of whole-file conflict patches (see below). |
 | `wiki-owned` | GAIA-seeded wiki pages (concepts, decisions, modules). Same as `shared`. | Emits a patch for manual resolution. |
 | adopter-owned (implicit) | Anything not in the manifest, plus sentinels like `wiki/hot.md`, `wiki/log.md`, `CHANGELOG.md`, `.gaia/VERSION`, `.gaia/manifest.json`. | Never touched. |
 
@@ -34,17 +34,27 @@ The three-way merge is governed by ownership classes defined in `.gaia/manifest.
 2. Resolves the latest release tag via `gh release list --repo gaia-react/gaia` (falls back to the GitHub API).
 3. Shows the release notes and asks you to confirm.
 4. Downloads the baseline and latest tarballs into `.gaia/cache/` (gitignored).
-5. Runs `gaia update merge` to compute the three-way diff per file.
+5. Runs the three-way merge per file directly (no CLI subcommand). Owned files are overwritten or conflict-patched; shared and wiki-owned files are merged or conflict-patched. `package.json` and `pnpm-workspace.yaml` are both classed `shared` but receive field-aware key-level merges rather than whole-file patches (see below).
 6. Walks any conflicts with you one at a time; reads `.gaia-merge/<path>.patch` for each.
-7. Prompts before deleting any file that the latest release removed.
-8. Writes the new version to `.gaia/VERSION` and copies the latest manifest into `.gaia/manifest.json`.
-9. Prints a summary with counts (overwritten, added, skipped, conflicts, deleted, backed up).
+7. For `pnpm-workspace.yaml`, uses `gaia update merge-workspace` to compute per-key verdicts. This is a field-aware merge of both the GAIA-managed settings keys and the `overrides` and `allowBuilds` maps. Overrides and build approvals live here (pnpm 11 no longer reads them from `package.json`); an adopter-only entry is never visited or clobbered.
+8. Prompts before deleting any file that the latest release removed.
+9. Prints a summary with counts (overwritten, added, skipped, conflicts, deleted, backed up) and per-file counts for `package.json` and `pnpm-workspace.yaml` (applied, conflicts, suggestions). Then writes the new version to `.gaia/VERSION` and copies the latest manifest into `.gaia/manifest.json`. The VERSION bump is deferred to this point so an interrupted run stays resumable at the baseline version.
 
 Backups land in `.gaia-backup/<timestamp>/`. Conflict patches land in `.gaia-merge/`.
 
+## Field-aware merges
+
+`package.json` and `pnpm-workspace.yaml` are both classed `shared`, but a whole-file three-way merge produces noise for them (every project diverges `package.json` at init; every override addition drifts `pnpm-workspace.yaml`). Both get key-level merges instead.
+
+**`package.json`** merges at JSON-key granularity across the managed sections: `dependencies`, `devDependencies`, `scripts`, `engines`, and `packageManager`. Identity keys (`name`, `version`, `description`, `author`, etc.) are never compared or patched. For each managed key, the outcome is one of: **apply** (GAIA changed it, you are still at the baseline pin), **conflict** (GAIA changed it, you re-pinned independently, left as yours with a note), or **suggestion** (GAIA added a key or changed one you removed, surfaced opt-in, never auto-inserted). Applied changes are written in place; conflicts and suggestions go to `.gaia-merge/package.json.notes`.
+
+**`pnpm-workspace.yaml`** merges at key/entry granularity using `gaia update merge-workspace`. The seven GAIA-managed settings keys (`minimumReleaseAge`, `trustPolicy`, etc.) are compared whole-value; the `overrides` and `allowBuilds` maps are compared per entry. An adopter-only override or build approval is never visited. Same apply/conflict/suggestion buckets as `package.json`; notes go to `.gaia-merge/pnpm-workspace.yaml.notes`. If the file is missing in the baseline (pre-pnpm 11 project) or unparseable, the skill falls back to a whole-file conflict patch.
+
+A release that touches no managed keys in either file produces a clean skip with no notes file.
+
 ## After the run
 
-Review patches in `.gaia-merge/`, run the quality gate, and inspect `git diff` before committing. The skill does not auto-commit. When satisfied:
+Review patches in `.gaia-merge/`, reconcile any `.gaia-merge/package.json.notes` or `.gaia-merge/pnpm-workspace.yaml.notes` files, then run `pnpm install` if `package.json` or `pnpm-workspace.yaml` was changed. Run the quality gate and inspect `git diff` before committing. The skill does not auto-commit. When satisfied:
 
 ```
 git commit -m "chore: update GAIA to <tag>"

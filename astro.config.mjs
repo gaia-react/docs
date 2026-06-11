@@ -56,6 +56,7 @@ export default defineConfig({
 						{ label: 'Overview', slug: 'maintenance' },
 						{ label: '/gaia-fitness', slug: 'commands/fitness' },
 						{ label: '/gaia-audit', slug: 'commands/audit' },
+						{ label: '/gaia-harden', slug: 'commands/harden' },
 						{ label: '/gaia-wiki', slug: 'commands/wiki' },
 					],
 				},

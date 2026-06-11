@@ -19,7 +19,7 @@ Source: `.claude/skills/typescript/SKILL.md`.
 
 ### React Code
 
-Conventions for React components, pages, routes, hooks, and forms. Includes pre-flight gates for `useEffect`, `useCallback`, and `useState`; a form-element check that swaps native `<input>` for the project's `Form/*` components; and a translation gate that requires every user-visible string to come from `t()`. Covers component extraction thresholds and route/page architecture (`app/routes/` thin shells, `app/pages/` for UI).
+Conventions for React components, pages, routes, hooks, and forms. Includes pre-flight gates for `useEffect`, `useCallback`, and `useState`; a form-element check that swaps native `<input>` for the project's `Form/*` components; and a translation gate that requires every user-visible string to come from `t()` (exception: approximate skeleton-loader placeholders standing in for dynamic runtime values stay hardcoded; static skeleton text that mirrors a real `t()` call must still use `t()`). Covers component extraction thresholds and route/page architecture (`app/routes/` thin shells, `app/pages/` for UI).
 
 **Triggers** when writing or reviewing React components, hooks (`useEffect`, `useCallback`, `useState`), event handlers, or component extraction decisions. Also triggers when debugging stale closures, infinite re-renders, or unnecessary re-renders caused by memoization issues.
 
@@ -42,6 +42,10 @@ Source: `.claude/skills/tailwind/SKILL.md`.
 ### Skeleton Loaders
 
 Build skeleton loading states that are pixel-perfect matches of the real content. Uses real HTML elements (`<p>`, `<span>`, `<h2>`, `<button>`) with the same font classes plus a shared `shimmer` class for the gradient animation; non-text elements stay as empty `<div>`s. Includes the 200ms delay pattern that suppresses skeleton flash on fast loads.
+
+**i18n:** Static translatable text in skeleton JSX (labels, headings, button text, placeholders) must use `t()` or `<Trans>`, the same call the real component uses, so the skeleton width matches the revealed text exactly. Only approximate placeholders standing in for dynamic runtime values (content from API data where the real value is unknown at render time) stay hardcoded.
+
+**Accessibility:** Put `aria-hidden` on the skeleton root element so assistive technology skips the decorative placeholders. The region that will receive the content must either carry `aria-busy="true"` while loading or include a visually-hidden `role="status"` live region so screen-reader users know content is on the way.
 
 **Triggers** when adding loading states, building skeletons for async data, handling pending loader states in route transitions, implementing the shimmer animation pattern, or preventing layout shift during data fetching.
 
