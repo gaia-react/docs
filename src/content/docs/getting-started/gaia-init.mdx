@@ -59,12 +59,14 @@ claude plugin install claude-obsidian@claude-obsidian-marketplace
 
 ### 5. CI integration
 
-`/gaia-init` asks whether to enable GAIA's GitHub Actions CI now or defer it. GAIA's pre-merge audit gate can run in CI or locally.
+`/gaia-init` records whether you plan to run GAIA's GitHub Actions CI and sets the local audit baseline. Nothing is installed on GitHub at this stage and no workflow files are added to the project; the actual install happens later via [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/), after your first push.
 
-- **Enable now.** CI becomes the venue for the pre-merge `code-review-audit` gate. `/gaia-init` prints the `gh` commands you run yourself once the project is on GitHub: mint and store the bot token, then register the `GAIA-Audit` required check. After your first push, [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/) wires up the scheduled maintenance jobs and confirms CI is connected.
-- **Skip.** Defers CI and sets the team audit default to `local` in `.gaia/audit-ci.yml`. The audit gate still holds, it just runs in your session at merge time instead of in CI. Re-enable anytime with [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/).
+You answer one question:
 
-Either way the audit gate is non-negotiable; the choice is only where it runs. See the [`code-review-audit` agent reference](/reference/agents/) for what the audit checks and how `default_mode` works.
+- **Yes, I'll enable CI after pushing (recommended).** Records the intent. After your first push, [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/) installs the `code-review-audit` PR gate and any cron maintenance workflows, stores the bot token as a repo secret, and registers the `GAIA-Audit` required check.
+- **No, local only.** GAIA's audit and maintenance tools run only when you invoke them on this machine.
+
+Either way, `/gaia-init` writes `default_mode: local` to `.gaia/audit-ci.yml` as the audit baseline: until CI is wired up, the local `code-review-audit` agent is the only producer of the `GAIA-Audit` stamp. If you enable CI later, `/setup-gaia-ci` updates the team default. The audit gate is non-negotiable; this choice is only about where it runs. See the [`code-review-audit` agent reference](/reference/agents/) for what the audit checks.
 
 ### 6. Adaptation feature opt-in
 

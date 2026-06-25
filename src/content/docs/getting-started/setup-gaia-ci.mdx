@@ -69,6 +69,8 @@ Paste the token when prompted. It is piped directly to `gh secret set` and never
 
 The command generates `.github/workflows/gaia-ci-*.yml` from `.gaia/automation.json` and installs `.github/workflows/code-review-audit.yml`, the pre-merge audit gate. The audit gate installs unconditionally, even when no cron tool runs in CI mode. The command then triggers one `workflow_dispatch` run on the first generated workflow to confirm it boots correctly.
 
+It also registers `GAIA-Audit` as a required status check on the default branch, so no PR can merge until the audit clears for that commit. This needs repo-admin access and an existing branch-protection rule; if either is missing, the command prints the `gh api` call to run yourself once you have admin rights, and the merge gate falls back to CI mode for every author until the check is registered.
+
 If the verification run fails, you can retry, abandon (deletes the generated files, leaves `setup_complete: false`), or commit anyway if you have confirmed the failure is a transient infrastructure issue.
 
 ### 8. Commit and push
