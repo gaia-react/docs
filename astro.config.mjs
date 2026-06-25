@@ -33,6 +33,7 @@ export default defineConfig({
 					label: 'Getting started',
 					items: [
 						{ label: 'Quick Start', slug: 'index' },
+						{ label: 'Working in GAIA', slug: 'getting-started/working-in-gaia' },
 						{ label: '/gaia-init', slug: 'getting-started/gaia-init' },
 						{ label: '/setup-gaia-ci', slug: 'getting-started/setup-gaia-ci' },
 						{ label: '/setup-cloned-gaia-project', slug: 'getting-started/setup-cloned-gaia-project' },
