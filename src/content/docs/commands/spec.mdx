@@ -104,7 +104,7 @@ Five GAIA hooks fire across the SPEC lifecycle. Never invoke them by hand.
 | `before_implement` | `/speckit-gaia-uat-write` | Renders frozen UATs into Playwright e2e specs at `.playwright/e2e/<spec-dir>/`, leaving a red-state harness before implementation begins. |
 | `after_implement` | `/speckit-gaia-wiki-promote` | Promotes merged-PR content into the project wiki under `wiki/<subdomain>/`. Defers if the implementing PR has not merged yet. |
 
-The chain-trigger to `/gaia-plan` lives inline at step 12 of the flow, not as a hook. Disposition of the SPEC artifact (archive, delete, or keep) happens through `/speckit-gaia-spec-close` after the implementing PR merges. It auto-fires from the `after_implement` wiki-promote step on the immediate-merge path, and is also invokable manually as `/speckit-gaia-spec-close [SPEC-NNN]` for the deferred path or retroactive cleanup. The SPEC ID is optional; omit it and the command surfaces every eligible SPEC to choose from.
+The chain-trigger to `/gaia-plan` lives inline at step 12 of the flow, not as a hook. Disposition of the SPEC artifact (archive, delete, or keep) is automatic after the implementing PR merges: on the immediate-merge path the `after_implement` wiki-promote step chains to `/speckit-gaia-spec-close`, and the step-3 housekeeping passes archive any SPEC whose PR has since merged. Running `/speckit-gaia-spec-close [SPEC-NNN]` by hand is a backstop, for draining a deferred wiki-promote when the PR merges after implementation, or for choosing delete or keep instead of the default archive. The SPEC ID is optional; omit it and the command surfaces every eligible SPEC to choose from.
 
 ## Related
 
