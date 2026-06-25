@@ -38,6 +38,14 @@ claude plugin install claude-obsidian@claude-obsidian-marketplace
 
 Already-installed plugins are no-ops.
 
+### Automatic steps
+
+Between plugin install and the prompts below, three steps run with no input from you:
+
+- **spec-kit init.** Registers the spec-kit runtime so `/gaia-spec` works in your clone. The repo already ships the GAIA extension and preset; this wires up spec-kit itself.
+- **Statusline permissions.** Restores the executable bit on the statusline scripts, which can be lost on cross-platform clones.
+- **Environment bootstrap.** If `.env.example` exists and `.env` does not, a copy is made for you.
+
 ### 3. Adaptation feature opt-in
 
 You can choose to opt into an optional adaptation feature.

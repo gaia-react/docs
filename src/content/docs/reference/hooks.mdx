@@ -43,6 +43,12 @@ For Claude Code's own hook documentation, see [the Hooks reference on docs.claud
 |---|---|---|---|
 | `intercept-init` | `init` | Redirects `/init` to `/gaia-init` so the built-in flow does not overwrite GAIA's curated `CLAUDE.md`. | `.claude/hooks/intercept-init.sh` |
 
+## WorktreeCreate
+
+| Hook | What it does | Path |
+|---|---|---|
+| `create-worktree` | Creates a git worktree in the sibling `worktrees/` directory, branching from `base_ref` (default `main`), and sets up GAIA's shared-state symlinks inside it. Prints the worktree path on stdout, which Claude Code waits for before starting the agent there. | `.gaia/scripts/create-worktree.sh` |
+
 ## PreToolUse (Edit / Write / MultiEdit)
 
 | Hook | What it does | Path |

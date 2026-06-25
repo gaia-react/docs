@@ -57,11 +57,20 @@ claude plugin marketplace add AgriciDaniel/claude-obsidian
 claude plugin install claude-obsidian@claude-obsidian-marketplace
 ```
 
-### 5. Adaptation feature opt-in
+### 5. CI integration
+
+`/gaia-init` asks whether to enable GAIA's GitHub Actions CI now or defer it. GAIA's pre-merge audit gate can run in CI or locally.
+
+- **Enable now.** CI becomes the venue for the pre-merge `code-review-audit` gate. `/gaia-init` prints the `gh` commands you run yourself once the project is on GitHub: mint and store the bot token, then register the `GAIA-Audit` required check. After your first push, [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/) wires up the scheduled maintenance jobs and confirms CI is connected.
+- **Skip.** Defers CI and sets the team audit default to `local` in `.gaia/audit-ci.yml`. The audit gate still holds, it just runs in your session at merge time instead of in CI. Re-enable anytime with [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/).
+
+Either way the audit gate is non-negotiable; the choice is only where it runs. See the [`code-review-audit` agent reference](/reference/agents/) for what the audit checks and how `default_mode` works.
+
+### 6. Adaptation feature opt-in
 
 You can choose to opt into an optional adaptation feature.
 
-### 6. Wiki initialization
+### 7. Wiki initialization
 
 GAIA comes with an Obsidian wiki built-in. Read more about it here.
 
