@@ -38,9 +38,18 @@ claude plugin install claude-obsidian@claude-obsidian-marketplace
 
 Already-installed plugins are no-ops.
 
-### 4. Mentorship opt-in
+### 3. Adaptation feature opt-in
 
-You can choose to opt-in to GAIA's experimental [mentorship](https://gaiareact.com/mentorship/) feature.
+You can choose to opt into an optional adaptation feature.
+
+### 4. Audit-mode choice
+
+If the project uses the pre-merge `code-review-audit` gate, you choose who runs it on your PRs:
+
+- **CI (default).** CI runs the audit on your PRs and you wait for the `GAIA-Audit` check before merging.
+- **Locally.** The audit runs in your own session at merge time, streaming as it goes, and CI's audit step stands down for your PRs.
+
+Your choice adds a one-line entry to `.gaia/audit-ci.yml`, which the command helps you commit as a small PR. If `gh` is not authenticated, the step is skipped; re-run `/setup-cloned-gaia-project` after `gh auth login` to finish it.
 
 ## Resuming after a failure
 

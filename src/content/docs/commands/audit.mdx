@@ -39,7 +39,11 @@ Use `--apply` to resume a report that was interrupted, or to retry after fixing 
 
 ## The decision gate
 
-Calling `/gaia-audit` is the intent to audit, not a commitment to apply. After the research stage writes its report, the main conversation summarizes the findings and asks one question with three options:
+Calling `/gaia-audit` is the intent to audit, not a commitment to apply. What happens next depends on what the research stage found.
+
+If the audit comes back clean, with zero actions, there is nothing to approve: the command finalizes the report and clears the statusline nudge automatically, with no prompt.
+
+Otherwise, the main conversation summarizes the findings and asks one question with three options:
 
 - **Apply.** Run the apply stage now. This is the one-keystroke fast path.
 - **Discuss / refine.** Talk the report through. Edits happen in the report in place (it stays a `draft`), then the gate is asked again.

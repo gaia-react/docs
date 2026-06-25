@@ -50,7 +50,7 @@ The tally is recomputed from GitHub PR data via `gaia harden-tally` each time yo
 
 ## Judge-the-form logic
 
-For each candidate, `/gaia-harden` judges two axes before recommending exactly one enforcement form. The bias is always to the lowest-context-weight form the pattern admits.
+For each candidate, `/gaia-harden` weighs three things before recommending exactly one enforcement form. The bias is always to the lowest-context-weight form the pattern admits.
 
 **Edit vs new (checked first).** Before recommending a new artifact, the command checks whether an existing rule, skill, or hook already covers the finding's territory. If one does, the recommendation is to edit it, not create a new one.
 
@@ -62,6 +62,8 @@ For each candidate, `/gaia-harden` judges two axes before recommending exactly o
 | Mechanizable pattern (catchable by a lint rule, hook, or test) | A deterministic check. v1 produces a hook+script sketch only; nothing is activated. |
 | Correct procedure (a sequence of steps) | A skill via `skill-creator`. v1 produces a scaffold only; nothing is activated. |
 | Judgment-based anti-pattern (no reliable mechanization) | A path-scoped prose rule. v1 owns this end to end. |
+
+**Will it change behavior (checked last).** A recurring finding proves the anti-pattern is real. It does not prove the recommended form will stop it. Before presenting a recommendation, the command asks what cheap evidence would show the form actually changes behavior, and whether that evidence exists. The bar is low: a couple of before-and-after task replays, or a single case of the agent ignoring guidance of the same kind. This matters most for prose rules, which advise rather than enforce. When the recommended form is a prose rule and no such evidence is available, because the pattern is too judgment-laden to catch reliably or a capable agent already honors the principle, the command says so and frames the candidate as a defer or decline. The decision is always yours; it never auto-declines.
 
 For each candidate, `/gaia-harden` presents the `finding_class`, its distinct-PR count and the PR numbers, the recommended form, and a one-line rationale. You then choose: **approve**, **decline**, **defer**, or **redirect** (override the form choice).
 
@@ -104,7 +106,7 @@ All approved work lands in the working tree only. It ships through your normal P
 - Every drafted prose rule has a mandatory `paths:` glob: no always-loaded frontmatter-less rules are ever produced.
 - A decline is machine-local only: it never vetoes the candidate for a teammate.
 - A defer persists nothing.
-- The command never reads the privacy-sealed mentorship event store. The Policy-Memory Loop keys only on `finding_class` recurrence from the PR window.
+- The Policy-Memory Loop keys only on recurring `finding_class` counts from the merged-PR window.
 
 ## Pruning promoted rules
 

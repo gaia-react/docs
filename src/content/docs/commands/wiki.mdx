@@ -9,7 +9,7 @@ The wiki at `wiki/` exists for Claude, not for human reading (though it is used 
 
 ## Why the wiki exists
 
-The Obsidian wiki is keeps a current, structured project context Claude can read on demand instead of re-inferring the same facts from source code on every request. That re-inference is a token sink that the wiki eliminates.
+The Obsidian wiki keeps a current, structured project context Claude can read on demand instead of re-inferring the same facts from source code on every request. That re-inference is a token sink that the wiki eliminates.
 
 Without it, every session that needs to reason about a service, a hook contract, or a past architectural decision pays for it twice: once when the source was written, and again when Claude reads the source to answer a question. The wiki captures the load-bearing facts once and stays current as commits land. Claude reads the wiki, not the source, for orientation, and only refers to the source code when more details are necessary.
 

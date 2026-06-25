@@ -51,3 +51,26 @@ The agent produces a structured report:
 When the report is clean (no Critical Issues, all Important Issues resolved in the working tree), the agent stamps HEAD with a `GAIA-Audit:` commit trailer and writes a marker file at `.gaia/local/audit/<HEAD-sha>.ok`. The marker unblocks `gh pr merge` locally; the trailer travels with the commit through the network so CI can recognize an already-audited tree and skip its own audit run.
 
 If findings remain, the agent does not write the marker. Address findings, commit, and re-invoke the agent on the new HEAD.
+
+### Local vs CI audit mode
+
+By default the audit runs in CI on every PR, and you wait for the `GAIA-Audit` commit status to go green before merging. Teams can let individual developers run it locally instead. In local mode the audit runs at merge time in your own session, streaming as it goes, and CI's audit step stands down for that author while still running for everyone else.
+
+The team default and the per-developer enrollments live in `.gaia/audit-ci.yml`, which ships with the project and is meant to be edited. You set the team default during [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/); individual developers opt in during [`/setup-cloned-gaia-project`](/getting-started/setup-cloned-gaia-project/). Local mode relies on `GAIA-Audit` being registered as a required status check on the default branch; if it is not, the audit falls back to CI.
+
+## worthiness-evaluator
+
+Path: `.claude/agents/worthiness-evaluator.md`. Model: `opus`.
+
+An advisory reviewer for tests on the emergent surface (components and Playwright), where the failing-first RED gate does not apply. The `tdd` skill dispatches it after tests go green. It reads only the test files the phase changed plus their sibling suites, and it edits nothing.
+
+### What it judges
+
+Each test is scored on two axes:
+
+- **Honesty**: can the test fail for a real reason? It must assert through the public interface (roles, accessible names, visible text), not internal call signatures or implementation detail, and survive an internal refactor.
+- **Worthiness**: is the test worth keeping? It should exercise your own code rather than a dependency or a platform formatter, and a composition test should not re-prove what a child's own suite already covers.
+
+### Output
+
+One verdict per test: `keep`, `fix`, or `delete`. A `fix` names the specific defect. A `delete` is always a proposal you confirm, never applied automatically, and it carries the evidence behind it. The verdicts surface in the end-of-task summary alongside the rest of the TDD roll-up.

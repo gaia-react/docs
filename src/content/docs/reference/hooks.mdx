@@ -29,6 +29,13 @@ For Claude Code's own hook documentation, see [the Hooks reference on docs.claud
 | Hook | What it does | Path |
 |---|---|---|
 | `wiki-drift-check` | Detects drift between `wiki/.state.json` and HEAD; injects a once-per-session reminder when drifted. | `.claude/hooks/wiki-drift-check.sh` |
+| `wiki-recompact-inject` | On the first prompt after a context compaction, restores the wiki hot cache into context, then clears the sentinel. No-op on every other prompt. Pairs with `wiki-recompact-sentinel`. | `.claude/hooks/wiki-recompact-inject.sh` |
+
+## PostCompact
+
+| Hook | What it does | Path |
+|---|---|---|
+| `wiki-recompact-sentinel` | After a context compaction, writes a sentinel file so the next `UserPromptSubmit` knows to restore the wiki hot cache. Pairs with `wiki-recompact-inject`. | `.claude/hooks/wiki-recompact-sentinel.sh` |
 
 ## UserPromptExpansion
 
@@ -57,7 +64,8 @@ For Claude Code's own hook documentation, see [the Hooks reference on docs.claud
 | `block-no-verify` | Denies `git commit` / `git push` that carry a hook bypass (`--no-verify`, or commit-only `-n`), so the commit-time floor (typecheck, lint, test) cannot be skipped. | `.claude/hooks/block-no-verify.sh` |
 | `block-rm-rf` | Denies `rm -rf` against root, `$HOME`, cwd, unscoped globs, `.git`, `node_modules`, and any path outside a small whitelist of scratch dirs. | `.claude/hooks/block-rm-rf.sh` |
 | `pr-merge-audit-check` | Blocks `gh pr merge` until a code-review-audit marker file exists at `.gaia/local/audit/<HEAD-sha>.ok`. | `.claude/hooks/pr-merge-audit-check.sh` |
-| `red-verify-commit-check` | Blocks `git commit` when a new-at-HEAD test that now passes has no recorded failing (RED) run matching its current content. Enforces mechanical TDD: a new test must be observed failing before its passing version can land. Type-only tests (all assertions are type-level via `expectTypeOf`/`assertType`/`@ts-expect-error`, no runtime `expect`) are exempt: they have no runtime failure mode, so `tsc` enforces them instead. | `.claude/hooks/red-verify-commit-check.sh` |
+| `red-verify-commit-check` | Blocks `git commit` when a new-at-HEAD test that now passes has no recorded failing (RED) run matching its current content. Enforces mechanical TDD: a new test must be observed failing before its passing version can land. Three kinds of test are exempt: type-only tests (all assertions are type-level via `expectTypeOf`/`assertType`/`@ts-expect-error`, no runtime `expect`), which `tsc` enforces instead; tests with dynamic or computed titles, which have no stable identity to key a RED to; and emergent-subject tests (component interaction, Playwright, or clock/IO-dependent), which have no stable failing-then-passing run to observe. The deterministic surface (pure utilities, service parsers, spec-derivable hooks) still demands a RED. | `.claude/hooks/red-verify-commit-check.sh` |
+| `worthiness-presence-check` | Blocks `gh pr merge` when an emergent test the PR changed has no worthiness-ledger line matching its current content, so the worthiness audit has run over every changed emergent test before merge. It checks presence only, never the keep/fix/delete verdict, and is a no-op when no emergent tests changed. Sits alongside `pr-merge-audit-check`. | `.claude/hooks/worthiness-presence-check.sh` |
 
 ## PostToolUse (Bash)
 

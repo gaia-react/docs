@@ -54,7 +54,8 @@ Inside the directory:
 3. **Plan directory resolution.** Slug is derived (or seeded from the SPEC id), suffixed on collision, then created under `.gaia/local/plans/`.
 4. **Planner dispatch.** The skill spawns a `general-purpose` Agent restricted to writing inside the plan directory only. The planner reads `wiki/concepts/Task Orchestration.md` for the orchestration pattern, then writes the plan files directly to disk.
 5. **Verification.** The skill confirms `README.md`, `ORCHESTRATOR.md`, `KICKOFF.md`, and at least one `task-*.md` exist. If anything is missing, the failure surfaces; no silent retry.
-6. **Hand-off.** The skill prints the kickoff prompt as a fenced code block and tries to copy it to the system clipboard via `pbcopy`, `wl-copy`, `xclip`, `xsel`, `clip.exe`, or `clip` (whichever is available). The trailing line says whether the copy succeeded.
+6. **Decomposition audit.** For non-trivial plans, the skill offers to stress-test the decomposition before hand-off, and running it is the recommended choice. See [Decomposition audit](#decomposition-audit).
+7. **Hand-off.** The skill prints the kickoff prompt as a fenced code block and tries to copy it to the system clipboard via `pbcopy`, `wl-copy`, `xclip`, `xsel`, `clip.exe`, or `clip` (whichever is available). The trailing line says whether the copy succeeded.
 
 The kickoff prompt looks exactly like:
 
@@ -63,6 +64,20 @@ Read /abs/path/.gaia/local/plans/<slug>/KICKOFF.md and execute it.
 ```
 
 Paste it into a fresh Claude Code session, started cold, to run the plan. The orchestrator's behavior lives entirely in `KICKOFF.md`.
+
+## Decomposition audit
+
+After the planner writes its files and verification confirms they exist, `/gaia-plan` offers to audit the decomposition itself before handing off. For non-trivial plans (parallel tasks, multiple phases, or shared frozen contracts), running it is the recommended choice; a trivial single-phase plan can skip it.
+
+Three auditors run in parallel, each targeting a different way a decomposition goes wrong:
+
+- **Decomposition & dependency soundness** checks that tasks placed in the same phase do not share state or edit the same files, that phase order respects real data and interface dependencies, and that every task reads the shared interface contracts the same way.
+- **Contract grounding** checks every file path, export, type, and function signature a task names against the real repo. A contract that points at something that does not exist would send a sub-agent building on a false assumption.
+- **SPEC coverage** runs only when the plan came from a SPEC. It maps each SPEC requirement to a covering task and flags anything left uncovered, contradicted, or scoped back in that the SPEC ruled out.
+
+Localized findings, like a wrong path or a missing acceptance criterion, are applied straight to the plan files. Structural findings, like a phase graph that needs reworking, re-spawn the planner with a correction directive and re-verify the regenerated plan before hand-off.
+
+The point is to catch a broken decomposition before hand-off, rather than mid-build after an orchestrator session has already started.
 
 ## Orchestrator vs sub-agents
 

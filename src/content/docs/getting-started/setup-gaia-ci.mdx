@@ -50,7 +50,13 @@ Three options:
 
 If `delete_branch_on_merge` is disabled on the repo and you have admin access, the command offers to enable it. Enabling it makes the stale-branches workflow redundant. The command marks `stale_branches.mode = "off"` in `.gaia/automation.json` automatically.
 
-### 5. Bot token
+### 5. Audit-mode policy
+
+The pre-merge `code-review-audit` gate runs in CI by default: every PR waits for the `GAIA-Audit` check before it can merge. The command offers a different team default, where developers run the audit locally at merge time and CI's audit step stands down for them. Either way the gate holds; the choice is only where the audit runs.
+
+The decision is recorded as `default_mode` in `.gaia/audit-ci.yml`. Individual developers can override it for themselves during [`/setup-cloned-gaia-project`](/getting-started/setup-cloned-gaia-project/), and `--reconfigure` re-offers the policy.
+
+### 6. Bot token
 
 GAIA CI needs an Anthropic token or key to authenticate the workflow steps that call Claude. The command asks which token type to use:
 
@@ -59,13 +65,13 @@ GAIA CI needs an Anthropic token or key to authenticate the workflow steps that 
 
 Paste the token when prompted. It is piped directly to `gh secret set` and never written to any file, never echoed in chat, and never appears in the terminal scrollback. You can add it manually on GitHub instead, if you prefer.
 
-### 6. Workflow generation
+### 7. Workflow generation
 
 The command generates `.github/workflows/gaia-ci-*.yml` from `.gaia/automation.json` and installs `.github/workflows/code-review-audit.yml`, the pre-merge audit gate. The audit gate installs unconditionally, even when no cron tool runs in CI mode. The command then triggers one `workflow_dispatch` run on the first generated workflow to confirm it boots correctly.
 
 If the verification run fails, you can retry, abandon (deletes the generated files, leaves `setup_complete: false`), or commit anyway if you have confirmed the failure is a transient infrastructure issue.
 
-### 7. Commit and push
+### 8. Commit and push
 
 On a successful verification run, the command stages the generated workflow files and `.gaia/automation.json`, commits with a standard message, and pushes.
 

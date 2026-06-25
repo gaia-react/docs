@@ -44,11 +44,13 @@ Source: `.gaia/cli/src/scaffold/index.ts`
 Code generators invoked by the `new-component`, `new-hook`, `new-route`, and `new-service` skills. Each generator reads templates from `.gaia/cli/src/scaffold/templates/`.
 
 ```
-gaia scaffold component <Name>
+gaia scaffold component <Name> [--props "a:string,..."]
 gaia scaffold hook <useFoo>
-gaia scaffold route <name>
+gaia scaffold route <name> [--dry-run]
 gaia scaffold service <name>
 ```
+
+`scaffold route --dry-run` previews the files it would write without touching disk. `scaffold component --props` splits on depth-0 commas, so comma-bearing types (`Record<K, V>`, tuples, multi-argument function types) are valid inside a single entry.
 
 ### `gaia setup`
 

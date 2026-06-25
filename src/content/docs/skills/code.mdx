@@ -21,7 +21,9 @@ Source: `.claude/skills/typescript/SKILL.md`.
 
 Conventions for React components, pages, routes, hooks, and forms. Includes pre-flight gates for `useEffect`, `useCallback`, and `useState`; a form-element check that swaps native `<input>` for the project's `Form/*` components; and a translation gate that requires every user-visible string to come from `t()` (exception: approximate skeleton-loader placeholders standing in for dynamic runtime values stay hardcoded; static skeleton text that mirrors a real `t()` call must still use `t()`). Covers component extraction thresholds and route/page architecture (`app/routes/` thin shells, `app/pages/` for UI).
 
-**Triggers** when writing or reviewing React components, hooks (`useEffect`, `useCallback`, `useState`), event handlers, or component extraction decisions. Also triggers when debugging stale closures, infinite re-renders, or unnecessary re-renders caused by memoization issues.
+Before adding a dependency or hand-rolling a primitive, the skill walks a platform-first ladder: existing GAIA code, then browser-native APIs (`Intl`, `URL`, `crypto.randomUUID()`, `structuredClone()`, modern CSS), then an already-installed dependency, then a new dependency, then custom code as a last resort. It stops at the first rung that fits. The biggest practical savings come from `Intl` standing in for date and number formatting libraries and native collection methods standing in for utility libraries, both already enforced by lint.
+
+**Triggers** when writing or reviewing React components, hooks (`useEffect`, `useCallback`, `useState`), event handlers, or component extraction decisions. Also triggers when debugging stale closures, infinite re-renders, or unnecessary re-renders caused by memoization issues, or when deciding whether to add a dependency or reach for a web-platform API instead.
 
 **Example phrasing:** "this useEffect is firing twice", "extract this section into its own component", "wire up a Conform form for sign-up".
 
@@ -58,6 +60,12 @@ Source: `.claude/skills/skeleton-loaders/SKILL.md`.
 Based on Matt Pocock's excellent [TDD Skill](https://www.aihero.dev/skill-test-driven-development-claude-code), tailored for GAIA's stack and conventions.
 
 Test-driven development with a vertical-slice red-green-refactor loop. Treats horizontal slicing (write all tests first, then all code) as an antipattern. Tests verify behavior through public interfaces, not implementation details. Includes a per-cycle checklist and a planning step that asks for the public interface before writing the first red test.
+
+After tests go green, a determinism classifier sorts each touched file and scopes the failing-first (RED) requirement to the deterministic surface only: pure utilities, service parsers, and spec-derivable hooks. Component and Playwright tests are treated as emergent and commit without a RED gate, since environment and DOM state make a stable failing run impossible to guarantee.
+
+For tests on that emergent surface, the skill dispatches a fresh-context evaluator that reviews each one for honesty and worthiness and returns a keep, fix, or delete verdict. Fixes for dishonest tests, like a test coupled to implementation detail or one asserting a tautology, apply automatically as ordinary edits for review. Delete proposals need your confirmation and show their evidence inline, so you decide without opening files. Everything lands in a single end-of-task summary.
+
+New components scaffolded with `new-component` start with a non-degenerate accessibility test that renders a real instance, so it can fail against an actual violation instead of passing against an empty DOM.
 
 It is automatically used by Claude when working in GAIA projects.
 
