@@ -43,8 +43,8 @@ export default defineConfig({
 					label: 'Commands',
 					items: [
 						{ label: 'Overview', slug: 'commands' },
-						{ label: '/gaia-plan', slug: 'commands/plan' },
 						{ label: '/gaia-spec', slug: 'commands/spec' },
+						{ label: '/gaia-plan', slug: 'commands/plan' },
 						{ label: '/gaia-handoff and pickup', slug: 'commands/handoff-pickup' },
 						{ label: '/gaia-forensics', slug: 'commands/forensics' },
 						{ label: '/update-deps', slug: 'commands/update-deps' },
