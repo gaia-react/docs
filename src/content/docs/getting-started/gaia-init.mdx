@@ -5,42 +5,46 @@ sidebar:
   order: 2
 ---
 
-`/gaia-init` is automatically run during `npx create-gaia`. It renames the project to your title, configures language support, replaces template branding, registers Claude tools and plugins, sets up the wiki, and hands you a project that compiles, lints, and tests cleanly.
+`/gaia-init` runs automatically during `npx create-gaia`. It renames the project to your title, configures language support, strips the template's GAIA branding, sets up CODEOWNERS and your environment file, registers Claude tools and plugins, verifies the build, and hands you a project that compiles, lints, and tests cleanly.
 
 ## The flow
 
-### 1. pnpm + dependencies
+### 1. Dependencies
 
-1. Enables pnpm via Corepack if available, otherwise installs it globally with npm.
+1. Enables pnpm via Corepack, or installs it globally with npm if Corepack isn't available.
 2. Runs `pnpm install` against the freshly extracted scaffold.
-3. Runs `/update-deps` to update every dependency to its latest compatible version. If a package is held back, the reason is surfaced.
+3. Runs `/update-deps` to bring every package to its latest compatible version. Anything held back is surfaced with a reason.
 
-If install fails, the run halts with the underlying error. Address the cause and re-run `/gaia-init`.
+If install fails, the run halts with the underlying error. Fix the cause and resume (see [Resuming after a failure](#resuming-after-a-failure)).
 
-### 2. Project questions
+### 2. Questions about your project
 
-Three sets of prompts.
+Up front, `/gaia-init` asks a few questions:
 
-**Project title.** Name of your project (default: `GAIA React App`).
+- **Primary language.** The main language for your app's UI. Defaults to the language you have been typing in.
+- **Additional languages.** Any extra locales on top of the primary, as ISO 639-1 codes (for example `es, de, ar`). If you want none, you also choose whether to keep the i18n scaffolding (recommended, so you can localize later with no rework) or strip it out entirely. Stripping is hard to reverse, so pick it only if you are sure the app stays single-language.
+- **Project identity.** Your GitHub username (used for CODEOWNERS), the project title (defaults to your folder name in title case, for example `my-cool-app` becomes `My Cool App`), and a kebab-case slug (defaults to the folder name).
 
-**Languages.** Pick the primary UI language, and any additional locales. If the project is single-language, you also choose whether to keep the i18n scaffolding or not. Stripping i18n now is cheaper than removing it later, but adding it back later is harder than leaving it in place.
+A few more questions come up later: CI intent and maintenance modes, and an optional adaptation opt-in.
 
-**Statusline mode.** `global` writes the statusline command to `~/.claude/settings.json`, `project` writes to `.claude/settings.json` only, `skip` leaves your settings alone.
+### 3. Branding, naming, and i18n
 
-### 3. Locale scaffolding
+With your answers, `/gaia-init` strips the template's GAIA branding (the funding file, the logo component and SVG, the Storybook brand), renames the project to your title and slug, configures i18n for your chosen locales, and wires the statusline into the project's `.claude/settings.json`. If you added locales, it scaffolds each non-English one. If you stripped i18n, it removes the framework cleanly.
 
-If multiple locales were chosen, it wires up non-`en` locale(s).
+### 4. Project files and build check
 
-If the project is single-language with i18n stripped, `/gaia-init` follows `.claude/instructions/remove-i18n.md` to remove the framework cleanly.
+- Creates `.github/CODEOWNERS` with your GitHub username as the repo-wide owner.
+- Copies `.env.example` to `.env` if you do not already have one.
+- Runs the full quality gate, `pnpm typecheck && pnpm lint && pnpm test:ci && pnpm build`, and stops if anything fails. This is the step that backs the "compiles, lints, and tests cleanly" promise, and the main reason init takes a few minutes.
 
-### 4. Claude tooling
+### 5. Claude tooling
 
-`/gaia-init` configures three external tools and three Claude plugins. You don't need to call these manually. They're listed here for your reference.
+`/gaia-init` configures the external tools, plugins, and spec-kit runtime GAIA relies on. The project-scoped skills (`react-code`, `typescript`, `tailwind`, `tdd`, `playwright-cli`, `eslint-fixes`, `skeleton-loaders`) already ship with the clone. You don't run any of this by hand; it is listed for reference.
 
 **Tools.** Per-machine, not tracked in the repo:
 
-- [React Doctor](https://github.com/millionco/react-doctor): `curl -fsSL https://react.doctor/install-skill.sh | bash`. Installs the `react-doctor` skill to `~/.claude/skills/`. Auto-runs after code edits in a `CLAUDECODE` environment and is invoked by the `code-review-audit` agent pre-merge.
-- [Playwright CLI](https://github.com/microsoft/playwright-cli) binary: `npm install -g @playwright/cli@latest`. Backs the bundled `playwright-cli` skill, which shells out to this binary.
+- [React Doctor](https://github.com/millionco/react-doctor): `npx -y react-doctor@latest install --yes`. Installs the `react-doctor` skill. Auto-runs after code edits in a `CLAUDECODE` environment and is invoked by the `code-review-audit` agent pre-merge.
+- [Playwright CLI](https://github.com/microsoft/playwright-cli) binary: `npm install -g @playwright/cli@latest`. Backs the bundled `playwright-cli` skill, which shells out to it.
 - [Serena](https://github.com/oraios/serena) MCP server, registered globally for your Claude Code:
 
   ```bash
@@ -57,7 +61,11 @@ claude plugin marketplace add AgriciDaniel/claude-obsidian
 claude plugin install claude-obsidian@claude-obsidian-marketplace
 ```
 
-### 5. CI integration
+**spec-kit.** `/gaia-spec` runs on top of [spec-kit](https://github.com/github/spec-kit). Init registers spec-kit's runtime along with the GAIA extension and preset that ship with the template, so `/gaia-spec` and the `/speckit.gaia.*` commands work.
+
+After installing, `/gaia-init` probes each component and reports `[ok]` or `[FAIL]` per item. A failure halts the run so you can retry before continuing.
+
+### 6. CI integration
 
 `/gaia-init` records whether you plan to run GAIA's GitHub Actions CI and sets the local audit baseline. Nothing is installed on GitHub at this stage and no workflow files are added to the project; the actual install happens later via [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/), after your first push.
 
@@ -68,22 +76,40 @@ You answer one question:
 
 Either way, `/gaia-init` writes `default_mode: local` to `.gaia/audit-ci.yml` as the audit baseline: until CI is wired up, the local `code-review-audit` agent is the only producer of the `GAIA-Audit` stamp. If you enable CI later, `/setup-gaia-ci` updates the team default. The audit gate is non-negotiable; this choice is only about where it runs. See the [`code-review-audit` agent reference](/reference/agents/) for what the audit checks.
 
-### 6. Adaptation feature opt-in
+It then asks how four optional maintenance jobs should run, wiki sync, dependency refresh (`/update-deps`), `pnpm audit`, and stale-branch cleanup, and writes your choices to `.gaia/automation.json`:
 
-You can choose to opt into an optional adaptation feature.
+- **`ci`** runs the job in GitHub Actions on a schedule (offered only if you enabled CI above).
+- **`local`** runs it only when you invoke it on this machine.
+- **`off`** disables it.
 
-### 7. Wiki initialization
+If you enabled CI, the recommended default is all four in `ci`. If you declined, they default to `local`. None of it activates until `/setup-gaia-ci` wires CI after your first push.
 
-GAIA comes with an Obsidian wiki built-in. Read more about it here.
+### 7. Adaptation feature opt-in
+
+`/gaia-init` asks once whether to opt into an optional adaptation feature. It stays off unless you turn it on, and you can change the choice later.
+
+### 8. Wiki reset
+
+GAIA ships with a built-in [wiki](/commands/wiki/) that Claude maintains as it works. Init resets two of its files, the hot cache and the log, to a clean slate so your project starts with its own context instead of GAIA's development history.
 
 ## After gaia-init completes
 
-You should see: `<Project Title> is ready for development. Restart Claude to pick up the new plugin and skill state.`
+Init marks per-machine setup complete, removes the one-time `/init` interceptor, prunes the matching entry from `.claude/settings.json`, and deletes its own command file. Then it prints:
 
-Restart Claude Code and you're ready to start developing with GAIA.
+```
+<Project Title> is ready for development. To pick up the new plugin and skill state, exit Claude, then from your terminal:
 
-Run `pnpm dev` to run the app locally. You can ask Claude to run it for you, or run it yourself in a separate terminal.
+cd <project-folder-name>
+
+Then start Claude again.
+
+After you create your GitHub repo and push, run /setup-gaia-ci to wire up tokens and enable CI.
+```
+
+Exit Claude and relaunch from inside the project folder. The `cd` matters: when you exit, your shell drops back to the directory you launched from, not the project folder. The new plugin and skill state only loads in a fresh session.
+
+From there you are ready to build. Run `pnpm dev` to start the app locally, or ask Claude to run it. After you push to GitHub, run [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/).
 
 ## Resuming after a failure
 
-`/gaia-init` is idempotent. If something breaks mid-run, ask Claude to fix any issues and resume gaia-init. Already-completed steps are skipped.
+`/gaia-init` is idempotent and records its progress. If something breaks mid-run, fix the cause and ask Claude to resume `/gaia-init`; already-completed steps are skipped.
