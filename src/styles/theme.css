@@ -9,6 +9,14 @@
 	--gaia-accent: #d97757;
 	--gaia-accent-2: #c96442;
 	--gaia-accent-soft: #efa58e;
+	--gaia-secondary: #5b8a8a;
+	--gaia-secondary-2: #436c6c;
+	--gaia-secondary-soft: #8eb4b4;
+	--gaia-secondary-low: #16231f; /* dark slate-teal tint for callout backgrounds */
+	--gaia-warn: #d9a857;
+	--gaia-warn-2: #b88a3f;
+	--gaia-warn-soft: #ecc781;
+	--gaia-warn-low: #2a2010; /* dark amber tint for caution callout backgrounds */
 	--gaia-line: #3d3d3a;
 	--gaia-line-soft: #2e2e2b;
 
@@ -123,6 +131,30 @@ header.header,
    `/gaia-wiki sync` should never break across the space. */
 .sl-markdown-content table code {
 	white-space: nowrap;
+}
+
+/* Callouts (Asides) — Starlight ships stock purple/blue accents that aren't in
+   the GAIA palette. Re-theme each variant to its palette job: tip = slate teal
+   (secondary register), note = neutral warm gray, caution = brand amber
+   (semantic warning). danger keeps Starlight's red until a GAIA danger color
+   lands. customCss is unlayered, so these win over Starlight's layered defaults
+   without a specificity fight. */
+.starlight-aside--tip {
+	--sl-color-asides-text-accent: var(--gaia-secondary-soft);
+	--sl-color-asides-border: var(--gaia-secondary);
+	background-color: var(--gaia-secondary-low);
+}
+
+.starlight-aside--note {
+	--sl-color-asides-text-accent: var(--gaia-ink);
+	--sl-color-asides-border: var(--gaia-muted);
+	background-color: var(--gaia-surface-raised);
+}
+
+.starlight-aside--caution {
+	--sl-color-asides-text-accent: var(--gaia-warn-soft);
+	--sl-color-asides-border: var(--gaia-warn);
+	background-color: var(--gaia-warn-low);
 }
 
 /* Right TOC: fit the inner container to its parent so long entries wrap,
