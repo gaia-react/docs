@@ -85,6 +85,14 @@ A handful of mechanics are used by multiple steps:
 
 Use auto mode when the description is well-formed and the cost of stopping for clarifications outweighs the cost of a reviewer auditing the deferred items afterward.
 
+## Running more than one at once
+
+You can run `/gaia-spec` in two sessions at the same time. Each session draws its own SPEC number from a shared, locked ledger, so two concurrent specs never collide on an id or overwrite each other's artifact. There is no flag and nothing to coordinate: open a second session and start the second spec.
+
+If a session finds a SPEC that was allocated in another terminal but not yet saved, the resume-or-start-new prompt surfaces it, so you don't fork the same draft in two places.
+
+A spec only writes its own artifacts and never touches git, so it also runs cleanly alongside a `/gaia-plan` that is mid-execution.
+
 ## Constraints during a spec session
 
 - **Write-surface allowlist.** Every write lands in `.gaia/local/specs/`, `.specify/`, or `.gaia/local/cache/`. No source files, no repo configs.

@@ -107,6 +107,12 @@ After all implementation phases pass and the final commit is pushed, the orchest
 
 After the user confirms the PR is ready to merge, the orchestrator deletes its own plan folder. If `.gaia/local/plans/` is gitignored (the GAIA default), the deletion is invisible to git and skipped from commit. Otherwise, the deletion lands as the final commit on the PR.
 
+## Running more than one at once
+
+Parallel `/gaia-plan` invocations stay isolated on disk. Each plan gets its own directory, with the `-2`, `-3` suffix from [What gets produced](#what-gets-produced) resolving any slug collision, so building two plans at once never overwrites either.
+
+Execution is the part that can actually clash, since two orchestrators editing the same branch would step on each other. When you start a plan on a branch that already has a live orchestrator, GAIA detects the in-flight run and asks how to proceed: isolate the new work in a [git worktree](#worktree-mode-experimental) (recommended), continue on the shared branch and accept the conflict risk, or defer. Plans on different branches, or a plan running alongside a spec, need no coordination.
+
 ## Worktree mode (experimental)
 
 If the orchestrator chose worktree mode at branch policy, the post-merge phase confirms the merge via `gh pr view <N> --json state`, then calls `ExitWorktree({action: "remove", discard_changes: true})`. The merged-state confirmation is the primary signal that the work is preserved; `discard_changes: true` is correct because squash-merge produces unreachable commits on the worktree branch.
