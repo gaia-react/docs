@@ -33,9 +33,13 @@ gaia init strip-branding --title <T>
 gaia init configure-i18n --locales <list> --strip <bool>
 gaia init rename --title <T> --kebab <K>
 gaia init wire-statusline --mode <global|project|skip>
+gaia init bootstrap-env
+gaia init configure-automation --wiki <m> --update-deps <m> --pnpm-audit <m> --stale-branches <m>
 gaia init finalize
 gaia init resume [--from-step <N>]
 ```
+
+`bootstrap-env` copies `.env.example` to `.env` when `.env` is absent. `configure-automation` writes `.gaia/automation.json` with the four tool-mode selections and `setup_complete: false` (Phase A of GAIA CI). Each `<m>` is one of `ci`, `local`, or `off`, and all four flags are required (no CLI-layer defaults).
 
 ### `gaia scaffold`
 
@@ -44,13 +48,13 @@ Source: `.gaia/cli/src/scaffold/index.ts`
 Code generators invoked by the `new-component`, `new-hook`, `new-route`, and `new-service` skills. Each generator reads templates from `.gaia/cli/src/scaffold/templates/`.
 
 ```
-gaia scaffold component <Name> [--props "a:string,..."]
+gaia scaffold component <Name> [--props "a:string,..."] [--no-story] [--parent <dir>] [--json]
 gaia scaffold hook <useFoo>
-gaia scaffold route <name> [--dry-run]
+gaia scaffold route <name> --group <_public+|_session+> [--loader] [--action] [--i18n] [--dry-run] [--json]
 gaia scaffold service <name>
 ```
 
-`scaffold route --dry-run` previews the files it would write without touching disk. `scaffold component --props` splits on depth-0 commas, so comma-bearing types (`Record<K, V>`, tuples, multi-argument function types) are valid inside a single entry.
+`scaffold route` requires `--group`, one of `_public+` or `_session+` (the React Router flat-route group, mapped to `Public` / `Session` in the page tree). `--loader` and `--action` emit those stubs, `--i18n` writes a locale file and wires the locale barrel, and `--dry-run` previews the files it would write without touching disk. `scaffold component --props` splits on depth-0 commas, so comma-bearing types (`Record<K, V>`, tuples, multi-argument function types) are valid inside a single entry. `--no-story` skips the stories file and rewires the test to be self-contained; `--parent <dir>` overrides the parent directory under `app/components/`.
 
 ### `gaia setup`
 
@@ -65,17 +69,57 @@ gaia setup finalize [--force]
 gaia setup link-worktree [--json]
 ```
 
+### `gaia setup-ci`
+
+Source: `.gaia/cli/src/setup-ci/index.ts`
+
+Phase B remote-integration primitives invoked by `/setup-gaia-ci`. The slash command shells out to these for remote detection, the admin permission probe, token piping (stdin only), `workflow_dispatch` verification, and the `setup_complete` flip.
+
+```
+gaia setup-ci status [--json]
+gaia setup-ci check-drift [--workflows-dir <p>] [--json]
+gaia setup-ci check-audit-drift [--workflows-dir <p>] [--baseline <p> [--latest <p>]] [--json]
+gaia setup-ci detect-remote [--json]
+gaia setup-ci warn-existing-tools [--json]
+gaia setup-ci check-admin --owner <o> --repo <r> [--json]
+gaia setup-ci dismiss-personal
+gaia setup-ci opt-out-team
+gaia setup-ci enable-delete-branch --owner <o> --repo <r>
+gaia setup-ci set-secret <name>
+gaia setup-ci verify-run <workflow-file> [--timeout-seconds N] [--json]
+gaia setup-ci finalize
+gaia setup-ci write-tool-mode <tool> <mode>
+```
+
+`check-drift` compares the rendered workflows against a fresh template render. `check-audit-drift` does the same for the installed audit workflow, two-way by default or a three-way classify when `--baseline` (and optional `--latest`) are passed. `detect-remote` reads `git remote get-url origin`. `warn-existing-tools` detects Dependabot or Renovate configs. `set-secret` reads the secret value from stdin and pipes it into `gh secret set <name>`. `dismiss-personal` writes `nudge_dismissed=true` (per-machine); `opt-out-team` writes `setup_opted_out=true` (committed). `write-tool-mode` sets one tool's mode in `.gaia/automation.json`; `<tool>` is one of `wiki`, `update-deps`, `pnpm-audit`, `stale-branches` and `<mode>` is `ci`, `local`, or `off`.
+
+### `gaia automation`
+
+Source: `.gaia/cli/src/automation/index.ts`
+
+Local-side GAIA CI primitives that read the automation config and render the workflow YAML.
+
+```
+gaia automation read-config [--json]
+gaia automation cron-decide <tool> [--json]
+gaia automation render-workflows --out-dir <path> [--tools <csv>] [--dry-run]
+gaia automation install-audit-workflow --out-dir <path> [--dry-run]
+```
+
+`read-config` prints the resolved `.gaia/automation.json`. `cron-decide <tool>` reports whether a given tool's scheduled run is due. `render-workflows` writes the workflow YAML for the enabled tools into `--out-dir`; `--tools` narrows the set to a comma-separated list and `--dry-run` previews without writing. `install-audit-workflow` writes the code-review-audit workflow into `--out-dir`.
+
 ### `gaia update`
 
 Source: `.gaia/cli/src/update/index.ts`
 
-Wired by the `/update-gaia` skill for the field-aware `pnpm-workspace.yaml` merge step (Step 7b).
+Wired by the `/update-gaia` skill for the field-aware `pnpm-workspace.yaml` merge (Step 7b) and the field-aware `.gaia/audit-ci.yml` merge (Step 7c).
 
 ```
 gaia update merge-workspace --baseline <file> --latest <file> --current <file> [--json]
+gaia update merge-audit-ci  --baseline <file> --latest <file> --current <file> [--json]
 ```
 
-A field-aware, read-only verdict oracle for `pnpm-workspace.yaml`. It parses three YAML files (baseline from the prior GAIA release, latest from the incoming tarball, current working-tree copy) and emits a JSON report of `{applied, conflicts, suggestions}`. It never writes the workspace file. The `/update-gaia` skill applies the `applied` entries with the Edit tool so comments, key order, and quote style survive. The `--json` flag switches output from the human summary to the raw JSON report.
+Both are field-aware, read-only verdict oracles. They parse three files (baseline from the prior GAIA release, latest from the incoming tarball, current working-tree copy) and emit a JSON report of `{applied, conflicts, suggestions}`. Neither writes the target file. The `/update-gaia` skill applies the `applied` entries with the Edit tool so comments, key order, and quote style survive. `merge-workspace` targets `pnpm-workspace.yaml`; `merge-audit-ci` targets `.gaia/audit-ci.yml`. The `--json` flag switches output from the human summary to the raw JSON report.
 
 ### `gaia update-deps`
 
@@ -102,6 +146,18 @@ gaia fitness render-card [--cols N]
 ```
 
 Reads a `/gaia-fitness` report JSON document on stdin and writes a width-aware ASCII report card to stdout. `--cols` sets the target terminal width (default: autodetect from `process.stdout.columns`, fallback 100). The box self-sizes to the longest content line, clamped to 120 columns and to the terminal width, wrapping remediation text to fit. Categories render alphabetically. The FINDINGS block is omitted when the `findings` array is empty (clean run). The skill pipes the assembled report JSON through this command and pastes the stdout verbatim into its chat reply.
+
+### `gaia react-perf`
+
+Source: `.gaia/cli/src/react-perf/index.ts`
+
+The deterministic reduce layer of the `/gaia-react-perf` render-performance diagnostic skill.
+
+```
+gaia react-perf reduce <raw.json> [--frame-budget-ms <n>]
+```
+
+`reduce` reads a raw bippy render dump from the `<raw.json>` path argument and writes a small ranked JSON summary to stdout for the skill to consume. `--frame-budget-ms` sets the per-frame budget used to flag slow renders (default: 16).
 
 ### `gaia harden-tally`
 
@@ -130,6 +186,32 @@ gaia harden-ledger prune --window-classes <c1,c2,...>
 
 `list` prints the full ledger as JSON. `record` upserts one entry keyed by `finding_class`, snapshotting the current PR count at decline time (re-recording overwrites the timestamp and count). `is-suppressed` exits 0 (suppressed) when an entry exists and fewer than 3 distinct PRs carrying the class have merged since the decline; exits 1 (not suppressed) otherwise. `prune` removes entries whose `finding_class` is no longer in the active window, idempotently. Ledger file: `.gaia/local/harden/declines.json`.
 
+### `gaia ci-revert`
+
+Source: `.gaia/cli/src/ci/revert.ts`. The `ci` prefix is a naming convention, not a sub-router; `ci-revert` and `ci-stale-check` register at the top level.
+
+Owns the GAIA CI hard cap of one revert attempt per merged PR. The Phase 2 composite action trusts these exit codes and never inspects the ledger directly.
+
+```
+gaia ci-revert open --pr <N> --label <name> [--reason <text>] [--json]
+gaia ci-revert mark-failed --pr <N> [--json]
+gaia ci-revert is-cap-reached --pr <N> [--json]
+```
+
+`open` opens one revert PR for merged PR `<N>` and refuses with `revert_already_opened` when a ledger entry already exists. `mark-failed` flips the recorded attempt's status to `failed`. `is-cap-reached` prints `{cap_reached, status}` for the original PR. Ledger file: `.gaia/automation.state-revert-attempts.json` (committed).
+
+### `gaia ci-stale-check`
+
+Source: `.gaia/cli/src/ci/stale-check.ts`
+
+Pre-run skip primitive for the GAIA CI Phase 2 composite action. Decides whether a workflow run should skip because a matching GAIA CI PR is already open.
+
+```
+gaia ci-stale-check --label <name> --base <branch> [--author <login>] [--json]
+```
+
+`--label` and `--base` are required. `--author` defaults to `github-actions[bot]`. The check delegates to `gh pr list` with the open state plus all three predicates and reports `proceed` or `skip`. Exit code is 0 on either decision and non-zero only on a `gh` invocation failure.
+
 ### `gaia wiki`
 
 Source: `.gaia/cli/src/wiki/index.ts`
@@ -143,15 +225,17 @@ gaia wiki state-init <sha>
 gaia wiki state-bump <field> <value>
 gaia wiki log-prepend --sha <h> --decision <D> --reason "..."
 gaia wiki page-index [--json]
-gaia wiki orphans
+gaia wiki orphans [--json]
 gaia wiki near-collisions [--max-distance N]
 gaia wiki dead-paths [--json]
 gaia wiki frontmatter [--json]
 gaia wiki empty-sections [--json]
+gaia wiki diff-size --threshold-pct N [--base <ref>] [--json]
 gaia wiki sync land [--branch-aware]
+gaia wiki chain <begin|commit|finish>
 ```
 
-`state-init <sha>` refuses if `wiki/.state.json` already exists. `state-bump` performs an atomic single-field update. `sync land` lands staged wiki changes via the correct branch strategy.
+`state-init <sha>` refuses if `wiki/.state.json` already exists. `state-bump` performs an atomic single-field update. `diff-size` gates auto-merge on the wiki byte-delta against a base ref. `sync land` lands staged wiki changes via the correct branch strategy. `chain` runs the one-branch, one-PR orchestration of the full `/gaia-wiki` chain: `begin [--branch-aware]` cuts the `wiki-sync/<date>-<sha>` branch on main, `commit --label "<subject>"` commits a stage in place, and `finish [--branch-aware]` pushes the branch, opens one PR, enables auto-merge, and returns to the base branch.
 
 ## Where to find tests
 

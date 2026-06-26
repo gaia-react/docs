@@ -7,7 +7,7 @@ sidebar:
 
 This section covers GAIA surface that exists in the template repo but is not included in the `npx create-gaia` bundle.
 
-Audience: Steven and any outside contributors working on the GAIA template itself.
+Audience: the GAIA maintainer and any outside contributors working on the GAIA template itself.
 
 If you ran `npx create-gaia my-app` for a scaffolded project, this section is not for you.
 
@@ -22,7 +22,7 @@ Both pass through the bundle-time scrub during release. The on-disk `.gaia/relea
 
 ## What's in this section
 
-- [CI workflows](/contributors/ci/): `release.yml`, `cli-tests.yml`, `distribution.yml`, `forensics-triage.yml`.
+- [CI workflows](/contributors/ci/): `release.yml`, `cli-tests.yml`, `audit-ci-tests.yml`, `distribution.yml`, `forensics-triage.yml`.
 - [CLI surface](/contributors/cli/): `gaia` binary subcommands that contributors invoke directly, plus where their source lives.
 - [`/health-audit`](/contributors/health-audit/): autonomous health audit and auto-heal loop with circuit breakers.
 - [`/gaia-release`](/contributors/release/): audience scope and what releases produce. The detailed runbook is internal to the maintainer.

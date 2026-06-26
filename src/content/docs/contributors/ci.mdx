@@ -31,7 +31,7 @@ The pre-publish distribution gate uses the org `CLAUDE_CODE_OAUTH_TOKEN` secret.
 
 Triggers on both `push` to `main` and `pull_request` against `main`. The job is gated to `pull_request` events via a job-level `if:` condition; push events keep the required status check green on merge commits without rerunning anything. Runs the Vitest suite under `.gaia/cli/`.
 
-PRs that don't touch `.gaia/cli/**` or this workflow file report green without installing or running anything. The path filter is `dorny/paths-filter`.
+PRs that don't touch `.gaia/cli/**`, this workflow file, or `.github/workflows/code-review-audit.yml` report green without installing or running anything. That third path is in the filter because a CLI test compares the in-tree audit workflow against its bundled template, so editing the workflow has to re-run the suite. The path filter is `dorny/paths-filter`.
 
 When the filter triggers, the job:
 
@@ -45,9 +45,9 @@ The required-check posture is intentional: contributors who don't touch the CLI 
 
 ## audit-ci-tests.yml
 
-Triggers on both `push` to `main` and `pull_request` against `main`, with the job gated to `pull_request` events via a job-level `if:` condition. Runs the bats suites for the `.github/audit/` helpers that `code-review-audit.yml` consumes: `check-trailer.sh` (the skip-logic gate) and `resolve-audit-base.sh` (the incremental-review base).
+Triggers on both `push` to `main` and `pull_request` against `main`, with the job gated to `pull_request` events via a job-level `if:` condition. It runs two bats suites. `bats .github/audit/tests/` covers the audit helpers that `code-review-audit.yml` consumes, including `check-trailer.sh` (the skip-logic gate), `resolve-audit-base.sh` (the incremental-review base), and `pr-merge-audit-check.sh` (the merge-status reader). `bats .gaia/scripts/tests/` covers the shipped GAIA-owned scripts under `.gaia/scripts/`.
 
-PRs that don't touch `.github/audit/**`, this workflow file, or `.claude/hooks/lib/repo-scope.sh` report green without installing or running anything. The path filter is `dorny/paths-filter`, mirroring `cli-tests.yml`.
+PRs that don't touch `.github/audit/**`, `.gaia/scripts/**`, this workflow file, or the audit hooks at `.claude/hooks/lib/repo-scope.sh`, `.claude/hooks/pr-merge-audit-check.sh`, and `.claude/hooks/post-audit-status.sh` report green without installing or running anything. The path filter is `dorny/paths-filter`, mirroring `cli-tests.yml`.
 
 Adopters receive the audit scripts as GAIA-controlled code they never edit, so the suite guards only maintainer changes.
 
@@ -81,7 +81,7 @@ The installable set:
 
 - `gaia-ci-wiki.yml`: daily `/gaia-wiki` sync, consolidate, and lint chain
 - `gaia-ci-update-deps.yml`: weekly dependency updates
-- `gaia-ci-pnpm-audit.yml`: weekly `pnpm audit` security pass
+- `gaia-ci-pnpm-audit.yml`: daily `pnpm audit` security pass
 - `gaia-ci-stale-branches.yml`: monthly cleanup of long-merged branches
 - `code-review-audit.yml`: the pre-merge audit gate, installed unconditionally (not a cron tool)
 
