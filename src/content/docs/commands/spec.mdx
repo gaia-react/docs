@@ -87,7 +87,7 @@ Use auto mode when the description is well-formed and the cost of stopping for c
 
 ## Running more than one at once
 
-You can run `/gaia-spec` in two sessions at the same time. Each session draws its own SPEC number from a shared, locked ledger, so two concurrent specs never collide on an id or overwrite each other's artifact. There is no flag and nothing to coordinate: open a second session and start the second spec.
+You can run `/gaia-spec` in more than one session at the same time. Each session draws its own SPEC number from a shared, locked ledger, so concurrent specs never collide on an id or overwrite each other's artifact, no matter how many run at once. There is no flag and nothing to coordinate: open another session and start the next spec.
 
 If a session finds a SPEC that was allocated in another terminal but not yet saved, the resume-or-start-new prompt surfaces it, so you don't fork the same draft in two places.
 

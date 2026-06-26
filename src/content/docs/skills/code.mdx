@@ -17,7 +17,7 @@ Patterns and conventions for TypeScript across the project: camelCase identifier
 
 Source: `.claude/skills/typescript/SKILL.md`.
 
-### React Code
+## React Code
 
 Conventions for React components, pages, routes, hooks, and forms. Includes pre-flight gates for `useEffect`, `useCallback`, and `useState`; a form-element check that swaps native `<input>` for the project's `Form/*` components; a translation gate that requires every user-visible string to come from `t()` (exception: approximate skeleton-loader placeholders standing in for dynamic runtime values stay hardcoded; static skeleton text that mirrors a real `t()` call must still use `t()`); and a React 19 idiom check that enforces `ref` as an ordinary prop (no `forwardRef`), `use()` over `useContext`, `<Context>` shorthand over `<Context.Provider>`, guarding the `&&` numeric-0 leak in JSX, and staying in React Router's form handling instead of reaching for `useActionState`, `useFormStatus`, or `useOptimistic`. Covers component extraction thresholds and route/page architecture (`app/routes/` thin shells, `app/pages/` for UI).
 
