@@ -26,10 +26,10 @@ No arguments. Pickup runs through four steps:
 1. **Locate.** Find the most recent handoff: `ls -t .gaia/local/handoff/HANDOFF-*.md | head -1`. If no handoff exists, fall back to `wiki/hot.md` and report `No handoff found, resuming from hot cache.`
 2. **Read.** Load the handoff in full. Run `git rev-parse --abbrev-ref HEAD`, `git status --short`, and `git log -1 --oneline` in parallel.
 3. **Report.** Surface a tight status block: current branch (with drift from the handoff if any), handoff filename and date, one-line context, 1 to 3 bullets on what's done or in-flight, 1 to 3 bullets on gaps, and a suggested next action.
-4. **Archive.** After you confirm a direction (pick an action, start editing, or say "go"), the consumed handoff moves to `.gaia/local/handoff/archive/`.
+4. **Resolve.** A handoff is never archived. Most of the time there's nothing to do here: the session that finishes the work deletes the handoff itself. If you pick up one whose work has already fully landed (its branch merged, its next actions already in `git log`), pickup clears it and resumes from the hot cache. If work is still outstanding, the handoff stays in place so an interruption stays recoverable.
 
-<Aside type="note">
-The handoff archive only happens after you act on it. Premature archive would lose context if the pickup itself hits a context break.
+<Aside type="tip" title="Note">
+A handoff is only deleted once its work has landed. An in-progress one is left untouched, so a context break mid-pickup never loses the thread.
 </Aside>
 
 ## Drift detection

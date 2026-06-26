@@ -58,6 +58,12 @@ End of session:
 
 In the fresh session, [`/gaia-pickup`](/workflow/pickup/) reads this back. See that page for the resume side of the flow.
 
+## Lifecycle
+
+Only one handoff exists at a time. Running `/gaia-handoff` again replaces the previous one and carries forward anything still unfinished, so you never sort through a stack of stale files.
+
+A handoff is temporary. Once its Next Actions are done and verified, the session that finished the work deletes it. If you were interrupted before finishing, it stays in place so the next [`/gaia-pickup`](/workflow/pickup/) can resume from it. Handoffs are never archived; a finished one is deleted, not kept.
+
 ## Storage
 
-Handoffs are project-local: `.gaia/local/` is gitignored. They never enter version control, so private notes, dirty-tree details, and device IDs stay on the machine that wrote them. Archived handoffs are not pruned automatically. You should clean `.gaia/local/handoff/archive/` when it grows.
+Handoffs are project-local: `.gaia/local/` is gitignored. They never enter version control, so private notes, dirty-tree details, and device IDs stay on the machine that wrote them.
