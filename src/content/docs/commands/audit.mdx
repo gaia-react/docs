@@ -55,13 +55,16 @@ Nothing in any knowledge store is touched until you choose **Apply**.
 
 | Store | Path | Auto-loaded? |
 | --- | --- | --- |
-| Machine-local project memory | `~/.claude/projects/<project>/memory/` | `MEMORY.md` (first 200 lines) |
+| Machine-local project memory | `~/.claude/projects/<project>/memory/` | `MEMORY.md` (first 200 lines), individual entries on demand |
 | Machine-local agent memory | `~/.claude/agent-memory/` | Per-agent, on demand |
 | Project agent memory | `.claude/agent-memory/` | Per-agent, on demand |
 | Project root `CLAUDE.md` | `CLAUDE.md` | Yes, every session |
 | Wiki hot cache | `wiki/hot.md` | Yes, every session |
+| Wiki index | `wiki/index.md` | On demand |
+| Wiki README | `wiki/README.md` | On demand |
 | Wiki domain pages | `wiki/<domain>/` | On demand |
 | Project rules | `.claude/rules/*.md` | Yes when `paths:` frontmatter matches |
+| Project commands | `.claude/commands/*.md` | On invocation only |
 | Nested `CLAUDE.md` | `**/CLAUDE.md` (e.g. monorepo packages) | Yes when cwd matches |
 
 The audit checks each entry against the other stores and classifies it as:
@@ -73,6 +76,8 @@ The audit checks each entry against the other stores and classifies it as:
 - **STALE**: references a file, branch, or feature no longer present; mark for deletion.
 
 Contradiction detection has two deliberate exclusions: a `paths:`-scoped rule that duplicates the wiki on purpose is sanctioned, not a conflict; and a wiki-page-vs-wiki-page disagreement is out of scope here. For that, use `/gaia-wiki consolidate`.
+
+A rule that carries a `gaia-harden:` provenance marker (one [`/gaia-harden`](/commands/harden/) promoted from a recurring finding) falls under the same path-scoped exclusion. It always carries a `paths:` glob, so the audit inventories it, word-budgets it, and applies the same DUPLICATE and obsolescence prune rules as a hand-authored rule. The marker grants no exemption, and a rule is never marked STALE just because its pattern stopped recurring.
 
 Then it computes auto-load budgets:
 
@@ -100,9 +105,9 @@ The two-stage split is technical (the stages carry different reasoning loads, wi
 | `delete` | Remove a memory or rules file whose facts are canonical in the wiki, gated on the file's SHA-256 matching what the report saw. |
 | `delete-entry` | Remove a specific block (e.g. a heading section in `MEMORY.md`) by verbatim match. |
 | `promote` | Move durable knowledge from memory to a named wiki page. Performs the target action (`append_section`, `insert_after_heading`, or `create_new`), prepends a log entry to `wiki/log.md`, appends an index entry to `wiki/index.md`, then deletes the source if the action says to. |
-| `replace` | Shrink inline content in an autoloaded file to a wikilink, or swap a contradicting line for the canonical value. The current block must match byte-for-byte. |
+| `replace` | Shrink inline content in an autoloaded file to a wikilink, or swap a contradicting line for the canonical value. The current block must match byte-for-byte. In report output and action IDs this type shows as `shrink` (for example `shrink-001`). |
 
-The apply stage runs actions in order: `replace` → `delete-entry` → `promote` → `delete`. Earlier replaces never reference content that later actions touch; deletes come last so pointers do not go stale before they are used. Contradiction findings reuse `replace` and `delete`; there is no separate action type for them.
+The apply stage runs actions in order: `shrink` → `delete-entry` → `promote` → `delete`. Earlier shrinks never reference content that later actions touch; deletes come last so pointers do not go stale before they are used. Contradiction findings reuse `replace` and `delete`; there is no separate action type for them.
 
 ## Report lifecycle and resume
 
@@ -145,11 +150,11 @@ Reports live under `.gaia/local/audit/` and are gitignored. They are machine-loc
 
 ## Statusline nudge
 
-GAIA surfaces `Run /gaia-audit (<reason>)` in the statusline when any of three conservative, debounced signals fires:
+GAIA surfaces `Run /gaia-audit (<reason>)` in the statusline when any of three conservative, debounced signals fires. The `<reason>` is the literal string shown in parentheses. Only the highest-priority signal appears at a time, in this order:
 
-- **Memory drift**: machine-local memory has grown by 10 or more entries, or 30 or more days have passed since the last applied audit.
-- **Project drift**: an autoloaded file is over budget (`wiki/hot.md` over 200 words, root `CLAUDE.md` over 400 words, or any `.claude/rules/*.md` over 200 lines).
-- **Pending draft**: a `draft` report is waiting to be resumed.
+- `resume draft`: a `draft` report is waiting to be resumed.
+- `machine drift`: machine-local memory has grown by 10 or more entries, or 30 or more days have passed since the last applied audit.
+- `over budget`: an autoloaded file is over budget (`wiki/hot.md` over 200 words, root `CLAUDE.md` over 400 words, or any `.claude/rules/*.md` over 200 lines).
 
 The nudge is suppressed inside git worktrees and is computed in a cached background refresher, never on the statusline's render path. All thresholds are tunable.
 

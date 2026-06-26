@@ -3,7 +3,7 @@ title: /gaia-harden
 description: Human-gated Policy-Memory Loop. Reviews recurring code-review-audit findings and, with your approval, drafts the lowest-context-weight enforcement form into the working tree.
 ---
 
-`/gaia-harden` is the human gate on the Policy-Memory Loop. When the same anti-pattern recurs across three or more distinct merged PRs at `warning` or `error` severity within a rolling 90-day window, the statusline nudges you with `Run /gaia-harden (N recurring patterns)`. Calling `/gaia-harden` reads the live candidate queue, judges the lightest durable enforcement form for each finding, and presents a per-candidate approve / decline / defer choice. Nothing is authored or activated without your answer.
+`/gaia-harden` is the human gate on the Policy-Memory Loop. When the same anti-pattern recurs across three or more distinct merged PRs at `warning` or `error` severity within a rolling 90-day window, the statusline nudges you with `Run /gaia-harden (N recurring patterns)`. Calling `/gaia-harden` reads the live candidate queue, judges the lightest durable enforcement form for each finding, and presents a per-candidate approve / decline / defer / redirect choice. Nothing is authored or activated without your answer.
 
 ## When to use it
 

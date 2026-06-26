@@ -27,13 +27,13 @@ Triage dispatches seven category checks in parallel. Each produces a set of find
 
 | Category | What it checks |
 | --- | --- |
-| Hook integrity | `.claude/hooks/*` scripts and their wiring in `settings.json`. |
-| Skill / command / agent frontmatter | `.claude/skills/**`, `.claude/commands/**`, `.claude/agents/**` frontmatter completeness and validity. |
-| Rule hygiene | `.claude/rules/*.md` scope, `paths:` frontmatter, size. |
-| `CLAUDE.md` hygiene | Root and nested `CLAUDE.md` files: size, structure, duplication. |
-| Settings hygiene | `.claude/settings.json`: permission pairs, redundancy, malformed entries. |
-| GAIA-install fitness | Whether the GAIA install is intact and consistent. |
-| Wiki fitness | Wiki structure: state file, manifest, orphans, dead repo-relative paths. |
+| Hook integrity | Hook commands wired in `.claude/settings.json` (and `settings.local.json`) exist and are executable, and every hook event name is valid. |
+| Skill / command / agent frontmatter | `name` and `description` present and non-placeholder across `.claude/skills/**`, `.claude/commands/**`, `.claude/agents/**`, with no name collisions. |
+| Rule hygiene | `.claude/rules/*.md`: valid `paths:` glob syntax, no skill `@`-imports, glob-versus-content coherence, and that rules cited in `CLAUDE.md` exist. |
+| `CLAUDE.md` hygiene | Root and folder-map `CLAUDE.md` files: size against guidance, resolvable `@`-imports, existing folder-map targets, and no dead or machine-local path references. |
+| Settings hygiene | `.claude/settings.json`: valid JSON, redundant permission entries, secret-shaped `env` values, and whether `.claude/settings.local.json` is gitignored. |
+| GAIA-install fitness | Drift between GAIA-managed files and the contents the installed version shipped, plus whether a newer GAIA release is available. |
+| Wiki fitness | Wiki state-file staleness, orphan pages, and dead path references in wiki prose. |
 
 The checks are recall-oriented and over-flag on purpose. Before grading, `/gaia-fitness` adjudicates each finding against the actual repo and drops the false positives (an unfamiliar-but-valid hook event, a permission pair that only looks redundant, and so on). What survives gets graded.
 
@@ -41,14 +41,14 @@ The checks are recall-oriented and over-flag on purpose. Before grading, `/gaia-
 
 Each category gets a letter grade. A+ means zero findings. From there the grade keys off the worst severity present, then the count at that severity:
 
-- All findings at `info`: stays in the A band (`A`, then `A-` as the count grows).
-- A `warning` is the worst severity: B band.
-- An `error` is the worst severity: C band, dropping through D as errors pile up.
-- A structurally broken category: F.
+- All findings at `info`: A band. `A` for one or two, `A-` for three or more.
+- A `warning` is the worst severity: B band. `B+` for one, `B` for two, `B-` for three or more.
+- An `error` is the worst severity: C and D bands. `C+` for one, `C` for two, `C-` for three, then `D+` for four, `D` for five, `D-` for six or more.
+- A structurally broken category (an unparseable `settings.json`, a missing `CLAUDE.md`): F.
 
 The **overall grade is the floor of the seven category grades**. The integration is only as fit as its weakest surface.
 
-An `A` should be considered a clean bill of health.
+An `A` means only advisory `info` findings remain. They surface in the FINDINGS block with remediation text but signal no structural breakage.
 
 ## The three phases
 
@@ -62,7 +62,7 @@ An `A` should be considered a clean bill of health.
 
 Where the fixes land depends on which branch you are on when you run it:
 
-- **On the default branch** (`main`), with at least one fixable finding: `/gaia-fitness` creates and switches to a new branch named `chore/gaia-fitness-<timestamp>` before applying anything, so `main` stays untouched.
+- **On your repo's default branch** (detected from the repo, typically `main`), with at least one fixable finding: `/gaia-fitness` creates and switches to a new branch named `chore/gaia-fitness-<timestamp>` before applying anything, so the default branch stays untouched.
 - **On any other branch**, with at least one fixable finding: it heals in place on your current branch.
 - **No fixable findings** (including a clean A+ run): no branch is created, `HEAD` stays put, nothing changes.
 
@@ -76,13 +76,13 @@ Before any heal-phase change, `/gaia-fitness` checks whether the repo is safe to
 
 The card has three sections:
 
-1. **Header row.** The command name (`/gaia-fitness`), the overall grade, and the `OVERALL` label right-aligned.
+1. **Header row.** The command name (`/gaia-fitness`) on the left, with the `OVERALL` label and the overall grade right-aligned.
 2. **Category rows.** One row per category, alphabetically sorted. Each row shows the category name, a compact severity note (for example, `2 errors, 1 warning`), and the category grade. A clean category shows no note.
 3. **FINDINGS block** (omitted on a clean run). When there are adjudicated findings, a `FINDINGS` section follows the category rows. Findings are grouped by category, and each entry shows the severity tag (`[error]`, `[warning]`, or `[info]`), the file path, and the remediation text, word-wrapped to fit the terminal width. Unresolved or unfixable findings appear here with their recommended approach.
 
 On a clean run (zero adjudicated findings, overall A+), the FINDINGS block is omitted. The card shows only the header and category rows, all graded A+.
 
-The card self-sizes: the box width is clamped to the longest content line, with a hard ceiling of 120 columns and a floor set by the widest category name. Remediation text wraps to fit.
+The card self-sizes. The box width tracks the longest content line, capped at 120 columns or the terminal width (whichever is smaller) and floored wide enough to keep the category names and grades from colliding. Remediation text wraps to fit.
 
 Then, depending on what happened:
 
