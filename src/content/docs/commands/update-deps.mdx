@@ -87,7 +87,7 @@ For major-version bumps, the skill makes one remediation pass if the quality gat
 ## Gotchas
 
 - Must run from the main checkout, not a linked worktree. The skill rejects worktree invocations early and surfaces the cached outdated count from main so you know whether action is even pending.
-- Must run from `main` or `master`, or from an existing chore branch. If on `main`, the skill creates `chore/update-deps-<timestamp>`.
+- On `main` or `master`, the skill creates `chore/update-deps-<timestamp>` and opens a PR after updates apply. On any other branch, it runs in place and pushes without opening a PR.
 - The final report is built from agent-returned data only. Anything filtered before installation (the ESLint cap) is silent on purpose.
 - `actionable_count` in the statusline already subtracts snoozed groups; the skill uses `total_count` internally for the actual apply set.
 

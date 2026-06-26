@@ -22,7 +22,7 @@ For feature work that has not been clarified yet, run [`/gaia-spec`](/commands/s
 Or, with a SPEC reference (typically passed automatically by `/gaia-spec`):
 
 ```
-/gaia-plan SPEC-005: rework auth, see .gaia/local/specs/SPEC-005.md
+/gaia-plan SPEC-005: rework auth, see .gaia/local/specs/SPEC-005/SPEC.md
 ```
 
 If you invoke `/gaia-plan` with no description, it asks for one before continuing.
@@ -55,7 +55,7 @@ Inside the directory:
 4. **Planner dispatch.** The skill spawns a `general-purpose` Agent restricted to writing inside the plan directory only. The planner reads `wiki/concepts/Task Orchestration.md` for the orchestration pattern, then writes the plan files directly to disk.
 5. **Verification.** The skill confirms `README.md`, `ORCHESTRATOR.md`, `KICKOFF.md`, and at least one `task-*.md` exist. If anything is missing, the failure surfaces; no silent retry.
 6. **Decomposition audit.** For non-trivial plans, the skill offers to stress-test the decomposition before hand-off, and running it is the recommended choice. See [Decomposition audit](#decomposition-audit).
-7. **Hand-off.** The skill prints the kickoff prompt as a fenced code block and tries to copy it to the system clipboard via `pbcopy`, `wl-copy`, `xclip`, `xsel`, `clip.exe`, or `clip` (whichever is available). The trailing line says whether the copy succeeded.
+7. **Hand-off.** The skill prints a short summary of the plan directory, then the kickoff prompt as a fenced code block you select and copy yourself. The trailing line reads `Type /clear and paste the prompt above.`
 
 The kickoff prompt looks exactly like:
 
@@ -93,7 +93,7 @@ Before any `gh pr merge` invocation, the orchestrator spawns the `code-review-au
 
 ## Branch policy
 
-If the orchestrator starts on `main`, it asks how to isolate the work: a feature branch in place (recommended) or a linked git worktree (experimental). On any other branch, it assumes the current branch is the work branch and proceeds.
+If the orchestrator starts on `main`, it asks how to isolate the work: a feature branch in place (recommended) or a linked git worktree (experimental). On any other branch, it first scans for a live orchestrator already running on that branch. If none is found, it treats the current branch as the work branch and proceeds without prompting. If one is found, it surfaces the three-choice prompt covered in [Running more than one at once](#running-more-than-one-at-once).
 
 ## Stop conditions
 

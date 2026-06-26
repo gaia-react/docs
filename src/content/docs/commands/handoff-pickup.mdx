@@ -7,16 +7,14 @@ sidebar:
 
 import { Aside } from '@astrojs/starlight/components';
 
-| Command | What it does |
+| Skill | What it does |
 | --- | --- |
 | `/gaia-handoff` | Writes a self-contained handoff document so you can clear context. |
 | `/gaia-pickup` | Reads the most recent handoff and reconstitutes context. |
 
 ## When to use them
 
-Run `/gaia-handoff` when your context starts getting "heavy". A good rule of thumb is:
-- **Opus 1M** - 20-25%
-- **Sonnet/Haiku** - 40-60%
+Run `/gaia-handoff` at the end of a session, before a context break, or when the current state is non-obvious. In practice that means when the context window is getting full and you are about to `/clear`, `/compact`, or restart Claude.
 
 Then `/clear` (or exit Claude and restart).
 

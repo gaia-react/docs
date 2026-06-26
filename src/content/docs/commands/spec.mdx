@@ -39,7 +39,7 @@ A description is required in auto mode. Without one, the skill aborts immediatel
 
 The SPEC has two gates and they are non-negotiable.
 
-**Gate 1: shape confirmation.** Before any clarifying question fires, the skill presents the proposed `intent` paragraph and the proposed UATs in plain English. The user reads, confirms, or revises. On confirmation, the gate-1 shape is snapshotted to `.gaia/local/cache/gate1-<spec_id>.json` and treated as immutable for the remainder of the session. The self-review at gate 2 detects drift against this snapshot.
+**Gate 1: shape confirmation.** Before any clarifying question fires, the skill presents the proposed `intent` paragraph and the proposed UATs in plain English. The user reads, confirms, or revises. On confirmation, the gate-1 shape is snapshotted to `.gaia/local/cache/gate1-<spec_id>.json` and treated as immutable for the remainder of the session. The self-review before gate 2 detects drift against this snapshot.
 
 **Gate 2: artifact confirmation.** After the Socratic loop and self-review apply, the full rendered SPEC is presented to the user one last time. Revisions loop until the user confirms. Only then does the canonical save fire.
 
@@ -49,7 +49,7 @@ Once saved, the SPEC artifact is immutable. Mutations require an explicit reopen
 
 A handful of mechanics are used by multiple steps:
 
-- **Working-draft cache.** Every fold in the Socratic loop, every gate confirmation, every research result, every self-review apply persists the in-flight draft to `.gaia/local/cache/draft-<spec_id>.md`. A single `Write` per turn. No incremental `Edit` calls. Step 10's canonical save deletes the cache as its final action. Resumed sessions pick up the cache if it is newer than the canonical artifact.
+- **Working-draft cache.** Every fold in the Socratic loop, every gate confirmation, every research result, every self-review apply, and every audit-finding apply persists the in-flight draft to `.gaia/local/cache/draft-<spec_id>.md`. A single `Write` per turn. No incremental `Edit` calls. Step 10's canonical save deletes the cache as its final action. Resumed sessions pick up the cache if it is newer than the canonical artifact.
 - **Per-topic revisit counter.** Tracks how many times the user has chosen "push deeper" on a given topic. On the third revisit, the prompt swaps to settle, defer, or push deeper anyway. Prevents one topic from consuming the whole session.
 - **Five-question cap.** Spec-kit's `/clarify` primitive caps the loop at five total questions per session. The wrapper inherits this cap and never invokes `/clarify` twice to extend it.
 - **Discuss-this escape.** Any closed-set question can drop into a plain Q&A discussion. On settlement, the outcome folds into `clarifications.answered[]` and the structured loop resumes on the next topic.
@@ -68,7 +68,7 @@ A handful of mechanics are used by multiple steps:
 9. **Gate 2.** Plain prompt: confirm the full rendered artifact, or revise.
 10. **Canonical save.** Writes `.gaia/local/specs/SPEC-NNN/SPEC.md` and deletes the working-draft cache. The `after_specify` hook fires `/speckit-gaia-lint` for immutability checks. Cycles 1 and 2 surface failures; cycle 3 prompts to step back to gate 2, defer remaining findings, or push another fix.
 11. **Optional GitHub issue mirror.** If opted in at step 2, `gh-mirror.sh` creates the issue and stamps the URL into frontmatter. Skips silently when `gh` is not authenticated, Issues are disabled, or the viewer lacks write permission.
-12. **Chain to `/gaia-plan`.** `AskUserQuestion`: trigger `/gaia-plan` now or defer. On yes, the skill enters a multi-plan dispatch loop. Each plan runs in its own `general-purpose` Agent so the wrapper context stays bounded across plan count.
+12. **Chain to `/gaia-plan`.** `AskUserQuestion`: trigger `/gaia-plan` now or defer. On yes, the skill enters a multi-plan dispatch loop, running `/gaia-plan` inline for each slice you author. The heavy planning for each slice is isolated in a subagent that returns only a compact result, so the session's context stays bounded no matter how many plans you author.
 
 ## Auto mode
 
@@ -100,7 +100,7 @@ A spec only writes its own artifacts and never touches git, so it also runs clea
 
 ## How spec-kit fires GAIA hooks
 
-Spec-kit's hooks are not shell scripts. When core invokes `/speckit-specify` (or any other core skill), it reads `.specify/extensions.yml` for the relevant event and emits an `EXECUTE_COMMAND: <id>` markdown directive into the agent's reasoning context. The agent then invokes the rendered slash command as a normal Claude skill.
+Spec-kit's hooks are not shell scripts. When core invokes `/speckit-specify` (or any other core skill), it reads the registered spec-kit extension configuration for the relevant event and emits an `EXECUTE_COMMAND: <id>` markdown directive into the agent's reasoning context. The agent then invokes the rendered slash command as a normal Claude skill.
 
 Five GAIA hooks fire across the SPEC lifecycle. Never invoke them by hand.
 
@@ -112,7 +112,7 @@ Five GAIA hooks fire across the SPEC lifecycle. Never invoke them by hand.
 | `before_implement` | `/speckit-gaia-uat-write` | Renders frozen UATs into Playwright e2e specs at `.playwright/e2e/<spec-dir>/`, leaving a red-state harness before implementation begins. |
 | `after_implement` | `/speckit-gaia-wiki-promote` | Promotes merged-PR content into the project wiki under `wiki/<subdomain>/`. Defers if the implementing PR has not merged yet. |
 
-The chain-trigger to `/gaia-plan` lives inline at step 12 of the flow, not as a hook. Disposition of the SPEC artifact (archive, delete, or keep) is automatic after the implementing PR merges: on the immediate-merge path the `after_implement` wiki-promote step chains to `/speckit-gaia-spec-close`, and the step-3 housekeeping passes archive any SPEC whose PR has since merged. Running `/speckit-gaia-spec-close [SPEC-NNN]` by hand is a backstop, for draining a deferred wiki-promote when the PR merges after implementation, or for choosing delete or keep instead of the default archive. The SPEC ID is optional; omit it and the command surfaces every eligible SPEC to choose from.
+The chain-trigger to `/gaia-plan` lives inline at step 12 of the flow, not as a hook. Disposition of the SPEC artifact (archive, delete, or keep) is automatic after the implementing PR merges: on the immediate-merge path the `after_implement` wiki-promote step chains to `/speckit-gaia-spec-close`, and the step-3 housekeeping passes archive any SPEC whose PR has since merged. Running `/speckit-gaia-spec-close [SPEC-NNN]` by hand is a backstop, for draining a deferred wiki-promote when the PR merges after implementation, or for choosing delete or keep instead of the default archive. The SPEC ID is optional; omit it and the command targets the single eligible SPEC, or prompts you to choose when more than one is eligible.
 
 ## Related
 

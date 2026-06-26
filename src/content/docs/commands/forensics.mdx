@@ -75,7 +75,7 @@ class_state_files:
 <plain prose: what you were doing, what you expected, what happened>
 ```
 
-The body posted to a GitHub issue is the post-frontmatter portion (`## Symptom` through the end), byte-identical to the local file body.
+The body posted to a GitHub issue is the full body, frontmatter and all four sections, byte-identical to the local file body at filing time. After filing, the local file gains the `gh_issue_url` value in its frontmatter.
 
 ## Hard constraints
 
@@ -84,7 +84,7 @@ These four rules are non-negotiable. They apply to every code path.
 </Aside>
 
 - **Read-only end-to-end.** Forensics inspects state. It never modifies, installs, fetches, or remediates.
-- **Write surface allowlist.** Writes go to one user-visible directory: `.gaia/local/forensics/` for the report. No other path is writable.
+- **Write surface allowlist.** Writes go to `.gaia/local/forensics/` for the report.
 - **Uniform redaction.** The local file body and the GitHub issue body pass through the same single redaction pass. The two bodies are byte-identical post-redaction.
 - **Strict body schema.** Frontmatter fields, section headers, and section order are fixed. Drift breaks downstream triage.
 
@@ -112,4 +112,4 @@ If you say no, the report stays local and you can attach it to a manual issue la
 
 ## Storage
 
-`.gaia/local/forensics/` is project-local and gitignored. Reports stay on your machine unless you explicitly file them. Old reports are not pruned automatically.
+`.gaia/local/forensics/` is project-local and gitignored. Reports stay on your machine unless you explicitly file them. The workflow defines no automatic pruning, so reports accumulate under `.gaia/local/forensics/` until you remove them yourself.
