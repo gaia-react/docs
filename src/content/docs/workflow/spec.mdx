@@ -3,7 +3,7 @@ title: /gaia-spec
 description: Run a Socratic discovery loop and save an immutable SPEC artifact.
 ---
 
-`/gaia-spec` produces an immutable SPEC artifact through a guided Socratic conversation. The artifact lands at `.gaia/local/specs/SPEC-NNN/SPEC.md` and serves as the contract for [`/gaia-plan`](/commands/plan/) to decompose into work. The skill produces an artifact and stops. It does not implement anything.
+`/gaia-spec` produces an immutable SPEC artifact through a guided Socratic conversation. The artifact lands at `.gaia/local/specs/SPEC-NNN/SPEC.md` and serves as the contract for [`/gaia-plan`](/workflow/plan/) to decompose into work. The skill produces an artifact and stops. It does not implement anything.
 
 This is for when you want to implement a large feature or change request with multiple parts, or you want to present an idea or concept and refine it before implementation.
 
@@ -13,7 +13,7 @@ The flow runs on top of [spec-kit](https://github.com/github/spec-kit), with GAI
 
 Run `/gaia-spec` for any feature where the boundaries are not yet clear. It is the right entry point when the description has more questions than answers, or when multiple readings of the same prompt produce different intents.
 
-For changes whose intent is already obvious (a bug fix, a refactor against a known interface, a copy edit), skip directly to [`/gaia-plan`](/commands/plan/).
+For changes whose intent is already obvious (a bug fix, a refactor against a known interface, a copy edit), skip directly to [`/gaia-plan`](/workflow/plan/).
 
 ## How to invoke
 
@@ -116,4 +116,4 @@ The chain-trigger to `/gaia-plan` lives inline at step 12 of the flow, not as a 
 
 ## Related
 
-After save, [`/gaia-plan`](/commands/plan/) is the natural next step. The chain-trigger at step 12 dispatches it automatically when accepted.
+After save, [`/gaia-plan`](/workflow/plan/) is the natural next step. The chain-trigger at step 12 dispatches it automatically when accepted.

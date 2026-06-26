@@ -77,7 +77,7 @@ The audit checks each entry against the other stores and classifies it as:
 
 Contradiction detection has two deliberate exclusions: a `paths:`-scoped rule that duplicates the wiki on purpose is sanctioned, not a conflict; and a wiki-page-vs-wiki-page disagreement is out of scope here. For that, use `/gaia-wiki consolidate`.
 
-A rule that carries a `gaia-harden:` provenance marker (one [`/gaia-harden`](/commands/harden/) promoted from a recurring finding) falls under the same path-scoped exclusion. It always carries a `paths:` glob, so the audit inventories it, word-budgets it, and applies the same DUPLICATE and obsolescence prune rules as a hand-authored rule. The marker grants no exemption, and a rule is never marked STALE just because its pattern stopped recurring.
+A rule that carries a `gaia-harden:` provenance marker (one [`/gaia-harden`](/maintenance/harden/) promoted from a recurring finding) falls under the same path-scoped exclusion. It always carries a `paths:` glob, so the audit inventories it, word-budgets it, and applies the same DUPLICATE and obsolescence prune rules as a hand-authored rule. The marker grants no exemption, and a rule is never marked STALE just because its pattern stopped recurring.
 
 Then it computes auto-load budgets:
 

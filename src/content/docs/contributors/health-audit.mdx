@@ -11,7 +11,7 @@ It grades the repo's Claude integration and distribution boundary, fixes what it
 
 ## How it differs from /gaia-fitness
 
-[`/gaia-fitness`](/commands/fitness/) is the adopter-facing Claude-integration health check. It ships in every GAIA project, runs one triage-heal-verify pass over seven categories, and reports a letter grade.
+[`/gaia-fitness`](/maintenance/fitness/) is the adopter-facing Claude-integration health check. It ships in every GAIA project, runs one triage-heal-verify pass over seven categories, and reports a letter grade.
 
 `/health-audit` is contributor-only and wider. It runs `/gaia-fitness`'s seven-category protocol as one of five audit buckets (Bucket E) and adds buckets for static checks, distribution-boundary leaks, bundle simulation, and enforcement-primitive coverage. It loops up to three audit-fix-audit cycles, preserves per-cycle artifacts, and escalates on the conditions below. Use `/gaia-fitness` to grade a project's Claude surface. Use `/health-audit` to vet the GAIA template repo itself before a release.
 

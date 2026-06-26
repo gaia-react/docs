@@ -11,7 +11,7 @@ sidebar:
 
 Contributors who modify CLI source, hooks, rules, or shipped wiki content land in trees that a release will eventually package. The release flow validates those trees in three ways:
 
-- **Manifest regeneration**. `.gaia/manifest.json` assigns each GAIA-managed file in the adopter tarball a class (`owned`, `shared`, or `wiki-owned`). The classification rules live in `.gaia/cli/src/release/manifest.ts`. The on-disk manifest is the source of truth that [`/update-gaia`](/commands/update-gaia/) reads to decide which files to overwrite, three-way merge, or leave alone.
+- **Manifest regeneration**. `.gaia/manifest.json` assigns each GAIA-managed file in the adopter tarball a class (`owned`, `shared`, or `wiki-owned`). The classification rules live in `.gaia/cli/src/release/manifest.ts`. The on-disk manifest is the source of truth that [`/update-gaia`](/maintenance/update-gaia/) reads to decide which files to overwrite, three-way merge, or leave alone.
 - **Bundle-time scrub**. The release workflow stages a tree from `git ls-files`, subtracts `.gaia/release-exclude` patterns, then runs the scrub against the staging directory. The scrub strips `gaia:maintainer-only` blocks and runs leak checks before the tarball is built. Any leak fails the build.
 - **Distribution test gate**. The release workflow runs `.gaia/tests/distribution/run-all.sh` against an independently-staged tree before the tarball uploads. A broken release halts before `gh release create` runs.
 

@@ -5,13 +5,13 @@ description: Health check and auto-heal for your project's Claude integration. T
 
 `/gaia-fitness` checks the health of your project's Claude integration and repairs what it safely can. One invocation, no flags: calling `/gaia-fitness` is the statement of intent to be fit. It runs three phases in sequence: triage, heal, verify, and reports a per-category and overall grade from F up to A+.
 
-It checks the Claude *surface* (hooks, skill/command/agent frontmatter, rule files, `CLAUDE.md`, `.claude/settings.json`, GAIA itself, and wiki structure), not your application code. For app code review before merge, use the `code-review-audit` agent. For knowledge-store bloat, duplication, and contradictions, use [`/gaia-audit`](/commands/audit/).
+It checks the Claude *surface* (hooks, skill/command/agent frontmatter, rule files, `CLAUDE.md`, `.claude/settings.json`, GAIA itself, and wiki structure), not your application code. For app code review before merge, use the `code-review-audit` agent. For knowledge-store bloat, duplication, and contradictions, use [`/gaia-audit`](/maintenance/audit/).
 
 ## When to use it
 
 Run `/gaia-fitness` after editing under `.claude/`, such as modifying or adding new commands, skills, agents, hooks, etc.
 
-You can also call it after pulling a GAIA update with [`/update-gaia`](/commands/update-gaia/) if you made any customizations to GAIA, or periodically as a routine check.
+You can also call it after pulling a GAIA update with [`/update-gaia`](/maintenance/update-gaia/) if you made any customizations to GAIA, or periodically as a routine check.
 
 ## How to invoke
 
@@ -93,4 +93,4 @@ Then, depending on what happened:
 
 ## Related
 
-`/gaia-fitness` checks the Claude integration surface. For knowledge-store duplication, contradictions, and autoload budgets, use [`/gaia-audit`](/commands/audit/). For wiki-internal redundancy and broken wikilinks, use [`/gaia-wiki`](/commands/wiki/). For your application code on a branch before merge, use the [`code-review-audit` agent](/reference/agents/).
+`/gaia-fitness` checks the Claude integration surface. For knowledge-store duplication, contradictions, and autoload budgets, use [`/gaia-audit`](/maintenance/audit/). For wiki-internal redundancy and broken wikilinks, use [`/gaia-wiki`](/maintenance/wiki/). For your application code on a branch before merge, use the [`code-review-audit` agent](/reference/agents/).

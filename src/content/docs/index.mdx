@@ -29,7 +29,22 @@ npx create-gaia@latest my-app
 3. Installs the packages
 4. Launches Claude Code in the project directory and runs `/gaia-init` automatically
 
-Follow along with the `/gaia-init` [walkthrough](/getting-started/gaia-init/). Once setup is done, [Working in GAIA](/getting-started/working-in-gaia/) shows how a normal session works.
+Follow along with the `/gaia-init` [walkthrough](/getting-started/gaia-init/). Once setup is done, the [Workflow overview](/workflow/) shows how a normal session works.
+
+### Permissions on the first run
+
+When you scaffold a project, `npx create-gaia` launches Claude Code once with `--dangerously-skip-permissions` and runs `/gaia-init`. That single run rewrites files, registers tools, and wires the project end to end. The flag lets it finish without stopping to ask permission at every step.
+
+That flag applies to the setup run only. Nothing stores it. When `/gaia-init` finishes, it tells you to exit Claude and relaunch, because the new skills and plugins load only in a fresh session. How you relaunch is your call: plain `claude` if you'd rather approve actions as they happen, or `claude --dangerously-skip-permissions` if you don't want to be interrupted.
+
+Either way, GAIA's guardrails stay on. They run as hooks on every tool call, not as permission prompts, so skipping the prompts doesn't disable them. Every scaffolded project ships hooks that block actions like:
+
+- committing or force-pushing directly to `main`
+- `rm -rf` on dangerous targets (`/`, `~`, `.git`, `node_modules`, the repo root)
+- writing secrets or `.env` files into the repo
+- committing with `--no-verify` to skip the typecheck, lint, and test gate
+
+These hold whether or not you pass the flag. See the [hooks reference](/reference/hooks/) for the full set.
 
 ## Cloning an existing GAIA project
 

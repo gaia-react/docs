@@ -33,32 +33,32 @@ export default defineConfig({
 					label: 'Getting started',
 					items: [
 						{ label: 'Quick Start', slug: 'index' },
-						{ label: 'Working in GAIA', slug: 'getting-started/working-in-gaia' },
 						{ label: '/gaia-init', slug: 'getting-started/gaia-init' },
 						{ label: '/setup-gaia-ci', slug: 'getting-started/setup-gaia-ci' },
 						{ label: '/setup-cloned-gaia-project', slug: 'getting-started/setup-cloned-gaia-project' },
 					],
 				},
 				{
-					label: 'Commands',
+					label: 'Workflow',
 					items: [
-						{ label: 'Overview', slug: 'commands' },
-						{ label: '/gaia-spec', slug: 'commands/spec' },
-						{ label: '/gaia-plan', slug: 'commands/plan' },
-						{ label: '/gaia-handoff and pickup', slug: 'commands/handoff-pickup' },
-						{ label: '/gaia-forensics', slug: 'commands/forensics' },
-						{ label: '/update-deps', slug: 'commands/update-deps' },
-						{ label: '/update-gaia', slug: 'commands/update-gaia' },
+						{ label: 'Overview', slug: 'workflow' },
+						{ label: '/gaia-spec', slug: 'workflow/spec' },
+						{ label: '/gaia-plan', slug: 'workflow/plan' },
+						{ label: '/gaia-handoff', slug: 'workflow/handoff' },
+						{ label: '/gaia-pickup', slug: 'workflow/pickup' },
+						{ label: '/gaia-forensics', slug: 'workflow/forensics' },
 					],
 				},
 				{
 					label: 'Maintenance',
 					items: [
 						{ label: 'Overview', slug: 'maintenance' },
-						{ label: '/gaia-fitness', slug: 'commands/fitness' },
-						{ label: '/gaia-audit', slug: 'commands/audit' },
-						{ label: '/gaia-harden', slug: 'commands/harden' },
-						{ label: '/gaia-wiki', slug: 'commands/wiki' },
+						{ label: '/gaia-fitness', slug: 'maintenance/fitness' },
+						{ label: '/gaia-audit', slug: 'maintenance/audit' },
+						{ label: '/gaia-harden', slug: 'maintenance/harden' },
+						{ label: '/gaia-wiki', slug: 'maintenance/wiki' },
+						{ label: '/update-deps', slug: 'maintenance/update-deps' },
+						{ label: '/update-gaia', slug: 'maintenance/update-gaia' },
 					],
 				},
 				{
@@ -80,6 +80,7 @@ export default defineConfig({
 				},
 				{
 					label: 'Contributors',
+					collapsed: true,
 					items: [
 						{ label: 'Overview', slug: 'contributors' },
 						{ label: 'CI workflows', slug: 'contributors/ci' },

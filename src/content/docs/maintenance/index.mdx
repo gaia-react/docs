@@ -1,0 +1,44 @@
+---
+title: Maintenance
+description: 'The GAIA commands that keep the GAIA setup itself in shape: the integration surface, loaded context, wiki, and recurring review findings.'
+---
+
+GAIA ships commands for doing work and commands for keeping the GAIA setup itself in shape. This page covers the second kind: the commands that check and repair GAIA's own setup as a project grows.
+
+As a project accumulates work, four parts of that setup drift or accumulate independently:
+
+- the **Claude integration surface**: hooks, command and skill frontmatter, rule wiring, `.claude/settings.json`;
+- the **loaded context** Claude reads every session: machine-local memory, project rules, and autoloaded `CLAUDE.md` files;
+- the **wiki** itself: pages that overlap or contradict each other, and broken wikilinks;
+- **recurring review findings**: patterns that code-review-audit flags repeatedly but that have not yet been codified as a rule, skill, or check.
+
+Each part has its own command. They run independently and do not call one another.
+
+## Maintenance Commands
+
+| Command | What it does |
+| --- | --- |
+| [`/gaia-fitness`](/maintenance/fitness/) | Health check and auto-heal for the Claude integration surface. Triage, heal, verify, and report an F-to-A+ grade. |
+| [`/gaia-audit`](/maintenance/audit/) | Audit memory, wiki, and auto-loaded files for duplication, conflicting instructions, and stale content. Researches, then asks before it applies. |
+| [`/gaia-harden`](/maintenance/harden/) | Human-gated hardening. Reviews recurring code-review-audit findings and, with approval, drafts the lowest-context-weight enforcement form (rule, skill, or deterministic check) into the working tree. Defaults to `review` mode. |
+| [`/gaia-wiki`](/maintenance/wiki/) | Wiki maintenance. With no arguments, runs the full sync, consolidate, and lint chain; each stage can also be invoked by name. |
+
+## Which one to run
+
+Pick by symptom:
+
+- The integration feels off, a hook is not firing, a rule is not loading, a command misbehaves: run [`/gaia-fitness`](/maintenance/fitness/).
+- The base context feels heavy, or machine-local memory has grown large: run [`/gaia-audit`](/maintenance/audit/).
+- The wiki has grown and pages overlap, or wikilinks break: run [`/gaia-wiki`](/maintenance/wiki/).
+- Recurring findings from code-review-audit keep surfacing for the same class of issue: run [`/gaia-harden`](/maintenance/harden/).
+
+The boundary between `/gaia-audit` and `/gaia-wiki` is deliberate. `/gaia-audit` reconciles the loaded context against the wiki (the source of truth) and resolves disagreements between project files; it does not touch wiki-page-vs-wiki-page conflicts. Those belong to `/gaia-wiki consolidate`.
+
+## Update Commands
+
+Keeping dependencies and GAIA itself current is a different kind of upkeep:
+
+| Command | What it does |
+| --- | --- |
+| [`/update-deps`](/maintenance/update-deps/) | Bump outdated packages group-by-group, run migrations for major-version bumps, and validate the full quality gate. |
+| [`/update-gaia`](/maintenance/update-gaia/) | Pull the latest GAIA release into your project without overwriting your customizations. |
