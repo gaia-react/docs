@@ -5,10 +5,14 @@ sidebar:
   order: 3
 ---
 
-`react-performance` is a measure-only render-performance diagnostic. It drives one
-concrete micro-interaction, captures the renders React actually performs, reduces
-that capture to a small ranked summary, and reports the memo-defeating reference
-instability behind an over-render along with a structural-first fix.
+GAIA includes a render-performance diagnostic that finds the wasted re-renders
+behind a slow interaction and names exactly what to fix. You point it at one
+specific interaction, like a button click, and it singles out the component that
+re-renders when it shouldn't and explains what's forcing the extra work.
+
+The render capture is built on [bippy](https://github.com/aidenybai/bippy), the
+same library that [react-scan](https://github.com/aidenybai/react-scan) uses to
+read React's internal fiber tree.
 
 It measures. It does not auto-fix. The diagnosis names the component, the unstable
 input, and the recommended fix; you (or Claude, in normal conversation) apply it.
