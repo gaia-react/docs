@@ -3,6 +3,8 @@ title: Quick Start
 description: Scaffold a new GAIA project with npx create-gaia.
 ---
 
+import { Aside } from '@astrojs/starlight/components';
+
 One command scaffolds the GAIA React framework and automatically launches Claude Code for the rest of setup.
 
 ## Prerequisites
@@ -55,7 +57,9 @@ For existing projects (e.g. created by a teammate), after you clone the repo:
 
 Follow along with the `/setup-cloned-gaia-project` [walkthrough](/getting-started/setup-cloned-gaia-project/).
 
-> **Note**: You can choose not to include `--dangerously-skip-permissions`. Leaving it out adds friction to the setup process, but it's up to you.
+<Aside type="note">
+You can leave out `--dangerously-skip-permissions`. It adds friction to setup, but the choice is yours.
+</Aside>
 
 ## Pinning to a specific version
 

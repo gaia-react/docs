@@ -3,6 +3,8 @@ title: /gaia-spec
 description: Run a Socratic discovery loop and save an immutable SPEC artifact.
 ---
 
+import { Aside } from '@astrojs/starlight/components';
+
 `/gaia-spec` produces an immutable SPEC artifact through a guided Socratic conversation. The artifact lands at `.gaia/local/specs/SPEC-NNN/SPEC.md` and serves as the contract for [`/gaia-plan`](/workflow/plan/) to decompose into work. The skill produces an artifact and stops. It does not implement anything.
 
 This is for when you want to implement a large feature or change request with multiple parts, or you want to present an idea or concept and refine it before implementation.
@@ -44,6 +46,10 @@ The SPEC has two gates and they are non-negotiable.
 **Gate 2: artifact confirmation.** After the Socratic loop and self-review apply, the full rendered SPEC is presented to the user one last time. Revisions loop until the user confirms. Only then does the canonical save fire.
 
 Once saved, the SPEC artifact is immutable. Mutations require an explicit reopen ceremony with `## Reopen rationale` and `## UAT diff` sections, which the lint helper enforces.
+
+<Aside type="caution">
+Confirming gate 2 saves the SPEC and locks it. Reopening a saved SPEC takes a formal ceremony with a written rationale and a UAT diff, so settle the shape before you confirm.
+</Aside>
 
 ## Operational primitives
 

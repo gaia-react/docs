@@ -5,6 +5,8 @@ sidebar:
   order: 3
 ---
 
+import { Aside } from '@astrojs/starlight/components';
+
 GAIA includes a render-performance diagnostic that finds the wasted re-renders
 behind a slow interaction and names exactly what to fix. You point it at one
 specific interaction, like a button click, and it singles out the component that
@@ -76,6 +78,10 @@ test('drive the target micro-interaction and capture renders', async ({page}) =>
 Run it. The Playwright config auto-starts the dev server, and the capture requires
 a development build (a production build is rejected, because render timings are
 zero in production).
+
+<Aside type="caution">
+The capture only works on a development build. Render timings are zero in production, so a production build is rejected.
+</Aside>
 
 ```sh
 pnpm pw react-perf-drive

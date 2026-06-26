@@ -3,6 +3,8 @@ title: /gaia-audit
 description: Audit memory, rules, and wiki for duplication, contradictions, stale entries, and over-budget autoloads, then apply the fixes behind a single review gate.
 ---
 
+import { Aside } from '@astrojs/starlight/components';
+
 `/gaia-audit` reviews the project's knowledge stores (machine-local memory, project rules, the wiki, and autoloaded `CLAUDE.md` files) for duplication, contradictions, stale entries, and bloated base context. It runs in two stages: a research stage writes a report, then a single decision gate asks you what to do before an apply stage executes anything.
 
 The wiki is the source of truth. Memory is machine-local only. Autoloaded files carry a token cost on every session, so the audit pushes detail behind lazy wikilinks and keeps the autoloaded surface as a pointer set.
@@ -50,6 +52,10 @@ Otherwise, the main conversation summarizes the findings and asks one question w
 - **Decline.** Delete the report. Nothing changes.
 
 Nothing in any knowledge store is touched until you choose **Apply**.
+
+<Aside type="tip" title="Safe by default">
+Calling `/gaia-audit` only researches and reports. Nothing in memory, rules, or the wiki changes until you choose Apply at the gate.
+</Aside>
 
 ## What gets audited
 

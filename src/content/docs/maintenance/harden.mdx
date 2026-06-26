@@ -3,6 +3,8 @@ title: /gaia-harden
 description: Human-gated Policy-Memory Loop. Reviews recurring code-review-audit findings and, with your approval, drafts the lowest-context-weight enforcement form into the working tree.
 ---
 
+import { Aside } from '@astrojs/starlight/components';
+
 `/gaia-harden` is the human gate on the Policy-Memory Loop. When the same anti-pattern recurs across three or more distinct merged PRs at `warning` or `error` severity within a rolling 90-day window, the statusline nudges you with `Run /gaia-harden (N recurring patterns)`. Calling `/gaia-harden` reads the live candidate queue, judges the lightest durable enforcement form for each finding, and presents a per-candidate approve / decline / defer / redirect choice. Nothing is authored or activated without your answer.
 
 ## When to use it
@@ -68,6 +70,10 @@ For each candidate, `/gaia-harden` weighs three things before recommending exact
 For each candidate, `/gaia-harden` presents the `finding_class`, its distinct-PR count and the PR numbers, the recommended form, and a one-line rationale. You then choose: **approve**, **decline**, **defer**, or **redirect** (override the form choice).
 
 ## What gets drafted on approve
+
+<Aside type="caution">
+Approving a deterministic check or a skill drafts a scaffold only. Nothing is wired into `settings.json` or activated; you finish and wire it yourself. Only prose rules are drafted complete.
+</Aside>
 
 ### Prose rule (v1: owned end to end)
 

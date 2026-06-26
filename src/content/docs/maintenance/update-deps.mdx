@@ -3,6 +3,8 @@ title: /update-deps
 description: Bump outdated packages group-by-group, run migrations for major-version bumps, and validate the full quality gate.
 ---
 
+import { Aside } from '@astrojs/starlight/components';
+
 `/update-deps` discovers outdated packages, shows you a grouped preview so you can snooze anything you are not ready for, applies migrations for major-version bumps, and validates the project through the full quality gate. It is wired to the statusline: when work is pending, the statusline shows a `Run /update-deps` indicator that loads the skill when clicked.
 
 ## When to use it
@@ -85,5 +87,9 @@ For major-version bumps, the skill makes one remediation pass if the quality gat
 - On `main` or `master`, the skill creates `chore/update-deps-<timestamp>` and opens a PR after updates apply. On any other branch, it runs in place and pushes without opening a PR.
 - The final report only lists what was actually installed. Anything filtered out beforehand is left off on purpose.
 - The statusline count already leaves out snoozed groups.
+
+<Aside type="caution">
+On any branch other than main or master, `/update-deps` commits in place and pushes to the remote without opening a PR. Run it from a branch where an automatic push is fine.
+</Aside>
 
 Source: `.claude/skills/update-deps/SKILL.md`.

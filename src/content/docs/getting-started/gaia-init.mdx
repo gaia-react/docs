@@ -5,6 +5,8 @@ sidebar:
   order: 2
 ---
 
+import { Aside } from '@astrojs/starlight/components';
+
 `/gaia-init` runs automatically during `npx create-gaia`. It renames the project to your title, configures language support, strips the template's GAIA branding, sets up CODEOWNERS and your environment file, registers Claude tools and plugins, verifies the build, and hands you a project that compiles, lints, and tests cleanly.
 
 ## The flow
@@ -26,6 +28,10 @@ Up front, `/gaia-init` asks a few questions:
 - **Project identity.** Your GitHub username (used for CODEOWNERS), the project title (defaults to your folder name in title case, for example `my-cool-app` becomes `My Cool App`), and a kebab-case slug (defaults to the folder name).
 
 A few more questions come up later: CI intent and maintenance modes, and an optional adaptation opt-in.
+
+<Aside type="caution">
+Stripping i18n is hard to reverse. Choose it only if you are certain the app stays single-language. Keeping the scaffolding lets you add locales later with no rework.
+</Aside>
 
 ### 3. Branding, naming, and i18n
 
@@ -107,6 +113,10 @@ After you create your GitHub repo and push, run /setup-gaia-ci to wire up tokens
 ```
 
 Exit Claude and relaunch from inside the project folder. The `cd` matters: when you exit, your shell drops back to the directory you launched from, not the project folder. The new plugin and skill state only loads in a fresh session.
+
+<Aside type="caution">
+When you exit Claude, your shell returns to the directory you launched from, not the project folder. Run `cd <project-folder-name>` before relaunching, or the new plugins and skills will not load.
+</Aside>
 
 From there you are ready to build. Run `pnpm dev` to start the app locally, or ask Claude to run it. After you push to GitHub, run [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/).
 
