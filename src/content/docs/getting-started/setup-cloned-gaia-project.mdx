@@ -9,18 +9,30 @@ sidebar:
 
 ## When to use this
 
-- After `git clone`-ing an existing GAIA project
-- Do not use after running `npx create-gaia`.
+- After `git clone`-ing an existing GAIA project.
+- Not after `npx create-gaia` (that path runs `/gaia-init` instead).
+
+GAIA's statusline prompts `Run /setup-cloned-gaia-project` until the per-machine setup is finished.
+
+The command is idempotent. Re-running it after a partial run picks up from the first step that has not completed yet, so it is safe to run more than once.
 
 ## The flow
+
+### Pre-step: worktrees
+
+If you set up the clone from a git worktree created outside Claude Code, the command first restores the shared-state symlinks the worktree needs. In a normal checkout this does nothing.
 
 ### Pre-step: pnpm and node_modules
 
 If `corepack` is available, pnpm is enabled at the version pinned in `package.json`. Otherwise pnpm is installed globally via npm. If `node_modules/` is missing, `pnpm install` runs.
 
+### Pre-step: GitHub CLI check
+
+The command checks for the GitHub CLI before installing anything. If `gh` is not installed or not authenticated, it prints a warning and keeps going; setup never blocks on it. The PR merge gate and `/gaia-plan` rely on `gh`, so install it from https://cli.github.com/ and run `gh auth login` when you can.
+
 ### 1. install-tools
 
-Three external tools, identical to step 4 of [`/gaia-init`](/getting-started/gaia-init/#4-claude-tooling):
+Three external tools, identical to step 5 of [`/gaia-init`](/getting-started/gaia-init/#5-claude-tooling):
 
 - React Doctor skill
 - Playwright CLI binary
@@ -57,8 +69,14 @@ If the project uses the pre-merge `code-review-audit` gate, you choose who runs 
 - **CI (default).** CI runs the audit on your PRs and you wait for the `GAIA-Audit` check before merging.
 - **Locally.** The audit runs in your own session at merge time, streaming as it goes, and CI's audit step stands down for your PRs.
 
-Your choice adds a one-line entry to `.gaia/audit-ci.yml`, which the command helps you commit as a small PR. If `gh` is not authenticated, the step is skipped; re-run `/setup-cloned-gaia-project` after `gh auth login` to finish it.
+Your choice adds a one-line entry to `.gaia/audit-ci.yml`. You commit and open the one-line PR yourself; the command prints the exact `git` and `gh` commands to run and never commits or opens the PR for you.
+
+If `gh` is not authenticated when this step runs, the choice is skipped and the step is recorded as done, so a later plain re-run will not prompt for it again. To set or change your audit mode afterward, add your `<login>=<mode>` entry to `audit_authors` in `.gaia/audit-ci.yml`.
+
+### 5. Finish
+
+Once every step is recorded, setup finalizes and confirms it is complete. Restart Claude Code so the new plugin and skill state load. After that, the statusline surfaces `/update-deps` and `/update-gaia` indicators when updates are available.
 
 ## Resuming after a failure
 
-If you encounter any issues while `/setup-cloned-gaia-project` runs, ask Claude to fix it and resume.
+If a step fails, fix the underlying cause and re-run `/setup-cloned-gaia-project`. Completed steps are detected and skipped, so the run resumes from where it stopped.
