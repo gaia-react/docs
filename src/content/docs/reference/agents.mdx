@@ -43,12 +43,12 @@ The agent produces a structured report:
 - **Summary**: overview, overall quality, top findings.
 - **Critical Issues (Must Fix)**: security and bugs that block merge. Each finding gives `path:line`, the issue, and a concrete fix.
 - **Important Issues (Should Fix)**: performance and architectural concerns at scale. Same shape.
-- **Suggestions (Consider Fixing)**: refactoring and minor improvements.
+- **Suggestions (Must Fix or Escalate)**: refactoring and minor improvements. Every suggestion must be resolved before the audit passes. Auto-fix it in the working tree or explicitly escalate with documented rationale. Escalated suggestions block the marker.
 - **What's Done Well**: included only when there are concrete patterns worth reinforcing.
 
 ### Audit marker and trailer
 
-When the report is clean (no Critical Issues, all Important Issues resolved in the working tree), the agent stamps HEAD with a `GAIA-Audit:` commit trailer and writes a marker file at `.gaia/local/audit/<HEAD-sha>.ok`. The marker unblocks `gh pr merge` locally; the trailer travels with the commit through the network so CI can recognize an already-audited tree and skip its own audit run.
+When the report is clean (no Critical Issues, all Important Issues resolved in the working tree, and the Suggestions section empty or every suggestion auto-fixed), the agent stamps HEAD with a `GAIA-Audit:` commit trailer and writes a marker file at `.gaia/local/audit/<HEAD-sha>.ok`. The marker unblocks `gh pr merge` locally; the trailer travels with the commit through the network so CI can recognize an already-audited tree and skip its own audit run.
 
 If findings remain, the agent does not write the marker. Address findings, commit, and re-invoke the agent on the new HEAD.
 
