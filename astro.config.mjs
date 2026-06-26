@@ -67,6 +67,7 @@ export default defineConfig({
 						{ label: 'Overview', slug: 'skills' },
 						{ label: 'Code skills', slug: 'skills/code' },
 						{ label: 'Scaffolders', slug: 'skills/scaffolders' },
+						{ label: 'React performance', slug: 'skills/react-performance' },
 					],
 				},
 				{

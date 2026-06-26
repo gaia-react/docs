@@ -19,7 +19,7 @@ Scaffolds a React component as a folder under `app/components/` (or a sub-folder
 
 **Example phrasing:** "create a PriceCard component", "scaffold a button under app/components/Form", "make a new component called UserAvatar with a name and url prop".
 
-Underlying CLI: `gaia scaffold component <Name> [--no-story] [--parent <dir>] [--props "a:string,b:number"]`.
+Underlying CLI: `gaia scaffold component <Name> [--no-story] [--parent <dir>] [--props "a:string,b:number"] [--json]`.
 
 `--props` takes comma-separated `name:type` pairs. Comma-bearing types like `Record<string, unknown>`, tuples, and multi-argument function types work inside a single entry, for example `--props "label:string,data:Record<string, unknown>"`.
 
@@ -35,13 +35,13 @@ Scaffolds a custom React hook with a Vitest test file.
 
 **Example phrasing:** "make a useCountdown hook", "scaffold useDebouncedValue with a value and delay parameter", "extract this into a useFormSubmission hook".
 
-Underlying CLI: `gaia scaffold hook <useFoo> [--params "a:string,b:number"] [--returns "ReturnType"]`.
+Underlying CLI: `gaia scaffold hook <useFoo> [--params "a:string,b:number"] [--returns "ReturnType"] [--json]`.
 
 Source: `.claude/skills/new-hook/SKILL.md`.
 
 ## New Route
 
-Scaffolds a new route with its page component, test, story, and optional i18n keys. Files land in `app/routes/<group>+/<name>.tsx` plus `app/pages/<Group>/<Pascal>Page/index.tsx` (for example `UserProfilePage`). The route file stays a thin shell (`loader`, `action`, `meta`, Zod schemas, one-line default export); UI lives in the page component.
+Scaffolds a new route with its page component, test, story, and optional i18n keys. Files land in `app/routes/<group>/<name>.tsx` plus `app/pages/<Group>/<Pascal>Page/index.tsx` (for example `UserProfilePage`). The route file stays a thin shell (`loader`, `action`, `meta`, Zod schemas, one-line default export); UI lives in the page component.
 
 **Confirms:** name (kebab-case), group (`_public+` or `_session+`), and which of `--loader`, `--action`, `--i18n` to include.
 

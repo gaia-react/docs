@@ -9,11 +9,15 @@ GAIA ships its skills under `.claude/skills/` in your project. Each one is a dir
 
 ## Catalog
 
-GAIA groups its skills into two categories:
+GAIA groups its skills into four categories:
+
+**Workflow skills** handle session context and wiki maintenance. Trigger on `/gaia-handoff`, `/gaia-pickup`, `/gaia-wiki`, or natural-language asks like "hand off this session" or "sync the wiki". See [Handoff and pickup](/commands/handoff-pickup/) and [/gaia-wiki](/commands/wiki/).
 
 **Code skills** govern how code is written and reviewed. Trigger when you write or edit TypeScript, React, Tailwind, tests, or browser automation. See [Code skills](/skills/code/).
 
 **Scaffolders** generate new files from templates. Trigger when you ask to create a component, hook, route, or service. See [Scaffolders](/skills/scaffolders/).
+
+**Maintenance skills** update project dependencies and pull new GAIA releases. See [/update-deps](/commands/update-deps/) and [/update-gaia](/commands/update-gaia/).
 
 ## How triggering works
 
