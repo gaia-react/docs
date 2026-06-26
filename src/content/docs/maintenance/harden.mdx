@@ -46,7 +46,7 @@ The `code-review-audit` agent tags each eligible finding with a stable `finding_
 - within a rolling **90-day window**, and
 - no promoted rule already covers it, and the decline ledger does not suppress it.
 
-The tally is recomputed from GitHub PR data via `gaia harden-tally` each time you invoke `/gaia-harden`. It is an ephemeral projection: an unacted pattern decays by ageing out of the window.
+The list is recomputed from your merged PRs each time you run `/gaia-harden`. A pattern you never act on drops off once it ages past the 90-day window.
 
 ## Judge-the-form logic
 

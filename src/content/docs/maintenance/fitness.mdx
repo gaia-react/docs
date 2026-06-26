@@ -35,7 +35,7 @@ Triage dispatches seven category checks in parallel. Each produces a set of find
 | GAIA-install fitness | Drift between GAIA-managed files and the contents the installed version shipped, plus whether a newer GAIA release is available. |
 | Wiki fitness | Wiki state-file staleness, orphan pages, and dead path references in wiki prose. |
 
-The checks are recall-oriented and over-flag on purpose. Before grading, `/gaia-fitness` adjudicates each finding against the actual repo and drops the false positives (an unfamiliar-but-valid hook event, a permission pair that only looks redundant, and so on). What survives gets graded.
+The checks over-flag on purpose. Before grading, `/gaia-fitness` adjudicates each finding against the actual repo and drops the false positives (an unfamiliar-but-valid hook event, a permission pair that only looks redundant, and so on). What survives gets graded.
 
 ## Grading
 
@@ -54,7 +54,7 @@ An `A` means only advisory `info` findings remain. They surface in the FINDINGS 
 
 **Triage.** Run the seven checks, adjudicate the findings, compute the grades. Each surviving finding is then classified as fixable (a mechanical edit a fixer can apply confidently without product context: a missing frontmatter field, a bad path, a `.gitignore` line) or unfixable (needs product context or invasive restructuring: splitting an oversized `CLAUDE.md`, rewriting a rule's scope, reworking hook logic).
 
-**Heal.** Fixable findings get repaired by lane-aware fixers running in parallel, one lane per surface area (`.claude/` surface and `CLAUDE.md`; `.claude/settings.json`; `.gitignore`; `.gaia/manifest.json`). Healing runs inside a bounded loop, three cycles by default. After each cycle the affected checks re-run; if a finding survives a fix attempt unchanged, the loop stops chasing it and marks it unresolved. A fixer that judges a repair too invasive to apply without product context leaves it alone and surfaces it in the report with a recommended approach. **Nothing is ever committed.** The working tree is left for you to review.
+**Heal.** Fixable findings get repaired automatically. GAIA retries each fix a few times, and if a finding does not clear, it stops and marks it unresolved. A fixer that judges a repair too invasive to apply without product context leaves it alone and surfaces it in the report with a recommended approach. **Nothing is ever committed.** The working tree is left for you to review.
 
 **Verify.** After each heal cycle the affected category checks re-run and the grades recompute. If the overall grade reaches A+, the loop exits clean.
 
@@ -72,7 +72,7 @@ Before any heal-phase change, `/gaia-fitness` checks whether the repo is safe to
 
 ## After the run
 
-`/gaia-fitness` renders the result as a deterministic width-aware ASCII card, produced by `gaia fitness render-card`. The card is pasted directly into the chat reply as a fenced code block.
+`/gaia-fitness` shows the result as a text card right in the chat reply.
 
 The card has three sections:
 
@@ -82,7 +82,7 @@ The card has three sections:
 
 On a clean run (zero adjudicated findings, overall A+), the FINDINGS block is omitted. The card shows only the header and category rows, all graded A+.
 
-The card self-sizes. The box width tracks the longest content line, capped at 120 columns or the terminal width (whichever is smaller) and floored wide enough to keep the category names and grades from colliding. Remediation text wraps to fit.
+The card sizes itself to fit your terminal, and long remediation text wraps.
 
 Then, depending on what happened:
 

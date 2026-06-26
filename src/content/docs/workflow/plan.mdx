@@ -35,7 +35,7 @@ If you invoke `/gaia-plan` with no description, it asks for one before continuin
 .gaia/local/plans/<kebab-slug>/
 ```
 
-The slug derives from the description. When invoked from a SPEC, the slug is prefixed with the SPEC id (e.g. `spec-005-cards-layout`) so plan-to-SPEC discovery is a one-line `ls .gaia/local/plans/ | grep ^spec-005-`. Slug collisions append `-2`, `-3`, and so on, so parallel invocations coexist without overwriting each other.
+The slug derives from the description. When invoked from a SPEC, the slug is prefixed with the SPEC id (e.g. `spec-005-cards-layout`) so you can tell at a glance which plan came from which spec. If two plans would share a slug, GAIA appends `-2`, `-3`, and so on, so running several at once never overwrites either.
 
 Inside the directory:
 
@@ -52,8 +52,8 @@ Inside the directory:
 1. **Description capture.** If `$ARGUMENTS` is empty, the skill asks. If a SPEC reference is detected, the SPEC itself becomes the source of truth and the dispatch summary is just a label.
 2. **Model check.** If the current session is not on Opus, the skill offers to spawn the planning agent on Opus. Plans benefit from the higher-capacity model.
 3. **Plan directory resolution.** Slug is derived (or seeded from the SPEC id), suffixed on collision, then created under `.gaia/local/plans/`.
-4. **Planner dispatch.** The skill spawns a `general-purpose` Agent restricted to writing inside the plan directory only. The planner reads `wiki/concepts/Task Orchestration.md` for the orchestration pattern, then writes the plan files directly to disk.
-5. **Verification.** The skill confirms `README.md`, `ORCHESTRATOR.md`, `KICKOFF.md`, and at least one `task-*.md` exist. If anything is missing, the failure surfaces; no silent retry.
+4. **Planner dispatch.** A planning agent writes the plan files, and only ever writes inside the plan directory.
+5. **Verification.** The skill checks that the core plan files were written. If any are missing, it surfaces the problem instead of guessing.
 6. **Decomposition audit.** For non-trivial plans, the skill offers to stress-test the decomposition before hand-off, and running it is the recommended choice. See [Decomposition audit](#decomposition-audit).
 7. **Hand-off.** The skill prints a short summary of the plan directory, then the kickoff prompt as a fenced code block you select and copy yourself. The trailing line reads `Type /clear and paste the prompt above.`
 
@@ -89,7 +89,7 @@ The orchestrator merges sub-agent notes into `SUMMARY.md` after every phase, so 
 
 ## Pre-merge audit
 
-Before any `gh pr merge` invocation, the orchestrator spawns the `code-review-audit` agent against the current branch. If the audit reports critical or unresolved important issues, the orchestrator stops and surfaces them. A clean pass writes a marker that a deny-hook reads to gate `gh pr merge`. The orchestrator does not wait for the deny-hook to fire; it spawns the agent proactively.
+Before any `gh pr merge` invocation, the orchestrator spawns the `code-review-audit` agent against the current branch. If the audit reports critical or unresolved important issues, the orchestrator stops and surfaces them. The merge stays blocked until that audit passes clean.
 
 ## Branch policy
 
@@ -115,9 +115,9 @@ Execution is the part that can actually clash, since two orchestrators editing t
 
 ## Worktree mode (experimental)
 
-If the orchestrator chose worktree mode at branch policy, the post-merge phase confirms the merge via `gh pr view <N> --json state`, then calls `ExitWorktree({action: "remove", discard_changes: true})`. The merged-state confirmation is the primary signal that the work is preserved; `discard_changes: true` is correct because squash-merge produces unreachable commits on the worktree branch.
+If the orchestrator ran in worktree mode, it waits until the PR shows as merged, then removes the worktree. It confirms the merge first so your work is safely on the PR before the isolated copy goes away.
 
-If the orchestrator was itself dispatched into an isolated subagent context, it cannot call `ExitWorktree` directly. It instead emits a copy-paste continuation prompt naming the absolute worktree path and the merged-state details, then stops. The user pastes that prompt into a fresh top-level session to complete the cleanup.
+If the orchestrator was running inside an isolated subagent, it can't remove the worktree itself. Instead it stops and hands you a copy-paste prompt with the worktree path. Paste that into a fresh session to finish the cleanup.
 
 ## Related
 

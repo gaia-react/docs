@@ -47,7 +47,7 @@ There are three main commands, plus a full-chain mode that runs them in sequence
 
 Walks every commit between the wiki's last evaluated SHA and HEAD. For each commit, decides whether the wiki needs an update. Edits pages, logs decisions, advances state.
 
-The classifier runs in two passes. The first pass classifies commits as `WORTHY` or `SKIP` deterministically (subject patterns, file patterns, file count). The second pass reads the diff for `WORTHY` commits only and edits the affected wiki pages.
+It first decides which commits are worth recording, then reads the diffs of those commits and updates the affected wiki pages.
 
 State lives in `wiki/.state.json`:
 
@@ -55,13 +55,13 @@ State lives in `wiki/.state.json`:
 - `last_evaluated_at`: when that classification ran.
 - `last_consolidated_sha` and `last_consolidated_at`: owned by consolidate. Sync preserves them.
 
-On the very first sync, if `last_consolidated_sha` is absent, sync seeds it so the consolidate gate has a baseline to accumulate from. Consolidate owns every update after that.
+On the first run, consolidate's starting point gets set up; after that, consolidate maintains it.
 
 If drift exceeds 30 commits, sync asks before processing the full range. You can opt to sync the recent 20 only and re-anchor.
 
 Run standalone, sync commits its own work. On `main` or `master` it cuts a `wiki-sync/<date>-<sha>` branch and opens a pull request; on a feature branch it commits in place. In the full chain the branch is cut once up front and every stage commits onto it (see Full chain below).
 
-Sync ends with a one-line trigger: `CONSOLIDATE_TRIGGERED: true|false`. Used by the full-chain mode to decide whether consolidate runs next.
+When run as part of the full chain, sync signals whether consolidate needs to run next.
 
 ## /gaia-wiki consolidate
 
@@ -69,7 +69,7 @@ Detects redundancy and contradiction across the wiki. Four passes:
 
 - **Same-subject across SPECs.** Pairs of pages in the same domain that share a title and were promoted from different SPECs at least 30 days apart. The newer page is canonical; the older becomes a supersession candidate.
 - **Reversed decisions.** Decision pages whose body negates an older decision page (`replaces`, `supersedes`, `deprecated in favor of`, etc.). The older page is flagged for retirement.
-- **Near-collision slugs.** Pairs within Levenshtein distance 2, or where one slug is a prefix of the other.
+- **Near-duplicate page names.** Names that differ by only a character or two, or where one name is the start of another.
 - **Subject-orphaned pages.** Pages with zero inbound wikilinks, no body-title matches in `wiki/concepts/` or `wiki/modules/`, and no edits in 90 days.
 
 For each finding, consolidate prompts you per finding: `Apply`, `Keep both`, or `Skip`. `Apply` performs the merge or retire action. `Keep both` writes a `consolidation_ack` flag on the canonical page so the finding does not re-surface. `Skip` defers to the next run.
@@ -78,7 +78,7 @@ Consolidate does not commit. Applied edits stage; sync (or your manual commit) l
 
 ## /gaia-wiki lint
 
-Standalone GAIA-native health check. Each check re-derives on every run, most from a dedicated `gaia wiki` CLI primitive, and the report is plain markdown GAIA owns end to end. The current checks:
+A standalone health check. Every check recomputes from scratch on each run, and the report is plain markdown. The current checks:
 
 - **#11 Wiki drift check.** Reports how many commits behind HEAD the wiki is. Severity: `none`, `low`, `medium`, `high`. High severity surfaces with a `WIKI DRIFT:` prefix.
 - **#12 Dead repo-relative paths.** Backticked paths in wiki body prose that no longer exist on disk (e.g. a hook removed in a refactor still cited in a concept page).

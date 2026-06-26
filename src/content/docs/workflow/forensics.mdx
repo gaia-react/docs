@@ -35,7 +35,7 @@ Forensics runs in nine read-only steps:
 1. **Capture.** Reads a fixed set of state files: GAIA version, Node, pnpm, Claude Code version, branch, dirty status, plus class-specific state files (different per failure category). Bodies from `app/` and `wiki/` are never captured. `.env*` and `node_modules/` are excluded. Long files are truncated.
 2. **Classify.** Walks a fixed taxonomy of eight classes (`init`, `update`, `wiki-sync`, `quality-gate`, `hook`, `scaffold`, `dev-server`, `other`) and matches signal phrases against your description. Cites the matched phrase and named state file as evidence.
 3. **Diagnose.** Decides whether the failure is a user-config issue (wrong Node version, missing env var, dirty working tree blocking a workflow) or a probable bug. User-config wins when both signals fire: the environment is the more likely cause.
-4. **Redact.** Runs the assembled report body through one redaction pass: project-root strip, machine-leak fallback, seven token-pattern sweeps, env-var value scrub, then a sanity recheck. If a credential-shaped string survives the recheck, forensics halts rather than emitting a partially redacted body.
+4. **Redact.** Strips secrets and machine-specific paths out of the report, then double-checks the result. If anything that still looks like a credential gets through, forensics stops instead of writing a report that could leak it.
 5. **Render.** Emits a strict-schema report with frontmatter (class, GAIA version, created date, optional issue URL) and four fixed sections: `## Symptom`, `## Classification`, `## Capture`, `## Reproduction context`.
 6. **Save.** Writes to `.gaia/local/forensics/<timestamp>-<class>.md`. The timestamp is ISO-8601 compact UTC.
 7. **Branch on diagnosis.** User-config failures: prints remediation steps inline, exits. Probable bugs: continues to the issue-filing offer.
@@ -44,7 +44,7 @@ Forensics runs in nine read-only steps:
 
 ## Strict body schema
 
-The report body has fixed section headers and order. Phase-2 automation parses these without LLM fallback, so the schema is load-bearing:
+The report body has fixed section headers and order. The fixed headers and order keep filed reports consistent and easy to triage:
 
 ```markdown
 ---

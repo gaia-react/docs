@@ -10,7 +10,7 @@ One command scaffolds the GAIA React framework and automatically launches Claude
 - Node 22.19 or later. Check with `node --version`.
 - Claude Code installed and reachable as `claude`.
 
-`pnpm` is not required up front. When `pnpm install` runs (the default), `create-gaia` bootstraps pnpm via Corepack if missing, falling back to `npm install -g pnpm`. With `--no-install`, no bootstrap is attempted.
+`pnpm` is not required up front. If `pnpm install` runs (the default) and pnpm is missing, `create-gaia` installs it for you. With `--no-install`, it installs nothing.
 
 `uv` is required for the Serena MCP server. GAIA will install it for you during setup if you don't already have it.
 

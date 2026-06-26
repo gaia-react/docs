@@ -20,7 +20,7 @@ The command is idempotent. Re-running it after a partial run picks up from the f
 
 ### Pre-step: worktrees
 
-If you set up the clone from a git worktree created outside Claude Code, the command first restores the shared-state symlinks the worktree needs. In a normal checkout this does nothing.
+If you set up the clone from a git worktree created outside Claude Code, the command first reconnects the shared files the worktree needs. In a normal checkout this does nothing.
 
 ### Pre-step: pnpm and node_modules
 
@@ -71,7 +71,7 @@ If the project uses the pre-merge `code-review-audit` gate, you choose who runs 
 
 Your choice adds a one-line entry to `.gaia/audit-ci.yml`. You commit and open the one-line PR yourself; the command prints the exact `git` and `gh` commands to run and never commits or opens the PR for you.
 
-If `gh` is not authenticated when this step runs, the choice is skipped and the step is recorded as done, so a later plain re-run will not prompt for it again. To set or change your audit mode afterward, add your `<login>=<mode>` entry to `audit_authors` in `.gaia/audit-ci.yml`.
+If `gh` is not authenticated when this step runs, the prompt is skipped and will not reappear on a plain re-run. To set or change your audit mode afterward, add your `<login>=<mode>` entry to `audit_authors` in `.gaia/audit-ci.yml`.
 
 ### 5. Finish
 

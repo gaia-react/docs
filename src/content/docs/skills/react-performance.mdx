@@ -38,17 +38,16 @@ don't name a target, the skill asks for one before proceeding.
 
 ## The workflow
 
-The diagnostic separates a token-heavy raw capture from the small summary the
-model reasons over. The raw dump (roughly 172 KB, about 43K tokens for a trivial
+The diagnostic writes a large raw capture to disk, then reduces it to a small
+summary. The raw dump (roughly 172 KB, about 43K tokens for a trivial
 flow) never enters the conversation. Only the reduced summary is read.
 
 ### 1. Capture
 
 The skill writes a short, temporary Playwright spec that drives your target
 interaction using the committed capture helper at `.playwright/react-perf/capture.ts`.
-The helper injects a render-instrumentation harness before React initializes,
-collects each rendered fiber, and writes the raw dump to
-`.gaia/local/cache/<run>/renders.json`.
+The helper records every render your interaction triggers and writes the raw data
+to `.gaia/local/cache/<run>/renders.json`.
 
 ```ts
 import {expect, test} from '@playwright/test';
@@ -92,8 +91,8 @@ summary: `gaia react-perf reduce <RAW_DUMP_PATH>`. The `gaia` binary resolves
 through the project's package bin, so the skill runs it for you; you don't type it
 into a separate terminal.
 
-The reduce filters framework noise, recomputes the signal, ranks findings, applies
-a frame-budget timing gate, and prints a `ReducedSummary` as JSON on stdout. The
+The reduce drops framework noise, ranks the findings, and prints a `ReducedSummary`
+as JSON. The
 frame budget defaults to 16ms; pass `--frame-budget-ms <n>` to change the timing
 gate. Malformed input prints a structured error and exits non-zero. That summary
 is the only thing the skill ingests.

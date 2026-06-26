@@ -46,14 +46,9 @@ After grouping, updates are classified into two waves:
 - **Wave A**: minor and patch bumps, bundled into one install.
 - **Wave B**: major-version bumps, each group processed individually with its own migration guide and code edits.
 
-## The CLI primitives behind it
+## Manual and scheduled runs agree
 
-The deterministic parts (discovering outdated packages, applying the group rules, and classifying each group into Wave A or B) run through the bundled CLI: `gaia update-deps run --emit-updates <path>` writes the grouped, wave-classified set to a JSON file. The skill calls it for those steps and layers the preview, migrations, and quality gate on top. The same primitive backs the `gaia-ci-update-deps` workflow that [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/) can install, so scheduled and interactive runs agree on what is outdated.
-
-`gaia update-deps decline` manages the snooze ledger:
-
-- `--source <path> --skip <a,b,...>`: record the named groups as snoozed. Accepts either a group name (e.g. `react-router`) or any member package name; both resolve to the whole group.
-- `--clear`: empty the ledger (used automatically when you choose "Update all").
+Discovering outdated packages, grouping them, and sorting them into waves work the same way whether you run `/update-deps` yourself or let the `gaia-ci-update-deps` workflow from [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/) run it on a schedule, so both agree on what is outdated.
 
 ## Override audit
 
@@ -88,7 +83,7 @@ For major-version bumps, the skill makes one remediation pass if the quality gat
 
 - Must run from the main checkout, not a linked worktree. The skill rejects worktree invocations early and surfaces the cached outdated count from main so you know whether action is even pending.
 - On `main` or `master`, the skill creates `chore/update-deps-<timestamp>` and opens a PR after updates apply. On any other branch, it runs in place and pushes without opening a PR.
-- The final report is built from agent-returned data only. Anything filtered before installation (the ESLint cap) is silent on purpose.
-- `actionable_count` in the statusline already subtracts snoozed groups; the skill uses `total_count` internally for the actual apply set.
+- The final report only lists what was actually installed. Anything filtered out beforehand is left off on purpose.
+- The statusline count already leaves out snoozed groups.
 
 Source: `.claude/skills/update-deps/SKILL.md`.
