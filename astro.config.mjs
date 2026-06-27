@@ -53,6 +53,7 @@ export default defineConfig({
 					label: 'Maintenance',
 					items: [
 						{ label: 'Overview', slug: 'maintenance' },
+						{ label: 'GAIA CI', slug: 'maintenance/gaia-ci' },
 						{ label: '/gaia-fitness', slug: 'maintenance/fitness' },
 						{ label: '/gaia-audit', slug: 'maintenance/audit' },
 						{ label: '/gaia-harden', slug: 'maintenance/harden' },

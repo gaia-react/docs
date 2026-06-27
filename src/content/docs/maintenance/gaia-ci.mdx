@@ -1,0 +1,75 @@
+---
+title: GAIA CI
+description: What GAIA CI is, the maintenance jobs it runs, and how to choose whether each one runs in CI, locally, or not at all.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+GAIA CI is the optional automation layer that keeps a GAIA project in shape without you having to remember to do the upkeep. It has two parts:
+
+- A pre-merge **audit gate**: the `code-review-audit` agent reviews every pull request before it can merge.
+- Four **maintenance jobs** on a schedule: wiki sync, dependency refresh, security audit, and stale-branch cleanup.
+
+`/gaia-init` asks how each maintenance job should run. This page explains what the jobs do and what the run modes mean, so you can decide.
+
+## Two phases
+
+GAIA CI is set up in two phases, and the split matters when you answer the init question:
+
+1. **Phase A, during [`/gaia-init`](/getting-started/gaia-init/).** You record your choices into `.gaia/automation.json`. Nothing touches GitHub. No workflow files are written.
+2. **Phase B, after your first push.** [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/) installs the workflow files, stores your bot token as a repo secret, and turns the jobs on.
+
+So choosing `ci` during init is a statement of intent. The jobs do not actually run until you finish Phase B. If you never run `/setup-gaia-ci`, nothing runs in CI regardless of what you picked.
+
+## The audit gate
+
+The audit gate is the part of GAIA CI that runs on every pull request. Before a PR can merge, the [`code-review-audit`](/reference/agents/) agent reviews the diff against the same rules and skills your project ships, and the PR holds until the `GAIA-Audit` check clears.
+
+<Aside type="tip" title="Tip: Run the audit locally">
+CI is the recommended team default, but running the code review audit locally is a better developer experience. It streams its output in your terminal as it goes.
+
+So opt yourself in, solo or on a team:
+
+- Solo: make `local` the default during [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/).
+- Team: keep `ci` as the default, then opt in during [`/setup-cloned-gaia-project`](/getting-started/setup-cloned-gaia-project/).
+
+The gate holds either way. If a local audit does not run, CI runs it instead, so every PR is audited before it can merge.
+
+The audit works the same on CI. However, due to a limitation with Claude running in GitHub Actions, it cannot stream its output. If you prefer to watch what the audit is doing as it's doing it, run it locally.
+</Aside>
+
+The gate is not one of the four toggleable jobs, and the run modes below do not apply to it. It is always on once CI is wired. The only choice is where it runs at merge time, in CI or locally. The rest of this page is about the four scheduled jobs.
+
+## The four maintenance jobs
+
+| Job | Default schedule | What it does | What it produces |
+| --- | --- | --- | --- |
+| `wiki` | Daily | Runs the [`/gaia-wiki`](/maintenance/wiki/) sync, consolidate, and lint chain when recent commits are worth recording | One PR with the updated wiki |
+| `update_deps` | Weekly | Runs [`/update-deps`](/maintenance/update-deps/) to bump outdated packages | One PR for batched patch and minor bumps, plus a separate PR per major-version group |
+| `pnpm_audit` | Daily | Runs `pnpm audit` for new advisories | A security issue and a targeted single-package bump PR for each high or critical advisory |
+| `stale_branches` | Monthly | Deletes branches whose merged PR closed more than 30 days ago | Nothing. It deletes branches directly, no PR |
+
+Many of these PRs auto-merge on green CI, so day to day you mostly review the ones that are held back for you: a wiki PR that rewrites more than a quarter of the wiki, every major-version bump PR, and each `pnpm_audit` security PR. The [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/) page covers the merge behavior in full.
+
+## Run Modes
+
+For each of the four jobs you pick one mode.
+
+- **`ci`**: The job runs unattended in GitHub Actions on its schedule, opens its PR (or deletes branches), and auto-merges on green CI. The local triggers that would otherwise run the wiki sync on your machine defer to CI once CI owns the job. This mode is only offered if you enabled CI during init.
+- **`local`**: The job never runs in CI. It runs on your machine when you trigger it, and where GAIA has a local nudge for it (the wiki sync that runs as you work, the `Run /update-deps` statusline indicator), that nudge still fires so you do not forget. Pick this if you want the upkeep but prefer to review and commit it yourself, or you are not using GitHub Actions.
+- **`off`**: GAIA does not run the job on its own and does not nudge you about it, in CI or locally. The underlying tools (`/gaia-wiki`, `/update-deps`, `pnpm audit`) are still there if you ever want to run them by hand.
+
+If you declined CI during init, only `local` and `off` are offered, since CI is not a valid target until you wire it up.
+
+### Choosing a run mode
+
+The recommended answer for a project with a GitHub repo is **all four in `ci`**. The jobs run hands-off, the routine PRs merge themselves, and you only step in for the few that are held for review. When in doubt, take the recommendation. Nothing actually runs until you complete `/setup-gaia-ci`, and you can change any of it later.
+
+Reach for a different mode in these cases:
+
+- **`update_deps` → `off` if you already run Dependabot or Renovate.** Both bump the same packages and would open duplicate PRs. `/setup-gaia-ci` warns you if it detects one of them.
+- **`stale_branches` → `off` if your repo auto-deletes merged branches.** GitHub's "automatically delete head branches" setting already does this. `/setup-gaia-ci` offers to turn that setting on and sets `stale_branches` to `off` for you when it does.
+- **`wiki` → `local` if you would rather keep wiki commits under your own eye** instead of having a daily PR land on its own.
+- **`pnpm_audit` → keep at `ci`** even when you turn other jobs off. A daily security audit is worth running unattended.
+
+You can revisit every one of these answers later with `/setup-gaia-ci --reconfigure`.

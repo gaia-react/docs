@@ -42,3 +42,7 @@ Keeping dependencies and GAIA itself current is a different kind of upkeep:
 | --- | --- |
 | [`/update-deps`](/maintenance/update-deps/) | Bump outdated packages group-by-group, run migrations for major-version bumps, and validate the full quality gate. |
 | [`/update-gaia`](/maintenance/update-gaia/) | Pull the latest GAIA release into your project without overwriting your customizations. |
+
+## Running this upkeep automatically
+
+Several of these jobs can run on a schedule instead of by hand. [GAIA CI](/maintenance/gaia-ci/) puts wiki sync, dependency refresh, a security audit, and stale-branch cleanup on a cron, opens PRs, and auto-merges them on green CI. Each job can run in CI, run locally, or stay off. See [GAIA CI](/maintenance/gaia-ci/) for what the jobs do and how to choose, and [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/) for wiring it to GitHub.
