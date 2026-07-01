@@ -17,9 +17,9 @@ GAIA CI is the optional automation layer that keeps a GAIA project in shape with
 GAIA CI is set up in two phases, and the split matters when you answer the init question:
 
 1. **Phase A, during [`/gaia-init`](/getting-started/gaia-init/).** You record your choices into `.gaia/automation.json`. Nothing touches GitHub. No workflow files are written.
-2. **Phase B, after your first push.** [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/) installs the workflow files, stores your bot token as a repo secret, and turns the jobs on.
+2. **Phase B, after your first push.** [`/setup-gaia`](/getting-started/setup-gaia/) installs the workflow files, wires your bot token as a repo secret out of band, and turns the jobs on.
 
-So choosing `ci` during init is a statement of intent. The jobs do not actually run until you finish Phase B. If you never run `/setup-gaia-ci`, nothing runs in CI regardless of what you picked.
+So choosing `ci` during init is a statement of intent. The jobs do not actually run until you finish Phase B. If you never run `/setup-gaia`, nothing runs in CI regardless of what you picked.
 
 ## The audit gate
 
@@ -30,8 +30,8 @@ CI is the recommended team default, but running the code review audit locally is
 
 So opt yourself in, solo or on a team:
 
-- Solo: make `local` the default during [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/).
-- Team: keep `ci` as the default, then opt in during [`/setup-cloned-gaia-project`](/getting-started/setup-cloned-gaia-project/).
+- Solo: make `local` the default during [`/setup-gaia`](/getting-started/setup-gaia/)'s audit-mode policy step.
+- Team: keep `ci` as the default there, then each developer opts in individually during their own `/setup-gaia` run.
 
 The gate holds either way. If a local audit does not run, CI runs it instead, so every PR is audited before it can merge.
 
@@ -49,7 +49,7 @@ The gate is not one of the four toggleable jobs, and the run modes below do not 
 | `pnpm_audit` | Daily | Runs `pnpm audit` for new advisories | A security issue and a targeted single-package bump PR for each high or critical advisory |
 | `stale_branches` | Monthly | Deletes branches whose merged PR closed more than 30 days ago | Nothing. It deletes branches directly, no PR |
 
-Many of these PRs auto-merge on green CI, so day to day you mostly review the ones that are held back for you: a wiki PR that rewrites more than a quarter of the wiki, every major-version bump PR, and each `pnpm_audit` security PR. The [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/) page covers the merge behavior in full.
+Many of these PRs auto-merge on green CI, so day to day you mostly review the ones that are held back for you: a wiki PR that rewrites more than a quarter of the wiki, every major-version bump PR, and each `pnpm_audit` security PR. The [`/setup-gaia`](/getting-started/setup-gaia/) page covers the merge behavior in full.
 
 ## Run Modes
 
@@ -63,13 +63,13 @@ If you declined CI during init, only `local` and `off` are offered, since CI is 
 
 ### Choosing a run mode
 
-The recommended answer for a project with a GitHub repo is **all four in `ci`**. The jobs run hands-off, the routine PRs merge themselves, and you only step in for the few that are held for review. When in doubt, take the recommendation. Nothing actually runs until you complete `/setup-gaia-ci`, and you can change any of it later.
+The recommended answer for a project with a GitHub repo is **all four in `ci`**. The jobs run hands-off, the routine PRs merge themselves, and you only step in for the few that are held for review. When in doubt, take the recommendation. Nothing actually runs until you complete `/setup-gaia`, and you can change any of it later.
 
 Reach for a different mode in these cases:
 
-- **`update_deps` → `off` if you already run Dependabot or Renovate.** Both bump the same packages and would open duplicate PRs. `/setup-gaia-ci` warns you if it detects one of them.
-- **`stale_branches` → `off` if your repo auto-deletes merged branches.** GitHub's "automatically delete head branches" setting already does this. `/setup-gaia-ci` offers to turn that setting on and sets `stale_branches` to `off` for you when it does.
+- **`update_deps` → `off` if you already run Dependabot or Renovate.** Both bump the same packages and would open duplicate PRs. `/setup-gaia` warns you if it detects one of them.
+- **`stale_branches` → `off` if your repo auto-deletes merged branches.** GitHub's "automatically delete head branches" setting already does this. `/setup-gaia` offers to turn that setting on and sets `stale_branches` to `off` for you when it does.
 - **`wiki` → `local` if you would rather keep wiki commits under your own eye** instead of having a daily PR land on its own.
 - **`pnpm_audit` → keep at `ci`** even when you turn other jobs off. A daily security audit is worth running unattended.
 
-You can revisit every one of these answers later with `/setup-gaia-ci --reconfigure`.
+You can revisit every one of these answers later with `/setup-gaia --reconfigure`.

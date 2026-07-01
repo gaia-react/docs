@@ -61,9 +61,9 @@ For each candidate, `/gaia-harden` weighs three things before recommending exact
 | Pattern type | Recommended form |
 | --- | --- |
 | Oracle-class (`react-doctor/`, `axe/`, `knip/`, `cve/`) | Tighten the existing deterministic check: make it blocking or add it to the quality gate. Never a new prose rule. |
-| Mechanizable pattern (catchable by a lint rule, hook, or test) | A deterministic check. v1 produces a hook+script sketch only; nothing is activated. |
-| Correct procedure (a sequence of steps) | A skill via `skill-creator`. v1 produces a scaffold only; nothing is activated. |
-| Judgment-based anti-pattern (no reliable mechanization) | A path-scoped prose rule. v1 owns this end to end. |
+| Mechanizable pattern (catchable by a lint rule, hook, or test) | A deterministic check. Produces a hook+script sketch only; nothing is activated. |
+| Correct procedure (a sequence of steps) | A skill via `skill-creator`. Produces a scaffold only; nothing is activated. |
+| Judgment-based anti-pattern (no reliable mechanization) | A path-scoped prose rule, drafted complete. |
 
 **Will it change behavior (checked last).** A recurring finding proves the anti-pattern is real. It does not prove the recommended form will stop it. Before presenting a recommendation, the command asks what cheap evidence would show the form actually changes behavior, and whether that evidence exists. The bar is low: a couple of before-and-after task replays, or a single case of the agent ignoring guidance of the same kind. This matters most for prose rules, which advise rather than enforce. When the recommended form is a prose rule and no such evidence is available, because the pattern is too judgment-laden to catch reliably or a capable agent already honors the principle, the command says so and frames the candidate as a defer or decline. The decision is always yours; it never auto-declines.
 
@@ -75,7 +75,7 @@ For each candidate, `/gaia-harden` presents the `finding_class`, its distinct-PR
 Approving a deterministic check or a skill drafts a scaffold only. Nothing is wired into `settings.json` or activated; you finish and wire it yourself. Only prose rules are drafted complete.
 </Aside>
 
-### Prose rule (v1: owned end to end)
+### Prose rule (drafted complete)
 
 The rule is written to `.claude/rules/<slug>.md`. It is always path-scoped: a `paths:` frontmatter glob is derived from the candidate's `area_tags`. The rule body uses present-tense prose naming the anti-pattern and the correct pattern. The first line after the frontmatter carries a provenance marker:
 
@@ -85,13 +85,13 @@ The rule is written to `.claude/rules/<slug>.md`. It is always path-scoped: a `p
 
 The marker documents the rule's origin and instructs `/gaia-audit` not to treat non-recurrence as a staleness signal. A quiet pattern under a live rule means the rule is working.
 
-### Deterministic check (v1: scaffold only)
+### Deterministic check (scaffold only)
 
 A hook+script sketch: a proposed hook entry and a script outline. The sketch is never wired into `.claude/settings.json`, never made executable, and no `.claude/rules/` file is written for it. You finish and wire the check yourself.
 
-### Skill (v1: scaffold only)
+### Skill (scaffold only)
 
-A `skill-creator` invocation with the captured intent (what the skill should enable, when it triggers, the expected output). Nothing is activated.
+GAIA hand-writes a `SKILL.md` scaffold (name, description, trigger conditions, ordered steps) for you to drop under `.claude/skills/<name>/`. If the `skill-creator` plugin skill happens to be installed, GAIA uses it as a convenience instead, but it is not bundled and neither `/setup-gaia` nor `/gaia-init` provisions it, so do not rely on its presence. Nothing is activated either way.
 
 ### Oracle-class enforcement edit
 
@@ -101,7 +101,7 @@ All approved work lands in the working tree only. It ships through your normal P
 
 ## Decline and defer
 
-**Decline.** The decline is written to the machine-local, gitignored ledger at `.gaia/local/harden/declines.json`. It is never shared: a teammate still sees the nudge and can approve the same candidate independently. The ledger is evidence-based: the declined class stays suppressed for you until at least **3 more distinct PRs** carrying that `finding_class` merge after the decline. At that point it resurfaces.
+**Decline.** The decline is written to the machine-local, gitignored ledger at `.gaia/local/harden/declines.json`. It is never shared: a teammate still sees the nudge and can approve the same candidate independently. The ledger is evidence-based: the declined class stays suppressed for you until at least **3 more distinct PRs** carrying that `finding_class` merge after the decline. This is a window-snapshot comparison, not a running tally: PRs aging out of the 90-day window can lower the current count, so re-surfacing is not guaranteed simply because 3 more PRs merge.
 
 **Defer.** Nothing is persisted. The candidate stays in the next tally pass and ages out naturally if the pattern stops recurring before anyone acts.
 

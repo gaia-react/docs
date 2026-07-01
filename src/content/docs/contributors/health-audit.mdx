@@ -24,7 +24,7 @@ Before the loop, the Orchestrator initializes a fresh `.gaia/local/audit/` direc
 1. The Orchestrator creates the cycle directory `.gaia/local/audit/c<N>/` and its bucket subdirectories.
 2. It spawns the five audit buckets (A–E) as parallel leaf subagents. Each writes its raw output to disk and returns a summary plus the artifact path.
 3. It spawns a fresh Adjudicator, which reads the bucket artifacts, classifies findings, and writes `.gaia/local/audit/c<N>/findings.json` (including Bucket E's shared-fitness grade and the cycle's overall grade).
-4. If the cycle is clean (no open findings, Bucket D reports A+ readiness, and the effective shared-fitness grade is A+), the loop exits with the honest overall grade and removes the per-cycle directories.
+4. If the cycle looks clean (no open findings, Bucket D reports A+ readiness, and the effective shared-fitness grade is A+), the Orchestrator does not trust it yet. Before reporting the grade and deleting the per-cycle directories, it spawns a **false-clean challenger** (see below). If a lens substantiates a finding, the clean exit is revoked; if the challenge still comes back clean, the loop exits with the honest overall grade and removes the per-cycle directories.
 5. Otherwise the Orchestrator compares this cycle's open-finding fingerprints against the previous cycle's to detect oscillation, then dispatches Fixers in lane-aware parallel.
 6. The Fixers report post-fix state to the Orchestrator, and the next cycle starts.
 
@@ -43,6 +43,12 @@ A clean cycle is not necessarily A+. The reported grade is the honest floor with
 | E | The shared Claude-integration fitness protocol, the same seven-category check `/gaia-fitness` runs (hook integrity, skill/command/agent frontmatter, rule hygiene, `CLAUDE.md` hygiene, settings hygiene, GAIA-install fitness, wiki fitness). |
 
 Mechanical buckets (A, B, C, and the mechanical half of E) run on Haiku. Judgment-bearing work (Bucket D, the judgment half of E, the Adjudicator, and the Fixers) runs on Sonnet. A Fixer is promoted to Opus only when the Adjudicator flags a high-complexity fix.
+
+## The false-clean challenger
+
+A clean cycle does not immediately end the run. The first time a cycle meets the clean gate, the Orchestrator spawns an adversarial false-clean challenger before it reports the grade or deletes the per-cycle artifacts. The challenger runs a fixed set of lenses in parallel (BS, MC, and GH always; FV as well when a prior cycle dispatched a Fixer), each trying to substantiate a finding the buckets missed.
+
+A substantiated finding revokes the clean exit: it is injected into the cycle's `findings.json` as real work. Below cycle 3 the run falls through to Fixers and continues; on cycle 3 it escalates with reason `false-clean-refuted`. The challenger runs at most once per run.
 
 ## Where the runbook lives
 
@@ -83,7 +89,7 @@ On escalation it preserves all `c*/` directories and prints the grades, the esca
 HEALTH AUDIT: ESCALATED
 Overall grade: <F-to-A+>
 Shared-fitness grade: <F-to-A+>
-Reason: <max-loops | oscillation | circuit-breaker | unclassified-finding | fixer-unable-to-fix>
+Reason: <max-loops | oscillation | circuit-breaker | unclassified-finding | fixer-unable-to-fix | false-clean-refuted>
 Outstanding findings: <list with fingerprints>
 Cycles run: <N>
 Artifacts: preserved at .gaia/local/audit/c1/, c2/, c3/ (see findings.json in each)

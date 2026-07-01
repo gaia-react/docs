@@ -37,7 +37,15 @@ Apply only. Re-run the apply stage against the most recent report:
 /gaia-audit --apply
 ```
 
-Use `--apply` to resume a report that was interrupted, or to retry after fixing drift that caused some actions to skip. It targets the newest report that is still `draft` or `applied-partial`. See [The re-apply window](#the-re-apply-window) for the grace period.
+Use `--apply` to resume a report that was interrupted, or to retry after fixing drift that caused some actions to skip. It targets the newest report that is still `draft` or `applied-partial`. See [The re-apply window](#the-re-apply-window) for the grace period. If the target report predates the verification round (or the round was skipped when it was written), `--apply` runs the round non-interactively before applying, with no prompt.
+
+## The verification round
+
+When the research stage finds at least one action, GAIA offers a classification-verification round before the decision gate. It hardens Stage 1's classifications against ground truth: three lenses run in parallel and check each proposed action's claim against the actual stores, the wiki, and the repo, then drop a mis-classified action (a `delete` that would remove something still needed, say), correct others, or re-run the research once for a structural finding.
+
+The round is recommended but optional. In an interactive run you are asked once whether to run it, with Run as the default recommendation; on Run, the report is hardened and stamped, then the decision gate follows. It never blocks: skip it, or run it in a context that cannot spawn the parallel lenses, and GAIA proceeds straight to the decision gate, which is the safety net. A clean audit (zero actions) skips both the round and the gate.
+
+Because memory edits are machine-local with no git undo, the round exists to catch a wrong or destructive edit before any approval or apply path consumes it.
 
 ## The decision gate
 
@@ -45,7 +53,7 @@ Calling `/gaia-audit` is the intent to audit, not a commitment to apply. What ha
 
 If the audit comes back clean, with zero actions, there is nothing to approve: the command finalizes the report and clears the statusline nudge automatically, with no prompt.
 
-Otherwise, the main conversation summarizes the findings and asks one question with three options:
+Otherwise, the main conversation summarizes the findings (hardened by the verification round above) and asks one question with three options:
 
 - **Apply.** Run the apply stage now. This is the one-keystroke fast path.
 - **Discuss / refine.** Talk the report through. Edits happen in the report in place (it stays a `draft`), then the gate is asked again.
@@ -102,7 +110,7 @@ Anything over budget is flagged with a proposed fix: inline facts moved to the w
 
 **Stage 2: apply.** Reads the most recent unfinished report and stops with a clear error if it was generated on another machine or clone. For each action it checks that the file still matches what the report saw, applies it or skips it with a recorded reason, then confirms the change landed.
 
-The split into two stages is internal. The only point where you decide anything is the single gate above.
+The split into two stages is internal. The only points where you decide anything are the optional verification-round question and the single decision gate above.
 
 ## Action types
 

@@ -41,7 +41,7 @@ The `/gaia-*` commands are for specific moments, not everyday driving. Reach for
 
 Here is the full loop for a feature you can't fully describe yet:
 
-1. **Settle what to build.** Run `/gaia-spec add saved-search filters`. It asks a few questions, confirms the intent and the acceptance tests in plain English, and saves a spec. When discovery is done it offers to hand off to planning.
+1. **Settle what to build.** Run `/gaia-spec add saved-search filters`. It asks a few questions, confirms the intent and the acceptance tests in plain English, and saves a spec, then prints a ready-to-paste prompt for `/gaia-plan`.
 2. **Plan the work.** `/gaia-plan` reads the spec and breaks it into phased workstreams with shared contracts. It writes a plan folder with a ready-to-run kickoff prompt, then stops without writing code.
 3. **Build it.** Open a fresh session and run the kickoff. The orchestrator builds each workstream, runs the quality gate after every phase, and sends the result through the [`code-review-audit`](/reference/agents/) agent before anything merges.
 4. **Handle the small stuff directly.** Not every change is worth that. "Fix the date formatting in the invoice header" is a single prompt. Claude makes the change, and the quality gate runs at commit.

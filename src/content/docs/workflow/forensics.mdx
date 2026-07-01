@@ -39,7 +39,7 @@ Forensics runs in nine read-only steps:
 5. **Render.** Emits a strict-schema report with frontmatter (class, GAIA version, created date, optional issue URL) and four fixed sections: `## Symptom`, `## Classification`, `## Capture`, `## Reproduction context`.
 6. **Save.** Writes to `.gaia/local/forensics/<timestamp>-<class>.md`. The timestamp is ISO-8601 compact UTC.
 7. **Branch on diagnosis.** User-config failures: prints remediation steps inline, exits. Probable bugs: continues to the issue-filing offer.
-8. **Offer to file.** If `gh` is installed, asks once whether to file an issue on `gaia-react/gaia` with the `gaia-forensics` label. If `gh` is not installed, prints the local report path and exits.
+8. **Offer to file.** If `gh` is installed, asks once whether to file an issue on `gaia-react/gaia` with the `gaia-forensics` label. If `gh` is not installed, prints the local report path and exits. If the `gaia-forensics` label fails to attach (common for adopters without triage access on the upstream repo, where GitHub silently drops it), forensics still files the issue but warns that label-gated automatic triage won't fire on it.
 9. **Confirm.** Prints a final line with the report path and (if filed) the issue URL.
 
 ## Strict body schema

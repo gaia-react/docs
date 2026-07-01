@@ -56,7 +56,7 @@ If findings remain, the agent does not write the marker. Address findings, commi
 
 By default the audit runs in CI on every PR, and you wait for the `GAIA-Audit` commit status to go green before merging. Teams can let individual developers run it locally instead. In local mode the audit runs at merge time in your own session, streaming as it goes, and CI's audit step stands down for that author while still running for everyone else.
 
-The team default and the per-developer enrollments live in `.gaia/audit-ci.yml`, which ships with the project and is meant to be edited. You set the team default during [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/); individual developers opt in during [`/setup-cloned-gaia-project`](/getting-started/setup-cloned-gaia-project/). Local mode relies on `GAIA-Audit` being registered as a required status check on the default branch; if it is not, the audit falls back to CI.
+The team default and the per-developer enrollments live in `.gaia/audit-ci.yml`, which ships with the project and is meant to be edited. Both are set through the single [`/setup-gaia`](/getting-started/setup-gaia/) command: its team audit-mode policy step writes the team default, and its per-developer step records each developer's own choice. Local mode relies on `GAIA-Audit` being registered as a required status check on the default branch; if it is not, the audit falls back to CI.
 
 ## worthiness-evaluator
 

@@ -21,8 +21,9 @@ It's a skill, so it also runs on plain-English asks like "pick up where we left 
 /gaia-pickup
 ```
 
-No arguments. Pickup runs through four steps:
+No arguments. Pickup runs through five steps:
 
+0. **Sweep.** If more than one handoff file exists (a leftover from a crash mid-handoff), keep only the newest and delete the rest. This self-heals any pile-up so pickup always resumes from a single source of truth.
 1. **Locate.** Find the most recent handoff: `ls -t .gaia/local/handoff/HANDOFF-*.md | head -1`. If no handoff exists, fall back to `wiki/hot.md` and report `No handoff found, resuming from hot cache.`
 2. **Read.** Load the handoff in full. Run `git rev-parse --abbrev-ref HEAD`, `git status --short`, and `git log -1 --oneline` in parallel.
 3. **Report.** Surface a tight status block: current branch (with drift from the handoff if any), handoff filename and date, one-line context, 1 to 3 bullets on what's done or in-flight, 1 to 3 bullets on gaps, and a suggested next action.

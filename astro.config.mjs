@@ -34,8 +34,7 @@ export default defineConfig({
 					items: [
 						{ label: 'Quick Start', slug: 'index' },
 						{ label: '/gaia-init', slug: 'getting-started/gaia-init' },
-						{ label: '/setup-gaia-ci', slug: 'getting-started/setup-gaia-ci' },
-						{ label: '/setup-cloned-gaia-project', slug: 'getting-started/setup-cloned-gaia-project' },
+						{ label: '/setup-gaia', slug: 'getting-started/setup-gaia' },
 					],
 				},
 				{
@@ -56,6 +55,7 @@ export default defineConfig({
 						{ label: 'GAIA CI', slug: 'maintenance/gaia-ci' },
 						{ label: '/gaia-fitness', slug: 'maintenance/fitness' },
 						{ label: '/gaia-audit', slug: 'maintenance/audit' },
+						{ label: '/gaia-debt', slug: 'maintenance/debt' },
 						{ label: '/gaia-harden', slug: 'maintenance/harden' },
 						{ label: '/gaia-wiki', slug: 'maintenance/wiki' },
 						{ label: '/update-deps', slug: 'maintenance/update-deps' },

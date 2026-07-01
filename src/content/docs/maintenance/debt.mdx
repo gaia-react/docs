@@ -1,0 +1,90 @@
+---
+title: /gaia-debt
+description: Drain the tech-debt backlog one issue at a time, highest severity then oldest first, on a fresh branch through the audit gate, closing the issue on merge.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+`/gaia-debt` drains the `tech-debt` backlog that [`/gaia-audit`](/maintenance/audit/) files as GitHub issues. It reads the open `tech-debt` issues, orders them deterministically (highest severity first, then oldest first), recommends the top candidate, and resolves **exactly one** issue per invocation on a fresh branch through the same `code-review-audit` gate every feature PR passes. The fix PR carries `Closes #N` so the merge closes the issue natively.
+
+## When to use it
+
+The statusline tells you. When open `tech-debt` issues accumulate, you will see:
+
+```
+Run /gaia-debt (N issues)
+```
+
+where `N` is the open count. Run `/gaia-debt` then to drain the top candidate.
+
+## How to invoke
+
+Default (interactive drain, the same thing the statusline nudge points at):
+
+```
+/gaia-debt
+```
+
+List the ordered backlog without draining anything:
+
+```
+/gaia-debt list
+```
+
+Explain where one issue sits in the ordering and why it is recommended:
+
+```
+/gaia-debt why 142
+```
+
+`drain` runs the full human-gated flow. `list` and `why` author nothing and prompt for nothing.
+
+## How the backlog is ordered
+
+The order is a pure sort over the issues' severity labels and creation timestamps. No model call ranks the backlog, so `list`, `why`, and `drain` all agree on the order and anyone can reproduce it:
+
+- **Severity descending.** `severity:critical` sorts above `severity:important`, which sorts above `severity:suggestion`. An issue with no severity label falls into the suggestion band, so a hand-filed issue is still a valid candidate.
+- **Oldest first within a band.** Two issues of equal severity sort by creation time, oldest first.
+
+Cross-band fairness and anti-starvation are out of scope: a steady stream of critical issues will always be recommended ahead of an old suggestion.
+
+## The drain flow
+
+`drain` is interactive and human-gated. It never auto-advances to the next issue, and it resolves exactly one issue per run.
+
+1. **Recommend and present.** The top candidate is recommended, but the full ordered backlog is printed so you can override. Pick a different issue and the command honors it.
+2. **Security screen.** Before opening any PR, the selected issue is screened. If it reads as a security concern (see below), the flow diverts instead of opening a public fix PR.
+3. **Confirm the handler class.** The issue may carry an advisory `Handler: prompt` (a single-file fix) or `Handler: plan` (cross-module or contract-changing). The command reads the code and can override it; when the honest class is `plan`, it says so before implementing so you know the fix is larger than a one-file edit.
+4. **Fix on a fresh branch.** A branch is cut from the default branch, the fix is implemented following the project's conventions (TDD, surgical changes), the [Quality Gate](/reference/rules/) runs, and the change is committed and pushed.
+5. **Open the PR.** `gh pr create` opens the PR with `Closes #N` in the body.
+
+<Aside type="caution">
+`/gaia-debt` does **not** merge. The fix PR clears the **same** `code-review-audit` marker gate as any feature PR, and you or your orchestrator merge it. The command never runs `gh pr merge`, and never bypasses or pre-empts the gate.
+</Aside>
+
+## Security screen
+
+A `tech-debt` issue that reads as a security concern is treated as security-class (fail-safe: when in doubt, it is security-class). Before draining one, the command re-reads the repo visibility and applies a gate:
+
+- **Public or internal repo** → the flow **diverts** to a count-only operator pointer and stops. It never opens a public `Closes #N` PR, because that would complete a coordinated-disclosure failure by pointing at the very issue it fixes.
+- **Confirmed private repo** → the fix stays inside the private repo, so draining proceeds normally.
+
+A security-class issue's detail never reaches a public PR, PR comment, or Actions log.
+
+## After the PR
+
+Once the fix PR is open, the command refreshes the debt-count sentinel so the statusline recomputes the open count on its next tick. The count also updates automatically when the PR merges.
+
+## Guardrails
+
+- **Exactly one issue per invocation.** There is no batch drain.
+- **Deterministic ordering.** The order is a fixed sort over severity labels and creation time, never a model ranking.
+- **The command does not merge.** It opens the fix PR through the normal PR merge workflow; the audit gate and you decide the merge.
+- **Security screen before any public PR.** A security-class issue diverts on a public or internal repo and drains only on a confirmed-private one.
+- **No issues backend, no-op.** With no GitHub Issues backend (repo unresolvable, `gh` unauthenticated, Issues disabled, or no write access), the command reports it and stops.
+
+## Related
+
+- [`/gaia-audit`](/maintenance/audit/): files the `tech-debt` issues this command drains.
+- [`/gaia-harden`](/maintenance/harden/): the sibling loop that promotes recurring `code-review-audit` findings into enforcement.
+- [`code-review-audit` agent](/reference/agents/): the gate every drain PR clears before merge.

@@ -64,17 +64,15 @@ A handful of mechanics are used by multiple steps:
 ## The flow
 
 1. **Description capture.** Open-ended prompt if not provided as arguments.
-2. **GitHub issue mirror prompt.** Single `AskUserQuestion`: skip (recommended) or mirror to a GitHub issue on save.
-3. **Resume-vs-start-new.** If an in-progress SPEC exists, the skill surfaces it (last touched, intent first line, UAT count) and asks: resume, start new, or discard the draft cache. Before this prompt, two silent housekeeping passes run: any earlier SPEC whose implementing PR has since merged is advanced, then those merged folders are swept into `.gaia/local/specs/archived/`. Both are best-effort and never block the session, and only still-draft sessions surface for resume.
-4. **Initial draft.** `/speckit-specify` runs the GAIA preset's body, allocates a SPEC id, lands the artifact at `.gaia/local/specs/SPEC-NNN/SPEC.md`. The `before_specify` hook (constitution check) fires automatically.
-5. **Gate 1.** Plain prompt: confirm intent and UATs, or revise.
-6. **Socratic clarify loop.** `/speckit-clarify` runs, capped at five questions. Closed-set questions go through `AskUserQuestion` with the recommended option first; open-ended questions are plain prompts. Per-topic exhaustion checkpoints fire when the natural well runs dry. Research subagents dispatch for any question requiring prior-art lookup.
-7. **Self-review.** The `after_clarify` hook fires `/speckit-gaia-self-review` against the gate-1 snapshot. Findings come back classified low, medium, or high. Low and medium auto-apply; high surfaces to the user before applying. Pending clarifications block save until answered or deferred with rationale.
-8. **Adversarial SPEC-audit.** Before gate 2, the skill offers to audit the draft, and the recommended choice is always an intensity (standard or deep), never skip. The audit checks the draft's claims against your actual code, tests whether each UAT is really testable, and looks for gaps. Fixes to the spec itself are folded in before save, so gate 2 shows the hardened version. Notes meant for the build land in `.gaia/local/specs/SPEC-NNN/AUDIT.md` for `/gaia-plan` to honor.
-9. **Gate 2.** Plain prompt: confirm the full rendered artifact, or revise.
-10. **Canonical save.** Writes `.gaia/local/specs/SPEC-NNN/SPEC.md` and deletes the working-draft cache. The `after_specify` hook fires `/speckit-gaia-lint` for immutability checks. Cycles 1 and 2 surface failures; cycle 3 prompts to step back to gate 2, defer remaining findings, or push another fix.
-11. **Optional GitHub issue mirror.** If opted in at step 2, `gh-mirror.sh` creates the issue and stamps the URL into frontmatter. Skips silently when `gh` is not authenticated, Issues are disabled, or the viewer lacks write permission.
-12. **Chain to `/gaia-plan`.** `AskUserQuestion`: trigger `/gaia-plan` now or defer. On yes, you can author one or more plans, one per slice of the spec. The session stays light no matter how many you create.
+2. **Resume-vs-start-new.** If an in-progress SPEC exists, the skill surfaces it (last touched, intent first line, UAT count) and asks: resume, start new, or discard the draft cache. Before this prompt, two silent housekeeping passes run: any earlier SPEC whose implementing PR has since merged is advanced, then those merged folders are swept into `.gaia/local/specs/archived/`. Both are best-effort and never block the session, and only still-draft sessions surface for resume.
+3. **Initial draft.** `/speckit-specify` runs the GAIA preset's body, allocates a SPEC id, lands the artifact at `.gaia/local/specs/SPEC-NNN/SPEC.md`. The `before_specify` hook (constitution check) fires automatically.
+4. **Gate 1.** Plain prompt: confirm intent and UATs, or revise.
+5. **Socratic clarify loop.** `/speckit-clarify` runs, capped at five questions. Closed-set questions go through `AskUserQuestion` with the recommended option first; open-ended questions are plain prompts. Per-topic exhaustion checkpoints fire when the natural well runs dry. Research subagents dispatch for any question requiring prior-art lookup.
+6. **Self-review.** The `after_clarify` hook fires `/speckit-gaia-self-review` against the gate-1 snapshot. Findings come back classified low, medium, or high. Low and medium auto-apply; high surfaces to the user before applying. Pending clarifications block save until answered or deferred with rationale.
+7. **Adversarial SPEC-audit.** Before gate 2, the skill offers to audit the draft, and the recommended choice is always an intensity (standard or deep), never skip. The audit checks the draft's claims against your actual code, tests whether each UAT is really testable, and looks for gaps. Fixes to the spec itself are folded in before save, so gate 2 shows the hardened version. Notes meant for the build land in `.gaia/local/specs/SPEC-NNN/AUDIT.md` for `/gaia-plan` to honor.
+8. **Gate 2.** Plain prompt: confirm the full rendered artifact, or revise.
+9. **Canonical save.** Writes `.gaia/local/specs/SPEC-NNN/SPEC.md` and deletes the working-draft cache. The `after_specify` hook fires `/speckit-gaia-lint` for immutability checks. Cycles 1 and 2 surface failures; cycle 3 prompts to step back to gate 2, defer remaining findings, or push another fix.
+10. **Hand off to `/gaia-plan`.** `/gaia-spec` does not run `/gaia-plan` itself. It prints a copy-pasteable `SPEC-NNN: <intent>, see <path>` prompt (with the `AUDIT.md` path appended when the audit ran) and stops. Run `/gaia-plan` yourself in a fresh session with that prompt; author one plan or several, one per slice of the spec.
 
 ## Auto mode
 
@@ -86,8 +84,7 @@ A handful of mechanics are used by multiple steps:
 - Per-topic exhaustion auto-advances; the third-revisit prompt auto-settles.
 - The adversarial SPEC-audit runs at the recommended intensity; it is never skipped.
 - Pending clarifications auto-defer with a static auto-mode rationale.
-- The GitHub issue mirror is forced on.
-- The chain to `/gaia-plan` is automatic and produces exactly one plan covering the full SPEC.
+- Ends the same way as interactive mode: prints the copy-pasteable `/gaia-plan` handoff prompt and stops.
 
 Use auto mode when the description is well-formed and the cost of stopping for clarifications outweighs the cost of a reviewer auditing the deferred items afterward.
 
@@ -118,8 +115,8 @@ Five GAIA hooks fire across the SPEC lifecycle. Never invoke them by hand.
 | `before_implement` | `/speckit-gaia-uat-write` | Renders frozen UATs into Playwright e2e specs at `.playwright/e2e/<spec-dir>/`, leaving a red-state harness before implementation begins. |
 | `after_implement` | `/speckit-gaia-wiki-promote` | Promotes merged-PR content into the project wiki under `wiki/<subdomain>/`. Defers if the implementing PR has not merged yet. |
 
-The chain-trigger to `/gaia-plan` lives inline at step 12 of the flow, not as a hook. Disposition of the SPEC artifact (archive, delete, or keep) is automatic after the implementing PR merges: on the immediate-merge path the `after_implement` wiki-promote step chains to `/speckit-gaia-spec-close`, and the step-3 housekeeping passes archive any SPEC whose PR has since merged. Running `/speckit-gaia-spec-close [SPEC-NNN]` by hand is a backstop, for draining a deferred wiki-promote when the PR merges after implementation, or for choosing delete or keep instead of the default archive. The SPEC ID is optional; omit it and the command targets the single eligible SPEC, or prompts you to choose when more than one is eligible.
+The `/gaia-plan` handoff is a copy-pasteable prompt printed at the end of the flow, not a hook. Disposition of the SPEC artifact (archive, delete, or keep) is automatic after the implementing PR merges: on the immediate-merge path the `after_implement` wiki-promote step chains to `/speckit-gaia-spec-close`, and the step-3 housekeeping passes archive any SPEC whose PR has since merged. Running `/speckit-gaia-spec-close [SPEC-NNN]` by hand is a backstop, for draining a deferred wiki-promote when the PR merges after implementation, or for choosing delete or keep instead of the default archive. The SPEC ID is optional; omit it and the command targets the single eligible SPEC, or prompts you to choose when more than one is eligible.
 
 ## Related
 
-After save, [`/gaia-plan`](/workflow/plan/) is the natural next step. The chain-trigger at step 12 dispatches it automatically when accepted.
+After save, [`/gaia-plan`](/workflow/plan/) is the natural next step. `/gaia-spec` prints a copy-pasteable SPEC reference at the end of its flow; paste it into `/gaia-plan` in a fresh session yourself.

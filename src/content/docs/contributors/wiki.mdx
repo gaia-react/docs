@@ -79,7 +79,7 @@ The `gaia wiki` namespace exposes these subcommands. The `/gaia-wiki` router and
 
 ## gaia:maintainer-only block convention
 
-Some pages under `wiki/concepts/`, `wiki/decisions/`, `.claude/`, and `.specify/extensions/gaia/` ship to end users but contain blocks that do not. The block convention is:
+Some pages under `wiki/concepts/`, `wiki/decisions/`, and `.claude/` ship to end users but contain blocks that do not; the same convention is available for `.specify/extensions/gaia/` files. The block convention is:
 
 ```markdown
 <!-- gaia:maintainer-only:start -->
@@ -95,4 +95,4 @@ When to use the block convention rather than path-level exclusion: use blocks wh
 ## Cross-references
 
 - end user wiki workflow: see the `/gaia-wiki` skill in end user docs.
-- The `.gaia/release-exclude` manifest is the authoritative path-level exclusion list. Anything matched there is also skipped by `gaia-maintainer release manifest`, so the end user manifest never references files an end user cannot have.
+- The `.gaia/release-exclude` manifest is the authoritative path-level exclusion list. Anything matched there is also skipped by the maintainer's release tooling, so the end user manifest never references files an end user cannot have.

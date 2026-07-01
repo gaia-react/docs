@@ -1,11 +1,11 @@
 ---
 title: CI workflows
-description: Contributor-only GitHub Actions workflows. Release, CLI tests, audit-script tests, distribution harness, forensics triage, and the on-demand automation workflows installed by /setup-gaia-ci.
+description: Contributor-only GitHub Actions workflows. Release, CLI tests, audit-script tests, distribution harness, forensics triage, and the on-demand automation workflows installed by /setup-gaia.
 sidebar:
   order: 5
 ---
 
-CI workflows are excluded from the end user tarball by `.gaia/release-exclude`. They run only on the GAIA template repo's clone. `chromatic.yml` and `tests.yml` ship to end users and are out of scope here. `code-review-audit.yml` is also release-excluded, but unlike the contributor-only workflows below, adopters can install it on demand with [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/); the template repo keeps it in-tree as the live pre-merge gate. The agent it runs is documented in the [agent reference](/reference/agents/).
+CI workflows are excluded from the end user tarball by `.gaia/release-exclude`. They run only on the GAIA template repo's clone. `chromatic.yml` and `tests.yml` ship to end users and are out of scope here. `code-review-audit.yml` is also release-excluded, but unlike the contributor-only workflows below, adopters can install it on demand with [`/setup-gaia`](/getting-started/setup-gaia/); the template repo keeps it in-tree as the live pre-merge gate. The agent it runs is documented in the [agent reference](/reference/agents/).
 
 ## release.yml
 
@@ -45,9 +45,9 @@ The required-check posture is intentional: contributors who don't touch the CLI 
 
 ## audit-ci-tests.yml
 
-Triggers on both `push` to `main` and `pull_request` against `main`, with the job gated to `pull_request` events via a job-level `if:` condition. It runs two bats suites. `bats .github/audit/tests/` covers the audit helpers that `code-review-audit.yml` consumes, including `check-trailer.sh` (the skip-logic gate), `resolve-audit-base.sh` (the incremental-review base), and `pr-merge-audit-check.sh` (the merge-status reader). `bats .gaia/scripts/tests/` covers the shipped GAIA-owned scripts under `.gaia/scripts/`.
+Triggers on both `push` to `main` and `pull_request` against `main`, with the job gated to `pull_request` events via a job-level `if:` condition. It runs three suites. `bats .github/audit/tests/` covers the audit helpers that `code-review-audit.yml` consumes, including `check-trailer.sh` (the skip-logic gate), `resolve-audit-base.sh` (the incremental-review base), and `pr-merge-audit-check.sh` (the merge-status reader). `bats .gaia/scripts/tests/` covers the shipped GAIA-owned scripts under `.gaia/scripts/`. `bash .gaia/tests/forensics/run-all.sh` covers the forensics-triage helper scripts.
 
-PRs that don't touch `.github/audit/**`, `.gaia/scripts/**`, this workflow file, or the audit hooks at `.claude/hooks/lib/repo-scope.sh`, `.claude/hooks/pr-merge-audit-check.sh`, and `.claude/hooks/post-audit-status.sh` report green without installing or running anything. The path filter is `dorny/paths-filter`, mirroring `cli-tests.yml`.
+PRs that don't touch `.github/audit/**`, `.gaia/scripts/**`, `.gaia/tests/forensics/**`, `.claude/skills/gaia/references/forensics*`, `.github/forensics/**`, this workflow file, or the audit hooks at `.claude/hooks/lib/repo-scope.sh`, `.claude/hooks/pr-merge-audit-check.sh`, and `.claude/hooks/post-audit-status.sh` report green without installing or running anything. The path filter is `dorny/paths-filter`, mirroring `cli-tests.yml`.
 
 Adopters receive the audit scripts as GAIA-controlled code they never edit, so the suite guards only maintainer changes.
 
@@ -75,7 +75,7 @@ The workflow is on the canonical denylist: future autonomous triage runs must no
 
 ## On-demand automation workflows
 
-GAIA can install a set of automation workflows into an adopter's repository on demand. They are not committed to the template repo's `.github/workflows/`; their templates live in the CLI source at `.gaia/cli/src/automation/templates/workflows/` and are rendered into an adopter's repo by [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/).
+GAIA can install a set of automation workflows into an adopter's repository on demand. They are not committed to the template repo's `.github/workflows/`; their templates live in the CLI source at `.gaia/cli/src/automation/templates/workflows/` and are rendered into an adopter's repo by [`/setup-gaia`](/getting-started/setup-gaia/).
 
 The installable set:
 
@@ -85,4 +85,4 @@ The installable set:
 - `gaia-ci-stale-branches.yml`: monthly cleanup of long-merged branches
 - `code-review-audit.yml`: the pre-merge audit gate, installed unconditionally (not a cron tool)
 
-The cron workflows are generated from `.gaia/automation.json`, so which tools run is per-project. The [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/) reference covers the adopter flow, tool modes, and schedules. The template repo keeps its own `code-review-audit.yml` in-tree as a live gate, so the `gaia-ci-*` cron workflows are an adopter-side surface rather than workflows that run on the GAIA template itself.
+The cron workflows are generated from `.gaia/automation.json`, so which tools run is per-project. The [`/setup-gaia`](/getting-started/setup-gaia/) reference covers the adopter flow, tool modes, and schedules. The template repo keeps its own `code-review-audit.yml` in-tree as a live gate, so the `gaia-ci-*` cron workflows are an adopter-side surface rather than workflows that run on the GAIA template itself.

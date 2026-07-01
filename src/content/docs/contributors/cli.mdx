@@ -7,7 +7,7 @@ sidebar:
 
 The `gaia` binary is the bundled CLI that ships with the end user tarball at `.gaia/cli/gaia`. End users do not invoke it directly in normal use. Skills, hooks, and slash commands invoke it for them.
 
-Contributors working on the CLI source need the surface map. Source lives under `.gaia/cli/src/` (contributor-only, excluded from the end user tarball). The bundle is rebuilt by `pnpm --filter @gaia-react/cli bundle`.
+Contributors working on the CLI source need the surface map. Source lives under `.gaia/cli/src/` (contributor-only, excluded from the end user tarball). `.gaia/cli` is its own isolated pnpm workspace, so the bundle is rebuilt with `pnpm -C .gaia/cli bundle`.
 
 ## Build layout
 
@@ -60,7 +60,7 @@ gaia scaffold service <name>
 
 Source: `.gaia/cli/src/setup/index.ts`
 
-Per-machine clone setup primitives invoked by `/setup-cloned-gaia-project`. The slash command orchestrates externally-shelled installs (React Doctor, Playwright CLI, Serena MCP, plugins, spec-kit) and calls these primitives to record progress in `.gaia/local/setup-state.json`.
+Per-machine clone setup primitives invoked by `/setup-gaia`. The slash command orchestrates externally-shelled installs (React Doctor, Playwright CLI, Serena MCP, plugins, spec-kit) and calls these primitives to record progress in `.gaia/local/setup-state.json`.
 
 ```
 gaia setup status [--json]
@@ -73,7 +73,7 @@ gaia setup link-worktree [--json]
 
 Source: `.gaia/cli/src/setup-ci/index.ts`
 
-Phase B remote-integration primitives invoked by `/setup-gaia-ci`. The slash command shells out to these for remote detection, the admin permission probe, token piping (stdin only), `workflow_dispatch` verification, and the `setup_complete` flip.
+Phase B remote-integration primitives invoked by `/setup-gaia`. The slash command shells out to these for remote detection, the admin permission probe, `workflow_dispatch` verification, and the `setup_complete` flip. The bot token itself is never handled by the CLI or the agent: `/setup-gaia` prints a `gh secret set` command for the user to run in their own terminal, then verifies the secret by name only.
 
 ```
 gaia setup-ci status [--json]
@@ -85,13 +85,12 @@ gaia setup-ci check-admin --owner <o> --repo <r> [--json]
 gaia setup-ci dismiss-personal
 gaia setup-ci opt-out-team
 gaia setup-ci enable-delete-branch --owner <o> --repo <r>
-gaia setup-ci set-secret <name>
 gaia setup-ci verify-run <workflow-file> [--timeout-seconds N] [--json]
 gaia setup-ci finalize
 gaia setup-ci write-tool-mode <tool> <mode>
 ```
 
-`check-drift` compares the rendered workflows against a fresh template render. `check-audit-drift` does the same for the installed audit workflow, two-way by default or a three-way classify when `--baseline` (and optional `--latest`) are passed. `detect-remote` reads `git remote get-url origin`. `warn-existing-tools` detects Dependabot or Renovate configs. `set-secret` reads the secret value from stdin and pipes it into `gh secret set <name>`. `dismiss-personal` writes `nudge_dismissed=true` (per-machine); `opt-out-team` writes `setup_opted_out=true` (committed). `write-tool-mode` sets one tool's mode in `.gaia/automation.json`; `<tool>` is one of `wiki`, `update-deps`, `pnpm-audit`, `stale-branches` and `<mode>` is `ci`, `local`, or `off`.
+`check-drift` compares the rendered workflows against a fresh template render. `check-audit-drift` does the same for the installed audit workflow, two-way by default or a three-way classify when `--baseline` (and optional `--latest`) are passed. `detect-remote` reads `git remote get-url origin`. `warn-existing-tools` detects Dependabot or Renovate configs. `dismiss-personal` writes `nudge_dismissed=true` (per-machine); `opt-out-team` writes `setup_opted_out=true` (committed). `write-tool-mode` sets one tool's mode in `.gaia/automation.json`; `<tool>` is one of `wiki`, `update-deps`, `pnpm-audit`, `stale-branches` and `<mode>` is `ci`, `local`, or `off`.
 
 ### `gaia automation`
 
