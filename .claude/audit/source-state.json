@@ -1,7 +1,7 @@
 {
   "version": 1,
   "captured_at": "2026-07-02T00:00:00Z",
-  "gaia_commit": "8789b84a",
+  "gaia_commit": "f0d8bd39",
   "items": [
     {
       "kind": "agent",
@@ -9,7 +9,7 @@
       "name": "code-review-audit",
       "description": "Comprehensive code review, security audit, performance analysis, and architectural assessment. Goes beyond linting and type-checking to identify vulnerabilities, bottlenecks, code smells, anti-patterns, and refactoring opportunities. Mandatory before PR merge.",
       "audience": "mixed",
-      "content_hash": "c08df8a0e21744411115a2b09c6477f4656763bcbf2a34c8c464e31721d7d163",
+      "content_hash": "639c0d869932a2a50ea3355bc15557c2033fe6b64e6f56224994cdf92d3e3b30",
       "excluded_from_docs": false,
       "marker_blocks": [
         [
@@ -28,7 +28,7 @@
       "name": "worthiness-evaluator",
       "description": "Advisory test-worthiness audit for the emergent surface. Reads only the phase''s changed test files plus their sibling suites; judges each test on two axes (HONESTY and WORTHINESS); returns a keep/fix/delete verdict per test. Proposes only, edits no files, every delete is human-gated.",
       "audience": "adopter",
-      "content_hash": "a6346ff53cc78e92d5e2fcc715dca9f92b3568f4bfad2fcdaf1100d6e4d0e552",
+      "content_hash": "79fb600ea423460f36e2fff01bfcec3c819324c5c74113e588d7a58384ee27ee",
       "excluded_from_docs": false
     },
     {
@@ -37,7 +37,7 @@
       "name": "_internal-fetch-coaching",
       "description": null,
       "audience": "adopter",
-      "content_hash": "59d20c03be413e6321457f99f10bbe32a0d80fa7486e6b5a754ca52bc34f814d",
+      "content_hash": "dc0519815ff3a1506993f1acfa2cd51053070527e5752c46ddd85a1082825290",
       "excluded_from_docs": true
     },
     {
@@ -46,7 +46,7 @@
       "name": "gaia automation cron-decide",
       "description": null,
       "audience": "adopter",
-      "content_hash": "f86f6009fbf46604bfa249d194494239b65d01421afbf89abf1a407732d12829",
+      "content_hash": "c0fd25611b57dfade1adb558166b238f8fdb8533abbff0f96a9d468f1fc03a53",
       "excluded_from_docs": false
     },
     {
@@ -55,7 +55,7 @@
       "name": "gaia automation install-audit-workflow",
       "description": null,
       "audience": "adopter",
-      "content_hash": "f86f6009fbf46604bfa249d194494239b65d01421afbf89abf1a407732d12829",
+      "content_hash": "c0fd25611b57dfade1adb558166b238f8fdb8533abbff0f96a9d468f1fc03a53",
       "excluded_from_docs": false
     },
     {
@@ -64,7 +64,7 @@
       "name": "gaia automation read-config",
       "description": null,
       "audience": "adopter",
-      "content_hash": "f86f6009fbf46604bfa249d194494239b65d01421afbf89abf1a407732d12829",
+      "content_hash": "c0fd25611b57dfade1adb558166b238f8fdb8533abbff0f96a9d468f1fc03a53",
       "excluded_from_docs": false
     },
     {
@@ -73,7 +73,7 @@
       "name": "gaia automation render-workflows",
       "description": null,
       "audience": "adopter",
-      "content_hash": "f86f6009fbf46604bfa249d194494239b65d01421afbf89abf1a407732d12829",
+      "content_hash": "c0fd25611b57dfade1adb558166b238f8fdb8533abbff0f96a9d468f1fc03a53",
       "excluded_from_docs": false
     },
     {
@@ -82,7 +82,7 @@
       "name": "gaia ci-revert is-cap-reached",
       "description": null,
       "audience": "adopter",
-      "content_hash": "609870ec29ab92ae6b89e92d366312838d6d9f42968175f9d20b0aabe20388c7",
+      "content_hash": "1b40e5de09233d2b24379eb7c88fc61c8e3a865a870e1cd04532185995ac2cf0",
       "excluded_from_docs": false
     },
     {
@@ -91,7 +91,7 @@
       "name": "gaia ci-revert mark-failed",
       "description": null,
       "audience": "adopter",
-      "content_hash": "609870ec29ab92ae6b89e92d366312838d6d9f42968175f9d20b0aabe20388c7",
+      "content_hash": "1b40e5de09233d2b24379eb7c88fc61c8e3a865a870e1cd04532185995ac2cf0",
       "excluded_from_docs": false
     },
     {
@@ -100,7 +100,7 @@
       "name": "gaia ci-revert open",
       "description": null,
       "audience": "adopter",
-      "content_hash": "609870ec29ab92ae6b89e92d366312838d6d9f42968175f9d20b0aabe20388c7",
+      "content_hash": "1b40e5de09233d2b24379eb7c88fc61c8e3a865a870e1cd04532185995ac2cf0",
       "excluded_from_docs": false
     },
     {
@@ -109,7 +109,7 @@
       "name": "gaia ci-stale-check",
       "description": null,
       "audience": "adopter",
-      "content_hash": "c3f3ee39327416f902eb110d41d6173135edfa295d4e5003c7298ab1b2b6dbc4",
+      "content_hash": "6b594dd06af11192d62c211f96ef329fa9a798b7ec71d6c4063694a533a5e38d",
       "excluded_from_docs": false
     },
     {
@@ -118,7 +118,7 @@
       "name": "gaia fitness render-card",
       "description": null,
       "audience": "adopter",
-      "content_hash": "4f34284c700bc1d45cf070b89201a01f88969f7925d8b37b3af3f4239315bde7",
+      "content_hash": "d6761fc42b186ab8d639ea247b9c66e95acae329b2d85eb1e2481aa92d3eebec",
       "excluded_from_docs": false
     },
     {
@@ -127,7 +127,7 @@
       "name": "gaia harden-ledger is-suppressed",
       "description": null,
       "audience": "adopter",
-      "content_hash": "9f370aafb652f89c04f2485189fd83af44973ba1cc3fdc7d216ae71f7ec112ec",
+      "content_hash": "2d66ef1dd87dbff5c8a0b22ebccc47d1e843ac402a168b2aabb90ad1e282cccf",
       "excluded_from_docs": false
     },
     {
@@ -136,7 +136,7 @@
       "name": "gaia harden-ledger list",
       "description": null,
       "audience": "adopter",
-      "content_hash": "9f370aafb652f89c04f2485189fd83af44973ba1cc3fdc7d216ae71f7ec112ec",
+      "content_hash": "2d66ef1dd87dbff5c8a0b22ebccc47d1e843ac402a168b2aabb90ad1e282cccf",
       "excluded_from_docs": false
     },
     {
@@ -145,7 +145,7 @@
       "name": "gaia harden-ledger prune",
       "description": null,
       "audience": "adopter",
-      "content_hash": "9f370aafb652f89c04f2485189fd83af44973ba1cc3fdc7d216ae71f7ec112ec",
+      "content_hash": "2d66ef1dd87dbff5c8a0b22ebccc47d1e843ac402a168b2aabb90ad1e282cccf",
       "excluded_from_docs": false
     },
     {
@@ -154,7 +154,7 @@
       "name": "gaia harden-ledger record",
       "description": null,
       "audience": "adopter",
-      "content_hash": "9f370aafb652f89c04f2485189fd83af44973ba1cc3fdc7d216ae71f7ec112ec",
+      "content_hash": "2d66ef1dd87dbff5c8a0b22ebccc47d1e843ac402a168b2aabb90ad1e282cccf",
       "excluded_from_docs": false
     },
     {
@@ -163,7 +163,7 @@
       "name": "gaia harden-tally",
       "description": null,
       "audience": "adopter",
-      "content_hash": "4e848130f5c0abd8e21437ebd4f5e91b0ce8dc485e912e5b834127c78d5e7a9e",
+      "content_hash": "c967cfb897cdaeb1f1024889508b466cad4a56fc883ef4a82fa912497a1e7d7c",
       "excluded_from_docs": false
     },
     {
@@ -172,7 +172,7 @@
       "name": "gaia init bootstrap-env",
       "description": null,
       "audience": "adopter",
-      "content_hash": "9fd385cb0e8c2b6de6f89becdcbbc2e9072ccf29978a51d4d9ef2e8022210e4a",
+      "content_hash": "42f340b01338586fa31e78f313971c111f55b1c2c8954ace4d54a7d08e95d9c3",
       "excluded_from_docs": false
     },
     {
@@ -181,7 +181,7 @@
       "name": "gaia init configure-automation",
       "description": null,
       "audience": "adopter",
-      "content_hash": "9fd385cb0e8c2b6de6f89becdcbbc2e9072ccf29978a51d4d9ef2e8022210e4a",
+      "content_hash": "42f340b01338586fa31e78f313971c111f55b1c2c8954ace4d54a7d08e95d9c3",
       "excluded_from_docs": false
     },
     {
@@ -190,7 +190,7 @@
       "name": "gaia init configure-i18n",
       "description": null,
       "audience": "adopter",
-      "content_hash": "9fd385cb0e8c2b6de6f89becdcbbc2e9072ccf29978a51d4d9ef2e8022210e4a",
+      "content_hash": "42f340b01338586fa31e78f313971c111f55b1c2c8954ace4d54a7d08e95d9c3",
       "excluded_from_docs": false
     },
     {
@@ -199,7 +199,7 @@
       "name": "gaia init finalize",
       "description": null,
       "audience": "adopter",
-      "content_hash": "9fd385cb0e8c2b6de6f89becdcbbc2e9072ccf29978a51d4d9ef2e8022210e4a",
+      "content_hash": "42f340b01338586fa31e78f313971c111f55b1c2c8954ace4d54a7d08e95d9c3",
       "excluded_from_docs": false
     },
     {
@@ -208,7 +208,7 @@
       "name": "gaia init rename",
       "description": null,
       "audience": "adopter",
-      "content_hash": "9fd385cb0e8c2b6de6f89becdcbbc2e9072ccf29978a51d4d9ef2e8022210e4a",
+      "content_hash": "42f340b01338586fa31e78f313971c111f55b1c2c8954ace4d54a7d08e95d9c3",
       "excluded_from_docs": false
     },
     {
@@ -217,7 +217,7 @@
       "name": "gaia init resume",
       "description": null,
       "audience": "adopter",
-      "content_hash": "9fd385cb0e8c2b6de6f89becdcbbc2e9072ccf29978a51d4d9ef2e8022210e4a",
+      "content_hash": "42f340b01338586fa31e78f313971c111f55b1c2c8954ace4d54a7d08e95d9c3",
       "excluded_from_docs": false
     },
     {
@@ -226,7 +226,7 @@
       "name": "gaia init strip-branding",
       "description": null,
       "audience": "adopter",
-      "content_hash": "9fd385cb0e8c2b6de6f89becdcbbc2e9072ccf29978a51d4d9ef2e8022210e4a",
+      "content_hash": "42f340b01338586fa31e78f313971c111f55b1c2c8954ace4d54a7d08e95d9c3",
       "excluded_from_docs": false
     },
     {
@@ -235,7 +235,7 @@
       "name": "gaia init wire-statusline",
       "description": null,
       "audience": "adopter",
-      "content_hash": "9fd385cb0e8c2b6de6f89becdcbbc2e9072ccf29978a51d4d9ef2e8022210e4a",
+      "content_hash": "42f340b01338586fa31e78f313971c111f55b1c2c8954ace4d54a7d08e95d9c3",
       "excluded_from_docs": false
     },
     {
@@ -244,7 +244,7 @@
       "name": "gaia mentorship _internal-assert-memory-rules",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1bf7a8ead9c4a3f85d6060c70950545584651cc719d3df78e36bbad3a9b5e149",
+      "content_hash": "d5236a4ddefbb75db80b44320ae640e238a52d8d4eaab61eaf29a00c9ff6d0d6",
       "excluded_from_docs": true
     },
     {
@@ -253,7 +253,7 @@
       "name": "gaia mentorship _internal-provision-dirs",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1bf7a8ead9c4a3f85d6060c70950545584651cc719d3df78e36bbad3a9b5e149",
+      "content_hash": "d5236a4ddefbb75db80b44320ae640e238a52d8d4eaab61eaf29a00c9ff6d0d6",
       "excluded_from_docs": true
     },
     {
@@ -262,7 +262,7 @@
       "name": "gaia mentorship _internal-write-config",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1bf7a8ead9c4a3f85d6060c70950545584651cc719d3df78e36bbad3a9b5e149",
+      "content_hash": "d5236a4ddefbb75db80b44320ae640e238a52d8d4eaab61eaf29a00c9ff6d0d6",
       "excluded_from_docs": true
     },
     {
@@ -271,7 +271,7 @@
       "name": "gaia mentorship analytics disable",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1bf7a8ead9c4a3f85d6060c70950545584651cc719d3df78e36bbad3a9b5e149",
+      "content_hash": "d5236a4ddefbb75db80b44320ae640e238a52d8d4eaab61eaf29a00c9ff6d0d6",
       "excluded_from_docs": true
     },
     {
@@ -280,7 +280,7 @@
       "name": "gaia mentorship analytics dry-run",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1bf7a8ead9c4a3f85d6060c70950545584651cc719d3df78e36bbad3a9b5e149",
+      "content_hash": "d5236a4ddefbb75db80b44320ae640e238a52d8d4eaab61eaf29a00c9ff6d0d6",
       "excluded_from_docs": true
     },
     {
@@ -289,7 +289,7 @@
       "name": "gaia mentorship analytics enable",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1bf7a8ead9c4a3f85d6060c70950545584651cc719d3df78e36bbad3a9b5e149",
+      "content_hash": "d5236a4ddefbb75db80b44320ae640e238a52d8d4eaab61eaf29a00c9ff6d0d6",
       "excluded_from_docs": true
     },
     {
@@ -298,7 +298,7 @@
       "name": "gaia mentorship disable",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1bf7a8ead9c4a3f85d6060c70950545584651cc719d3df78e36bbad3a9b5e149",
+      "content_hash": "d5236a4ddefbb75db80b44320ae640e238a52d8d4eaab61eaf29a00c9ff6d0d6",
       "excluded_from_docs": true
     },
     {
@@ -307,7 +307,7 @@
       "name": "gaia mentorship enable",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1bf7a8ead9c4a3f85d6060c70950545584651cc719d3df78e36bbad3a9b5e149",
+      "content_hash": "d5236a4ddefbb75db80b44320ae640e238a52d8d4eaab61eaf29a00c9ff6d0d6",
       "excluded_from_docs": true
     },
     {
@@ -316,7 +316,7 @@
       "name": "gaia mentorship purge",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1bf7a8ead9c4a3f85d6060c70950545584651cc719d3df78e36bbad3a9b5e149",
+      "content_hash": "d5236a4ddefbb75db80b44320ae640e238a52d8d4eaab61eaf29a00c9ff6d0d6",
       "excluded_from_docs": true
     },
     {
@@ -325,7 +325,7 @@
       "name": "gaia mentorship status",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1bf7a8ead9c4a3f85d6060c70950545584651cc719d3df78e36bbad3a9b5e149",
+      "content_hash": "d5236a4ddefbb75db80b44320ae640e238a52d8d4eaab61eaf29a00c9ff6d0d6",
       "excluded_from_docs": true
     },
     {
@@ -334,7 +334,7 @@
       "name": "gaia react-perf reduce",
       "description": null,
       "audience": "adopter",
-      "content_hash": "a1c3cff78c70e410b5c3fa4410f2e5f47211badb85c1c6a2a730ad5d25122fac",
+      "content_hash": "e8380258e8aa8ee7bdd44f138bc4389bad1d40485b0032b1a0469b184a748df0",
       "excluded_from_docs": false
     },
     {
@@ -343,7 +343,7 @@
       "name": "gaia release bump",
       "description": null,
       "audience": "adopter",
-      "content_hash": "86018880a3291f03dc8adaae200da2b6a0c8cfc5fc70b4bf9c2fbea1b40fc406",
+      "content_hash": "93fb423af244f3e3487ed9379dcb7ae45a6cc5cc967cd95e0f9b414e5c6a1546",
       "excluded_from_docs": true
     },
     {
@@ -352,7 +352,7 @@
       "name": "gaia release changelog",
       "description": null,
       "audience": "adopter",
-      "content_hash": "86018880a3291f03dc8adaae200da2b6a0c8cfc5fc70b4bf9c2fbea1b40fc406",
+      "content_hash": "93fb423af244f3e3487ed9379dcb7ae45a6cc5cc967cd95e0f9b414e5c6a1546",
       "excluded_from_docs": true
     },
     {
@@ -361,7 +361,7 @@
       "name": "gaia release commit-and-tag",
       "description": null,
       "audience": "adopter",
-      "content_hash": "86018880a3291f03dc8adaae200da2b6a0c8cfc5fc70b4bf9c2fbea1b40fc406",
+      "content_hash": "93fb423af244f3e3487ed9379dcb7ae45a6cc5cc967cd95e0f9b414e5c6a1546",
       "excluded_from_docs": true
     },
     {
@@ -370,7 +370,7 @@
       "name": "gaia release manifest",
       "description": null,
       "audience": "adopter",
-      "content_hash": "86018880a3291f03dc8adaae200da2b6a0c8cfc5fc70b4bf9c2fbea1b40fc406",
+      "content_hash": "93fb423af244f3e3487ed9379dcb7ae45a6cc5cc967cd95e0f9b414e5c6a1546",
       "excluded_from_docs": true
     },
     {
@@ -379,7 +379,7 @@
       "name": "gaia release preflight",
       "description": null,
       "audience": "adopter",
-      "content_hash": "86018880a3291f03dc8adaae200da2b6a0c8cfc5fc70b4bf9c2fbea1b40fc406",
+      "content_hash": "93fb423af244f3e3487ed9379dcb7ae45a6cc5cc967cd95e0f9b414e5c6a1546",
       "excluded_from_docs": true
     },
     {
@@ -388,7 +388,7 @@
       "name": "gaia release runtime-deps",
       "description": null,
       "audience": "adopter",
-      "content_hash": "86018880a3291f03dc8adaae200da2b6a0c8cfc5fc70b4bf9c2fbea1b40fc406",
+      "content_hash": "93fb423af244f3e3487ed9379dcb7ae45a6cc5cc967cd95e0f9b414e5c6a1546",
       "excluded_from_docs": true
     },
     {
@@ -397,7 +397,7 @@
       "name": "gaia release scrub",
       "description": null,
       "audience": "adopter",
-      "content_hash": "86018880a3291f03dc8adaae200da2b6a0c8cfc5fc70b4bf9c2fbea1b40fc406",
+      "content_hash": "93fb423af244f3e3487ed9379dcb7ae45a6cc5cc967cd95e0f9b414e5c6a1546",
       "excluded_from_docs": true
     },
     {
@@ -406,7 +406,7 @@
       "name": "gaia release scrub-wiki",
       "description": null,
       "audience": "adopter",
-      "content_hash": "86018880a3291f03dc8adaae200da2b6a0c8cfc5fc70b4bf9c2fbea1b40fc406",
+      "content_hash": "93fb423af244f3e3487ed9379dcb7ae45a6cc5cc967cd95e0f9b414e5c6a1546",
       "excluded_from_docs": true
     },
     {
@@ -415,7 +415,7 @@
       "name": "gaia scaffold component",
       "description": null,
       "audience": "adopter",
-      "content_hash": "e7521c7f63da9c5fbf5ed314f91be66c1b3ca632cc98ecad10dbbd5d200f68c2",
+      "content_hash": "a9aa34fd6eabba7edab569cacce5d87b9aeec4870097e77a642533efcaaa0843",
       "excluded_from_docs": false
     },
     {
@@ -424,7 +424,7 @@
       "name": "gaia scaffold hook",
       "description": null,
       "audience": "adopter",
-      "content_hash": "e7521c7f63da9c5fbf5ed314f91be66c1b3ca632cc98ecad10dbbd5d200f68c2",
+      "content_hash": "a9aa34fd6eabba7edab569cacce5d87b9aeec4870097e77a642533efcaaa0843",
       "excluded_from_docs": false
     },
     {
@@ -433,7 +433,7 @@
       "name": "gaia scaffold route",
       "description": null,
       "audience": "adopter",
-      "content_hash": "e7521c7f63da9c5fbf5ed314f91be66c1b3ca632cc98ecad10dbbd5d200f68c2",
+      "content_hash": "a9aa34fd6eabba7edab569cacce5d87b9aeec4870097e77a642533efcaaa0843",
       "excluded_from_docs": false
     },
     {
@@ -442,7 +442,7 @@
       "name": "gaia scaffold service",
       "description": null,
       "audience": "adopter",
-      "content_hash": "e7521c7f63da9c5fbf5ed314f91be66c1b3ca632cc98ecad10dbbd5d200f68c2",
+      "content_hash": "a9aa34fd6eabba7edab569cacce5d87b9aeec4870097e77a642533efcaaa0843",
       "excluded_from_docs": false
     },
     {
@@ -451,7 +451,7 @@
       "name": "gaia setup finalize",
       "description": null,
       "audience": "adopter",
-      "content_hash": "a17dba78921931f39bab23f2ceeb44d2761bfa92373d44e795bdc9827a323b51",
+      "content_hash": "a8d99095bbe04a4518f08da22b140b653b8910afe0e2d22cf8dbc14a7ca42087",
       "excluded_from_docs": false
     },
     {
@@ -460,7 +460,7 @@
       "name": "gaia setup link-worktree",
       "description": null,
       "audience": "adopter",
-      "content_hash": "a17dba78921931f39bab23f2ceeb44d2761bfa92373d44e795bdc9827a323b51",
+      "content_hash": "a8d99095bbe04a4518f08da22b140b653b8910afe0e2d22cf8dbc14a7ca42087",
       "excluded_from_docs": false
     },
     {
@@ -469,7 +469,7 @@
       "name": "gaia setup mark-step",
       "description": null,
       "audience": "adopter",
-      "content_hash": "a17dba78921931f39bab23f2ceeb44d2761bfa92373d44e795bdc9827a323b51",
+      "content_hash": "a8d99095bbe04a4518f08da22b140b653b8910afe0e2d22cf8dbc14a7ca42087",
       "excluded_from_docs": false
     },
     {
@@ -478,7 +478,7 @@
       "name": "gaia setup status",
       "description": null,
       "audience": "adopter",
-      "content_hash": "a17dba78921931f39bab23f2ceeb44d2761bfa92373d44e795bdc9827a323b51",
+      "content_hash": "a8d99095bbe04a4518f08da22b140b653b8910afe0e2d22cf8dbc14a7ca42087",
       "excluded_from_docs": false
     },
     {
@@ -487,7 +487,7 @@
       "name": "gaia setup-ci check-admin",
       "description": null,
       "audience": "adopter",
-      "content_hash": "513e3ae85bc7ae69ac86e7c83825d4f2c5ee1abe3c88f921a24b57eabdefbf46",
+      "content_hash": "ce8f54b05e6263d2832e5d010803d8e53c1d345d0d22a5cb714162d121959c1c",
       "excluded_from_docs": false
     },
     {
@@ -496,7 +496,7 @@
       "name": "gaia setup-ci check-audit-drift",
       "description": null,
       "audience": "adopter",
-      "content_hash": "513e3ae85bc7ae69ac86e7c83825d4f2c5ee1abe3c88f921a24b57eabdefbf46",
+      "content_hash": "ce8f54b05e6263d2832e5d010803d8e53c1d345d0d22a5cb714162d121959c1c",
       "excluded_from_docs": false
     },
     {
@@ -505,7 +505,7 @@
       "name": "gaia setup-ci check-drift",
       "description": null,
       "audience": "adopter",
-      "content_hash": "513e3ae85bc7ae69ac86e7c83825d4f2c5ee1abe3c88f921a24b57eabdefbf46",
+      "content_hash": "ce8f54b05e6263d2832e5d010803d8e53c1d345d0d22a5cb714162d121959c1c",
       "excluded_from_docs": false
     },
     {
@@ -514,7 +514,7 @@
       "name": "gaia setup-ci detect-remote",
       "description": null,
       "audience": "adopter",
-      "content_hash": "513e3ae85bc7ae69ac86e7c83825d4f2c5ee1abe3c88f921a24b57eabdefbf46",
+      "content_hash": "ce8f54b05e6263d2832e5d010803d8e53c1d345d0d22a5cb714162d121959c1c",
       "excluded_from_docs": false
     },
     {
@@ -523,7 +523,7 @@
       "name": "gaia setup-ci dismiss-personal",
       "description": null,
       "audience": "adopter",
-      "content_hash": "513e3ae85bc7ae69ac86e7c83825d4f2c5ee1abe3c88f921a24b57eabdefbf46",
+      "content_hash": "ce8f54b05e6263d2832e5d010803d8e53c1d345d0d22a5cb714162d121959c1c",
       "excluded_from_docs": false
     },
     {
@@ -532,7 +532,7 @@
       "name": "gaia setup-ci enable-delete-branch",
       "description": null,
       "audience": "adopter",
-      "content_hash": "513e3ae85bc7ae69ac86e7c83825d4f2c5ee1abe3c88f921a24b57eabdefbf46",
+      "content_hash": "ce8f54b05e6263d2832e5d010803d8e53c1d345d0d22a5cb714162d121959c1c",
       "excluded_from_docs": false
     },
     {
@@ -541,7 +541,7 @@
       "name": "gaia setup-ci finalize",
       "description": null,
       "audience": "adopter",
-      "content_hash": "513e3ae85bc7ae69ac86e7c83825d4f2c5ee1abe3c88f921a24b57eabdefbf46",
+      "content_hash": "ce8f54b05e6263d2832e5d010803d8e53c1d345d0d22a5cb714162d121959c1c",
       "excluded_from_docs": false
     },
     {
@@ -550,7 +550,7 @@
       "name": "gaia setup-ci opt-out-team",
       "description": null,
       "audience": "adopter",
-      "content_hash": "513e3ae85bc7ae69ac86e7c83825d4f2c5ee1abe3c88f921a24b57eabdefbf46",
+      "content_hash": "ce8f54b05e6263d2832e5d010803d8e53c1d345d0d22a5cb714162d121959c1c",
       "excluded_from_docs": false
     },
     {
@@ -559,7 +559,7 @@
       "name": "gaia setup-ci status",
       "description": null,
       "audience": "adopter",
-      "content_hash": "513e3ae85bc7ae69ac86e7c83825d4f2c5ee1abe3c88f921a24b57eabdefbf46",
+      "content_hash": "ce8f54b05e6263d2832e5d010803d8e53c1d345d0d22a5cb714162d121959c1c",
       "excluded_from_docs": false
     },
     {
@@ -568,7 +568,7 @@
       "name": "gaia setup-ci verify-run",
       "description": null,
       "audience": "adopter",
-      "content_hash": "513e3ae85bc7ae69ac86e7c83825d4f2c5ee1abe3c88f921a24b57eabdefbf46",
+      "content_hash": "ce8f54b05e6263d2832e5d010803d8e53c1d345d0d22a5cb714162d121959c1c",
       "excluded_from_docs": false
     },
     {
@@ -577,7 +577,7 @@
       "name": "gaia setup-ci warn-existing-tools",
       "description": null,
       "audience": "adopter",
-      "content_hash": "513e3ae85bc7ae69ac86e7c83825d4f2c5ee1abe3c88f921a24b57eabdefbf46",
+      "content_hash": "ce8f54b05e6263d2832e5d010803d8e53c1d345d0d22a5cb714162d121959c1c",
       "excluded_from_docs": false
     },
     {
@@ -586,7 +586,7 @@
       "name": "gaia setup-ci write-tool-mode",
       "description": null,
       "audience": "adopter",
-      "content_hash": "513e3ae85bc7ae69ac86e7c83825d4f2c5ee1abe3c88f921a24b57eabdefbf46",
+      "content_hash": "ce8f54b05e6263d2832e5d010803d8e53c1d345d0d22a5cb714162d121959c1c",
       "excluded_from_docs": false
     },
     {
@@ -595,7 +595,7 @@
       "name": "gaia telemetry compute-profile",
       "description": null,
       "audience": "adopter",
-      "content_hash": "858f3f57f7d5191f61cf1d88685dcb4585ae48549e5d3c5b5e5488bd40882fee",
+      "content_hash": "02ebb343549c98377e3c20c7ce6585f1c69b85bdad2f3547e9184c45bb50dfee",
       "excluded_from_docs": true
     },
     {
@@ -604,7 +604,7 @@
       "name": "gaia telemetry emit",
       "description": null,
       "audience": "adopter",
-      "content_hash": "858f3f57f7d5191f61cf1d88685dcb4585ae48549e5d3c5b5e5488bd40882fee",
+      "content_hash": "02ebb343549c98377e3c20c7ce6585f1c69b85bdad2f3547e9184c45bb50dfee",
       "excluded_from_docs": true
     },
     {
@@ -613,7 +613,7 @@
       "name": "gaia telemetry parse-stdin",
       "description": null,
       "audience": "adopter",
-      "content_hash": "858f3f57f7d5191f61cf1d88685dcb4585ae48549e5d3c5b5e5488bd40882fee",
+      "content_hash": "02ebb343549c98377e3c20c7ce6585f1c69b85bdad2f3547e9184c45bb50dfee",
       "excluded_from_docs": true
     },
     {
@@ -622,7 +622,7 @@
       "name": "gaia update merge-audit-ci",
       "description": null,
       "audience": "adopter",
-      "content_hash": "ce0a463998010548b60abcc329fa59162b39974714546beabda7e2c46b01de0f",
+      "content_hash": "f0ff38cb3c96c643e506525914d55d2e090ccb2cadf1758b7bc0dd96ec05a7ba",
       "excluded_from_docs": false
     },
     {
@@ -631,7 +631,7 @@
       "name": "gaia update merge-workspace",
       "description": null,
       "audience": "adopter",
-      "content_hash": "ce0a463998010548b60abcc329fa59162b39974714546beabda7e2c46b01de0f",
+      "content_hash": "f0ff38cb3c96c643e506525914d55d2e090ccb2cadf1758b7bc0dd96ec05a7ba",
       "excluded_from_docs": false
     },
     {
@@ -640,7 +640,7 @@
       "name": "gaia update-deps decline",
       "description": null,
       "audience": "adopter",
-      "content_hash": "a0acf474367b85f27b095f299c2401cf85ecca3091d5ab806684dbf278e01019",
+      "content_hash": "24758a6935f50fdd986462fa11b0a60939cbd18007f2f449a8d5dead776b958e",
       "excluded_from_docs": false
     },
     {
@@ -649,7 +649,7 @@
       "name": "gaia update-deps run",
       "description": null,
       "audience": "adopter",
-      "content_hash": "a0acf474367b85f27b095f299c2401cf85ecca3091d5ab806684dbf278e01019",
+      "content_hash": "24758a6935f50fdd986462fa11b0a60939cbd18007f2f449a8d5dead776b958e",
       "excluded_from_docs": false
     },
     {
@@ -658,7 +658,7 @@
       "name": "gaia wiki chain",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1c22e649faf0479f2204c6b80cad21450733825238813511362b845b5630e07b",
+      "content_hash": "d2afb8af5610e8cf1fd4ff84575c32ac90a14a3ce573c5f07b93fa56c1af3aff",
       "excluded_from_docs": false
     },
     {
@@ -667,7 +667,7 @@
       "name": "gaia wiki commit-classify",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1c22e649faf0479f2204c6b80cad21450733825238813511362b845b5630e07b",
+      "content_hash": "d2afb8af5610e8cf1fd4ff84575c32ac90a14a3ce573c5f07b93fa56c1af3aff",
       "excluded_from_docs": false
     },
     {
@@ -676,7 +676,7 @@
       "name": "gaia wiki dead-paths",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1c22e649faf0479f2204c6b80cad21450733825238813511362b845b5630e07b",
+      "content_hash": "d2afb8af5610e8cf1fd4ff84575c32ac90a14a3ce573c5f07b93fa56c1af3aff",
       "excluded_from_docs": false
     },
     {
@@ -685,7 +685,7 @@
       "name": "gaia wiki diff-size",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1c22e649faf0479f2204c6b80cad21450733825238813511362b845b5630e07b",
+      "content_hash": "d2afb8af5610e8cf1fd4ff84575c32ac90a14a3ce573c5f07b93fa56c1af3aff",
       "excluded_from_docs": false
     },
     {
@@ -694,7 +694,7 @@
       "name": "gaia wiki empty-sections",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1c22e649faf0479f2204c6b80cad21450733825238813511362b845b5630e07b",
+      "content_hash": "d2afb8af5610e8cf1fd4ff84575c32ac90a14a3ce573c5f07b93fa56c1af3aff",
       "excluded_from_docs": false
     },
     {
@@ -703,7 +703,7 @@
       "name": "gaia wiki frontmatter",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1c22e649faf0479f2204c6b80cad21450733825238813511362b845b5630e07b",
+      "content_hash": "d2afb8af5610e8cf1fd4ff84575c32ac90a14a3ce573c5f07b93fa56c1af3aff",
       "excluded_from_docs": false
     },
     {
@@ -712,7 +712,7 @@
       "name": "gaia wiki log-prepend",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1c22e649faf0479f2204c6b80cad21450733825238813511362b845b5630e07b",
+      "content_hash": "d2afb8af5610e8cf1fd4ff84575c32ac90a14a3ce573c5f07b93fa56c1af3aff",
       "excluded_from_docs": false
     },
     {
@@ -721,7 +721,7 @@
       "name": "gaia wiki near-collisions",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1c22e649faf0479f2204c6b80cad21450733825238813511362b845b5630e07b",
+      "content_hash": "d2afb8af5610e8cf1fd4ff84575c32ac90a14a3ce573c5f07b93fa56c1af3aff",
       "excluded_from_docs": false
     },
     {
@@ -730,7 +730,7 @@
       "name": "gaia wiki orphans",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1c22e649faf0479f2204c6b80cad21450733825238813511362b845b5630e07b",
+      "content_hash": "d2afb8af5610e8cf1fd4ff84575c32ac90a14a3ce573c5f07b93fa56c1af3aff",
       "excluded_from_docs": false
     },
     {
@@ -739,7 +739,7 @@
       "name": "gaia wiki page-index",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1c22e649faf0479f2204c6b80cad21450733825238813511362b845b5630e07b",
+      "content_hash": "d2afb8af5610e8cf1fd4ff84575c32ac90a14a3ce573c5f07b93fa56c1af3aff",
       "excluded_from_docs": false
     },
     {
@@ -748,7 +748,7 @@
       "name": "gaia wiki state",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1c22e649faf0479f2204c6b80cad21450733825238813511362b845b5630e07b",
+      "content_hash": "d2afb8af5610e8cf1fd4ff84575c32ac90a14a3ce573c5f07b93fa56c1af3aff",
       "excluded_from_docs": false
     },
     {
@@ -757,7 +757,7 @@
       "name": "gaia wiki state-bump",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1c22e649faf0479f2204c6b80cad21450733825238813511362b845b5630e07b",
+      "content_hash": "d2afb8af5610e8cf1fd4ff84575c32ac90a14a3ce573c5f07b93fa56c1af3aff",
       "excluded_from_docs": false
     },
     {
@@ -766,7 +766,7 @@
       "name": "gaia wiki state-init",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1c22e649faf0479f2204c6b80cad21450733825238813511362b845b5630e07b",
+      "content_hash": "d2afb8af5610e8cf1fd4ff84575c32ac90a14a3ce573c5f07b93fa56c1af3aff",
       "excluded_from_docs": false
     },
     {
@@ -775,7 +775,7 @@
       "name": "gaia wiki sync land",
       "description": null,
       "audience": "adopter",
-      "content_hash": "1c22e649faf0479f2204c6b80cad21450733825238813511362b845b5630e07b",
+      "content_hash": "d2afb8af5610e8cf1fd4ff84575c32ac90a14a3ce573c5f07b93fa56c1af3aff",
       "excluded_from_docs": false
     },
     {
@@ -784,7 +784,7 @@
       "name": "gaia-audit",
       "description": "Audit memory, wiki, and auto-loaded files for duplication, conflicting instructions, and stale content. The default path researches, then asks you a single Apply / Discuss / Decline question before any change. Pass --apply to re-run the apply stage against the most recent report.",
       "audience": "adopter",
-      "content_hash": "15d24d80271ef0f8ee47b2cd261f438ae17ee98fef9267b1da4ea1833ae52802",
+      "content_hash": "24bf0fa98c5ee1f337b41a69f70f5a1f91c3ab9a5ecf4c25560f422d9403d1c9",
       "excluded_from_docs": false
     },
     {
@@ -793,7 +793,7 @@
       "name": "gaia-debt",
       "description": "Drain the tech-debt backlog one issue at a time, highest severity then oldest first, on a fresh branch through the audit gate, closing the issue on merge. Pass `list` to see the ordered backlog or `why <issue-number>` to explain the recommendation.",
       "audience": "adopter",
-      "content_hash": "d4ba95198d283a1c9b3d3f25af8ac777a9a0148ef9cd817d037442fd2e015a13",
+      "content_hash": "2eb7042ced2a629c26810712e4cdd7b1e969bcff31772c0ec122826f11fbff52",
       "excluded_from_docs": false
     },
     {
@@ -802,7 +802,7 @@
       "name": "gaia-fitness",
       "description": "Health-check and auto-heal this project's Claude integration, triage, heal, verify, and report an F-to-A+ grade.",
       "audience": "adopter",
-      "content_hash": "44163c052753e37f8b03240a1258e2094473101f7ec0c2fb5e298fc5546c3e07",
+      "content_hash": "1314279c64a80509a1ef0183215874ac50de1b2af83eb5591f66f21208cad0ae",
       "excluded_from_docs": false
     },
     {
@@ -811,7 +811,7 @@
       "name": "gaia-forensics",
       "description": "Turn a GAIA workflow misfire into a redacted, classified, filing-ready bug report in one read-only pass. Self-diagnoses config issues inline; files probable bugs upstream on confirmation.",
       "audience": "adopter",
-      "content_hash": "57f8a5a8ba18bb6ed05691e71cfd6b2f964afcea17a563ec3f8c54f6564c9612",
+      "content_hash": "5e1f8b2f81a0a152c753456d6ff5d979c422121d4a4edbe026aa56e1e9e2589c",
       "excluded_from_docs": false
     },
     {
@@ -820,7 +820,7 @@
       "name": "gaia-harden",
       "description": "Judge-the-form, human-gated hardening. Reviews recurring code-review-audit findings and, with approval, drafts the lowest-context-weight form (deterministic check / skill / path-scoped prose rule) into the working tree. Pass `list` to see live candidates or `why <finding_class>` to explain one.",
       "audience": "adopter",
-      "content_hash": "fadd2aa3f772488c4f54a17ab342a7e80a85e6249619a4e13482e99791e12941",
+      "content_hash": "a60e07393c994eb60ef41a8e63de92b5bfed764770dca0add9cc54323143aef2",
       "excluded_from_docs": false
     },
     {
@@ -829,7 +829,7 @@
       "name": "gaia-init",
       "description": "Initialize a new project from the GAIA React template, renames, strips GAIA branding, configures i18n, installs Claude skills/plugins.",
       "audience": "adopter",
-      "content_hash": "82bc9ac42d3df2bf0cad30bdd24a49b7887c8efef2ceaf90cb420be6797a2570",
+      "content_hash": "0ef2cf887f534ffcd3f7e61f6c78dafadf259b99ced2037e5a1cfea4c91d586c",
       "excluded_from_docs": false
     },
     {
@@ -838,7 +838,7 @@
       "name": "gaia-plan",
       "description": "Plan a complex feature using GAIA's task-orchestration pattern, structures the work into fresh-context subagent phases for your approval. Does not implement.",
       "audience": "adopter",
-      "content_hash": "cfd418c519c8ca7f1c581e8d3747b64b52cdeb7124d945627c250a30ea6624e1",
+      "content_hash": "fd49c7aae8e3c13db64291b116e00eecee4ca1dc0b599d3b045675dc8b652542",
       "excluded_from_docs": false
     },
     {
@@ -847,7 +847,7 @@
       "name": "gaia-release",
       "description": "Cut a new GAIA release, bump version, graduate CHANGELOG, regenerate manifest, open release PR, then tag on merge. Maintainer-only.",
       "audience": "contributor",
-      "content_hash": "4d6f9e24fa24d42a855b0a14ab2bcd7f1d877768adb381f11c6273f92660075c",
+      "content_hash": "72fe327eacf6e2d9572611d368a6bd9bb60a65610d97c0c6a8626afb356d9c25",
       "excluded_from_docs": false
     },
     {
@@ -856,7 +856,7 @@
       "name": "gaia-spec",
       "description": "Author an immutable SPEC artifact through Socratic discovery (spec-kit wrapper), then hand off to /gaia-plan. Pass `auto <description>` for non-interactive mode that answers its own questions.",
       "audience": "adopter",
-      "content_hash": "bc936010f11d0d30576e33e169498b174dfe732239ba2e1976862335613ada49",
+      "content_hash": "4d0d82ec64b299a775a7692dcf28ffd75dae5276ae132b315669df4c518776eb",
       "excluded_from_docs": false
     },
     {
@@ -865,7 +865,7 @@
       "name": "health-audit",
       "description": "Maintainer-only autonomous health audit + auto-heal loop. Runs N=3 fresh-team audit-fix-audit cycles with circuit breakers, reports an F-to-A+ verdict (folding in the shared Claude-integration fitness grade) or escalates.",
       "audience": "contributor",
-      "content_hash": "c1573471ab9a17f65fbc586d732bf531b153b21f092e10f1b72cbfe09030235c",
+      "content_hash": "4347f3e0128a8f3193337b677e537447d8cc8c206129203769d176ee4f222baf",
       "excluded_from_docs": false
     },
     {
@@ -874,7 +874,7 @@
       "name": "setup-gaia",
       "description": "Single post-init onboarding command; detects situation, runs only owed phases; safe to re-run. --reconfigure rotates token and re-selects tools.",
       "audience": "adopter",
-      "content_hash": "a96c66b89336abe30c6c8a51a54de83a8bab79a4494235c6be79a63b8ccee643",
+      "content_hash": "01ce1ee5af2add1d20cc6fb520f0eb42a4f7153a6fca5424dd19ef90258777af",
       "excluded_from_docs": false
     },
     {
@@ -883,7 +883,7 @@
       "name": "audit-disposition-check.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "21733a499e251e00e2225e8e4ddebd6fcb26946403de0c83974a6c103f0e2e39",
+      "content_hash": "7e54231edcff2f182da7905731cd4c5a780a63fa330d977d6b4719f9a81938cc",
       "excluded_from_docs": false
     },
     {
@@ -892,7 +892,7 @@
       "name": "audit-stamp-trailer.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "2ca5f934c88bbd3a76d98372fad8c560f211938a76b5248e3da368ddf96a8ae0",
+      "content_hash": "baeae3b6e0007c555acb0d85aa28e6b13198dbcded47d454f72db594c4c4ad07",
       "excluded_from_docs": false
     },
     {
@@ -901,7 +901,7 @@
       "name": "block-bare-test.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "77f261eb1ad881f4d7cfdf453df3340d73312f37ac5050661b7b82843d9e7300",
+      "content_hash": "679478ede41236df0dfb0fd0a180729911e44d268548dcea0a6b252ea444cf41",
       "excluded_from_docs": false
     },
     {
@@ -910,7 +910,7 @@
       "name": "block-env-write.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "bd38d6dd01c7701e6d851ac79eecca1cf08e4f5b4b5d53a6115e15e6125f7d07",
+      "content_hash": "678a58957998a1e0c22c0e785bb9d933eb73f0712bcc5fc9f655d547aa3361b2",
       "excluded_from_docs": false
     },
     {
@@ -919,7 +919,7 @@
       "name": "block-eslint-config-edit.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "382cf421cc05ebaa8d08aee1c215db95f3cb6203edab714c498f44ce6f729d28",
+      "content_hash": "e6675b7cb26af1cae095fe1b57991252887c3ea0a1a4fead77c80a015c27181f",
       "excluded_from_docs": false
     },
     {
@@ -928,7 +928,7 @@
       "name": "block-lockfile-edit.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "c92b3d2f3aab3e8fd50ec6fdc9985f95b6be0178d84693b91d11cf708ac584e7",
+      "content_hash": "5059a03ae4e3a362522703f8738b2b13aa5c45e49cce6b83362c6b88755d9570",
       "excluded_from_docs": false
     },
     {
@@ -937,7 +937,7 @@
       "name": "block-main-destructive-git.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "79bae7da60102dbbad95395e6cbbe8ead2b5dcc8ca3754ab5627398e1ac78602",
+      "content_hash": "2e86b4d5f153bd7458008fc4c1336955a00eae15176a0903c6cc95e9f10e290e",
       "excluded_from_docs": false
     },
     {
@@ -946,7 +946,7 @@
       "name": "block-no-verify.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "c41acbbf68a04c8991f5e9bc5a4f050d84cbf8a38ef450a50a249901406dee90",
+      "content_hash": "8224cc4e2e7b8fd49846eebf4ffa075187704cbcbd8d1ec9b97c554e6f938d8d",
       "excluded_from_docs": false
     },
     {
@@ -955,7 +955,7 @@
       "name": "block-rm-rf.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "ab8b009c6b93a18afc86e43885c3045b3eeb35ba2632b0720e32b2104fbd54f1",
+      "content_hash": "876d755adf60c5659255f43cbcd9b872eb04a24f549c4a87357bfc1764fb5e3b",
       "excluded_from_docs": false
     },
     {
@@ -964,7 +964,7 @@
       "name": "block-secrets-write.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "15c853049a92cac906435d1ee49cf976a1451fee106111dc5d1eeb982d0b106f",
+      "content_hash": "9cd17699fd43a9cd00d2d32f5f50e3c2b0b998bc17d515eddc082257ae1eaa08",
       "excluded_from_docs": false
     },
     {
@@ -973,7 +973,7 @@
       "name": "block-vitest-globals-tsconfig.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "7c39291110d6d19682ce3e646df5e6a0c16d7354b1c648fd8bb157055247266b",
+      "content_hash": "0a9e235b114393fbc49d35a775c4762dfeac7be56060f1083e0a3ec0a10e3672",
       "excluded_from_docs": false
     },
     {
@@ -982,7 +982,7 @@
       "name": "capture-red-observations.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "ab9f73003a5b7b90a0f6e5356c0e24a1a453833f044a76426ca3e4eb15dda3d3",
+      "content_hash": "52f6e19e7ad4c8a137509e6699a15d291d088833be40aa217793156b54b7699f",
       "excluded_from_docs": false
     },
     {
@@ -991,7 +991,7 @@
       "name": "check-i18n-strings.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "6d7b793dcd3717735a9bac1f7e128928e51cdf2c03f7a08a24f71c707bb04ca8",
+      "content_hash": "7620e140933c8739ca56bbac111f3f9b4820a9bcdbc9e33696a1265da3824c72",
       "excluded_from_docs": false
     },
     {
@@ -1000,7 +1000,7 @@
       "name": "check-story-exists.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "8f9b24944201cb9e301fc28a31a0cb765f83e6666c5ec7d202bfca2afdf9e75e",
+      "content_hash": "7e2dd46c8e8ccbb605e2064879a4893e71f442bb6f1149d98584bc8290f602cb",
       "excluded_from_docs": false
     },
     {
@@ -1009,7 +1009,7 @@
       "name": "debt-sentinel-touch.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "cbcad59a8bc73fdfb4b362abce625222103d0b2da0651f5e8fe3a9f422e5b905",
+      "content_hash": "3d613cc614d020a2d3ab5a8b50a6bd81b3b8c63b58f214919e283f548425c6a9",
       "excluded_from_docs": false
     },
     {
@@ -1018,7 +1018,7 @@
       "name": "intercept-init.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "4b83bd8a984b9daafa1226dce7d982cc130592c67588f9ad321119273c81099f",
+      "content_hash": "91befea795ab9311a80c740f11af3ea69ae405ba75195ccda2ed1ad5b455b202",
       "excluded_from_docs": false
     },
     {
@@ -1027,7 +1027,7 @@
       "name": "local-janitor.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "96e84677d9d7ee1256698bd8870a18a1691f01a66f2cbed4fa601bfb1e35ee20",
+      "content_hash": "6468d442296f48db595e860248be47d1cd45f75a93084b16d8cb252c57cd9441",
       "excluded_from_docs": false
     },
     {
@@ -1036,7 +1036,7 @@
       "name": "post-audit-status.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "f79e1565c4244e5afe5789cc5d732637d2d7e41cc958d78a3ebcaaec03355759",
+      "content_hash": "b517948c4ccd492d3e7031755711e8446d6a835ffc4cfe2026abe096eae44a5e",
       "excluded_from_docs": false
     },
     {
@@ -1045,7 +1045,7 @@
       "name": "pr-merge-audit-check.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "c32c62c81deb99c5365ef8a15ecd79d4465440f59a07e3de5824e70755e97832",
+      "content_hash": "c8f95c351829a05d0da81b74895951dd0913c1da2e50310b28418411ee9e4239",
       "excluded_from_docs": false
     },
     {
@@ -1054,7 +1054,16 @@
       "name": "red-verify-commit-check.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "51d54cf037f886f9596150223769f125356033d9de7a725ba21000f6b9530b88",
+      "content_hash": "3d21825028be9b0525db23f0764b96d9f78cd822abe5a20e989497d0e04f52c5",
+      "excluded_from_docs": false
+    },
+    {
+      "kind": "hook",
+      "path": ".claude/hooks/serena-code-search-guard.sh",
+      "name": "serena-code-search-guard.sh",
+      "description": null,
+      "audience": "adopter",
+      "content_hash": "344c87e0561901f5139a504fd26285f97e5df37d3fe617c6c1036db523e77767",
       "excluded_from_docs": false
     },
     {
@@ -1063,7 +1072,7 @@
       "name": "telemetry-task-postuse.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "4d62a3bc42e408cc1ebf5dcd81bbdb8b4839748326d15e1048281f4a8367a621",
+      "content_hash": "12f64685fdfaf273b47d3dc96d4773faa922a661a84fbcdb15cb9f059e94645d",
       "excluded_from_docs": true
     },
     {
@@ -1072,7 +1081,7 @@
       "name": "wiki-commit-nudge.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "e9568be598cacaf42955a2e5c0f0a97136ff5fc1cb89c0ac6cf5be7b5e776d0a",
+      "content_hash": "ae9b39f5b54a8cf5afd1c586c58b8494e793da84a6c7bf2375122caadbdb3b49",
       "excluded_from_docs": false
     },
     {
@@ -1081,7 +1090,7 @@
       "name": "wiki-drift-check.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "ec0f4b5f301ad202f0f97aac6adb81ffcf6ca1adc50e1f3b4f9914738fe157a6",
+      "content_hash": "bb0ed860b83522f74d599969cb7346ba349891139a1f7e5c41cfb6d6d0f22908",
       "excluded_from_docs": false
     },
     {
@@ -1090,7 +1099,7 @@
       "name": "wiki-recompact-inject.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "d3c9343b2658fba225cf59ff2bc231debbac115d8c42ca03f1f0e2ab04cda810",
+      "content_hash": "d131a6fbb89c34287355fe5275e7819027ad45aedc9b0edb1dec56b07ddd0ad7",
       "excluded_from_docs": false
     },
     {
@@ -1099,7 +1108,7 @@
       "name": "wiki-recompact-sentinel.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "072f0ca720634f8940e525eca2c3f350777be7bda0554e4d54c05f914078078a",
+      "content_hash": "2d6364bbc987106aec39292256a6a6ec0835edd095e7b241b9fe7c4c2f154aac",
       "excluded_from_docs": false
     },
     {
@@ -1108,7 +1117,7 @@
       "name": "wiki-session-start.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "8c4fbb842ea4bcc149fcf3c8e2799c58a63308c584dad22da70a57f646983464",
+      "content_hash": "e224dddf5ed072904abfd3f0836bf7996151cd5193f76ef8e3b2017c0d2ef85e",
       "excluded_from_docs": false
     },
     {
@@ -1117,7 +1126,7 @@
       "name": "wiki-session-stop.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "8de32c3bf225a2d002de0486cdd97a4cdb39f4ff67720a26285598da47592026",
+      "content_hash": "9118a931cd15ef635e5bff82baf83487b9dc9c70e313b859d1a63fd6fbf66436",
       "excluded_from_docs": false
     },
     {
@@ -1126,7 +1135,7 @@
       "name": "wiki-squash-autocommits.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "2581bbb2424a33f14023859f50b96e3e9eea390a227bc616019152dc69499041",
+      "content_hash": "714323b380e18f2b72da97ae412b1e5dc06666148b5af325c05909d0448b44d3",
       "excluded_from_docs": false
     },
     {
@@ -1135,106 +1144,106 @@
       "name": "worthiness-presence-check.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "c56d0c716e09b7040cb644618db5936ed3fa5ad594934f340b7bf1c35ddff72d",
+      "content_hash": "a8cc81309bb5b73cdd1b2c0195a370dd29b9498e6a4ce7e9f38cc120031c47c3",
       "excluded_from_docs": false
     },
     {
       "kind": "rule",
       "path": ".claude/rules/accessibility.md",
       "name": "accessibility",
-      "description": null,
+      "description": "Accessibility",
       "audience": "adopter",
-      "content_hash": "06e05dd2864630a5219c76b8d5fdf910ed4c08ecc50822c9cd4225cad1aaa482",
+      "content_hash": "1b577e2a8ff122371b10a3fbe714650b51c2d0a8a3ebd7dfdd658120163a4875",
       "excluded_from_docs": false
     },
     {
       "kind": "rule",
       "path": ".claude/rules/api-service.md",
       "name": "api-service",
-      "description": null,
+      "description": "API Service Pattern",
       "audience": "adopter",
-      "content_hash": "e89cd84388867108950f2b17a8c9bf758994eaea2454678d89eb29eb746857a7",
+      "content_hash": "59da00063ba256aa7f61b4461691884c662fc1b7218b52222df4de2725d63d53",
       "excluded_from_docs": false
     },
     {
       "kind": "rule",
       "path": ".claude/rules/code-search.md",
       "name": "code-search",
-      "description": null,
+      "description": "Code Search",
       "audience": "adopter",
-      "content_hash": "1c5d7d68a309060bba4fbbc180e222af80fd1845464006d1489c6bab2ff17df3",
+      "content_hash": "bb34e4b807adfea468c033c6dd630c2b8b56a006510d88ac2c2bb6e6758edd28",
       "excluded_from_docs": false
     },
     {
       "kind": "rule",
       "path": ".claude/rules/coding-guidelines.md",
       "name": "coding-guidelines",
-      "description": null,
+      "description": "Coding Guidelines",
       "audience": "adopter",
-      "content_hash": "7f093d16440c6f3b71618fb96edfac598f11652ff354cab1562ca5f23bb96729",
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "excluded_from_docs": false
     },
     {
       "kind": "rule",
       "path": ".claude/rules/dep-audit.md",
       "name": "dep-audit",
-      "description": null,
+      "description": "Dependency-CVE Advisory, pnpm audit",
       "audience": "adopter",
-      "content_hash": "6f6d74fa3dfe390bcc8d3441fa5e85dcb10e1c76de4c024b1a725f9fb3d9e92e",
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "excluded_from_docs": false
     },
     {
       "kind": "rule",
       "path": ".claude/rules/design-baseline.md",
       "name": "design-baseline",
-      "description": null,
+      "description": "Design Baseline (Neutral, Not a Design System)",
       "audience": "adopter",
-      "content_hash": "4a3ba64f750cc63cfa158a202c513b7151c1f74da325231a13141a6daf3881f2",
+      "content_hash": "fba81035a60bd0a55f8c94896710de74135f45807de00aa3b51d0f4b2901c025",
       "excluded_from_docs": false
     },
     {
       "kind": "rule",
       "path": ".claude/rules/i18n.md",
       "name": "i18n",
-      "description": null,
+      "description": "Internationalization (i18n)",
       "audience": "adopter",
-      "content_hash": "ad6c8185c726617efa258b44748c748ef4775a63d23dd2f9cb507b72b1957fd3",
+      "content_hash": "017b5aa6e2f272912589fdc1cbc574204059370a0fb54af29b32d0e12c393d1b",
       "excluded_from_docs": false
     },
     {
       "kind": "rule",
       "path": ".claude/rules/instruction-files.md",
       "name": "instruction-files",
-      "description": null,
+      "description": "Template-Distributed File Paths",
       "audience": "adopter",
-      "content_hash": "56139089ff921642c268225e0b30dbd6bf75b43e01d9231028199f1442864db0",
+      "content_hash": "904a0f9e30c59cbf0df5b887aef42d809e79af976055909117da2b8f9074ac89",
       "excluded_from_docs": false
     },
     {
       "kind": "rule",
       "path": ".claude/rules/knip.md",
       "name": "knip",
-      "description": null,
+      "description": "Knip, Dead Code Detection",
       "audience": "adopter",
-      "content_hash": "8d403da764bd614bb670c21b05c1555b1e4ac20199a9b14a45b34dc0f1a9d481",
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "excluded_from_docs": false
     },
     {
       "kind": "rule",
       "path": ".claude/rules/playwright.md",
       "name": "playwright",
-      "description": null,
+      "description": "Playwright E2E Conventions",
       "audience": "adopter",
-      "content_hash": "8e158d5e77f96bd9b4f69bf1b43675ddf5a155fcda654ac55722ca534ad5c237",
+      "content_hash": "1d30ba9ac80cde4532e4a078ba05705b436d1adbfd0d9287a5effd877529c73c",
       "excluded_from_docs": false
     },
     {
       "kind": "rule",
       "path": ".claude/rules/pr-merge.md",
       "name": "pr-merge",
-      "description": null,
+      "description": "PR Merge",
       "audience": "mixed",
-      "content_hash": "d82ef90cf052df1eaa585e8efa94e6f00ceee3ac33344e42fd1db685d2cedd25",
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "excluded_from_docs": false,
       "marker_blocks": [
         [
@@ -1247,81 +1256,81 @@
       "kind": "rule",
       "path": ".claude/rules/quality-gate.md",
       "name": "quality-gate",
-      "description": null,
+      "description": "Quality Gate",
       "audience": "adopter",
-      "content_hash": "f2e7e93bcb4d0eec4607b98805103fc204fead26b1e007aaee3d0fb87bfb8d06",
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "excluded_from_docs": false
     },
     {
       "kind": "rule",
       "path": ".claude/rules/react-router-docs.md",
       "name": "react-router-docs",
-      "description": null,
+      "description": "React Router Docs",
       "audience": "adopter",
-      "content_hash": "5ed8a19ff0b292588157278aecae6321dad809be6d4e528bb325201fb9ca9e29",
+      "content_hash": "25827562af72388f2cdb54c259a1e55731696e64b0758b272e8cb9aa96677540",
       "excluded_from_docs": false
     },
     {
       "kind": "rule",
       "path": ".claude/rules/repo-relative-paths.md",
       "name": "repo-relative-paths",
-      "description": null,
+      "description": "Repo-Relative Paths (repo-wide)",
       "audience": "adopter",
-      "content_hash": "8227dbac3abf49be4633941dc96828fac7b1d50f725f315e0d4495a5cc45edf6",
+      "content_hash": "0088bb7ed0cf77e823e4252bf523ea8d06349ecf5ddf0d7c383cb9ee6f7a353f",
       "excluded_from_docs": false
     },
     {
       "kind": "rule",
       "path": ".claude/rules/routes.md",
       "name": "routes",
-      "description": null,
+      "description": "Route & Page Conventions",
       "audience": "adopter",
-      "content_hash": "3bad5675aa7c207dffcbe4215b052f1267c2b840fdc867de095abba21bed3fbf",
+      "content_hash": "61ccf39a698ad10b0ecf144adf79be83816717a83e16cdc326aa292e28689645",
       "excluded_from_docs": false
     },
     {
       "kind": "rule",
       "path": ".claude/rules/shell-cwd.md",
       "name": "shell-cwd",
-      "description": null,
+      "description": "Shell CWD",
       "audience": "adopter",
-      "content_hash": "07712b78905470acb35f959927364debd036e77b0dbe6011fa44a2af6a14253c",
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "excluded_from_docs": false
     },
     {
       "kind": "rule",
       "path": ".claude/rules/state-pattern.md",
       "name": "state-pattern",
-      "description": null,
+      "description": "State Pattern",
       "audience": "adopter",
-      "content_hash": "cbbac2140ba708334a8bce6534c5d0aa5e9c2c869b8b9d8c8225c6882f1c59da",
+      "content_hash": "80faacf9f64e65ed5f366feb8f178934dcb58cec14d4cc6cf9e1e5a8528503f1",
       "excluded_from_docs": false
     },
     {
       "kind": "rule",
       "path": ".claude/rules/storybook.md",
       "name": "storybook",
-      "description": null,
+      "description": "Storybook Conventions",
       "audience": "adopter",
-      "content_hash": "6ee715a88bcd07c4ad81f64579f032425b83afeec6f710886010a17b7c6ef27b",
+      "content_hash": "4f30188aada01f63759dbe7c7538cf9c7a4a8474d274791bef3d7103901fe69e",
       "excluded_from_docs": false
     },
     {
       "kind": "rule",
       "path": ".claude/rules/tailwind.md",
       "name": "tailwind",
-      "description": null,
+      "description": "Tailwind Conventions",
       "audience": "adopter",
-      "content_hash": "d86ab326bf4dea4807f01db0844485414baa23d9544cd801dd4798b924867763",
+      "content_hash": "5221a14aa0e03071718299f9c0465ef63c848d44e16f630da0b31ed7f697c8f0",
       "excluded_from_docs": false
     },
     {
       "kind": "rule",
       "path": ".claude/rules/wiki-style.md",
       "name": "wiki-style",
-      "description": null,
+      "description": "Wiki & Comment Style",
       "audience": "mixed",
-      "content_hash": "b9cc6d87d04684fbf3cb0e2c1d478d7c27866934b9ff455983d4ca522c39c89c",
+      "content_hash": "7741824094da61273f0392323a2f796645ae7a7b20c40cce8fe98176659ac01d",
       "excluded_from_docs": false,
       "marker_blocks": [
         [
@@ -1336,7 +1345,7 @@
       "name": "a11y-fixes",
       "description": "Resolve axe-core accessibility violations reported by Vitest (test/a11y.ts), Playwright (.playwright/a11y.ts), or the code-review-audit agent's a11y bucket. Trigger on any axe rule id appearing in test output, not only the ones named here. Contains fix patterns for the most common violations (color-contrast, label, label-title-only, image-alt, button-name, link-name, region, landmark-one-main, heading-order, aria-allowed-attr, aria-required-attr, aria-required-children, aria-required-parent, aria-valid-attr-value, focus-trap, tabindex, html-has-lang, document-title, duplicate-id, listitem, definition-list); for any violation not listed, apply the general axe guidance and the same fix-then-verify loop.",
       "audience": "adopter",
-      "content_hash": "ee2db89a989fa91c0185e4d4c33bf7e5ab757b0e47d3f19993d565e694563e19",
+      "content_hash": "09c7fa8cc920643553f782f78a5a3b5e393e669a9e0707469dd6d5eef3a9d817",
       "excluded_from_docs": false
     },
     {
@@ -1345,7 +1354,7 @@
       "name": "eslint-fixes",
       "description": "Resolve specific ESLint errors and warnings that appear in this project. Use when fixing lint failures, ESLint reported issues, or autofix conflicts (e.g. no-void, canonical/export-specifier-newline vs prettier, no-shadow trailing underscores, sonarjs/deprecation, you-dont-need-lodash-underscore, testing-library/prefer-screen-queries, testing-library/await-async-events, jest-dom/prefer-*).",
       "audience": "adopter",
-      "content_hash": "a95cd96418e804d8824ab6d5371e9c61b997f09f8ace3783b138918d6a65fa90",
+      "content_hash": "8524b87eea0cfb624fdd4cb7585791fc66c3a36e1483b606a5aca6f1289463c0",
       "excluded_from_docs": false
     },
     {
@@ -1354,7 +1363,7 @@
       "name": "gaia-handoff",
       "description": "Generate a comprehensive GAIA session handoff document, accomplishments, decisions, current state, open questions, so context can be cleared or compacted without losing anything. Trigger on `/gaia-handoff` or natural-language asks like \"write a handoff\", \"hand off this session\", or \"document where we are before I clear context\".",
       "audience": "adopter",
-      "content_hash": "7390177fa3f3f4836de4aabe7b2dc19a91e2fb3e59acc32f9801e065fcb94cf0",
+      "content_hash": "b31612ba40de0a7e921c07e7f2e0bf79b6e944afb863bf40a42e9f7b50206de6",
       "excluded_from_docs": false
     },
     {
@@ -1363,7 +1372,7 @@
       "name": "gaia-pickup",
       "description": "Restore context from the most recent GAIA session handoff and suggest the next action. Trigger on `/gaia-pickup` or natural-language asks like \"pick up where we left off\", \"resume from the handoff\", or \"continue the last session\".",
       "audience": "adopter",
-      "content_hash": "f79e44408b8a144221af5a92f34dd93c16bdc826ea31128f8ec7d3339d56c968",
+      "content_hash": "7f5d86c8c16a0d86aa07dc9108cc4222013fab6f10ac6b91421b4214ba6cb946",
       "excluded_from_docs": false
     },
     {
@@ -1372,7 +1381,7 @@
       "name": "gaia-react-perf",
       "description": "Diagnose React render performance by driving a micro-interaction, capturing real renders, and surfacing memo-defeating reference instability with a recommended structural fix. Measure-only: it emits a diagnosis, it does not auto-fix. Trigger on `/gaia-react-perf` or natural-language asks like \"profile renders\", \"measure renders\", \"why is X re-rendering\", or \"diagnose render performance\". Do NOT trigger on vague \"feels slow\", \"janky\", or \"optimize my app\".",
       "audience": "adopter",
-      "content_hash": "c66586b202f490f02350f8b4caa5af43b003a460d18a330eaf8f8f8c19a1bc16",
+      "content_hash": "6a825b1a8e72ce9c7a44acf4100491949ef65a949af6c64d9a004f2a4c195a90",
       "excluded_from_docs": false
     },
     {
@@ -1381,7 +1390,7 @@
       "name": "gaia-wiki",
       "description": "GAIA wiki maintenance, sync, consolidate, lint. Runs the full chain with no sub-arg, or a single stage when named (sync | consolidate | lint); append --force to override drift gating. Trigger on `/gaia-wiki <stage>` or natural-language asks like \"sync the wiki\", \"run the wiki maintenance chain\", \"consolidate the wiki\", or \"lint the wiki\".",
       "audience": "adopter",
-      "content_hash": "0cdec802d82c87e775e1e81888815b33a737c0cb7366372c33634a5c339c809b",
+      "content_hash": "e001f586793a0fd425cccdd7fb31b3ee953142d333597753c9e718101def4b13",
       "excluded_from_docs": false
     },
     {
@@ -1390,7 +1399,7 @@
       "name": "new-component",
       "description": "Scaffold a new React component with optional Storybook story and Vitest test files. Use this skill whenever the user asks to \"create a component\", \"make a button\", \"scaffold a card\", \"add a new component\", or asks for a new file under `app/components/` following the project's component pattern (PascalCase folder, index.tsx, tests/).",
       "audience": "adopter",
-      "content_hash": "d2b876c917d00aebe6dd7a2026769840937b8afc616a6a4e32c5f1b24549b649",
+      "content_hash": "193e4dad08d5482d1727b2ae9dffbed92d658eebf4254e5af88a40330deb9a25",
       "excluded_from_docs": false
     },
     {
@@ -1399,7 +1408,7 @@
       "name": "new-hook",
       "description": "Scaffold a new custom React hook with a Vitest test file. Use this skill whenever the user asks to \"create a hook\", \"make a useFoo hook\", \"scaffold a custom React hook\", \"add a hook under app/hooks\", or describes a piece of reusable React state/effect logic that warrants extraction into a named `use*` hook.",
       "audience": "adopter",
-      "content_hash": "ff8236fe66c5d832c485ef1e1ab5e31590af69a58d235bc17511990843df3b2a",
+      "content_hash": "11f513ba72eefa4d43bf2d3f57a5a251ed3d6687a3878259a3fc82acc09e1b25",
       "excluded_from_docs": false
     },
     {
@@ -1408,7 +1417,7 @@
       "name": "new-route",
       "description": "Scaffold a new route with its page component, test, story, and optional i18n keys. Use this skill whenever the user asks to \"create a route\", \"add a new page\", \"scaffold /dashboard\", \"wire up a new route under _public+ or _session+\", or anything that implies adding a file under `app/routes/` with a matching `app/pages/{Group}/{PascalName}Page/` folder.",
       "audience": "adopter",
-      "content_hash": "9a89221361d2200fda53225e9668ee6df246c1cf103eaf66bd00659b1fca1ae9",
+      "content_hash": "7a28123bd547be49e8a3340496cddc528bc48420d289459e59f2c901def34294",
       "excluded_from_docs": false
     },
     {
@@ -1417,7 +1426,7 @@
       "name": "new-service",
       "description": "Scaffold a new API service with request functions, Zod schemas, URL constants, and optional MSW mock handlers. Use this skill whenever the user asks to \"add a service\", \"create the projects API\", \"scaffold a new GAIA service\", \"wire up CRUD for users\", or anything implying a new folder under `app/services/gaia/{name}/` with parsers/types/requests + matching `test/mocks/{name}/` collections.",
       "audience": "adopter",
-      "content_hash": "f2151d2de96301380eb1938c1d3119d13438a1d7b30302679bc8d3873bb64c73",
+      "content_hash": "5c8074bb65a11449e57f95c516ed46fe1a3973d0dffa82ed63b19b404d9b41b4",
       "excluded_from_docs": false
     },
     {
@@ -1426,7 +1435,7 @@
       "name": "playwright-cli",
       "description": "Automates browser interactions for web testing, form filling, screenshots, and data extraction. Use when the user needs to navigate websites, interact with web pages, fill forms, take screenshots, test web applications, or extract information from web pages.",
       "audience": "adopter",
-      "content_hash": "1f2e43f13e025921e8622b3cae27a4236d45ef5f29d074cb8d0c1b7fbe3af1ee",
+      "content_hash": "aa3fc734d7e1d5fe54a6b1f6aa7a1511a2719089680abfa5ceb005a5e94be360",
       "excluded_from_docs": false
     },
     {
@@ -1435,7 +1444,7 @@
       "name": "react-code",
       "description": "Patterns and conventions for writing and editing React code, including components and hooks. Use this skill whenever writing or reviewing React components, hooks (useEffect, useCallback, useState), event handlers, or component extraction decisions. Also trigger when debugging stale closures, infinite re-renders, or unnecessary re-renders caused by memoization issues, or when deciding whether to add a dependency, reach for a web-platform API (Intl, URL, crypto.randomUUID), or hand-roll a primitive. Also trigger when choosing a React 19 idiom, deciding between forwardRef and ref-as-prop, useContext and use(), or Context.Provider and the Context shorthand; when conditional rendering risks the && numeric-0 leak; or when tempted to reach for React's form Actions (useActionState, useFormStatus, useOptimistic) instead of React Router's form handling.",
       "audience": "adopter",
-      "content_hash": "3d8454c1c26e86f30a225498f74e5cc587e6a580402baec502648c37baa4d49f",
+      "content_hash": "0c02706a5ba3b235211c461097f1f0ad08708e3749be67a32562145a2856216a",
       "excluded_from_docs": false
     },
     {
@@ -1444,7 +1453,7 @@
       "name": "release-notes",
       "description": "Maintainer-only. Translate a version's GAIA CHANGELOG entries into plain-language public release notes for the marketing site (gaiareact.com). Writes a release-data `.ts` file under `../website/src/pages/changelog/releases/` plus an editorial-decisions report for human review. Use whenever the maintainer wants the adopter-facing notes for a version, e.g. \"write release notes\", \"generate the changelog page entry\", \"translate the CHANGELOG for the website\", \"what's new on the site for v1.5.0\", \"public notes for 1.4.0\", or right after cutting a release, and for one-time backfill of historical `## [x.y.z]` blocks. This is the website-notes step only. It does NOT edit `CHANGELOG.md`, it is not how you cut a release (version bump, manifest, and tag are `/gaia-release`), and it is not for an adopter's own app's release notes.",
       "audience": "contributor",
-      "content_hash": "f4bfd9f447e99f08dfdebcc308cb62b01e75fdae4d3cc1b291c6336da99c11e0",
+      "content_hash": "c64a67ec438a7bd31c004338d9e8037c9929b1401ef65ac008a926136999f78c",
       "excluded_from_docs": false
     },
     {
@@ -1453,7 +1462,7 @@
       "name": "skeleton-loaders",
       "description": "For building skeleton loading states that are pixel-perfect matches of real content. Use this skill whenever adding loading states to components, building skeletons for async data, handling pending loader states in route transitions, or implementing the shimmer animation pattern. Also trigger when the user asks about preventing layout shift during data fetching.",
       "audience": "adopter",
-      "content_hash": "1fb209cd697b618523c1b59518a6b62121987f031c311a37fdc75d761b6bcc76",
+      "content_hash": "dcb705dcefaa30b8e41360dd75e60afe9002c6a7eda6d7759e6245fd447c4b79",
       "excluded_from_docs": false
     },
     {
@@ -1462,7 +1471,7 @@
       "name": "tailwind",
       "description": "Patterns and conventions for all Tailwind styling. Use this skill whenever writing Tailwind class names, combining conditional classes, building component variants, or choosing between twJoin and twMerge. Also trigger when the user asks about custom values, defining @theme tokens or CSS variables, naming color/spacing tokens, rem vs px, responsive breakpoints, or avoiding template literal class strings.",
       "audience": "adopter",
-      "content_hash": "52f51d6abd0b3478a8242d95a7cb89b41f58b8b36f3177f826290e3a2aedbd4a",
+      "content_hash": "5e2273874b8a1e246e8ed7c80ff7844ad54872c9ff2db10c723de92c0b3e5193",
       "excluded_from_docs": false
     },
     {
@@ -1471,7 +1480,7 @@
       "name": "tdd",
       "description": "Test-driven development with red-green-refactor loop. Use when user wants to build features or fix bugs using TDD, mentions \"red-green-refactor\", wants integration tests, or asks for test-first development.",
       "audience": "adopter",
-      "content_hash": "bc8648391de5a1703fa838e65c04379c4f0f5890a44860ba43fa7079c08777df",
+      "content_hash": "fd3aa0eb3390d9b9ecd1f67a8214277042e35afb211af7f11db7143f273bcc07",
       "excluded_from_docs": false
     },
     {
@@ -1480,7 +1489,7 @@
       "name": "typescript",
       "description": "Patterns and conventions for all TypeScript code. Use this skill whenever writing or reviewing TypeScript, naming identifiers, typing exports, choosing between type and interface, using Zod schemas, structuring function parameters, or enforcing code patterns like avoiding switch statements and enums.",
       "audience": "adopter",
-      "content_hash": "787a07a85a87a578869054093a3d0fd8ae5ef965b9ff3853b195968c405830d9",
+      "content_hash": "39c9811862464bae0a3d47a8ab7510402808aa276a8255fc0df04570dbf54bac",
       "excluded_from_docs": false
     },
     {
@@ -1489,7 +1498,7 @@
       "name": "update-deps",
       "description": "Autonomous Dependabot, auto-discover outdated packages, audit overrides, apply migrations for major bumps, resolve conflicts, run quality gate. Trigger when the user clicks the statusline `Run /update-deps` indicator or asks \"update dependencies\", \"bump deps\", \"run dependabot\".",
       "audience": "adopter",
-      "content_hash": "1097e4259e0efe52047998c6360314971d89627a105c0455dbfd45e26c6e6afd",
+      "content_hash": "79bcaeb956ab5a7dd8155e0bab8507d8c02b6b1da913e8adb51345c3b10ad132",
       "excluded_from_docs": false
     },
     {
@@ -1498,7 +1507,7 @@
       "name": "update-gaia",
       "description": "Pull the latest GAIA release into this project without clobbering customizations. Three-way merge per file using .gaia/manifest.json classes. Trigger when the user clicks the statusline `Run /update-gaia` indicator or asks \"update GAIA\", \"pull the latest GAIA\", \"apply the new GAIA release\".",
       "audience": "adopter",
-      "content_hash": "f74fa381fadd18500bde7c6d9c699a8548c9893bdd006f107dc7196961799be5",
+      "content_hash": "881306337605ec3abddc614844cbea1b5030f199c0134f5bb3d280bfc4923915",
       "excluded_from_docs": false
     },
     {
@@ -1507,7 +1516,7 @@
       "name": "speckit.gaia.constitution-check",
       "description": "GAIA before_specify hook: constitution placeholder check + spec-kit version-pin drift detection.",
       "audience": "adopter",
-      "content_hash": "0333cea3f94bce08001769a48408c5aaa850cb60df84ff834e5f5090c8d9a6d1",
+      "content_hash": "8fb7e4d0da8600304f7aebdc275c68e3a5c3e57aa72c4efc4e0e3ff635338916",
       "excluded_from_docs": false
     },
     {
@@ -1516,7 +1525,7 @@
       "name": "speckit.gaia.lint",
       "description": "GAIA after_specify hook: immutability lint over the just-written SPEC artifact.",
       "audience": "adopter",
-      "content_hash": "7f02306597d42e12ac8f179fa5ed8d98192ab90c5ba3e6913450e077ea5d1798",
+      "content_hash": "7ce7755041d318a3819eb1e6988eeb510dbf8e21ab23e7e6f966b6d00efdd0d3",
       "excluded_from_docs": false
     },
     {
@@ -1525,7 +1534,7 @@
       "name": "speckit.gaia.self-review",
       "description": "GAIA after_clarify hook: pre-gate-2 self-review pass on the in-progress SPEC draft.",
       "audience": "adopter",
-      "content_hash": "fc6a59e7f5a8fef8b183f32edbef3f607016dea706cc4d6fcf9789749d9ecd69",
+      "content_hash": "e54bf82af2d05deeb1c62a0b66693770d942aaa0e7999cab160921512668401d",
       "excluded_from_docs": false
     },
     {
@@ -1534,7 +1543,7 @@
       "name": "speckit.gaia.spec",
       "description": "GAIA Socratic discovery wrapper around /speckit-specify and /speckit-clarify.",
       "audience": "adopter",
-      "content_hash": "f717099f7e3367c94740bf8758e54381f6d4759e621e86f8937d0db657961ee0",
+      "content_hash": "eca21bb13f2293a44fbb24bccbbc2b2ba228ed0895c52a67ac61c4af0d227339",
       "excluded_from_docs": false
     },
     {
@@ -1543,7 +1552,7 @@
       "name": "speckit.gaia.spec-close",
       "description": "Close a SPEC after implementation+merge. Optional drain of deferred wiki-promote, then disposition prompt (archive / delete / keep) for the local SPEC artifact.",
       "audience": "adopter",
-      "content_hash": "a0ae668a218f8cdaa0d5b007aa97b3016b7abc88eaefa48fb6775cf60025a558",
+      "content_hash": "8d7ec1aa092a9e328c8592bb70767aea963d06ca17c85e56d4b03ec31e62fd4d",
       "excluded_from_docs": false
     },
     {
@@ -1552,7 +1561,7 @@
       "name": "speckit.gaia.uat-write",
       "description": "GAIA before_implement hook: render PO-authored UATs into Playwright e2e specs at .playwright/e2e/spec-NNN/.",
       "audience": "adopter",
-      "content_hash": "97744bbd528a063cb93a6920748e6b7bab2c51c9feace45cc38ef2ef137fe237",
+      "content_hash": "dbd6e30322a93d2fa62e74907982d24b19b54273407923816854abee9cfb4433",
       "excluded_from_docs": false
     },
     {
@@ -1561,7 +1570,7 @@
       "name": "speckit.gaia.wiki-promote",
       "description": "Promote merged SPEC content into the GAIA wiki.",
       "audience": "adopter",
-      "content_hash": "6b9ef7fabc4c72ebc8f7fb173650a99d4c979b5baf9c245ada5851f2354e5494",
+      "content_hash": "b5a0b4de826b5aacbfca1c7f3631859872785b5ae524c73e5e30a759c36f4499",
       "excluded_from_docs": false
     },
     {
@@ -1570,7 +1579,7 @@
       "name": "/gaia audit",
       "description": null,
       "audience": "adopter",
-      "content_hash": "674152ab39dcac2e052924f780c356e2208463f8afee584d7b1d01d2064e4e8c",
+      "content_hash": "f36edd3e9069d7f765949182d92d25d32808bd36560257ff52c207afff3ec5b4",
       "excluded_from_docs": false
     },
     {
@@ -1579,7 +1588,7 @@
       "name": "/gaia debt",
       "description": null,
       "audience": "adopter",
-      "content_hash": "888bbd3e585c5114a0b834414c40e4ffccf71826af239d04bafc264d34ccd892",
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "excluded_from_docs": false
     },
     {
@@ -1588,7 +1597,7 @@
       "name": "/gaia fitness",
       "description": null,
       "audience": "adopter",
-      "content_hash": "3cdae5b27117f9c731d6f1e4605257f6759306b8bf823167ad1227bea23a13a1",
+      "content_hash": "a5f5989cf827f74b2962a8b67fa8442938f8e2d0c4fdf866e4d781f13c04982a",
       "excluded_from_docs": false
     },
     {
@@ -1597,7 +1606,7 @@
       "name": "/gaia forensics",
       "description": null,
       "audience": "adopter",
-      "content_hash": "f092b8ab8c1123fe8b01db04bdb0445aeecfc9c6e991b59e5739bb6eeb3507d7",
+      "content_hash": "82f45182bd08baa335b8628867cc63e88d537af4b5a54d7f71ef8e4ab5c5fd1d",
       "excluded_from_docs": false
     },
     {
@@ -1606,7 +1615,7 @@
       "name": "/gaia handoff",
       "description": null,
       "audience": "adopter",
-      "content_hash": "a084aa464e115f6c05c0e9efdbc7091bfaa2a874c77162ec96f3701b0951570b",
+      "content_hash": "76521d18c415526a1dd6574166dc76b184a1effbd934f5469cd912305b9b17f3",
       "excluded_from_docs": false
     },
     {
@@ -1615,7 +1624,7 @@
       "name": "/gaia harden",
       "description": null,
       "audience": "mixed",
-      "content_hash": "b2a42e00e585a5ca30740c9f31f5db2cfa51dd9e53d4fd7cb37ffee796c0ca5b",
+      "content_hash": "77702c05d26f3fd16ed4ea8642b1bd4ff0aa70ad6bf74d1fbfef4fa98a5fb99e",
       "excluded_from_docs": false,
       "marker_blocks": [
         [
@@ -1634,7 +1643,7 @@
       "name": "/gaia pickup",
       "description": null,
       "audience": "adopter",
-      "content_hash": "d9a7383a28debca37c56f6f186d446f1e9bb8c6abf6095b1866b58bf06d26be0",
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "excluded_from_docs": false
     },
     {
@@ -1643,7 +1652,7 @@
       "name": "/gaia plan",
       "description": null,
       "audience": "adopter",
-      "content_hash": "f52dfeea7a03dd0c61b863e66ec4bd50fbe20bd941564a426987e15914fb6374",
+      "content_hash": "df859ab5318abb2b2a6182a70f5055fba167bf7e71a32fcbeb1df3dbc983bbac",
       "excluded_from_docs": false
     },
     {
@@ -1652,7 +1661,7 @@
       "name": "/gaia spec",
       "description": null,
       "audience": "adopter",
-      "content_hash": "37ade2ca15632fab1f4500d902b28c1416e4cf5441e12668098a02e41bcd6e8a",
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "excluded_from_docs": false
     },
     {
@@ -1661,7 +1670,7 @@
       "name": "/gaia wiki",
       "description": null,
       "audience": "adopter",
-      "content_hash": "66705c96b8e12823967252ee3782bbdf217c578aadbc4a7a888e4600abbb973a",
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "excluded_from_docs": false
     },
     {
@@ -1670,7 +1679,7 @@
       "name": "/gaia wiki consolidate",
       "description": null,
       "audience": "adopter",
-      "content_hash": "4ad75944791bbb401ff21f8b871899c48191838fe315931032ad558c97a092c9",
+      "content_hash": "22f078744907fd72456da8be2a44802b7446743bfdfa5fac5e07355ba658ffb9",
       "excluded_from_docs": false
     },
     {
@@ -1679,7 +1688,7 @@
       "name": "/gaia wiki lint",
       "description": null,
       "audience": "adopter",
-      "content_hash": "c059eead694bb3228c775d20029ae25b9731cffbed01548ec94a6d9a81eca2f7",
+      "content_hash": "5d1ba52cf9420bc7a92cf27238281f3bc55cec25faf15a2fafa8f083c7dd4501",
       "excluded_from_docs": false
     },
     {
@@ -1688,7 +1697,7 @@
       "name": "/gaia wiki sync",
       "description": null,
       "audience": "adopter",
-      "content_hash": "0912c8cc3f3757388c2a8ad706faef82dac2d375ce68264868b22024aaa9c53a",
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "excluded_from_docs": false
     },
     {
@@ -1697,7 +1706,7 @@
       "name": "wiki/README.md",
       "description": "GAIA React: LLM Wiki",
       "audience": "mixed",
-      "content_hash": "82a187fab7d211c84b9ff7a29ed9e999d777b72bfe94d0f014f681b4d7c30660",
+      "content_hash": "10d763bd112d164cc4c1d5a193e6950213951339748d61836b6f861fea744843",
       "excluded_from_docs": false,
       "marker_blocks": [
         [
@@ -1720,7 +1729,7 @@
       "name": "wiki/components/Form Choices.md",
       "description": "Form Choices",
       "audience": "adopter",
-      "content_hash": "f9baa96fddbb7d464a70ff8eac83c29a679ba8e3074674fa04781dae7ad0259c",
+      "content_hash": "50a3c5fccae2a173a588ecd35a35541b63b3c137bb6881f5a206d79b857c2e27",
       "excluded_from_docs": false
     },
     {
@@ -1729,7 +1738,7 @@
       "name": "wiki/components/Form Field.md",
       "description": "Form Field",
       "audience": "adopter",
-      "content_hash": "d4c4fb3a404ad70f1622cd0df5c16682394bc8d2056f372fe3164677155eded4",
+      "content_hash": "2cdc69e2547f413b7ee546eaa163390f8ebee82d34717a63efacdfa51f828e13",
       "excluded_from_docs": false
     },
     {
@@ -1738,7 +1747,7 @@
       "name": "wiki/components/Form Layout.md",
       "description": "Form Layout",
       "audience": "adopter",
-      "content_hash": "abfeb5274f77f258c78a780e9c298f183a0679608e5d16d660491a0affa5799e",
+      "content_hash": "ea945e02af4744c2877912294fbbacb23f82f1cc571075118bf2507328d9a8a3",
       "excluded_from_docs": false
     },
     {
@@ -1747,7 +1756,7 @@
       "name": "wiki/components/Form Select.md",
       "description": "Form Select",
       "audience": "adopter",
-      "content_hash": "f1ed4a132c95dc09adcf38cd8f1cec3f204f5f5effc5e887b0c4667c9bbbe39e",
+      "content_hash": "506fc7a5c17cf2d029a0040a0676987ab5399d7ae1053c1558ae95ebdfa10636",
       "excluded_from_docs": false
     },
     {
@@ -1756,7 +1765,7 @@
       "name": "wiki/components/Form Text Inputs.md",
       "description": "Form Text Inputs",
       "audience": "adopter",
-      "content_hash": "66dfb77816662eaab95bcef9af4fb8efce37321c6b79cefd7e0cd926b577b344",
+      "content_hash": "35737ae7afa41545d131c39ea22923a2b8a3718c6fded6c12f62b562953b2f59",
       "excluded_from_docs": false
     },
     {
@@ -1765,7 +1774,7 @@
       "name": "wiki/components/Form YearMonthDay.md",
       "description": "Form YearMonthDay",
       "audience": "adopter",
-      "content_hash": "0dfd89311c2f4bf7d1f241b2be2bbbcb1b38ea538cd7ff2968abf5dc2b1e9d45",
+      "content_hash": "f090729bb4564fcf754e9c16f4a17de58e63989a6874d3607f634fb941a244b3",
       "excluded_from_docs": false
     },
     {
@@ -1774,7 +1783,7 @@
       "name": "wiki/concepts/API Service Pattern.md",
       "description": "API Service Pattern",
       "audience": "adopter",
-      "content_hash": "cc178e4800b3e07510688bb77c1ac4d3f1164ac2a3be2bb9b709274ae919405f",
+      "content_hash": "b476892aaaaa53fb1326afd16c73dc75b99bed080b7a2bdcd6862b16dfaf97c8",
       "excluded_from_docs": false
     },
     {
@@ -1783,7 +1792,7 @@
       "name": "wiki/concepts/Accessibility.md",
       "description": "Accessibility",
       "audience": "adopter",
-      "content_hash": "db2ba1aa6972d20ecf809ec9606d12d02be43c4eb9514393641fc4fb2a65401e",
+      "content_hash": "6ffe1c6ea70370daa76ea93698a75f16bfa6468ac4292d33934431ee6bf75721",
       "excluded_from_docs": false
     },
     {
@@ -1792,7 +1801,7 @@
       "name": "wiki/concepts/Audit Disposition and Debt Drain.md",
       "description": "Audit Disposition and Debt Drain",
       "audience": "adopter",
-      "content_hash": "eca0c23cbbb2d0ba34480311a5f995b6ceeb600d70a49f6640f417ad3de34011",
+      "content_hash": "ed4165aa8450cb8fdf20e9df1f7638bda64f5661003d9825edb7aadaf072b6f9",
       "excluded_from_docs": false
     },
     {
@@ -1801,7 +1810,7 @@
       "name": "wiki/concepts/Chromatic Opt-Out.md",
       "description": "Chromatic Opt-Out",
       "audience": "adopter",
-      "content_hash": "02146ac12dada1153943b513f0b18992702d846802103acdfb608a97d0375f87",
+      "content_hash": "d731383464b37c19c36b2e092a5cb0921ce66bfd4d52f09f05c950ae7c2fd88b",
       "excluded_from_docs": false
     },
     {
@@ -1810,7 +1819,7 @@
       "name": "wiki/concepts/Claude Hooks.md",
       "description": "Claude Hooks",
       "audience": "adopter",
-      "content_hash": "2f8c1de7448a34582333ab85c9286b079a4f4d29220c51dc4444abe536d3b59e",
+      "content_hash": "b7595a72508bc131c8cf7e96e3625d0ae2c90ab7dd90033d8baf2d6c5602fddb",
       "excluded_from_docs": false
     },
     {
@@ -1819,7 +1828,7 @@
       "name": "wiki/concepts/Claude Integration Conventions.md",
       "description": "Claude Integration Conventions",
       "audience": "adopter",
-      "content_hash": "6cdde6c6d1ded43485e0b0d9c5e1bce401ca4a2710434bdd1a35739a59106642",
+      "content_hash": "3c9ea00dd872728af5ca2420961abc49293b6dd4560221390ab87e33f24a86ff",
       "excluded_from_docs": false
     },
     {
@@ -1828,7 +1837,7 @@
       "name": "wiki/concepts/Claude Skills.md",
       "description": "Claude Skills",
       "audience": "adopter",
-      "content_hash": "d1218f6243e7e516655149c3fc44f6933295fbf43277962c34a3445885982a21",
+      "content_hash": "cdcae096d3d7545e0bb4137ef455f462518f0e5982a02ee0f3a1992cf51e4833",
       "excluded_from_docs": false
     },
     {
@@ -1837,7 +1846,7 @@
       "name": "wiki/concepts/Code Review Audit Agent.md",
       "description": "Code Review Audit Agent",
       "audience": "adopter",
-      "content_hash": "e7dc2e462ed00221e062dd7c9233047a6c59c9cb019ab6d383643b565e1678a8",
+      "content_hash": "26be15eda9b6e1cedc9d70319e1f3b3a1712a798aca810a28209508d6f8d879b",
       "excluded_from_docs": false
     },
     {
@@ -1846,7 +1855,7 @@
       "name": "wiki/concepts/Code Review Audit CI.md",
       "description": "Code Review Audit CI",
       "audience": "mixed",
-      "content_hash": "6fea464264bb41a2d6e123675167583dd3d3ce75560820bcf3c8085e767996fa",
+      "content_hash": "1d12b1108060e561d9e4f6f761af93552337845e16eff1fad48c63b58644a0f5",
       "excluded_from_docs": false,
       "marker_blocks": [
         [
@@ -1869,7 +1878,7 @@
       "name": "wiki/concepts/Coding Guidelines.md",
       "description": "Coding Guidelines",
       "audience": "adopter",
-      "content_hash": "3b8b8f6e925226e1ae9cc87109a11220149da4818c812f5b2e45c0a999ae68d4",
+      "content_hash": "9e54983e53abf58302878f53bb61459d1de0b2045746410ed35c49695eb6a1f5",
       "excluded_from_docs": false
     },
     {
@@ -1878,7 +1887,7 @@
       "name": "wiki/concepts/Component Testing.md",
       "description": "Component Testing",
       "audience": "adopter",
-      "content_hash": "0db25526955deeef1492ee4c74024f6f6ba2ced84bcf5f0dce4f5729f8c523a1",
+      "content_hash": "d0deb4aee6184c685eabd3014ea99bcc5a5ee76f14f09b9ac274a01fb074596e",
       "excluded_from_docs": false
     },
     {
@@ -1887,7 +1896,7 @@
       "name": "wiki/concepts/Design System.md",
       "description": "Design System",
       "audience": "adopter",
-      "content_hash": "a61550f277de3706ca2ea8d7a0233233debafbae6764d8b0643fb28e52ee0ca0",
+      "content_hash": "e77783da97dddfc0fbe3e0e3fea323f0f792e4566892325d795d77e15983dc15",
       "excluded_from_docs": false
     },
     {
@@ -1896,7 +1905,7 @@
       "name": "wiki/concepts/ESLint Fixes.md",
       "description": "ESLint Fixes",
       "audience": "adopter",
-      "content_hash": "287061f2a83c77d81153ed96919ff519626c31d00f22ddcd1e500cbefc34233e",
+      "content_hash": "78e6040d6ea481ab533c277eb0d126d4f14a06a3e034faf333cacf63909ff786",
       "excluded_from_docs": false
     },
     {
@@ -1905,7 +1914,7 @@
       "name": "wiki/concepts/Forensics.md",
       "description": "Forensics",
       "audience": "adopter",
-      "content_hash": "a418b6f1a28f02c2b3f5c70a582210de9f2b32a5760c28c31f2f36842b81ccff",
+      "content_hash": "21cfad2dee3af04dadcd888008588147a80fdcfcfe86693d681b70f26bcfebbe",
       "excluded_from_docs": false
     },
     {
@@ -1914,7 +1923,7 @@
       "name": "wiki/concepts/GAIA Audit.md",
       "description": "GAIA Audit",
       "audience": "adopter",
-      "content_hash": "99d53aebc04e37488bf93c7e7ae59b818384e7a2ff52ae4788bcf218f9776fad",
+      "content_hash": "abd395c05c3705e6f0f2f09fb395f335c4269dfd3a19c029771b8c288f77e569",
       "excluded_from_docs": false
     },
     {
@@ -1923,7 +1932,7 @@
       "name": "wiki/concepts/GAIA Handoff.md",
       "description": "GAIA Handoff",
       "audience": "adopter",
-      "content_hash": "81a58bd665377219ecbf8834c2ecc59d19e468b67bb9e5a628724c9941168a65",
+      "content_hash": "bd18b4ecd3d86e344ac5968b056237ed175b000f98b1b77fe75c80dbff974d07",
       "excluded_from_docs": false
     },
     {
@@ -1932,7 +1941,7 @@
       "name": "wiki/concepts/GAIA Init Workflow.md",
       "description": "GAIA Init Workflow",
       "audience": "adopter",
-      "content_hash": "3c46ab0fe8f1c9a5cce09225af1f6c348fb55095b74a8d2fb50e27631db8cc45",
+      "content_hash": "ffb0ad76a1abd61501d8a5e29ee534b5dc64bfda8e2638c2b304ef2f29c2f82b",
       "excluded_from_docs": false
     },
     {
@@ -1941,7 +1950,7 @@
       "name": "wiki/concepts/GAIA Philosophy.md",
       "description": "GAIA Philosophy",
       "audience": "adopter",
-      "content_hash": "711b18c4cfb76d48c372671d322b11b1a989096a1e207957f8d3ec86a7d0525d",
+      "content_hash": "fbff3da39ac7e52656bfdcdb36fb0138021321dac3908b51f3148c3f6ec134d8",
       "excluded_from_docs": false
     },
     {
@@ -1950,7 +1959,7 @@
       "name": "wiki/concepts/GAIA Pickup.md",
       "description": "GAIA Pickup",
       "audience": "adopter",
-      "content_hash": "6cb6cf6c4de7706274a421df8a2229486263de85a382774cc8fdcb90d1f6fa6b",
+      "content_hash": "7bc40d5d16ad1af8ceded18650acc5f3e6935b37b6069852bed33427e5138f39",
       "excluded_from_docs": false
     },
     {
@@ -1959,7 +1968,7 @@
       "name": "wiki/concepts/GAIA Plan.md",
       "description": "GAIA Plan",
       "audience": "adopter",
-      "content_hash": "a70c84e8bb490de4f14cfef75cb151418fd6a7a023770d810578958e3c400a8f",
+      "content_hash": "1dd63a9b6ae495131489e4deeed1db0032cdc0faf3770c8cfe8812bbe1569184",
       "excluded_from_docs": false
     },
     {
@@ -1968,7 +1977,7 @@
       "name": "wiki/concepts/GAIA Spec.md",
       "description": "GAIA Spec",
       "audience": "adopter",
-      "content_hash": "2849ad04e03088ff1d59b847ffc9ef0c863bf61d7c775b297a44980723b999b2",
+      "content_hash": "7732ae8b5c04df98ddd000205f910a5d604b3f80d6a6f0aba7d2fcbcaaf280a3",
       "excluded_from_docs": false
     },
     {
@@ -1977,7 +1986,7 @@
       "name": "wiki/concepts/Git Workflow.md",
       "description": "Git Workflow",
       "audience": "adopter",
-      "content_hash": "0cf3b70e2c9532f67c8707fa75298846f58108e235da11fd7c573b1163c1ea95",
+      "content_hash": "4714bb53456941a90361fea417dd7ab1bf8ec76b368381edcba37e6f97e654f2",
       "excluded_from_docs": false
     },
     {
@@ -1986,7 +1995,7 @@
       "name": "wiki/concepts/Incremental CI Skipping.md",
       "description": "Incremental CI Skipping",
       "audience": "mixed",
-      "content_hash": "86473650286fcc5ee728ef60ee4f59becd03efbd7b400ed6f4634ce08d2c98a0",
+      "content_hash": "237efdf9f644d9e20f090f519abb0286fafdddcb34a14ba5f2760851bd4f8586",
       "excluded_from_docs": false,
       "marker_blocks": [
         [
@@ -2001,7 +2010,7 @@
       "name": "wiki/concepts/Local Working State.md",
       "description": "Local Working State",
       "audience": "adopter",
-      "content_hash": "7a18a6ffd695317b75fcf7a3997584554a9366884cc6587c3d641d71c51d4f5c",
+      "content_hash": "7e4926cf29a3d7881e566edb0c09716f2c6050fa4e17b9bcb7980c3012ca1bc2",
       "excluded_from_docs": false
     },
     {
@@ -2010,7 +2019,7 @@
       "name": "wiki/concepts/PR Merge Workflow.md",
       "description": "PR Merge Workflow",
       "audience": "mixed",
-      "content_hash": "e9449eb1a038a1f7d9fd7e3978fa347d7b0bc9e76e8f963fa78990e0663dd1aa",
+      "content_hash": "1519e29a39855010cd97ec16c0b059989901441d31ce0ead431069d91486fac3",
       "excluded_from_docs": false,
       "marker_blocks": [
         [
@@ -2029,7 +2038,7 @@
       "name": "wiki/concepts/Policy-Memory Loop.md",
       "description": "Policy-Memory Loop",
       "audience": "adopter",
-      "content_hash": "008902f4cf837bdd1549e33f1335cc3d295cfdd2b42ef2cf9462e07294f1ec0b",
+      "content_hash": "222d9783b03adc6d3d211c0853119e37fffe6326f1c93b0a8ab263a5d6f36f1c",
       "excluded_from_docs": false
     },
     {
@@ -2038,7 +2047,7 @@
       "name": "wiki/concepts/Pre-commit Hooks.md",
       "description": "Pre-commit Hooks",
       "audience": "adopter",
-      "content_hash": "def9738703c84a48055bb5f13b517c0e163f4589cb06785388cca599fad26b18",
+      "content_hash": "202ae004f7cdb1180e85a8992ed4e529022cbba41d2c49c29047cc1acc11e178",
       "excluded_from_docs": false
     },
     {
@@ -2047,7 +2056,7 @@
       "name": "wiki/concepts/React Perf Diagnostic.md",
       "description": "React Perf Diagnostic",
       "audience": "mixed",
-      "content_hash": "81de974b69b985fdd380973f84d54127bd3a5772465317a10ab4da708622a00b",
+      "content_hash": "c87f3ae54562bb30fee190e245bd8ed0381df540352d2e33284efb0275b6bc33",
       "excluded_from_docs": false,
       "marker_blocks": [
         [
@@ -2062,7 +2071,7 @@
       "name": "wiki/concepts/Release Workflow.md",
       "description": "Release Workflow",
       "audience": "contributor",
-      "content_hash": "8aa79dd6a2a88809fe397379ccc9613ea84f0ad1cb66e16d8d6d6e8db5e2945f",
+      "content_hash": "4c42854e5e5991a1d10e0de296bc08f6e01092a71f107d6e5aa7d91490c52bb8",
       "excluded_from_docs": false
     },
     {
@@ -2071,7 +2080,7 @@
       "name": "wiki/concepts/Release-Notes.md",
       "description": "Maintainer-only. Translate a version's GAIA CHANGELOG entries into plain-language public release notes for the marketing site.",
       "audience": "contributor",
-      "content_hash": "8b58cb03141b17016553c1dddb9ccd460b7a47e85b3edb2526fab8e020d2c483",
+      "content_hash": "16573ca6ae691d19dd67bd11e32626e8d4c2f33b624894f2d2c6ef1498c9a508",
       "excluded_from_docs": false
     },
     {
@@ -2080,7 +2089,7 @@
       "name": "wiki/concepts/Serena Integration.md",
       "description": "Serena Integration",
       "audience": "adopter",
-      "content_hash": "0fcd5f2685b232ebb3b83670a8253df5ba18ef87f000263ec2d98af8c7cc08a8",
+      "content_hash": "e7d98f56c7f572568896ed54c90301fb41cb9b96e89067223b6c432f640847b8",
       "excluded_from_docs": false
     },
     {
@@ -2089,7 +2098,7 @@
       "name": "wiki/concepts/Task Orchestration.md",
       "description": "Task Orchestration",
       "audience": "adopter",
-      "content_hash": "5a6816e04604a064911f029de32060f6a82c11d22d47195fbe2b8bff43bf7751",
+      "content_hash": "e3983f42acdeb50673d385bbf7cf7fdd4cd3a66b9e220a3b57ae748f1dee743e",
       "excluded_from_docs": false
     },
     {
@@ -2098,7 +2107,7 @@
       "name": "wiki/concepts/Telemetry.md",
       "description": "Telemetry",
       "audience": "adopter",
-      "content_hash": "ff357c5243f3603f0ecc0e6053306ebdcf214998ab24379b2665b8c0118eaa43",
+      "content_hash": "05b079c194ed9b224c3a0063b6c6caf57004801121984191dcf8b9b8b6b622cd",
       "excluded_from_docs": true
     },
     {
@@ -2107,7 +2116,7 @@
       "name": "wiki/concepts/Test Runner.md",
       "description": "Test Runner Rule",
       "audience": "adopter",
-      "content_hash": "99848afffbb7b73e9e35f9395fbca68c46082805bcba487001c119038ca71608",
+      "content_hash": "f2bf6ceb081c2ad818ca85773a429731666da086a049347c6fcb1d4e07146a07",
       "excluded_from_docs": false
     },
     {
@@ -2116,7 +2125,7 @@
       "name": "wiki/concepts/Update Workflow.md",
       "description": "Update Workflow",
       "audience": "adopter",
-      "content_hash": "ee530f1a8e7ec66c582742e1612d1673a9072ef0bffe4874519e621183377636",
+      "content_hash": "3d8069623570e692e900610a69da45ea6c9d2e11f769bc7a272ef5017fd8e915",
       "excluded_from_docs": false
     },
     {
@@ -2125,7 +2134,7 @@
       "name": "wiki/concepts/Wiki Consolidate.md",
       "description": "Wiki Consolidate",
       "audience": "adopter",
-      "content_hash": "123cb3e7f8d49116790980abe17d11a24d1fce74d1679c846e662bc89ab7ca8b",
+      "content_hash": "c4568c4fee2a6ae27b5652c15c8a9a1aa2e590868d3fe1ea0f61c59f70049564",
       "excluded_from_docs": false
     },
     {
@@ -2134,7 +2143,7 @@
       "name": "wiki/concepts/Wiki Sync.md",
       "description": "Wiki Sync",
       "audience": "adopter",
-      "content_hash": "a97e072320b63c3e5fea0518a4d0fec9f306f00bb8baca4852183a2d0e2c98b6",
+      "content_hash": "eeba1cb09446264de2756b8f1523b59269d5bc39faef16a863957739a007c5f7",
       "excluded_from_docs": false
     },
     {
@@ -2143,7 +2152,7 @@
       "name": "wiki/decisions/Bundle-time Scrub.md",
       "description": "Bundle-time Scrub",
       "audience": "contributor",
-      "content_hash": "2d77519f8419b0913260531982577ffec38d9a7382c98bb731c9c4e1b3f5e564",
+      "content_hash": "006cb30747dfcf5119ca63ff2789342f3f4053a1cbdddd687681c5a639e68eee",
       "excluded_from_docs": false
     },
     {
@@ -2152,7 +2161,7 @@
       "name": "wiki/decisions/CLI-Binary-Split.md",
       "description": "CLI Binary Split",
       "audience": "contributor",
-      "content_hash": "50a601b9d733ed9eda57ed0c95c6b8bde7f49dcca12125cdf96520772c8c4cf6",
+      "content_hash": "17e02dfe85409f7e159c8488499480ed93a0225ac06b9071ab35042e91552967",
       "excluded_from_docs": false
     },
     {
@@ -2161,7 +2170,7 @@
       "name": "wiki/decisions/Claude Integration Fitness.md",
       "description": "Claude Integration Fitness",
       "audience": "adopter",
-      "content_hash": "81be777a1daf923dce73f1055ab9d7663e5864b2a1241e8d80dbd44bbf0030d4",
+      "content_hash": "f87b2a25df678eb5604d7b7f863c1ad52bd238858fcd1f9cb0cc1d5b33f3aa9b",
       "excluded_from_docs": false
     },
     {
@@ -2170,7 +2179,7 @@
       "name": "wiki/decisions/Co-located Tests Folder.md",
       "description": "Decision: Co-located `tests/` Subfolder",
       "audience": "adopter",
-      "content_hash": "b7250ff75c99ff5d24d80413d7ae2d16b53580676fc1f561e17cc40cd3dde80e",
+      "content_hash": "fc1a232006a42851220609a4e03e5e825fd3d16888334e0a5517fc882b95c24a",
       "excluded_from_docs": false
     },
     {
@@ -2179,7 +2188,7 @@
       "name": "wiki/decisions/Content Security Policy.md",
       "description": "Decision: Content Security Policy",
       "audience": "adopter",
-      "content_hash": "7f0df59a006c42f3599a967b80c04d87bd56b833c6ccf3defb6b04ed0931cae4",
+      "content_hash": "00acb6a3321ebec18ad36925cdd99b9bbff1569ba4d8f5696ac280403f9eca74",
       "excluded_from_docs": false
     },
     {
@@ -2188,7 +2197,7 @@
       "name": "wiki/decisions/Dark Mode Modernization.md",
       "description": "Decision: Modernize Dark Mode (Cookie + Optimistic UI)",
       "audience": "adopter",
-      "content_hash": "a44bc53b923ca3d48c30521f6459f32f804f46671c7b55a35773c84a0383addb",
+      "content_hash": "9680e828908879fe9f17cf6d432fae297cba6b84a803544e4b6bae72edf77a82",
       "excluded_from_docs": false
     },
     {
@@ -2197,7 +2206,7 @@
       "name": "wiki/decisions/Determinism Classifier.md",
       "description": "Determinism Classifier",
       "audience": "adopter",
-      "content_hash": "1a8cb81ca3c954c4284360cc546ccf5004d3a67f039f6f82bc73d5e05ccd3a69",
+      "content_hash": "215efb12c0b3f5d29070436acde0d53aa3a80d525ef14a95d726f0550ae04c04",
       "excluded_from_docs": false
     },
     {
@@ -2206,7 +2215,7 @@
       "name": "wiki/decisions/Dispatched-Check Rollup via Polling.md",
       "description": "Decision: Dispatched-Check Rollup via In-Loop Polling",
       "audience": "adopter",
-      "content_hash": "6192dff5d9379ae3b87a97079bf75cf3460fca1e55b3eff16ece5d1944c41ec6",
+      "content_hash": "3f13395100cf19d4086331ac09d79c0681ef24876d42f503acc218c9a2b123d2",
       "excluded_from_docs": false
     },
     {
@@ -2215,7 +2224,7 @@
       "name": "wiki/decisions/DragonScale Opt-Out.md",
       "description": "Decision: DragonScale Opt-Out",
       "audience": "adopter",
-      "content_hash": "822bc7430cb2d9becaf053c2b6efcc2dec76d35ba916895807edc63f0a32a799",
+      "content_hash": "425b6f090c31a311c1cc557268827f0729e77ac49fd63351f8fa7c552860ae39",
       "excluded_from_docs": false
     },
     {
@@ -2224,7 +2233,7 @@
       "name": "wiki/decisions/Forensics Triage Workflow.md",
       "description": "Decision: Forensics Triage Workflow",
       "audience": "contributor",
-      "content_hash": "f5dc6a700a6155c634ef436b7a7728ca2881b08c8876d3b7e270220a44baba90",
+      "content_hash": "1c353e60af79700948aab3827fdb8a3c3ae7cec9e29dbb09be1aef228cb5bbe1",
       "excluded_from_docs": false
     },
     {
@@ -2233,7 +2242,7 @@
       "name": "wiki/decisions/No Component Library.md",
       "description": "Decision: No Component Library",
       "audience": "adopter",
-      "content_hash": "ff5be854813eb60e9d0d9a554cf04975ec4f79ab2c8173c916f9cf80810c0ca7",
+      "content_hash": "761c6fe115257b6e6607551db9e59bb7489fa055ba5de55a29c45d366e67d6d2",
       "excluded_from_docs": false
     },
     {
@@ -2242,7 +2251,7 @@
       "name": "wiki/decisions/Quality Gate.md",
       "description": "Decision: Mandatory Quality Gate",
       "audience": "adopter",
-      "content_hash": "d6f83b0b08d5e94332acfb68c1a563306d7ed16e0e05787a030d3f73a9e6323a",
+      "content_hash": "16c020703b0f428ea343859f7145959067a7105caef91f8bc52be9dfa464f774",
       "excluded_from_docs": false
     },
     {
@@ -2251,7 +2260,7 @@
       "name": "wiki/decisions/TDD RED Verification.md",
       "description": "TDD RED Verification",
       "audience": "adopter",
-      "content_hash": "c2fa73b0c38ecfc050be7246e7be0398f9e236a72d8ddc5e8d5f2e541cf1b073",
+      "content_hash": "71d788caf90bf34b5d149b417783ece9c3b21eeca1cb434a70808c75e1c3364f",
       "excluded_from_docs": false
     },
     {
@@ -2260,7 +2269,7 @@
       "name": "wiki/decisions/Thin Routes.md",
       "description": "Decision: Thin Routes, Fat Pages",
       "audience": "adopter",
-      "content_hash": "b2c24ec7c58f40c6fdcb5f4d9b47c5a19b5d7a72cdbb5ca3c9acf4946b3e948d",
+      "content_hash": "9662215138fd8a79490783047c7f315da27a6fa12734d7f74fdfad2fa0b6182c",
       "excluded_from_docs": false
     },
     {
@@ -2269,7 +2278,7 @@
       "name": "wiki/decisions/TypeScript 7 Readiness.md",
       "description": "Decision: TypeScript 7 Readiness",
       "audience": "adopter",
-      "content_hash": "a5b88cd8b8f5f9a4d7363cc166dd50767b99bbc4a337f4a19467567daddc59b0",
+      "content_hash": "66d9b4adf1c2005775167b667b270875e02947147064ec670d237ff64e9b83d4",
       "excluded_from_docs": false
     },
     {
@@ -2278,7 +2287,7 @@
       "name": "wiki/decisions/TypeScript Language Files.md",
       "description": "Decision: TypeScript Language Files Over JSON",
       "audience": "adopter",
-      "content_hash": "dd06cdcc41d489958c3a89aee48ea873c342b130ef19a3834881bb69917da2ae",
+      "content_hash": "2599a899a9a9a957f14151c002aa9ad37ce1348f70b8142e2665dbf2cc70b5fc",
       "excluded_from_docs": false
     },
     {
@@ -2287,7 +2296,7 @@
       "name": "wiki/decisions/Wiki Management.md",
       "description": "Wiki Management",
       "audience": "adopter",
-      "content_hash": "e1b86473004697c657f80fb389271bce563b57508fbac9ecf95b14ca0054b8db",
+      "content_hash": "22c6d30ef1974c24e7ac1289e7b1266c0f23b03c1220d5dc4b11a2a844d4042a",
       "excluded_from_docs": false
     },
     {
@@ -2296,7 +2305,7 @@
       "name": "wiki/decisions/Worthiness Audit.md",
       "description": "Worthiness Audit",
       "audience": "adopter",
-      "content_hash": "f252bcc561a0a75b62ea57dc503dcffbbd8acf64be094d0880baf1927c0bcca0",
+      "content_hash": "bb1b3d776c34c1e8461838fe837a0433d05c2f867faad1c94ea6d800a3074622",
       "excluded_from_docs": false
     },
     {
@@ -2305,7 +2314,7 @@
       "name": "wiki/decisions/Worthiness Presence Gate.md",
       "description": "Worthiness Presence Gate",
       "audience": "adopter",
-      "content_hash": "10067c401033e4348fe13bd506dd8e17e883891117f9dc9777c022d07e4d8926",
+      "content_hash": "e7ee7eb6b4859a5443d4a0313c42fdde64d1970eda29387a5324ea2da4a8cc1b",
       "excluded_from_docs": false
     },
     {
@@ -2314,7 +2323,7 @@
       "name": "wiki/decisions/composeStory Pattern.md",
       "description": "Decision: Test Components via Storybook `composeStory`",
       "audience": "adopter",
-      "content_hash": "1d5dc7c21d50558f3afbd2d1a1c2cd9d83fec432500d777766557cade16c8b48",
+      "content_hash": "6226b64ee8ab3522d185a41c921380041381e7a44333a1efdd875d77a4df0f06",
       "excluded_from_docs": false
     },
     {
@@ -2323,7 +2332,7 @@
       "name": "wiki/decisions/pnpm.md",
       "description": "Decision: pnpm as the Package Manager",
       "audience": "adopter",
-      "content_hash": "e77e8c81adedb3e39b5a179f8e72167a04dab0db90371e1381577b0b1ad0ca81",
+      "content_hash": "88c0adc0552e32d5131bc15e797380f5bfcb68b42b44a4043d73c6d95237fb56",
       "excluded_from_docs": false
     },
     {
@@ -2332,7 +2341,7 @@
       "name": "wiki/decisions/spec-kit Extension Strategy.md",
       "description": "spec-kit Extension Strategy",
       "audience": "adopter",
-      "content_hash": "02bf624514a6c8f77c9e9438c3ef4986eb0d99b114a2597c611ee3abd8f7bf97",
+      "content_hash": "37e1507389c247bb777e6ec7886dd7c8ebe2f4ea8890a2109fd4727cfaf13a6f",
       "excluded_from_docs": false
     },
     {
@@ -2341,7 +2350,7 @@
       "name": "wiki/dependencies/Chromatic.md",
       "description": "Chromatic",
       "audience": "adopter",
-      "content_hash": "d24cd1cefacdab0c3bc43266a8e8e45754d6ba184a77567b3fd06da447a76523",
+      "content_hash": "6b2c541c05dc50755bf52ff141c5e06755ef41d5306928598265d302f3627a32",
       "excluded_from_docs": false
     },
     {
@@ -2350,7 +2359,7 @@
       "name": "wiki/dependencies/Conform.md",
       "description": "Conform",
       "audience": "adopter",
-      "content_hash": "77ad97209e20504cf1d7dd57b9fb2eb2b831ac2a249624d13a7aad7b4525f4aa",
+      "content_hash": "f17f316d6c49b330633ea15783887c26f2ad7acea7660bc31ed96a4ca9611cf0",
       "excluded_from_docs": false
     },
     {
@@ -2359,7 +2368,7 @@
       "name": "wiki/dependencies/Husky.md",
       "description": "Husky + lint-staged",
       "audience": "adopter",
-      "content_hash": "2a1ee2df1a902ae866551931a52b92d5ee96747e7605125d6e97b7aeb694701b",
+      "content_hash": "c6af1c8460164631d132d52de3c9140067c1357c97736c2f7a40f0a62042af1c",
       "excluded_from_docs": false
     },
     {
@@ -2368,7 +2377,7 @@
       "name": "wiki/dependencies/Ky.md",
       "description": "Ky",
       "audience": "adopter",
-      "content_hash": "0c1c41573dda0131494748db1c13daf0634815fbc71e10784862fe4837097129",
+      "content_hash": "15837df4134fc76be2fbae12294b318cf6992e8511b0a7c290c48cfc6812f6a6",
       "excluded_from_docs": false
     },
     {
@@ -2377,7 +2386,7 @@
       "name": "wiki/dependencies/MSW.md",
       "description": "MSW",
       "audience": "adopter",
-      "content_hash": "58c8399ade9c4abf77186257d6d59387261714aa5307768e4a3cda1068e2e0a0",
+      "content_hash": "bb0fca54ffda32103e01a6cb595af68c811beefd58c1ccfa3d5db114b9189151",
       "excluded_from_docs": false
     },
     {
@@ -2386,7 +2395,7 @@
       "name": "wiki/dependencies/Playwright.md",
       "description": "Playwright",
       "audience": "adopter",
-      "content_hash": "fd12e3719bdb6c44d06d35fa04e5e65941f60e57cedcad2f6a503aa77f75ea18",
+      "content_hash": "e49839b8bd336b60d85f963cc027914904959484e545c5ea6dc26dbb4b4c9df8",
       "excluded_from_docs": false
     },
     {
@@ -2395,7 +2404,7 @@
       "name": "wiki/dependencies/React Router.md",
       "description": "React Router",
       "audience": "adopter",
-      "content_hash": "4308971983011cf12e9cb9075d746d2368fc99a2ddd91382975efaec5a8eddd2",
+      "content_hash": "d3db284d8c69e5ad8d3be320cd89abfd877abf645e438b4504c8244755f448c9",
       "excluded_from_docs": false
     },
     {
@@ -2404,7 +2413,7 @@
       "name": "wiki/dependencies/React Testing Library.md",
       "description": "React Testing Library",
       "audience": "adopter",
-      "content_hash": "99dabf01f219fcb38719e2cfc7025d0759988cf991ad007e6782eb5132dc63d1",
+      "content_hash": "b72a664f89cde0cd49c2ed8479e6d425df84bcb624525707151ce3266a012c7e",
       "excluded_from_docs": false
     },
     {
@@ -2413,7 +2422,7 @@
       "name": "wiki/dependencies/Serena.md",
       "description": "Serena",
       "audience": "adopter",
-      "content_hash": "4592979349184e2e265fc483733b90f421ac41bceb12c28337c2956fe56f25f1",
+      "content_hash": "6916e91a5e0a3fbcc8faec37974bd92badd8b2df9fb29babc1c10d5e41780768",
       "excluded_from_docs": false
     },
     {
@@ -2422,7 +2431,7 @@
       "name": "wiki/dependencies/Storybook.md",
       "description": "Storybook",
       "audience": "adopter",
-      "content_hash": "5e7ff464666b988aa0fd80fcaed5b238dd789bb6498025aff461f214a3316a5b",
+      "content_hash": "7fd672ded73836a4e76144c27f4a21cda77e161497ed4b5791538ae3dc268f75",
       "excluded_from_docs": false
     },
     {
@@ -2431,7 +2440,7 @@
       "name": "wiki/dependencies/Tailwind.md",
       "description": "Tailwind",
       "audience": "adopter",
-      "content_hash": "cea13478d1fb6d8fe39780823b2168e525dbc8b1631da6c38a27a469e96c13a8",
+      "content_hash": "93f7fe465378981d913feb109abeb271e640522646a051ea38eefd6ad9f8c2f4",
       "excluded_from_docs": false
     },
     {
@@ -2440,7 +2449,7 @@
       "name": "wiki/dependencies/Vitest.md",
       "description": "Vitest",
       "audience": "adopter",
-      "content_hash": "9df847aad28161f1ee66adfd36ac4eb58ae6814060c6280914def3994d8145f7",
+      "content_hash": "1d91e0682de46c08b4470968e9376fcefe143ebbdd0727d1c7b98c9c6704e586",
       "excluded_from_docs": false
     },
     {
@@ -2449,7 +2458,7 @@
       "name": "wiki/dependencies/Zod.md",
       "description": "Zod",
       "audience": "adopter",
-      "content_hash": "46f343fadab96a6eb084306ee8102ba24f8f06d8e6b0ee7720f66e78b5ab429a",
+      "content_hash": "635934c75d1654f1b1e0e5636d2aac7d3d2787c4c5919a1e01ca92f36f80cf5f",
       "excluded_from_docs": false
     },
     {
@@ -2458,7 +2467,7 @@
       "name": "wiki/dependencies/gaia-lint.md",
       "description": "@gaia-react/lint",
       "audience": "adopter",
-      "content_hash": "019145cd33c2283d35f1475560d07203873e6cae73560cce6273f63c7ffdb7da",
+      "content_hash": "305f49a638253c75c83227829716d79dafbde8614bcb3a77c22069ceb1701adb",
       "excluded_from_docs": false
     },
     {
@@ -2467,7 +2476,7 @@
       "name": "wiki/dependencies/i18next.md",
       "description": "i18next",
       "audience": "adopter",
-      "content_hash": "61613c4899672ab9b8165feecd2e1dbdc964d85daec6b0f8f79ac38a0ed07898",
+      "content_hash": "80d9cbcb1151f7f44ad7bda7fac788b16c53ac0d6258cc615fe15fb54abfd53f",
       "excluded_from_docs": false
     },
     {
@@ -2476,7 +2485,7 @@
       "name": "wiki/dependencies/knip.md",
       "description": "knip",
       "audience": "adopter",
-      "content_hash": "00c60fb6637cf8d8c74e3db9e2a82dfa20c053ba557a2782ba5e5a6d1f23d2ad",
+      "content_hash": "e250b8a3e3cf9308c0708f53b7ebbf9e98d24bb83ce2e9afeea4af7d21fe3c35",
       "excluded_from_docs": false
     },
     {
@@ -2485,7 +2494,7 @@
       "name": "wiki/dependencies/pnpm-audit.md",
       "description": "pnpm-audit",
       "audience": "adopter",
-      "content_hash": "8d8d0fd9cae2822ac4bb1efbed3e74f2778e4778d96669f6ee8609a41639e42d",
+      "content_hash": "c2c42cc51f527b0fc53f391d6d82da3a7f3dc5e770ce1070f537648f50779d75",
       "excluded_from_docs": false
     },
     {
@@ -2494,7 +2503,7 @@
       "name": "wiki/dependencies/pnpm-overrides.md",
       "description": "pnpm-overrides",
       "audience": "adopter",
-      "content_hash": "4dc97194dd6ffd5928060b930fe6ad1c06c46c73d1a7e941f701a565b8534a18",
+      "content_hash": "ae2fa06c120b128b0ec13ffc4f619fbace9068ee9793bf2ad465abc77f8b6200",
       "excluded_from_docs": false
     },
     {
@@ -2503,7 +2512,7 @@
       "name": "wiki/dependencies/react-doctor.md",
       "description": "react-doctor",
       "audience": "adopter",
-      "content_hash": "c0b918b2a1597e0ca638fdd9ab58fad9b759fb1b70096c56693850675752e245",
+      "content_hash": "52abe0d751c29f901db365487ac8fd10069077acb62cf516cd4127a00231da56",
       "excluded_from_docs": false
     },
     {
@@ -2512,7 +2521,7 @@
       "name": "wiki/dependencies/react-icons.md",
       "description": "react-icons",
       "audience": "adopter",
-      "content_hash": "4067ca8add807e915e85a63b19c419154a293aafc97d05e2e3bbd6e38543de79",
+      "content_hash": "16d885ea724117bddc996387438170923c62f7667dd13bd262b6d56560a62e7b",
       "excluded_from_docs": false
     },
     {
@@ -2521,7 +2530,7 @@
       "name": "wiki/dependencies/remix-flat-routes.md",
       "description": "remix-flat-routes",
       "audience": "adopter",
-      "content_hash": "d04a46c5c29cf7c57e397a0fb8cbe6158d22f8a97122f44618750b21cac2965f",
+      "content_hash": "3d82ffefe76440d3c6e2bb72bac3eac79417682dba1e158cb538d6a2854d7544",
       "excluded_from_docs": false
     },
     {
@@ -2530,7 +2539,7 @@
       "name": "wiki/dependencies/remix-i18next.md",
       "description": "remix-i18next",
       "audience": "adopter",
-      "content_hash": "ebfa9538c5a5b68174335b79148d66f2fc6c68a95e6ab439b03e270cc38f3a6c",
+      "content_hash": "08b6faee9c04bf8fa9321b73888fba4ba129cdc9437f41a543b4cb0cb7f439ee",
       "excluded_from_docs": false
     },
     {
@@ -2539,7 +2548,7 @@
       "name": "wiki/dependencies/remix-toast.md",
       "description": "remix-toast + Sonner",
       "audience": "adopter",
-      "content_hash": "70bcdd8abdcb0620add3dc726630dba14ab0356a8b3439607b7b199aa48bac36",
+      "content_hash": "244213c3860e4f4ef65ab8eab6a1424415b0924708ebe74ca3a01a0f28b1599c",
       "excluded_from_docs": false
     },
     {
@@ -2548,7 +2557,7 @@
       "name": "wiki/dependencies/remix-utils.md",
       "description": "remix-utils",
       "audience": "adopter",
-      "content_hash": "6f2c07525bda8ea010e9f5dc6df2a6b56a127c1f7e49b6db7f2c981ed24d08d6",
+      "content_hash": "bede0b2d32b427ff16b2dcb91bd1be916d1b1367acd121c5ba3168b66b3cc96b",
       "excluded_from_docs": false
     },
     {
@@ -2557,7 +2566,7 @@
       "name": "wiki/dependencies/spec-kit.md",
       "description": "spec-kit",
       "audience": "adopter",
-      "content_hash": "bd41f9855160879a698185656d7cd88006eba3e2c942c2e84899fdf7fee6048e",
+      "content_hash": "e74ccef0b165ccadb566bdb3d63244e273d9af1759dd7b3c73d624f2e67c2eee",
       "excluded_from_docs": false
     },
     {
@@ -2566,7 +2575,7 @@
       "name": "wiki/entities/GAIA.md",
       "description": "GAIA",
       "audience": "contributor",
-      "content_hash": "36300ad918ef54da56b8f6cf139522309613eb4339aa03ac669763d843a5dc36",
+      "content_hash": "d34ae40b9ca65c21b84fc0d06191bb1e1f5e23eacd2c43bccf4ac85c2ca9278c",
       "excluded_from_docs": false
     },
     {
@@ -2575,7 +2584,7 @@
       "name": "wiki/entities/Steven Sacks.md",
       "description": "Steven Sacks",
       "audience": "contributor",
-      "content_hash": "f7a0b8ff1f6a96d6f5df3085b3001533b385373a2f24419279e90a189c74a731",
+      "content_hash": "e40e159a7f4dd9e773dc95ca844512fd383ab772058840e2f0325e5b788e66a3",
       "excluded_from_docs": false
     },
     {
@@ -2584,7 +2593,7 @@
       "name": "wiki/flows/Form Submit Flow.md",
       "description": "Form Submit Flow",
       "audience": "adopter",
-      "content_hash": "cfddeb2d1e8348e3143a69e8ec078ac44f38aa498c79b42bf2124e18b2e9b65f",
+      "content_hash": "c0e63b2702f0a0836c3d6f2db44e1adaa28ae301c6485b6844ffe1c725fbef80",
       "excluded_from_docs": false
     },
     {
@@ -2593,7 +2602,7 @@
       "name": "wiki/flows/Language Flow.md",
       "description": "Language Flow",
       "audience": "adopter",
-      "content_hash": "bc88c884fcc30086f17c3d383435d9501dea929a6d85cac94c7319d7024614aa",
+      "content_hash": "11e3ae2b0b3d6bedc4d52dd9d668fe07f9f38bf4821d8a18dd880ea1b41e84d7",
       "excluded_from_docs": false
     },
     {
@@ -2602,7 +2611,7 @@
       "name": "wiki/flows/Theme Flow.md",
       "description": "Theme Flow (Dark Mode)",
       "audience": "adopter",
-      "content_hash": "4e2b8ac9c86a0eda9646401ea71f6a0207cb6574d6418156607499ffa2e691f7",
+      "content_hash": "04d5e0c16f037be48616893a4b88c5edf3652138f2333fa8e8a98c5ed61c1392",
       "excluded_from_docs": false
     },
     {
@@ -2611,7 +2620,7 @@
       "name": "wiki/hot.md",
       "description": "Recent Context",
       "audience": "adopter",
-      "content_hash": "6b936180dd0ebb789fc6ec8ca083d46782823d666a56af60d632aaf27d1bf656",
+      "content_hash": "e4d0566d02e3480a1cd5526df81e447967349f61822a56a8281912d30649d108",
       "excluded_from_docs": false
     },
     {
@@ -2620,7 +2629,7 @@
       "name": "wiki/index.md",
       "description": "Index",
       "audience": "mixed",
-      "content_hash": "5aac771422d10e9369a0ec343e1141794ed5464a76635f2ebafaad7c86725c36",
+      "content_hash": "a1144b0a45f01e6e96a723f1d3be4c8033078c4fa273e5c9b8222103c80d6ebc",
       "excluded_from_docs": false,
       "marker_blocks": [
         [
@@ -2651,7 +2660,7 @@
       "name": "wiki/log.md",
       "description": "Log",
       "audience": "adopter",
-      "content_hash": "692c0b2a2547aece648a7507e48123b6936f9282062e2add11eea64c5af0e369",
+      "content_hash": "1dd15b743874b31c2fa45ce967f4602d49aae11003ed8852e92437dc40f87ea1",
       "excluded_from_docs": false
     },
     {
@@ -2660,7 +2669,7 @@
       "name": "wiki/meta/consolidate-report-2026-05-07.md",
       "description": "Consolidate Report: 2026-05-07",
       "audience": "contributor",
-      "content_hash": "b54e9e88b9cc400264f22f8a005ad644d3b49442e89bdc49679265a60a2a54e7",
+      "content_hash": "43e50ac0b54c7a62429213a41fcbd5aaf64fe77d4c12aa1b379865b63319f450",
       "excluded_from_docs": false
     },
     {
@@ -2669,7 +2678,7 @@
       "name": "wiki/meta/consolidate-report-2026-05-08.md",
       "description": "Consolidate Report: 2026-05-08",
       "audience": "contributor",
-      "content_hash": "eb0c6774c2425bc453c9d5eb57c6c28d150f0b27a0fe7eb087b53cd6a64c6399",
+      "content_hash": "2c486fe6bda9d0298b70f444eedb239312a7fb5b9dc355c40d0d793b39a9a3a0",
       "excluded_from_docs": false
     },
     {
@@ -2678,7 +2687,7 @@
       "name": "wiki/meta/consolidate-report-2026-05-26.md",
       "description": "Consolidate Report: 2026-05-26",
       "audience": "contributor",
-      "content_hash": "cd5ed30af619cc0703e30088aa8009fbf1e1087e486ad3279856e0873c538eb5",
+      "content_hash": "39637b94b6af2b58819fbbfa5b56bd48972ef166b3a0adbca594fb94ab75516b",
       "excluded_from_docs": false
     },
     {
@@ -2687,7 +2696,7 @@
       "name": "wiki/meta/consolidate-report-2026-06-04.md",
       "description": "Consolidate Report: 2026-06-04",
       "audience": "contributor",
-      "content_hash": "3eee63afa9251f2a0f67efc54ee94286c00e1b2a11a412dcde8a30f87d4130bc",
+      "content_hash": "4d348be73a7e10a317147f5a7e331ae79df14bb9939747ab2d61ba29c362fed2",
       "excluded_from_docs": false
     },
     {
@@ -2696,7 +2705,7 @@
       "name": "wiki/meta/consolidate-report-2026-06-11.md",
       "description": "Consolidate Report, 2026-06-11",
       "audience": "contributor",
-      "content_hash": "6a712fc0d560c6b7d8697564608860d8b7e774ce53c451ba903a2cf7e8db10e5",
+      "content_hash": "f887dc5756e18e4279a7a72b08ea1bbeb98427cd2d45e223ee432b88953ad795",
       "excluded_from_docs": false
     },
     {
@@ -2705,7 +2714,7 @@
       "name": "wiki/meta/consolidate-report-2026-06-23.md",
       "description": "Consolidate Report, 2026-06-23",
       "audience": "contributor",
-      "content_hash": "60b137f52a3ab41ad3b860c896a18a4de809e69c9a7c2ba6b2d8012d03b4b2c0",
+      "content_hash": "5972c12944cd39a1b523154bff54a4ec63b14459c031fdd62acfed9ec08fad1b",
       "excluded_from_docs": false
     },
     {
@@ -2714,7 +2723,7 @@
       "name": "wiki/meta/consolidate-report-2026-06-24.md",
       "description": "Consolidate Report, 2026-06-24",
       "audience": "contributor",
-      "content_hash": "fc3564e2860374e04da9609462d1c088e5c7cdfd1ad79d585278f516dbc572e1",
+      "content_hash": "2806106a5c6c7d9a286bbe3ca2f85da373eff631aede87d55477f5e489cd1dc2",
       "excluded_from_docs": false
     },
     {
@@ -2723,7 +2732,7 @@
       "name": "wiki/meta/consolidate-report-2026-07-01.md",
       "description": "Consolidate Report, 2026-07-01",
       "audience": "contributor",
-      "content_hash": "d10f3f6ac327da179356a10d08c8aa6ee875c7568fb5c0f96b69f8dd5b0190cc",
+      "content_hash": "2fc09ed3df7dbf3a37a473ab5ff812e18be4d4887e931c347f6f139c55d7259c",
       "excluded_from_docs": false
     },
     {
@@ -2732,7 +2741,7 @@
       "name": "wiki/meta/dashboard.md",
       "description": "Wiki Dashboard",
       "audience": "contributor",
-      "content_hash": "204bcd31639d3a23dccbf96088c8560c3d209d08978e720fd1ad07752795218c",
+      "content_hash": "0f61388be568ef1f56cf12549c386a671fc9c53c835ba72f2791a920c894cfbf",
       "excluded_from_docs": false
     },
     {
@@ -2741,7 +2750,7 @@
       "name": "wiki/meta/lint-report-2026-04-21.md",
       "description": "Wiki Lint Report: 2026-04-21",
       "audience": "contributor",
-      "content_hash": "47da64e572093275f2687a031bf5f0b3d5e6726831ace7563f15b21692731b2d",
+      "content_hash": "b1f93907876b432041a0937949dd247b3efdc3d4d58877e7cc00ea634fbf4ecc",
       "excluded_from_docs": false
     },
     {
@@ -2750,7 +2759,7 @@
       "name": "wiki/meta/lint-report-2026-04-26.md",
       "description": "Wiki Lint Report: 2026-04-26",
       "audience": "contributor",
-      "content_hash": "cb2780f09507db24b0c9c3874cd1a67d057c9e7a5dd5e11e4bbf8c2eb49f3004",
+      "content_hash": "fdcc2d3495b43a9b97d42579a09481c99194611ffec0877f2229879888d2d35e",
       "excluded_from_docs": false
     },
     {
@@ -2759,7 +2768,7 @@
       "name": "wiki/meta/lint-report-2026-04-27.md",
       "description": "Wiki Lint Report: 2026-04-27",
       "audience": "contributor",
-      "content_hash": "c5a2eafc5307c561513bca91ff8be6f82338325b5fc9e13e1e21816666a18921",
+      "content_hash": "aed76f8f834653a2ade3dc591c590372e6350163020ec0853e71d6da2eeebd2c",
       "excluded_from_docs": false
     },
     {
@@ -2768,7 +2777,7 @@
       "name": "wiki/meta/lint-report-2026-05-01.md",
       "description": "Wiki Lint Report: 2026-05-01",
       "audience": "contributor",
-      "content_hash": "15e889bab326a4b9a97225ab28ada216f1511e7428be42a5d47e23c37eb26b73",
+      "content_hash": "593e2b2f7b5869612227215a79fcd8d28b98f5b8d584acb9d7d859990ab96a3a",
       "excluded_from_docs": false
     },
     {
@@ -2777,7 +2786,7 @@
       "name": "wiki/meta/lint-report-2026-05-03.md",
       "description": "Lint Report: 2026-05-03",
       "audience": "contributor",
-      "content_hash": "e539d457a6ff80b0b9da57cd2ba258d9c592ade51808683ae4ac05c86529d287",
+      "content_hash": "f2e86781c63a00f89da37e8d825450208674929bdb57bb95a5f256771c6a41b3",
       "excluded_from_docs": false
     },
     {
@@ -2786,7 +2795,7 @@
       "name": "wiki/meta/lint-report-2026-05-04.md",
       "description": "Lint Report: 2026-05-04",
       "audience": "contributor",
-      "content_hash": "2a5896323cc4325dcb3b81549dfa1c6051099985f21e6e6892e4e139e9198ad1",
+      "content_hash": "7254f2cffc894e6ab7df1240fd08c1f30f179aa3917d1b4f8bd039382a36479a",
       "excluded_from_docs": false
     },
     {
@@ -2795,7 +2804,7 @@
       "name": "wiki/meta/lint-report-2026-05-06.md",
       "description": "Lint Report: 2026-05-06",
       "audience": "contributor",
-      "content_hash": "9e4a4203993258a01888e46b6ed339e44c3df74431596d2b1b9b00c8fac962bf",
+      "content_hash": "9cc1ad09e5f73f27cb8e4860236a3fd4134d86286ca688fd18aaff8138669505",
       "excluded_from_docs": false
     },
     {
@@ -2804,7 +2813,7 @@
       "name": "wiki/meta/lint-report-2026-05-07.md",
       "description": "Lint Report: 2026-05-07",
       "audience": "contributor",
-      "content_hash": "cfd858f56fa7e5082d5c730259166741ac84eb7464539ecb636fe28d5e19d619",
+      "content_hash": "8f8b07ffc9440b8e39e1b6388d4224e9a4af089e3c3c0f294f9c31b0de13dcd6",
       "excluded_from_docs": false
     },
     {
@@ -2813,7 +2822,7 @@
       "name": "wiki/meta/lint-report-2026-05-08.md",
       "description": "Lint Report: 2026-05-08",
       "audience": "contributor",
-      "content_hash": "6909fcee915a33b0c5b6cd8a2045cf6b1616906a3f3b416b87327dc01bc70ac8",
+      "content_hash": "88e59f900509e50b3fbc9273932a2c70b84f7c5129b49f1d916f0050143d59cd",
       "excluded_from_docs": false
     },
     {
@@ -2822,7 +2831,7 @@
       "name": "wiki/meta/lint-report-2026-06-02.md",
       "description": "Lint Report: 2026-06-02",
       "audience": "contributor",
-      "content_hash": "67f7f57cdf87529080c1f9c71861336cd3a45eadd789f465bc0ebe4d3b9e7be1",
+      "content_hash": "6458c0fc86b7a5ed215dd732aea708097dc1f6e493687dd4b56ae6f9e5d53109",
       "excluded_from_docs": false
     },
     {
@@ -2831,7 +2840,7 @@
       "name": "wiki/meta/lint-report-2026-06-04.md",
       "description": "Lint Report: 2026-06-04",
       "audience": "contributor",
-      "content_hash": "c3dd16c315796ebe39565b64f582bfebdb6f99830a8f2b7fe8b680a16b1950fc",
+      "content_hash": "8419b7df2d4a99dff74bc2a51fbcb495e849e3ed150684afdb4f3d95e50bff3c",
       "excluded_from_docs": false
     },
     {
@@ -2840,7 +2849,7 @@
       "name": "wiki/meta/lint-report-2026-06-05.md",
       "description": "Lint Report: 2026-06-05",
       "audience": "contributor",
-      "content_hash": "36379b1d165cd224eb66e6b7fba38e8ebda413761f12e18a04bbc9b2f9cf1dda",
+      "content_hash": "ec027c7932e85eba42ba28b84e9f39ee1f0f24f5b39abfbdede91e9e4cc6c826",
       "excluded_from_docs": false
     },
     {
@@ -2849,7 +2858,7 @@
       "name": "wiki/meta/lint-report-2026-06-09.md",
       "description": "Lint Report: 2026-06-09",
       "audience": "contributor",
-      "content_hash": "bb9f2f5bd1a6949ae3a2e360b18df5d13d5090a201fb0a496ac1723f84261765",
+      "content_hash": "6bb8cd800627b942f9d85eda05a4eb063903dd4396b96e03d35f22c8b2fcedc1",
       "excluded_from_docs": false
     },
     {
@@ -2858,7 +2867,7 @@
       "name": "wiki/meta/lint-report-2026-06-11.md",
       "description": "Lint Report: 2026-06-11",
       "audience": "contributor",
-      "content_hash": "faeff0fdfd508b539559abbde2bc102070962570e1ef0748852ee5ff8773dfcc",
+      "content_hash": "329c4890ca8c8d8c5f5f4d3210cfc5249d0c3297acb00573969579be2e0f4761",
       "excluded_from_docs": false
     },
     {
@@ -2867,7 +2876,7 @@
       "name": "wiki/meta/lint-report-2026-06-12.md",
       "description": "Lint Report: 2026-06-12",
       "audience": "contributor",
-      "content_hash": "7a1ebf969ce5f53435c2e4ace11c27325d2b3854e0f2b1411a8b5fb33d9c3acb",
+      "content_hash": "ca2aed248ebb8f82d06db4bfa32405fc4322aecc8315ef87606297b985fd15e0",
       "excluded_from_docs": false
     },
     {
@@ -2876,7 +2885,7 @@
       "name": "wiki/meta/lint-report-2026-06-23.md",
       "description": "Lint Report: 2026-06-23",
       "audience": "contributor",
-      "content_hash": "b35dc10c286cb0d4cb503fd50612f963d0a3f8ed23edc64919df258e4983dc60",
+      "content_hash": "fc53ee56faa0b4cc8a036d84426b88881051cb6db1e3e30833a34b1ca912a4b0",
       "excluded_from_docs": false
     },
     {
@@ -2885,7 +2894,7 @@
       "name": "wiki/meta/lint-report-2026-06-24.md",
       "description": "Lint Report: 2026-06-24",
       "audience": "contributor",
-      "content_hash": "ad02612f77cc6747b96a3b086983b1c5b2de443076b594b24b60dc3d82b6a893",
+      "content_hash": "bfd4d8eb698126db6fe15ac51e908a1af3604d1e2e6ec83fc96fea0cc1f68f12",
       "excluded_from_docs": false
     },
     {
@@ -2894,7 +2903,7 @@
       "name": "wiki/meta/lint-report-2026-06-25.md",
       "description": "Lint Report: 2026-06-25",
       "audience": "contributor",
-      "content_hash": "5a3209e935a6c8d7f10082bcfdfd0b31777c57ee78b486d45bfde78f7dff591e",
+      "content_hash": "ada120750dc829104c0e61c0f696a597100b412a71ab5b1ce00f7269a67f66bf",
       "excluded_from_docs": false
     },
     {
@@ -2903,7 +2912,7 @@
       "name": "wiki/meta/lint-report-2026-07-01.md",
       "description": "Lint Report: 2026-07-01",
       "audience": "contributor",
-      "content_hash": "8696ad992e85ac41838caa92df1e8141824878cc118b3ff41feb3abad57efc36",
+      "content_hash": "f92387f5366c2bda543b1fad21e2ff10015635032c1b9b8a031d0b333787886c",
       "excluded_from_docs": false
     },
     {
@@ -2912,7 +2921,7 @@
       "name": "wiki/meta/lint-report-2026-07-02.md",
       "description": "Lint Report: 2026-07-02",
       "audience": "contributor",
-      "content_hash": "58e109ff6090127f389ae72d66a08ba265e235438c2c6bfe5ef495fa7a5ae1a7",
+      "content_hash": "5ebd98171c6c193d3391a4bfce7276e1327275aab6f6c86abf574836ca8e96f0",
       "excluded_from_docs": false
     },
     {
@@ -2921,7 +2930,7 @@
       "name": "wiki/meta/staleness-audit-2026-06-24.md",
       "description": "Whole-Wiki Staleness + Completeness Audit",
       "audience": "contributor",
-      "content_hash": "44fc62ae29ead9bbccdccaf849980735bae4ac1a1781dba9241cd37a0c699a11",
+      "content_hash": "9d6c433e743f1ebf5bd145d92313a38d4125474dc433bef486cabe2bf576cb00",
       "excluded_from_docs": false
     },
     {
@@ -2930,7 +2939,7 @@
       "name": "wiki/modules/CLI Scaffolding.md",
       "description": "CLI Scaffolding",
       "audience": "adopter",
-      "content_hash": "2dac238438c9b7d44c01f11bdad4d086113658f3b3cbd8215ba610cd90aa1637",
+      "content_hash": "da484441f4fc43265b607d7af9920ff7576cdec59b691afa17855855a3ceebfb",
       "excluded_from_docs": false
     },
     {
@@ -2939,7 +2948,7 @@
       "name": "wiki/modules/Claude Integration.md",
       "description": "Claude Integration",
       "audience": "adopter",
-      "content_hash": "072bac12ed6fda8093af6fcbc6c69d210acae1e5c4ff21b3f8c570cc58c45208",
+      "content_hash": "3262dd1eb90b8e72df51645823c78888eadaafd3f25bc4662d4ee84127f81b36",
       "excluded_from_docs": false
     },
     {
@@ -2948,7 +2957,7 @@
       "name": "wiki/modules/Components.md",
       "description": "Components",
       "audience": "adopter",
-      "content_hash": "27ce1c96a6100a382f52955c0d0e8fd7ba2942295f6887cc9df488e4b85d0306",
+      "content_hash": "b935b345338f07969c39cdf6e30bcc762991142d330afb94da55b06609de44fd",
       "excluded_from_docs": false
     },
     {
@@ -2957,7 +2966,7 @@
       "name": "wiki/modules/Folder Structure.md",
       "description": "Folder Structure",
       "audience": "adopter",
-      "content_hash": "507fa3ffd1e5f6a58149ce549bc7a23e6292e393c3d43680c2d8242d9ca3a0d2",
+      "content_hash": "371e7d89420390bb63583e9655407fbda47de4e69640264ca9518f4c8521e237",
       "excluded_from_docs": false
     },
     {
@@ -2966,7 +2975,7 @@
       "name": "wiki/modules/Form Components.md",
       "description": "Form Components",
       "audience": "adopter",
-      "content_hash": "48616ef15dd292baaecb72132d233088831158322b1c3066ed9a1c0856ce7f60",
+      "content_hash": "3abbe06d8b206d8e82a01b2a1110c1e29e8dadbfdce34d08704c84ec386f2b5f",
       "excluded_from_docs": false
     },
     {
@@ -2975,7 +2984,7 @@
       "name": "wiki/modules/Hooks.md",
       "description": "Hooks",
       "audience": "adopter",
-      "content_hash": "ff1853508834914746cef38fe4c694d1c6b0a8fe855bdfca258788b9997f8c07",
+      "content_hash": "d7450d0f8549cd082320291f6b8893879fdd17c5d170d69d7ed14f1f5e8260c2",
       "excluded_from_docs": false
     },
     {
@@ -2984,7 +2993,7 @@
       "name": "wiki/modules/MSW Handlers.md",
       "description": "MSW (Mock Service Worker)",
       "audience": "adopter",
-      "content_hash": "37ac7033721dbbf0beedc1217cae7bfff066fb3496896b59e03eb423a36134ba",
+      "content_hash": "810717c40dc01b615f23214a0b4e9433696217804286fcde86e0c4b9e6dd06c2",
       "excluded_from_docs": false
     },
     {
@@ -2993,7 +3002,7 @@
       "name": "wiki/modules/Middleware.md",
       "description": "Middleware",
       "audience": "adopter",
-      "content_hash": "565ede4a21a018d5e7cdca467146d4fb8aa4adc994e4f3b3e6191262f6a820b9",
+      "content_hash": "d940338cc17e9cad182213d14300a963250abeb7bfd995ad350e556f7e2d194d",
       "excluded_from_docs": false
     },
     {
@@ -3002,7 +3011,7 @@
       "name": "wiki/modules/Pages.md",
       "description": "Pages",
       "audience": "adopter",
-      "content_hash": "0731df5961219ca1d5262dd6be6e4be2d71569fc1822867b00bcaffd7a418ace",
+      "content_hash": "9962cb298352f39c0185855596bf2321a2b591b88f8780d18ad31c08e1082b0a",
       "excluded_from_docs": false
     },
     {
@@ -3011,7 +3020,7 @@
       "name": "wiki/modules/Routing.md",
       "description": "Routing",
       "audience": "adopter",
-      "content_hash": "e182469e250f9298b65a7b69b2cb6239c62e55052e1590613d2a916814b39ac8",
+      "content_hash": "a99db0336bae7d4dad18724bb9942cfb2219e744693866dd8297764e9a235d1f",
       "excluded_from_docs": false
     },
     {
@@ -3020,7 +3029,7 @@
       "name": "wiki/modules/Services.md",
       "description": "Services",
       "audience": "adopter",
-      "content_hash": "9468191d4a45d1379aa8e7994468124b34b7f1cb8321e1d4ce3c3883bde8ce6d",
+      "content_hash": "4b6c3b992e6c283d3d264cf4c0d6ac218688fa858fd8e5ca84810f7b50a9399c",
       "excluded_from_docs": false
     },
     {
@@ -3029,7 +3038,7 @@
       "name": "wiki/modules/Sessions.md",
       "description": "Sessions",
       "audience": "adopter",
-      "content_hash": "f3bc92e31d03b883e341e29c0aef4ed11043f1bde951affe4bbef7ed98015be1",
+      "content_hash": "86b8ac6eb3e34f650c3b5a88c7c3500597f5b91d8af2c66165a1d918b61236af",
       "excluded_from_docs": false
     },
     {
@@ -3038,7 +3047,7 @@
       "name": "wiki/modules/State.md",
       "description": "State",
       "audience": "adopter",
-      "content_hash": "d0d2da2650bba88d9f160478700691d698cbf6d7b03bebbc3f951001570107a2",
+      "content_hash": "d362649124e4e4da9243eee4b36c424dbec60693f6567d8fdf44458ae01a58ad",
       "excluded_from_docs": false
     },
     {
@@ -3047,7 +3056,7 @@
       "name": "wiki/modules/Storybook Stories.md",
       "description": "Storybook Stories",
       "audience": "adopter",
-      "content_hash": "4a8a0f97331fd83382717c4453c56c277e34a5473796b0007957f993e3195030",
+      "content_hash": "4533eeea085c2b2977ffa650ee3bfcd8a90c950c7c449c970f94d3ae30a1ef7d",
       "excluded_from_docs": false
     },
     {
@@ -3056,7 +3065,7 @@
       "name": "wiki/modules/Styles.md",
       "description": "Styles",
       "audience": "adopter",
-      "content_hash": "ca657cc537e0ed166e74de3803d3096e619c0d851d0ee258df87185b1e980e05",
+      "content_hash": "456e4a0b1de35bbedc9311390abf2be12bb39bbad72bb83ca098b2313054b211",
       "excluded_from_docs": false
     },
     {
@@ -3065,7 +3074,7 @@
       "name": "wiki/modules/Testing.md",
       "description": "Testing",
       "audience": "adopter",
-      "content_hash": "3ef413e0ef048713f9b20fe64c0b9d9d99561c030f397119461a91d2ac0cdcce",
+      "content_hash": "4fef4575d216597bc13d2847718e7a51d9359084f215d6f6f44994cbbe7ef30d",
       "excluded_from_docs": false
     },
     {
@@ -3074,7 +3083,7 @@
       "name": "wiki/modules/Utils.md",
       "description": "Utils",
       "audience": "adopter",
-      "content_hash": "3401019f1697f0584653f44a9012882856bcf390f8ad6732ab6c8feac6338908",
+      "content_hash": "f0671d5d35e2d804abb89db3d0c9b451573e075dffa17a53b11c6273e685d0c1",
       "excluded_from_docs": false
     },
     {
@@ -3083,7 +3092,7 @@
       "name": "wiki/modules/i18n.md",
       "description": "i18n",
       "audience": "adopter",
-      "content_hash": "0203d52d13d7be8e2c7ff9566e7b511dbd464bf9fa227ae15e4a87d38c1b3926",
+      "content_hash": "1f5afd615fabc9b96b8c6f74c9f4c6afa64ffaa8c5f33bf2a1b78dcd54e3f89c",
       "excluded_from_docs": false
     },
     {
@@ -3092,7 +3101,7 @@
       "name": "wiki/overview.md",
       "description": "GAIA React",
       "audience": "adopter",
-      "content_hash": "51ba814164f3ff3a6849bb9b59396337d2ecf2225f44c85ffb36eb3020df9794",
+      "content_hash": "6e468c9d663b23b6ad6a572529efe81708cbd3a6908f7d37a029239e1c25373e",
       "excluded_from_docs": false
     },
     {
@@ -3101,7 +3110,7 @@
       "name": "audit-ci-tests.yml",
       "description": "Audit CI Tests",
       "audience": "contributor",
-      "content_hash": "d4894d302570c27cbd642acb33bf719170c93340bb0e5ac7a642e4875fce1bb4",
+      "content_hash": "711f2ba1d25d3e9007a5603a29eb87ad5e9598e15c29c4329d06b53cbc1c2921",
       "excluded_from_docs": false
     },
     {
@@ -3110,7 +3119,7 @@
       "name": "chromatic.yml",
       "description": "Chromatic",
       "audience": "adopter",
-      "content_hash": "2ce36c47ac26392fc66526e05080f71cf816ec6cce46cfc2db613a1766df1fed",
+      "content_hash": "5cefd9e69176baa1d771c3fdb391f6a7235d12ebaccf0ea43e7634b08f9322bf",
       "excluded_from_docs": false
     },
     {
@@ -3119,7 +3128,7 @@
       "name": "cli-tests.yml",
       "description": "CLI Tests",
       "audience": "contributor",
-      "content_hash": "8f00c9639113642b9b7f9d12435650d340aa38305b43dc96099fd1e67afde6ca",
+      "content_hash": "99cf3d981ce1f5f78c40f69fc6f1efe4ef6c45436b4db4310892d78dec4c5c44",
       "excluded_from_docs": false
     },
     {
@@ -3128,7 +3137,7 @@
       "name": "code-review-audit.yml",
       "description": "Code Review Audit",
       "audience": "contributor",
-      "content_hash": "b3100425b19559acaf163d7f300a794ad7af8b5f49b376ec998fde763755d6f7",
+      "content_hash": "ca89b1f788f83368233d4ab53b20d0e1778f4ae6cf89246aefe27b848adc25b2",
       "excluded_from_docs": false
     },
     {
@@ -3137,7 +3146,7 @@
       "name": "distribution.yml",
       "description": "Distribution",
       "audience": "contributor",
-      "content_hash": "235c2c2b1fca395f413f1faeb53e449b143dac5d50b2909b082a78cec1af4a9d",
+      "content_hash": "76049c9be969653b5b4f1cee4fa66b35ad60accfc47b836f155b1e0193af2846",
       "excluded_from_docs": false
     },
     {
@@ -3146,7 +3155,7 @@
       "name": "forensics-triage.yml",
       "description": "Forensics Triage",
       "audience": "contributor",
-      "content_hash": "08fa217b28adb5225e6134989fd3c1ef64e1e84e3cd5c3b8b297ca8033eeacc1",
+      "content_hash": "14d384e09c41e0cf55837cc9d745e0a2c34872656df8c76ea4d8fde6c508f21e",
       "excluded_from_docs": false
     },
     {
@@ -3155,7 +3164,7 @@
       "name": "release.yml",
       "description": "Release",
       "audience": "contributor",
-      "content_hash": "8cbb09f165a5b5bee87c4e4799604e2aaf3e194b6b9494380424a6cfc56aa975",
+      "content_hash": "b956e44cdccf941738525730a098e512ddcb3263a79118abe63f6ace288b72fb",
       "excluded_from_docs": false
     },
     {
@@ -3164,7 +3173,7 @@
       "name": "tests.yml",
       "description": "Tests",
       "audience": "adopter",
-      "content_hash": "0fc92904d3e654e2c3e7763069de954eee1295013c7adb5be9244f654f58828e",
+      "content_hash": "4dce87c265d8d9305e03f480671e8c161b2f162db76c1c63927cdf0857ac0a1d",
       "excluded_from_docs": false
     }
   ]

@@ -75,6 +75,12 @@ For Claude Code's own hook documentation, see [the Hooks reference on docs.claud
 | `worthiness-presence-check` | Blocks `gh pr merge` when an emergent test the PR changed has no worthiness-ledger line matching its current content, so the worthiness audit has run over every changed emergent test before merge. It checks presence only, never the keep/fix/delete verdict, and is a no-op when no emergent tests changed. Sits alongside `pr-merge-audit-check`. | `.claude/hooks/worthiness-presence-check.sh` |
 | `audit-disposition-check` | Blocks `gh pr merge` when the disposition-ledger sidecar for HEAD (`.gaia/local/audit/<sha>.dispositions.json`) claims a `filed` or `pending` disposition for an out-of-scope finding that does not actually hold (no matching tech-debt issue on the reachable backend, or a definitive filing failure). Deterministic backstop alongside `pr-merge-audit-check` and `worthiness-presence-check`; fails open on a missing or unparseable sidecar, an absent backend, or any `gh` failure. | `.claude/hooks/audit-disposition-check.sh` |
 
+## PreToolUse (Grep)
+
+| Hook | What it does | Path |
+|---|---|---|
+| `serena-code-search-guard` | Routes symbol-level searches to Serena's LSP-backed tools instead of ripgrep. When a `Grep` pattern is a bare identifier (>= 3 chars, no spaces or regex metacharacters) scoped to `app/**` or `test/**` TS/TSX source, the grep is blocked with a pointer to Serena's `find_symbol`, `find_referencing_symbols`, and `get_symbols_overview`. Re-running the identical grep within two minutes passes, for the rare string-literal or comment search that is identifier-shaped. No-ops unless Serena is a registered MCP server and the repo has a `tsconfig.json`, so a project without Serena never sees it. Pairs with the [`code-search` rule](/reference/rules/). | `.claude/hooks/serena-code-search-guard.sh` |
+
 ## PostToolUse (Bash)
 
 | Hook | What it does | Path |

@@ -74,7 +74,7 @@ You choose whether to opt into an optional adaptation feature. It defaults to of
 
 Judged from the actual repo, branch, and push state, not merely whether an `origin` remote exists. If the repo is already provisioned, the command prints `GitHub repository already provisioned.` and moves on. Otherwise, for a first adopter this is the first prompt you see:
 
-- **Create the repo on GitHub** (recommended). Created **private** by default, your default branch pushed, and the recommended defaults applied. Flipping it public or internal requires a separate, explicit confirmation, because a public repo exposes your full pushed history. Secret-scanning push-protection is enabled right after creation where the plan supports it.
+- **Create the repo on GitHub** (recommended). If you belong to any GitHub organizations, it first asks where the repo should live, your personal account (the default) or one of your orgs, ranked by your recent commit activity. Created **private** by default, your default branch pushed, and the recommended defaults applied. Flipping it public or internal requires a separate, explicit confirmation, because a public repo exposes your full pushed history. Secret-scanning push-protection is enabled right after creation where the plan supports it.
 - **Adopt an existing repo.** You already have a GitHub `origin`; creation is skipped and the recommended defaults are applied.
 - **Set one up manually.** The command prints the `git remote add` / `git push` guidance and leaves GitHub untouched. Re-run `/setup-gaia` once it is pushed.
 
@@ -111,12 +111,14 @@ Two cases hold for human review instead of auto-merging, both tagged `needs-huma
 
 The command also installs `code-review-audit.yml`, the pre-merge audit gate. It is not one of the four cron tools and installs **unconditionally**, even when no cron tool runs in CI. It reads `.gaia/audit-ci.yml` at runtime, and the bot token below authenticates it. See the [`code-review-audit` agent reference](/reference/agents/) for what it checks.
 
-### Team audit-mode policy
+### Audit-mode policy
 
-Sets the team baseline for how `code-review-audit` runs at merge time, written to `.gaia/audit-ci.yml`:
+Sets how `code-review-audit` runs at merge time, written to `.gaia/audit-ci.yml`. It first asks whether the repo is solo or team:
 
-- **CI audits every PR** (recommended). Every PR's audit runs on CI.
-- **Local-first.** Developers who run GAIA locally have the audit run at merge time; CI stands down for them. Each developer still opts in per-person below. Local-first relies on the `GAIA-Audit` required check being registered (this same flow registers it); if that check is ever unconfirmable, the resolver fails closed to CI, so a local stand-down can never leave the branch unguarded.
+- **Solo engineer.** Your audit runs locally at merge time, streaming and incremental. No further audit questions, and CI stays installed as a failsafe. Re-run `/setup-gaia --reconfigure` to switch to CI audits if you add collaborators.
+- **A team.** You then choose how the team's audit runs:
+  - **Local** (recommended). Each developer's audit runs on their machine at merge time and CI stands down for them, the better day-to-day experience. The `GAIA-Audit` required check still guards the branch, and if a developer's local mode cannot be confirmed the resolver fails closed to CI, so the branch is never left unguarded. Each teammate confirms their own mode in the per-developer step below.
+  - **CI.** Every PR's audit runs on CI as a shared failsafe; contributors wait for the `GAIA-Audit` check. Simplest to reason about for larger teams.
 
 ### Bot token (out of band)
 
@@ -139,6 +141,18 @@ Do not paste the token into the Claude Code chat. Anything typed into the chat i
 
 Managing Actions secrets needs repo-admin permission. A non-admin runner gets the instruction to hand off to an admin instead.
 
+### Claude GitHub App (out of band)
+
+GAIA CI's workflows run as the **Claude GitHub App**. The bot token authenticates the Anthropic API, but the workflows also need this app installed on your repo to mint the short-lived GitHub token they run under. Without it, every run fails at the Claude step with `App token exchange failed: 401 Unauthorized`, even after the token secret is set and the Quality Gate passes.
+
+`/setup-gaia` gates this before the verification run and waits for you to install it. Only a repo admin or org owner can install it; it is an interactive GitHub authorization the command cannot perform for you:
+
+1. Open [github.com/apps/claude](https://github.com/apps/claude).
+2. Click **Install**, or **Configure** if it is already installed on your account or org.
+3. Grant it access to your repo, or to **All repositories**.
+
+For an org-owned repo where you are an org owner, the command detects an existing install and skips the prompt. Once the app is installed, tell the command and it runs the verification. You can also choose to skip verification and finish setup, then trigger a run from the Actions tab after installing.
+
 ### Workflow generation and the required check
 
 The command generates `.github/workflows/gaia-ci-*.yml` from `.gaia/automation.json`, installs `code-review-audit.yml`, and triggers one `workflow_dispatch` run to confirm the first workflow boots. It then registers `GAIA-Audit` as a required status check on the default branch by **unioning** it into the existing contexts, so sibling checks (`Tests`, `Chromatic`) are preserved. Registration needs repo-admin access and a branch-protection rule; if either is missing, the command prints the `gh api` call to run yourself, and the merge gate falls back to CI mode for every author until the check is registered.
@@ -149,8 +163,8 @@ If the verification run fails, you can retry, abandon (deletes the generated fil
 
 Once the project has CI wired, you choose who runs **your** `code-review-audit` at merge time:
 
-- **CI (default).** CI audits your PRs; you wait for the `GAIA-Audit` check.
-- **Locally.** Your audit runs at merge time when you ask Claude to merge, streaming and incremental. CI stands down for you.
+- **Locally** (recommended). Your audit runs at merge time when you ask Claude to merge, streaming and incremental. CI stands down for you.
+- **CI.** CI audits your PRs; you wait for the `GAIA-Audit` check.
 
 Your choice appends a `<login>=<mode>` pair to `audit_authors` in the **committed** `.gaia/audit-ci.yml`, so other developers see it. It lands via a one-line PR that you review, commit, and open yourself; the command prints the exact `git` and `gh` commands and never commits or opens the PR for you. If `gh` is not authenticated when this step runs, it is skipped and will not reappear on a plain re-run.
 
