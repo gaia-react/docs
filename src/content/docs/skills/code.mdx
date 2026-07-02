@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-Eight skills that govern code generation and review. Each one loads automatically when its trigger phrasing matches the conversation. You don't invoke them by name.
+Nine skills that govern code generation and review. Each one loads automatically when its trigger phrasing matches the conversation. You don't invoke them by name.
 
 ## TypeScript
 
@@ -17,15 +17,27 @@ Patterns and conventions for TypeScript across the project: camelCase identifier
 
 Source: `.claude/skills/typescript/SKILL.md`.
 
-### React Code
+## React Code
 
-Conventions for React components, pages, routes, hooks, and forms. Includes pre-flight gates for `useEffect`, `useCallback`, and `useState`; a form-element check that swaps native `<input>` for the project's `Form/*` components; and a translation gate that requires every user-visible string to come from `t()` (exception: approximate skeleton-loader placeholders standing in for dynamic runtime values stay hardcoded; static skeleton text that mirrors a real `t()` call must still use `t()`). Covers component extraction thresholds and route/page architecture (`app/routes/` thin shells, `app/pages/` for UI).
+Conventions for React components, pages, routes, hooks, and forms. Includes checks for `useEffect`, `useCallback`, and `useState`; a form-element check that swaps native `<input>` for the project's `Form/*` components; a translation check that requires every user-visible string to come from `t()`; and a React 19 idiom check that enforces `ref` as an ordinary prop (no `forwardRef`), `use()` over `useContext`, `<Context>` shorthand over `<Context.Provider>`, guarding the `&&` numeric-0 leak in JSX, and staying in React Router's form handling instead of reaching for `useActionState`, `useFormStatus`, or `useOptimistic`. Covers component extraction thresholds and route/page architecture (`app/routes/` thin shells, `app/pages/` for UI).
 
-**Triggers** when writing or reviewing React components, hooks (`useEffect`, `useCallback`, `useState`), event handlers, or component extraction decisions. Also triggers when debugging stale closures, infinite re-renders, or unnecessary re-renders caused by memoization issues.
+Before adding a dependency or hand-rolling a primitive, the skill walks a platform-first ladder: existing GAIA code, then browser-native APIs (`Intl`, `URL`, `crypto.randomUUID()`, `structuredClone()`, modern CSS), then an already-installed dependency, then a new dependency, then custom code as a last resort. It stops at the first rung that fits. The biggest practical savings come from `Intl` standing in for date and number formatting libraries and native collection methods standing in for utility libraries, both already enforced by lint.
+
+**Triggers** when writing or reviewing React components, hooks (`useEffect`, `useCallback`, `useState`), event handlers, or component extraction decisions. Also triggers when debugging stale closures, infinite re-renders, or unnecessary re-renders caused by memoization issues; when deciding whether to add a dependency, reach for a web-platform API, or hand-roll a primitive; or when choosing a React 19 idiom: `ref` as a prop vs `forwardRef`, `use()` vs `useContext`, `<Context>` shorthand vs `<Context.Provider>`, guarding `&&` conditional rendering against the numeric-0 leak, or routing form handling to React Router instead of `useActionState` / `useFormStatus` / `useOptimistic`.
 
 **Example phrasing:** "this useEffect is firing twice", "extract this section into its own component", "wire up a Conform form for sign-up".
 
 Source: `.claude/skills/react-code/SKILL.md`.
+
+## React Performance
+
+You point it at one specific interaction, like a button click, and it finds the component that re-renders when it shouldn't and explains what's forcing the extra work. It diagnoses, it does not auto-fix. See [React performance](/skills/react-performance/) for the full capture-reduce-diagnose-verify workflow.
+
+**Triggers** on explicit render-performance asks: "profile renders", "measure renders", "why is X re-rendering", or "diagnose render performance". Does NOT trigger on vague "feels slow" or "janky". Requires a concrete micro-interaction target (a button click or local state change on a specific page), not a page navigation or "the whole app".
+
+**Example phrasing:** "profile renders on the dashboard table", "why does the theme toggle re-render the header", "measure renders on the checkout form".
+
+Source: `.claude/skills/gaia-react-perf/SKILL.md`.
 
 ## Styling
 
@@ -59,6 +71,12 @@ Based on Matt Pocock's excellent [TDD Skill](https://www.aihero.dev/skill-test-d
 
 Test-driven development with a vertical-slice red-green-refactor loop. Treats horizontal slicing (write all tests first, then all code) as an antipattern. Tests verify behavior through public interfaces, not implementation details. Includes a per-cycle checklist and a planning step that asks for the public interface before writing the first red test.
 
+The failing-test-first (RED) requirement applies only where a test can reliably fail first: pure utilities, service parsers, and hooks. Component and Playwright tests skip it, since their environment and DOM state can't guarantee a clean failing run.
+
+For those component and Playwright tests, the skill reviews each one for honesty and worthiness and returns a keep, fix, or delete verdict. Fixes for dishonest tests, like a test coupled to implementation detail or one asserting a tautology, apply automatically as ordinary edits for review. Delete proposals need your confirmation and show their evidence inline, so you decide without opening files. Everything lands in a single end-of-task summary.
+
+New components scaffolded with `new-component` start with an accessibility test that renders a real instance, so it can catch a real violation instead of passing against an empty DOM.
+
 It is automatically used by Claude when working in GAIA projects.
 
 **Triggers** when building features or fixing bugs with TDD, mentioning "red-green-refactor", asking for integration tests, or asking for test-first development.
@@ -91,9 +109,9 @@ Source: `.claude/skills/eslint-fixes/SKILL.md`.
 
 ## Accessibility Fixes
 
-Resolve specific axe-core accessibility violations in your project. Covers the common rule failures: `color-contrast`, `label`, `image-alt`, `button-name`, `link-name`, `region`, `landmark-one-main`, `heading-order`, and the `aria-*` family. The fix patterns reach for the project's semantic Tailwind tokens and `Form/*` components, so corrections hold in both light and dark mode. General accessibility guidance lives in the `accessibility` rule; this skill handles the concrete fix once a violation is reported.
+Resolve specific axe-core accessibility violations in your project. Covers common rule failures: `color-contrast`, `label`, `label-title-only`, `image-alt`, `button-name`, `link-name`, `region`, `landmark-one-main`, `heading-order`, `aria-allowed-attr`, `aria-required-attr`, `aria-required-children`, `aria-required-parent`, `aria-valid-attr-value`, `focus-trap`, `tabindex`, `html-has-lang`, `document-title`, `duplicate-id`, `listitem`, and `definition-list`. For any violation not in that list, apply the same fix-then-verify loop. The fix patterns reach for the project's semantic Tailwind tokens and `Form/*` components, so corrections hold in both light and dark mode. General accessibility guidance lives in the `accessibility` rule; this skill handles the concrete fix once a violation is reported.
 
-**Triggers** when an axe rule id appears in test output from `test/a11y.ts` (Vitest), `.playwright/a11y.ts` (Playwright), or the `code-review-audit` agent's accessibility bucket.
+**Triggers** when any axe rule id appears in test output from `test/a11y.ts` (Vitest), `.playwright/a11y.ts` (Playwright), or the `code-review-audit` agent's accessibility bucket.
 
 **Example phrasing:** "fix the color-contrast violation on the status badge", "axe says this button has no accessible name", "resolve the heading-order error".
 

@@ -9,17 +9,21 @@ GAIA ships its skills under `.claude/skills/` in your project. Each one is a dir
 
 ## Catalog
 
-GAIA groups its skills into two categories:
+GAIA groups its skills into four categories:
+
+**Workflow skills** handle session context and wiki maintenance. Trigger on `/gaia-handoff`, `/gaia-pickup`, `/gaia-wiki`, or natural-language asks like "hand off this session" or "sync the wiki". See [/gaia-handoff](/workflow/handoff/), [/gaia-pickup](/workflow/pickup/), and [/gaia-wiki](/maintenance/wiki/).
 
 **Code skills** govern how code is written and reviewed. Trigger when you write or edit TypeScript, React, Tailwind, tests, or browser automation. See [Code skills](/skills/code/).
 
 **Scaffolders** generate new files from templates. Trigger when you ask to create a component, hook, route, or service. See [Scaffolders](/skills/scaffolders/).
 
+**Maintenance skills** update project dependencies and pull new GAIA releases. See [/update-deps](/maintenance/update-deps/) and [/update-gaia](/maintenance/update-gaia/).
+
 ## How triggering works
 
 Each `SKILL.md` has a `description:` field that lists the phrasings and situations that load the skill. The skills do not run on every prompt; they activate when the description matches what you said. You don't invoke them by name. Saying "scaffold a card called PriceCard" loads `new-component`. Saying "the typecheck is angry about a stale closure" loads `react-code`.
 
-A few skills are also wired to the statusline. When [`/update-deps`](/commands/update-deps/) or [`/update-gaia`](/commands/update-gaia/) detect pending work, the statusline shows a `Run /update-deps` or `Run /update-gaia` indicator; clicking the indicator loads the skill.
+A few skills are also wired to the statusline. When [`/update-deps`](/maintenance/update-deps/) or [`/update-gaia`](/maintenance/update-gaia/) detect pending work, the statusline shows a `Run /update-deps` or `Run /update-gaia` indicator; clicking the indicator loads the skill.
 
 ## Adding your own
 

@@ -19,7 +19,9 @@ Scaffolds a React component as a folder under `app/components/` (or a sub-folder
 
 **Example phrasing:** "create a PriceCard component", "scaffold a button under app/components/Form", "make a new component called UserAvatar with a name and url prop".
 
-Underlying CLI: `gaia scaffold component <Name> [--no-story] [--parent <dir>] [--props "a:string,b:number"]`.
+Underlying CLI: `gaia scaffold component <Name> [--no-story] [--parent <dir>] [--props "a:string,b:number"] [--json]`.
+
+`--props` takes comma-separated `name:type` pairs. Comma-bearing types like `Record<string, unknown>`, tuples, and multi-argument function types work inside a single entry, for example `--props "label:string,data:Record<string, unknown>"`.
 
 Source: `.claude/skills/new-component/SKILL.md`.
 
@@ -33,13 +35,13 @@ Scaffolds a custom React hook with a Vitest test file.
 
 **Example phrasing:** "make a useCountdown hook", "scaffold useDebouncedValue with a value and delay parameter", "extract this into a useFormSubmission hook".
 
-Underlying CLI: `gaia scaffold hook <useFoo> [--params "a:string,b:number"] [--returns "ReturnType"]`.
+Underlying CLI: `gaia scaffold hook <useFoo> [--params "a:string,b:number"] [--returns "ReturnType"] [--json]`.
 
 Source: `.claude/skills/new-hook/SKILL.md`.
 
 ## New Route
 
-Scaffolds a new route with its page component, test, story, and optional i18n keys. Files land in `app/routes/<group>+/<name>.tsx` plus `app/pages/<Group>/<PageName>/index.tsx`. The route file stays a thin shell (`loader`, `action`, `meta`, Zod schemas, one-line default export); UI lives in the page component.
+Scaffolds a new route with its page component, test, story, and optional i18n keys. Files land in `app/routes/<group>/<name>.tsx` plus `app/pages/<Group>/<Pascal>Page/index.tsx` (for example `UserProfilePage`). The route file stays a thin shell (`loader`, `action`, `meta`, Zod schemas, one-line default export); UI lives in the page component.
 
 **Confirms:** name (kebab-case), group (`_public+` or `_session+`), and which of `--loader`, `--action`, `--i18n` to include.
 
@@ -47,7 +49,9 @@ Scaffolds a new route with its page component, test, story, and optional i18n ke
 
 **Example phrasing:** "add a /pricing page in _public+", "scaffold /settings/profile under _session+ with a loader and action", "create a new route /forgot-password with i18n".
 
-Underlying CLI: `gaia scaffold route <name> --group <_public+|_session+> [--loader] [--action] [--i18n] [--json]`.
+Underlying CLI: `gaia scaffold route <name> --group <_public+|_session+> [--loader] [--action] [--i18n] [--dry-run] [--json]`.
+
+`--dry-run` prints the files it would write without touching disk, so you can confirm the output paths first. With `--i18n`, the new locale file is also wired into `app/languages/en/pages/index.ts`. If that barrel is missing, the command writes the locale file but stops with an actionable error instead of reporting success, so you can add the import by hand or re-run from the repo root.
 
 Source: `.claude/skills/new-route/SKILL.md`.
 

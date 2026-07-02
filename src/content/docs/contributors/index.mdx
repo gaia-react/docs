@@ -5,11 +5,15 @@ sidebar:
   order: 1
 ---
 
-This section covers GAIA surface that exists in the template repo but is not included in the `npx creata-gaia` bundle.
+import { Aside } from '@astrojs/starlight/components';
 
-Audience: Steven and any outside contributors working on the GAIA template itself.
+This section covers GAIA surface that exists in the template repo but is not included in the `npx create-gaia` bundle.
 
-If you ran `npx create-gaia my-app` for a scaffolded project, this section is not for you.
+Audience: the GAIA maintainer and any outside contributors working on the GAIA template itself.
+
+<Aside type="caution">
+If you ran `npx create-gaia my-app` for a scaffolded project, this section is not for you. Start with the [Quick Start](/) instead.
+</Aside>
 
 ## Adopter / contributor split
 
@@ -22,7 +26,7 @@ Both pass through the bundle-time scrub during release. The on-disk `.gaia/relea
 
 ## What's in this section
 
-- [CI workflows](/contributors/ci/): `release.yml`, `cli-tests.yml`, `distribution.yml`, `forensics-triage.yml`.
+- [CI workflows](/contributors/ci/): `release.yml`, `cli-tests.yml`, `audit-ci-tests.yml`, `distribution.yml`, `forensics-triage.yml`.
 - [CLI surface](/contributors/cli/): `gaia` binary subcommands that contributors invoke directly, plus where their source lives.
 - [`/health-audit`](/contributors/health-audit/): autonomous health audit and auto-heal loop with circuit breakers.
 - [`/gaia-release`](/contributors/release/): audience scope and what releases produce. The detailed runbook is internal to the maintainer.

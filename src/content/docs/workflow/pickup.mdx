@@ -1,0 +1,64 @@
+---
+title: /gaia-pickup
+description: Reconstitute context in a fresh session from the most recent handoff.
+sidebar:
+  order: 6
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+`/gaia-pickup` reads the most recent handoff and reconstitutes context in a fresh session. It's the resume half of the pair; [`/gaia-handoff`](/workflow/handoff/) writes the document it reads.
+
+## When to use it
+
+Run `/gaia-pickup` at the start of a fresh session, after you've cleared or restarted Claude following a [`/gaia-handoff`](/workflow/handoff/). It reads the last handoff back and tells you what changed since.
+
+It's a skill, so it also runs on plain-English asks like "pick up where we left off", not just the slash form.
+
+## Usage
+
+```
+/gaia-pickup
+```
+
+No arguments. Pickup runs through five steps:
+
+0. **Sweep.** If more than one handoff file exists (a leftover from a crash mid-handoff), keep only the newest and delete the rest. This self-heals any pile-up so pickup always resumes from a single source of truth.
+1. **Locate.** Find the most recent handoff: `ls -t .gaia/local/handoff/HANDOFF-*.md | head -1`. If no handoff exists, fall back to `wiki/hot.md` and report `No handoff found, resuming from hot cache.`
+2. **Read.** Load the handoff in full. Run `git rev-parse --abbrev-ref HEAD`, `git status --short`, and `git log -1 --oneline` in parallel.
+3. **Report.** Surface a tight status block: current branch (with drift from the handoff if any), handoff filename and date, one-line context, 1 to 3 bullets on what's done or in-flight, 1 to 3 bullets on gaps, and a suggested next action.
+4. **Resolve.** A handoff is never archived. Most of the time there's nothing to do here: the session that finishes the work deletes the handoff itself. If you pick up one whose work has already fully landed (its branch merged, its next actions already in `git log`), pickup clears it and resumes from the hot cache. If work is still outstanding, the handoff stays in place so an interruption stays recoverable.
+
+<Aside type="tip" title="Note">
+A handoff is only deleted once its work has landed. An in-progress one is left untouched, so a context break mid-pickup never loses the thread.
+</Aside>
+
+## Drift detection
+
+If the handoff says branch `feat/auth` at commit `abc1234`, and current state is `main` at `def5678` with a dirty tree, pickup flags the divergence before suggesting next actions. The handoff may be stale; pickup says so explicitly rather than reconstructing context against a different reality.
+
+## Example
+
+After a [`/gaia-handoff`](/workflow/handoff/), in the fresh session:
+
+```
+> /gaia-pickup
+```
+
+Pickup reports:
+
+```
+Branch: feat/saved-search-filters (clean, matches handoff)
+Last handoff: HANDOFF-2026-06-12-saved-search-filters.md (2026-06-12)
+Context: Wired the date-range filter into the saved-search panel; empty state and tests pending.
+
+State:
+- Filter state lifted into the useSavedSearch hook
+- Active filters synced to the URL query params
+
+Open:
+- Empty state: no message when a filter set matches zero results
+- Test for the inclusive date-range boundary (end date)
+
+Suggested next: Add empty-state handling at @components/SavedSearchPanel.tsx:42
+```

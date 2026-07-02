@@ -7,54 +7,98 @@ sidebar:
 
 `/health-audit` is the autonomous audit + auto-heal loop for the GAIA template repo. It is contributor-only. The slash command file (`.claude/commands/health-audit.md`) and the supporting infrastructure under `.gaia/cli/health/` are excluded from the tarball.
 
-GAIA's Claude integration is graded for efficiency, safety, and correctness.
+It grades the repo's Claude integration and distribution boundary, fixes what it safely can, re-audits, and reports an F-to-A+ verdict, or escalates to you when it cannot resolve a finding on its own.
 
-The goal of `/health-audit` is to get an A+ score on the GAIA repo with 0 issues of any severity.
+## How it differs from /gaia-fitness
+
+[`/gaia-fitness`](/maintenance/fitness/) is the adopter-facing Claude-integration health check. It ships in every GAIA project, runs one triage-heal-verify pass over seven categories, and reports a letter grade.
+
+`/health-audit` is contributor-only and wider. It runs `/gaia-fitness`'s seven-category protocol as one of five audit buckets (Bucket E) and adds buckets for static checks, distribution-boundary leaks, bundle simulation, and enforcement-primitive coverage. It loops up to three audit-fix-audit cycles, preserves per-cycle artifacts, and escalates on the conditions below. Use `/gaia-fitness` to grade a project's Claude surface. Use `/health-audit` to vet the GAIA template repo itself before a release.
 
 ## What it does
 
-`/health-audit` runs up to three audit-fix-audit cycles. Each cycle:
+`/health-audit` runs up to three audit-fix-audit cycles. The Orchestrator runs on the main thread and owns every spawn. A spawned subagent cannot spawn another, so the buckets, the Adjudicator, and the Fixers are all leaf subagents the Orchestrator dispatches directly.
 
-1. Spawns a fresh Triager.
-2. The Triager runs the Audit Team in parallel across buckets A-D.
-3. Findings get written to `.gaia/local/audit/c<N>/findings.json`.
-4. If clean (zero findings + Bucket D reports A+ readiness), the cycle exits with grade A+.
-5. Otherwise, the Triager classifies findings, compares fingerprints against the previous cycle to detect oscillation, and dispatches Fixers in lane-aware parallel.
-6. Fixers complete; the Triager reports post-fix state; the team shuts down; the next cycle starts.
+Before the loop, the Orchestrator initializes a fresh `.gaia/local/audit/` directory, archiving any stale prior run first. Then each cycle:
 
-A fresh Triager per cycle prevents prior-cycle findings from bleeding into verification.
+1. The Orchestrator creates the cycle directory `.gaia/local/audit/c<N>/` and its bucket subdirectories.
+2. It spawns the five audit buckets (A–E) as parallel leaf subagents. Each writes its raw output to disk and returns a summary plus the artifact path.
+3. It spawns a fresh Adjudicator, which reads the bucket artifacts, classifies findings, and writes `.gaia/local/audit/c<N>/findings.json` (including Bucket E's shared-fitness grade and the cycle's overall grade).
+4. If the cycle looks clean (no open findings, Bucket D reports A+ readiness, and the effective shared-fitness grade is A+), the Orchestrator does not trust it yet. Before reporting the grade and deleting the per-cycle directories, it spawns a **false-clean challenger** (see below). If a lens substantiates a finding, the clean exit is revoked; if the challenge still comes back clean, the loop exits with the honest overall grade and removes the per-cycle directories.
+5. Otherwise the Orchestrator compares this cycle's open-finding fingerprints against the previous cycle's to detect oscillation, then dispatches Fixers in lane-aware parallel.
+6. The Fixers report post-fix state to the Orchestrator, and the next cycle starts.
+
+A fresh Adjudicator per cycle keeps prior-cycle findings from bleeding into this cycle's verification. The Adjudicator classifies findings and writes `findings.json`; it never dispatches Fixers and never runs the oscillation compare. Those belong to the Orchestrator, which stays mechanical (counters, directory creation, disk reads, the fingerprint compare, and dispatch) and never audits, adjudicates, or fixes in its own context, so session state it inherits cannot bias a grade.
+
+A clean cycle is not necessarily A+. The reported grade is the honest floor with no open work left, and non-blocking residual `info` findings (for example the post-sync `wiki/.state.json` drift) legitimately cap it at A.
+
+## What the buckets check
+
+| Bucket | Checks |
+| --- | --- |
+| A | The bundled CLI's typecheck and test suite (`pnpm -C .gaia/cli typecheck` and `pnpm -C .gaia/cli test --run`). |
+| B | Distribution-boundary leaks in adopter-shipped files: greps for contributor-only paths that must not appear in files that ship. |
+| C | Bundle simulation: stages the would-be release tarball and confirms it carries no maintainer-only marker fragments and no wikilinks to excluded pages. |
+| D | Cross-class enforcement walk: confirms every distribution-boundary class has an enforcing primitive, returning a verdict from A− up to A+ readiness. |
+| E | The shared Claude-integration fitness protocol, the same seven-category check `/gaia-fitness` runs (hook integrity, skill/command/agent frontmatter, rule hygiene, `CLAUDE.md` hygiene, settings hygiene, GAIA-install fitness, wiki fitness). |
+
+Mechanical buckets (A, B, C, and the mechanical half of E) run on Haiku. Judgment-bearing work (Bucket D, the judgment half of E, the Adjudicator, and the Fixers) runs on Sonnet. A Fixer is promoted to Opus only when the Adjudicator flags a high-complexity fix.
+
+## The false-clean challenger
+
+A clean cycle does not immediately end the run. The first time a cycle meets the clean gate, the Orchestrator spawns an adversarial false-clean challenger before it reports the grade or deletes the per-cycle artifacts. The challenger runs a fixed set of lenses in parallel (BS, MC, and GH always; FV as well when a prior cycle dispatched a Fixer), each trying to substantiate a finding the buckets missed.
+
+A substantiated finding revokes the clean exit: it is injected into the cycle's `findings.json` as real work. Below cycle 3 the run falls through to Fixers and continues; on cycle 3 it escalates with reason `false-clean-refuted`. The challenger runs at most once per run.
 
 ## Where the runbook lives
 
-The orchestrator reads `.gaia/cli/health/runbook.md` end-to-end before running. The runbook codifies role structure, bucket definitions, fixer lane mapping, model selection, circuit breakers, and escalation criteria. The taxonomy of findings lives at `.gaia/cli/health/taxonomy.md`.
+The Orchestrator reads `.gaia/cli/health/runbook.md` end-to-end before running. The runbook codifies role structure, bucket definitions, fixer lane mapping, model selection, circuit breakers, and escalation criteria. The finding taxonomy lives at `.gaia/cli/health/taxonomy.md`. Bucket E runs the protocol defined in `wiki/decisions/Claude Integration Fitness.md`.
 
-Both files are excluded from the adopter tarball via the `.gaia/cli/health/` directory rule in `.gaia/release-exclude`.
+Both `runbook.md` and `taxonomy.md` are excluded from the adopter tarball via the `.gaia/cli/health/` directory rule in `.gaia/release-exclude`.
 
 ## Circuit breakers
 
-A Fixer dispatch pauses for human-confirm if the proposed fix:
+A Fixer dispatch pauses for your confirmation if the proposed fix:
 
 - Touches more than 100 lines.
 - Modifies `.gaia/release-exclude`.
 - Modifies `.claude/rules/`.
 - Removes a check from `.gaia/release-scrub.yml`.
-- Edits `.gaia/cli/health/taxonomy.md` "Decided / not findings" entries.
+- Edits the "Decided / not findings" entries in `.gaia/cli/health/taxonomy.md`.
+- Edits the "Decided / not findings" section of `wiki/decisions/Claude Integration Fitness.md`.
 
-If the human refuses the fix, the orchestrator escalates.
+If you refuse the fix, the Orchestrator escalates.
 
 ## Reports
 
-On a clean exit the orchestrator prints:
+On a clean exit the Orchestrator prints:
 
 ```
-HEALTH AUDIT: A+
+HEALTH AUDIT: <overall grade, A+ or A>
+Overall grade: <A+ | A>
+Shared-fitness grade: <honest floor of seven category grades>
 Cycles: <N>
 Findings closed: <count> (per cycle: <breakdown>)
+Non-blocking residuals: <count> (e.g. wiki/.state.json post-sync drift, recorded not blocking)
 Artifacts: cleaned (.gaia/local/audit/c* removed)
 ```
 
-On escalation, it preserves all `c*/` directories and prints the outstanding findings with fingerprints and the escalation reason (max-loops hit, oscillation detected, circuit breaker tripped, unclassified finding, or fixer unable to fix).
+On escalation it preserves all `c*/` directories and prints the grades, the escalation reason, the outstanding findings with fingerprints, and the preserved artifact paths:
+
+```
+HEALTH AUDIT: ESCALATED
+Overall grade: <F-to-A+>
+Shared-fitness grade: <F-to-A+>
+Reason: <max-loops | oscillation | circuit-breaker | unclassified-finding | fixer-unable-to-fix | false-clean-refuted>
+Outstanding findings: <list with fingerprints>
+Cycles run: <N>
+Artifacts: preserved at .gaia/local/audit/c1/, c2/, c3/ (see findings.json in each)
+```
+
+The overall grade is F-to-A+ and is never higher than the shared-fitness grade. Both grades appear in every report, on a clean exit and on escalation.
 
 ## When contributors run it
 
-Run `/health-audit` against the template repo before cutting a release, after merging changes that touched the CLI source or shipped Claude surface, or when investigating drift between the template and its own internal rules.
+Run `/health-audit` against the template repo before cutting a release, after merging changes that touched the CLI source or the shipped Claude surface, or when investigating drift between the template and its own internal rules.
+
+`/health-audit` does not commit. The Fixers leave the working tree dirty, and you review and commit their changes yourself.

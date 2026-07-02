@@ -1,0 +1,70 @@
+---
+title: Working in GAIA
+description: How a normal Claude Code session works once GAIA is installed, and when to reach for each /gaia-* command.
+sidebar:
+  order: 1
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+This page shows how GAIA's pieces fit together in normal use, so you know what to do once setup is done.
+
+## Mostly, you just prompt Claude
+
+Working in GAIA is the same as working in Claude Code: describe what you want in plain language. GAIA loads its rules, skills, and guardrails when the session starts, so an ordinary request already runs through them. You don't invoke them.
+
+Ask for a component, a fix, a refactor:
+
+```
+> Add a date-range filter to the saved-search panel.
+```
+
+The code skills (TypeScript, React, Tailwind, tests) and the scaffolders trigger on their own from how you phrase the request. You never call them by name. Before each commit, the quality gate runs typecheck, lint, and tests, and the hooks block risky actions in the background. Most sessions never touch a slash command.
+
+Notice the prompt didn't ask for a test. GAIA works test-first: for a feature or a bug fix, Claude writes a failing test, then the code that makes it pass. A commit hook backs this up, refusing to commit a new test that was never seen to fail first. You get tests as part of the work, not as a separate request.
+
+## When to reach for a command
+
+The `/gaia-*` commands are for specific moments, not everyday driving. Reach for these based on what you're doing:
+
+| When you're... | Reach for | Why |
+| --- | --- | --- |
+| Starting a feature whose shape isn't settled | [`/gaia-spec`](/workflow/spec/) | Pins down intent and acceptance tests, then saves a spec you can review before any code is written. |
+| Turning a big feature into parallel work | [`/gaia-plan`](/workflow/plan/) | Breaks it into phased workstreams with shared contracts and a ready-to-run kickoff. |
+| Pausing, or your context is getting heavy | [`/gaia-handoff`](/workflow/handoff/) | Writes down where you are so you can clear context without losing the thread. |
+| Starting a fresh session | [`/gaia-pickup`](/workflow/pickup/) | Reads the last handoff back and tells you what changed since. |
+| A GAIA command or hook misbehaved | [`/gaia-forensics`](/workflow/forensics/) | Diagnoses the misfire and, if it's a bug, drafts a filing-ready report. |
+
+**When to skip them.** Small, clear changes don't need a spec or a plan. "Fix the timezone bug in the invoice header" is just a prompt. Spec and plan earn their overhead on larger, fuzzier work, the kind where it's worth agreeing on what to build before building it.
+
+## A feature, start to finish
+
+Here is the full loop for a feature you can't fully describe yet:
+
+1. **Settle what to build.** Run `/gaia-spec add saved-search filters`. It asks a few questions, confirms the intent and the acceptance tests in plain English, and saves a spec, then prints a ready-to-paste prompt for `/gaia-plan`.
+2. **Plan the work.** `/gaia-plan` reads the spec and breaks it into phased workstreams with shared contracts. It writes a plan folder with a ready-to-run kickoff prompt, then stops without writing code.
+3. **Build it.** Open a fresh session and run the kickoff. The orchestrator builds each workstream, runs the quality gate after every phase, and sends the result through the [`code-review-audit`](/reference/agents/) agent before anything merges.
+4. **Handle the small stuff directly.** Not every change is worth that. "Fix the date formatting in the invoice header" is a single prompt. Claude makes the change, and the quality gate runs at commit.
+5. **Pause and resume cleanly.** When a session runs long, `/gaia-handoff` writes down where you are. Next time, `/gaia-pickup` reads it back and flags anything that changed since.
+
+You won't run every step for every task. Reach for as much of the loop as the work needs, and prompt directly for the rest.
+
+## Maintenance commands
+
+<Aside type="tip">
+You rarely reach for these yourself, and you don't have to memorize them. They surface on the statusline when they're due.
+</Aside>
+
+| When you're... | Reach for | Why |
+| --- | --- | --- |
+| The Claude integration feels off | [`/gaia-fitness`](/maintenance/fitness/) | Health-checks hooks, frontmatter, rules, and settings, then heals what it can. |
+| Memory or rules have drifted | [`/gaia-audit`](/maintenance/audit/) | Finds duplication, contradictions, and stale guidance across your knowledge stores. |
+| The wiki has fallen behind the code | [`/gaia-wiki`](/maintenance/wiki/) | Syncs, consolidates, and lints the project wiki Claude reads from. |
+| Dependencies are stale | [`/update-deps`](/maintenance/update-deps/) | Walks outdated packages by group and runs major-version migrations. |
+| A new GAIA release is out | [`/update-gaia`](/maintenance/update-gaia/) | Merges the release into your project without clobbering your changes. |
+
+## Related
+
+- [Quick Start](/) scaffolds a new project.
+- [Maintenance overview](/maintenance/) covers the upkeep commands (`/gaia-fitness`, `/gaia-audit`, `/gaia-wiki`).
+- [Skills overview](/skills/) lists the code skills and scaffolders that trigger from plain prompts.

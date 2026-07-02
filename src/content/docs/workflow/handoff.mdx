@@ -1,0 +1,69 @@
+---
+title: /gaia-handoff
+description: Write a self-contained handoff document so you can clear context without losing the thread.
+sidebar:
+  order: 5
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+`/gaia-handoff` writes a self-contained handoff document so you can clear context. Its companion, [`/gaia-pickup`](/workflow/pickup/), reads that document back in a fresh session.
+
+## When to use it
+
+Run `/gaia-handoff` at the end of a session, before a context break, or when the current state is non-obvious. In practice that means when the context window is getting full and you are about to `/clear`, `/compact`, or restart Claude.
+
+Then `/clear` (or exit Claude and restart) and call [`/gaia-pickup`](/workflow/pickup/) in the fresh session to continue.
+
+It's a skill, so it also runs on plain-English asks like "write a handoff", not just the slash form.
+
+## Usage
+
+```
+/gaia-handoff [optional inline notes]
+```
+
+Pulls from three sources:
+
+- The conversation transcript (accomplishments, decisions, gaps, open questions).
+- Git state (`git rev-parse --abbrev-ref HEAD`, `git log -1 --oneline`, `git status --short`).
+- You can optionally include notes inline after `handoff` to help "focus" on specific parts or the next step(s).
+
+The handoff document is written to:
+
+```
+.gaia/local/handoff/HANDOFF-{YYYY-MM-DD}-{slug}.md
+```
+
+The slug is derived from the session's main thread (e.g. `auth-refactor`, `route-cleanup`).
+
+## What the document contains
+
+Sections present only when there is real content. Empty sections are dropped, not stubbed.
+
+- **Accomplishments**: what shipped, with commit hashes when committed.
+- **Decisions**: table of decision, rationale, impact.
+- **Gaps and open questions**: each gap names a status (`FIXED` / `PARTIAL` / `UNKNOWN` / `DEFERRED` / `INTENTIONAL`), notes, a concrete next check, and a reference (`@path/to/file:line`).
+- **Environment state**: branch, background processes, devices or simulators, test fixtures.
+- **Reference files**: `@path` cross-references so the next session can jump straight in.
+- **Next actions**: table of concrete, testable steps with rough effort estimates.
+
+## Example
+
+End of session:
+
+```
+> /gaia-handoff saved-search filters still need empty-state handling
+```
+
+In the fresh session, [`/gaia-pickup`](/workflow/pickup/) reads this back. See that page for the resume side of the flow.
+
+## Lifecycle
+
+Only one handoff exists at a time. Running `/gaia-handoff` again replaces the previous one and carries forward anything still unfinished, so you never sort through a stack of stale files.
+
+A handoff is temporary. Once its Next Actions are done and verified, the session that finished the work deletes it. If you were interrupted before finishing, it stays in place so the next [`/gaia-pickup`](/workflow/pickup/) can resume from it. Handoffs are never archived; a finished one is deleted, not kept.
+
+## Storage
+
+Handoffs are project-local: `.gaia/local/` is gitignored. They never enter version control, so private notes, dirty-tree details, and device IDs stay on the machine that wrote them.
