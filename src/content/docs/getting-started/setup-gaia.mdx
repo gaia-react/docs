@@ -40,7 +40,7 @@ Three checks run on every invocation and never block setup:
 
 Skipped whole if this clone already finished per-machine setup (a first adopter finishes it inside `/gaia-init`). Otherwise these steps run in order, each recorded so a re-run resumes from the first incomplete one.
 
-### install-tools
+### Install Tools
 
 Three external tools, identical to step 5 of [`/gaia-init`](/getting-started/gaia-init/#5-claude-tooling):
 
@@ -48,7 +48,7 @@ Three external tools, identical to step 5 of [`/gaia-init`](/getting-started/gai
 - **Playwright CLI** binary, installed globally.
 - **Serena** MCP server, with `uv` bootstrapped first if missing. If Serena is already registered, the "name already exists" error is treated as success.
 
-### install-plugins
+### Install Plugins
 
 ```bash
 claude plugin install typescript-lsp@claude-plugins-official
