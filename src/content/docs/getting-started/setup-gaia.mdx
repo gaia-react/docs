@@ -44,7 +44,7 @@ Skipped whole if this clone already finished per-machine setup (a first adopter 
 
 Three external tools, identical to step 5 of [`/gaia-init`](/getting-started/gaia-init/#5-claude-tooling):
 
-- **React Doctor** skill. GAIA installs only the skill and strips React Doctor's bundled workflow, commit-hook block, package script, and devDependency so GAIA stays the sole controller of when react-doctor runs (via the skill after edits and the `code-review-audit` agent pre-merge).
+- **React Doctor** skill. GAIA installs the skill and stays the sole controller of when react-doctor runs: via the skill after edits and the `code-review-audit` agent pre-merge.
 - **Playwright CLI** binary, installed globally.
 - **Serena** MCP server, with `uv` bootstrapped first if missing. If Serena is already registered, the "name already exists" error is treated as success.
 
@@ -120,7 +120,9 @@ Sets the team baseline for how `code-review-audit` runs at merge time, written t
 
 ### Bot token (out of band)
 
-GAIA CI needs an Anthropic token or key to authenticate the workflow steps that call Claude. You pick the type:
+GAIA CI needs an Anthropic token or key to authenticate the workflow steps that call Claude.
+
+Before asking you to set one, `/setup-gaia` checks whether the repo or its organization already exposes a usable secret, matched **by name only, never by value** (`CLAUDE_CODE_OAUTH_TOKEN` takes precedence over `ANTHROPIC_API_KEY`). If one is found, it prints `Detected <NAME> already set at the <repo|org> level; GAIA CI will use it. Skipping token setup.` and skips the rest of this step. You only pick a token type when none is already present:
 
 - **CLAUDE_CODE_OAUTH_TOKEN**, for Claude Code subscribers.
 - **ANTHROPIC_API_KEY**, for direct Anthropic API customers.
@@ -162,7 +164,7 @@ Once every owed step is recorded, per-machine setup is finalized and the command
 /setup-gaia --reconfigure
 ```
 
-`--reconfigure` skips the idempotent short-circuit and re-runs the CI flow: it re-prompts for which tools run on cron, re-offers the audit-mode policy, and asks you to rotate the bot token out of band (running `gh secret set` again overwrites the value silently). `setup_complete` stays `true`; it never re-provisions the repo or changes branch protection.
+`--reconfigure` skips the idempotent short-circuit and re-runs the CI flow: it re-prompts for which tools run on cron, re-offers the audit-mode policy, and asks you to rotate the bot token out of band (running `gh secret set` again overwrites the value silently). If the token is managed at the org level, it is not rotated at repo scope; the command prints `<NAME> is managed at the org level; rotate it there, then re-run. Skipping repo-secret rotation.` `setup_complete` stays `true`; it never re-provisions the repo or changes branch protection.
 
 ## On failure: re-run
 

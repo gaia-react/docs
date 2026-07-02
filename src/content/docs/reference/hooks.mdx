@@ -16,7 +16,7 @@ For Claude Code's own hook documentation, see [the Hooks reference on docs.claud
 | Hook | What it does | Path |
 |---|---|---|
 | `wiki-session-start` | Records HEAD into `.git/claude-session-start` so the Stop hook can detect wiki commits made during the session. | `.claude/hooks/wiki-session-start.sh` |
-| `local-janitor` | Bounded cleanup of `.gaia/local/` working-state residue: removes orphaned audit markers whose sha is neither HEAD nor reachable from a local branch, abandoned plan directories whose branch no longer exists, and stray empty directories. Invoked from `wiki-session-start.sh` at SessionStart, not registered as its own event; fail-safe, never blocks a session. | `.claude/hooks/local-janitor.sh` |
+| `local-janitor` | Bounded cleanup of `.gaia/local/` working-state residue: removes orphaned audit markers whose sha is neither HEAD nor reachable from a local branch, abandoned plan directories whose branch no longer exists, and stray empty directories. Also prunes local `wiki-sync/*` branches whose upstream is gone, left behind after a wiki-sync PR lands. Never deletes the current branch, and any git failure leaves branches untouched. Invoked from `wiki-session-start.sh` at SessionStart, not registered as its own event; fail-safe, never blocks a session. | `.claude/hooks/local-janitor.sh` |
 
 ## Stop
 

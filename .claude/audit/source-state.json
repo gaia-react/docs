@@ -1,7 +1,7 @@
 {
   "version": 1,
   "captured_at": "2026-07-02T00:00:00Z",
-  "gaia_commit": "da32c76d828ebee4459d56e9ca2b8239fa5801d6",
+  "gaia_commit": "8789b84a",
   "items": [
     {
       "kind": "agent",
@@ -829,7 +829,7 @@
       "name": "gaia-init",
       "description": "Initialize a new project from the GAIA React template, renames, strips GAIA branding, configures i18n, installs Claude skills/plugins.",
       "audience": "adopter",
-      "content_hash": "1e7261d598e0a3611aa83566144ef5cde92177390fce41b37dba20582ba72478",
+      "content_hash": "82bc9ac42d3df2bf0cad30bdd24a49b7887c8efef2ceaf90cb420be6797a2570",
       "excluded_from_docs": false
     },
     {
@@ -1027,7 +1027,7 @@
       "name": "local-janitor.sh",
       "description": null,
       "audience": "adopter",
-      "content_hash": "4ea86ede18fc922f41a0308b0964ec95705fedc30f98311ae99a505c09c26095",
+      "content_hash": "96e84677d9d7ee1256698bd8870a18a1691f01a66f2cbed4fa601bfb1e35ee20",
       "excluded_from_docs": false
     },
     {
@@ -1792,7 +1792,7 @@
       "name": "wiki/concepts/Audit Disposition and Debt Drain.md",
       "description": "Audit Disposition and Debt Drain",
       "audience": "adopter",
-      "content_hash": "64299c9f09275f97355901999025530e82f16cf7fac16addafab340c73303615",
+      "content_hash": "eca0c23cbbb2d0ba34480311a5f995b6ceeb600d70a49f6640f417ad3de34011",
       "excluded_from_docs": false
     },
     {
@@ -1856,6 +1856,10 @@
         [
           125,
           127
+        ],
+        [
+          172,
+          186
         ]
       ]
     },
@@ -2025,7 +2029,7 @@
       "name": "wiki/concepts/Policy-Memory Loop.md",
       "description": "Policy-Memory Loop",
       "audience": "adopter",
-      "content_hash": "f430995ba56f7549790ea76a7a4c767cd5bcc788284860130ec06cc65e94a451",
+      "content_hash": "008902f4cf837bdd1549e33f1335cc3d295cfdd2b42ef2cf9462e07294f1ec0b",
       "excluded_from_docs": false
     },
     {
@@ -2647,7 +2651,7 @@
       "name": "wiki/log.md",
       "description": "Log",
       "audience": "adopter",
-      "content_hash": "7581dc164a078bcddefe755110a5ef737067c79c2104f095ba88cf9cffc71b7f",
+      "content_hash": "692c0b2a2547aece648a7507e48123b6936f9282062e2add11eea64c5af0e369",
       "excluded_from_docs": false
     },
     {

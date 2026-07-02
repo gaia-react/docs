@@ -23,13 +23,20 @@ Click the `Run /update-deps` statusline indicator, or trigger by phrasing:
 
 Before applying anything, the skill shows a grouped preview. Updates are bucketed into four sections: **Major**, **Non-semver**, **Minor**, **Patch**. Companion groups (packages that always move together) appear as a single block under the section of their most-severe member.
 
-The preview offers three choices:
+When nothing is snoozed, the preview offers three choices:
 
-- **Update all** (default): apply every group. Any prior snoozes are cleared.
+- **Update all** (default): apply every group.
 - **Choose what to skip**: name the packages or groups to defer. Each name expands to its whole companion group. The remaining apply set is echoed back for confirmation. If you skip everything, the skill exits without creating a branch.
 - **Cancel**: exit with no changes and no ledger write.
 
-Skipped groups are recorded in `.gaia/local/declined-updates.json` (gitignored, local only). A snoozed group resurfaces automatically when a newer version ships or after 14 days, whichever comes first. Snoozes only quiet the statusline nudge; every future preview still shows snoozed groups as updatable, and CI ignores the ledger entirely.
+When one or more groups are snoozed, the preview marks each with a trailing `[snoozed until <date>]` and default-skips it. The choices become four:
+
+- **Update the rest** (default): apply every group except the snoozed ones, leaving the snoozes intact.
+- **Choose what to skip**: as above.
+- **Update everything incl. snoozed**: apply every group and clear the snoozes.
+- **Cancel**: exit with no changes and no ledger write.
+
+Skipped groups are recorded in `.gaia/local/declined-updates.json` (gitignored, local only). A snoozed group is default-skipped in every preview until it resurfaces, which happens when a newer version ships or after 14 days, whichever comes first. CI ignores the ledger entirely.
 
 `CI=true` and `--scope <group>` runs skip the preview and apply the full set (or the named group) unattended.
 
@@ -64,6 +71,20 @@ An override is declared obsolete only when removing it passes both tests. A peer
 ## Pinned versions
 
 Packages pinned in `package.json` (no `^` or `~`) stay pinned to the exact target. Unpinned specs use `^<latest>`.
+
+## Config version holds
+
+For a package you want capped below the latest release, add a `gaia.updateDepsHold` map to `package.json`. It maps a package name to a version-prefix ceiling:
+
+- `"8.0"` holds the package at the highest published `8.0.x`.
+- `"8.0.16"` freezes it at exactly that version.
+- `"8"` holds it at the highest `8.x`.
+
+A hold is different from a snooze. A snooze is local, temporary, and lapses after 14 days; a hold is committed to `package.json`, applies in CI runs too, and never lapses until you remove it. Held packages are never installed above their ceiling, and the preview surfaces them on a line like:
+
+```
+Held by config (not offered): vite (current 8.0.16, ceiling 8.0)
+```
 
 ## Quality gate
 

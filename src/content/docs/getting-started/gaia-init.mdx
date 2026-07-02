@@ -13,7 +13,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 ### 1. Dependencies
 
-1. Enables pnpm via Corepack, or installs it globally with npm if Corepack isn't available.
+1. Ensures pnpm is available and new enough. GAIA requires pnpm 11 or later (it pins `pnpm@11.9.0`). If pnpm is missing, init enables it via Corepack, or installs it globally with npm when Corepack isn't available. If an older major is already on your `PATH` (for example 10.x), init asks you to confirm the upgrade before continuing, and stops if an older pnpm binary takes precedence on your `PATH`.
 2. Runs `pnpm install` against the freshly extracted scaffold.
 3. Runs `/update-deps` to bring every package to its latest compatible version. Anything held back is surfaced with a reason.
 
@@ -21,11 +21,18 @@ If install fails, the run halts with the underlying error. Fix the cause and res
 
 ### 2. Questions about your project
 
-Up front, `/gaia-init` asks a few questions:
+Before it asks about your project, `/gaia-init` asks how you want to answer the setup questions:
+
+- **Interactive** (recommended): GAIA asks each question and waits for your answer.
+- **Automatic**: GAIA picks the recommended default for every question and shows you the full list of chosen values before it proceeds, so you can review them first.
+
+In interactive mode it then asks a few questions:
 
 - **Primary language.** The main language for your app's UI. Defaults to the language you have been typing in.
 - **Additional languages.** Any extra locales on top of the primary, as ISO 639-1 codes (for example `es, de, ar`). If you want none, you also choose whether to keep the i18n scaffolding (recommended, so you can localize later with no rework) or strip it out entirely. Stripping is hard to reverse, so pick it only if you are sure the app stays single-language.
-- **Project identity.** Your GitHub username (used for CODEOWNERS), the project title (defaults to your folder name in title case, for example `my-cool-app` becomes `My Cool App`), and a kebab-case slug (defaults to the folder name).
+- **Project identity.** Your GitHub username (used for CODEOWNERS), the project title (defaults to your folder name in title case, for example `my-cool-app` becomes `My Cool App`), and a kebab-case slug (defaults to the folder name). GAIA detects your GitHub handle from your authenticated GitHub CLI and offers it as the default; confirm it or type a different one. If detection fails, GAIA asks you to type your handle rather than guessing.
+
+If you leave an identity question unanswered, GAIA re-asks rather than guessing; questions with a safe default fall back to that default instead of blocking.
 
 A few more questions come up later: CI intent and maintenance modes, and an optional adaptation opt-in.
 
@@ -39,7 +46,7 @@ With your answers, `/gaia-init` strips the template's GAIA branding (the funding
 
 ### 4. Project files and build check
 
-- Creates `.github/CODEOWNERS` with your GitHub username as the repo-wide owner.
+- Creates `.github/CODEOWNERS` with your detected or confirmed GitHub handle as the repo-wide owner. In Automatic mode, if the handle could not be detected, it writes a placeholder (`REPLACE-WITH-YOUR-GITHUB-HANDLE`) instead and flags a required follow-up to edit before you push.
 - Copies `.env.example` to `.env` if you do not already have one.
 - Runs the full quality gate, `pnpm typecheck && pnpm lint && pnpm test:ci && pnpm build`, and stops if anything fails. This is the step that backs the "compiles, lints, and tests cleanly" promise, and the main reason init takes a few minutes.
 
