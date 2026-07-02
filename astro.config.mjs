@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import llmsTxt from 'starlight-llms-txt';
 
 // https://astro.build/config
 export default defineConfig({
@@ -27,6 +28,46 @@ export default defineConfig({
 					label: 'GitHub',
 					href: 'https://github.com/gaia-react/gaia',
 				},
+			],
+			plugins: [
+				// Generates /llms.txt, /llms-full.txt, /llms-small.txt, and per-set files
+				// so Claude Code (and other agents) can ingest these docs cleanly.
+				llmsTxt({
+					projectName: 'GAIA',
+					description:
+						'GAIA is a React and TypeScript framework that ships with a Claude Code configuration layer: slash commands, skills, hooks, rules, and agents that give Claude structure and focus when working in the codebase. Scaffold a project with `npx create-gaia my-app`. This documentation covers installing GAIA and using its commands, skills, and supporting machinery.',
+					details: [
+						'GAIA has two audiences.',
+						'',
+						'Adopters run `npx create-gaia` and get a scaffolded project with the commands, skills, hooks, rules, and agents that ship in the release.',
+						'',
+						'Contributors work on the GAIA template repo itself and additionally have the release tooling, bundled CLI internals, CI workflows, and wiki internals documented under `contributors/`.',
+						'',
+						'The abridged documentation below covers adopter surface only. Contributor documentation is available as a separate set.',
+					].join('\n'),
+					// Lead with install, then follow the sidebar order.
+					promote: [
+						'index*',
+						'getting-started/**',
+						'workflow/**',
+						'maintenance/**',
+						'skills/**',
+						'reference/**',
+					],
+					// Push contributor pages to the end of llms-full.txt (they sort near
+					// the top alphabetically otherwise).
+					demote: ['contributors/**'],
+					// Keep contributor-only surface out of the compact adopter file.
+					exclude: ['contributors/**'],
+					customSets: [
+						{
+							label: 'Contributor documentation',
+							paths: ['contributors/**'],
+							description:
+								'for people working on the GAIA template repo itself: CI workflows, the bundled CLI, releases, health audits, and wiki internals. Not needed if you installed GAIA with `npx create-gaia`.',
+						},
+					],
+				}),
 			],
 			sidebar: [
 				{
