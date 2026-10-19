@@ -1,45 +1,40 @@
 ---
 title: Releases
-description: Audience and scope for /gaia-release. The release workflow exists in the template repo but is excluded from the tarball.
+description: Audience and scope for /gaia-release. The release workflow exists in the GAIA repo but is excluded from the release bundle.
 sidebar:
   order: 2
 ---
 
-`/gaia-release` cuts a new release of the GAIA template itself. It is invoked by **Steven only**. The slash command and its supporting `gaia-maintainer` binary are stripped from the tarball by `.gaia/release-exclude`, so adopters never see this surface.
+`/gaia-release` cuts a new release of GAIA itself. It is invoked by **Steven only**. The command and the `gaia-maintainer` binary it drives are excluded from the release bundle by `.gaia/release-exclude`, so no project scaffolded from GAIA has them.
 
 ## Why contributors should know it exists
 
-Contributors who modify CLI source, hooks, rules, or shipped wiki content land in trees that a release will eventually package. The release flow validates those trees in three ways:
+Contributors who change CLI source, hooks, rules, or shipped wiki content land in trees a release will eventually package. The release validates those trees in three ways:
 
-- **Manifest regeneration**. `.gaia/manifest.json` assigns each GAIA-managed file in the adopter tarball a class (`owned`, `shared`, or `wiki-owned`). The classification rules live in `.gaia/cli/src/release/manifest.ts`. The on-disk manifest is the source of truth that [`/update-gaia`](/maintenance/update-gaia/) reads to decide which files to overwrite, three-way merge, or leave alone.
-- **Bundle-time scrub**. The release workflow stages a tree from `git ls-files`, subtracts `.gaia/release-exclude` patterns, then runs the scrub against the staging directory. The scrub strips `gaia:maintainer-only` blocks and runs leak checks before the tarball is built. Any leak fails the build.
-- **Distribution test gate**. The release workflow runs `.gaia/tests/distribution/run-all.sh` against an independently-staged tree before the tarball uploads. A broken release halts before `gh release create` runs.
+- **Manifest regeneration.** `.gaia/manifest.json` assigns each file in the bundle a class (`owned`, `shared`, or `wiki-owned`). [`/update-gaia`](/maintenance/update-gaia/) reads it to decide which files to overwrite, three-way merge, or leave alone. A newly shipping file needs an explicit ship-or-withhold decision before the manifest is regenerated.
+- **Bundle-time scrub.** The release workflow stages a tree from `git ls-files`, subtracts `.gaia/release-exclude`, then strips `gaia:maintainer-only` blocks and runs leak checks. Any leak fails the build.
+- **Distribution test gate.** The release workflow runs the distribution harness against the staged tree before anything publishes.
 
-If a change touches surface the release flow validates, expect the next release to surface any drift.
+If a change touches surface the release validates, expect the next release to surface any drift.
 
 ## What /gaia-release does
 
-The command runs on a clean `main` and takes a `patch`, `minor`, or `major` argument. At a behavioral level it:
+The command runs on a clean default branch with a `patch`, `minor`, or `major` argument. At a behavioral level it:
 
-- bumps the version in `.gaia/VERSION` and `package.json`,
-- graduates the CHANGELOG's `## [Unreleased]` section into a dated `## [X.Y.Z]` entry,
-- regenerates `.gaia/manifest.json`,
-- resets `wiki/hot.md` and `wiki/log.md` to release-baseline content so adopters scaffold from a clean slate,
-- commits on a `release/vX.Y.Z` branch and opens a PR,
-- tags the merge commit after the PR lands, which triggers the release CI.
+- bumps the version in `.gaia/VERSION`, `package.json`, and `frontend/package.json`;
+- graduates the CHANGELOG's `## [Unreleased]` section into a dated `## [X.Y.Z]` entry;
+- resets `wiki/log.md` to release-clean content, so projects scaffold from a clean slate;
+- regenerates `.gaia/manifest.json` and rebuilds the bundled CLIs;
+- commits on a `release/vX.Y.Z` branch and opens a pull request, which passes the same checks and the same [Code Audit Team](/workflow/code-audit-team/) audit as any other;
+- tags the merge commit once it lands, which triggers [release.yml](/contributors/ci/#releaseyml);
+- then brings `create-gaia`, the website, and these docs into lockstep with the release.
 
-The release PR is not exempt from the merge gate. It runs the same Vitest, Playwright, and Chromatic checks and the `code-review-audit` handshake as any other PR before it can merge.
-
-## What runs the release end-to-end
-
-The CI counterpart is [release.yml](/contributors/ci/#releaseyml). It runs on `v*.*.*` tags, re-stages the tree, re-validates the staged tree and verifies runtime dependencies, runs the distribution test gate, builds the tarball, and creates the GitHub Release.
-
-`main` is protected. The release commit lands on a `release/v<version>` branch, goes through a PR, and the tag is created on the merge commit after it lands on `main`.
+A 2.x release ships `gaia-bundle-<tag>.tar.gz` with a `.sha256` asset, and any migration notes it needs travel inside the bundle under `.gaia/migrations/` (see [Migration notes](/maintenance/update-gaia/#migration-notes)). While 1.x projects can still reach a 2.x release, the release body opens with the routing line that sends a 1.6.1 project to the 2.0.0 migration.
 
 ## The two CLI binaries
 
-The CLI bundles two binaries from two entry points. `.gaia/cli/gaia` is the adopter binary and ships in the tarball; `.gaia/cli/gaia-maintainer` carries the release surface and is excluded by `.gaia/release-exclude`. esbuild tree-shakes the release code out of the adopter binary, so the shipped `gaia` has no way to cut a release. The build layout is documented in the [CLI surface](/contributors/cli/#build-layout) reference.
+The CLI bundles two binaries from two entry points. `.gaia/cli/gaia` is the binary every project gets; `.gaia/cli/gaia-maintainer` carries the release surface and is excluded by `.gaia/release-exclude`. esbuild keeps the release code out of the shipped binary, so `gaia` has no way to cut a release. See [CLI surface](/contributors/cli/#build-layout).
 
 ## Detailed runbook
 
-The end-to-end runbook lives in the template source at `.claude/commands/gaia-release.md`. It is not reproduced here.
+The end-to-end runbook lives in the GAIA source at `.claude/commands/gaia-release.md`. It is not reproduced here.

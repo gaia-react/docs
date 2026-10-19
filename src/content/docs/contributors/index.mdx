@@ -7,35 +7,39 @@ sidebar:
 
 import { Aside } from '@astrojs/starlight/components';
 
-This section covers GAIA surface that exists in the template repo but is not included in the `npx create-gaia` bundle.
+This section covers GAIA surface that exists in the GAIA repo but is not included in the `npx create-gaia` bundle.
 
-Audience: the GAIA maintainer and any outside contributors working on the GAIA template itself.
+Audience: the GAIA maintainer and any outside contributors working on GAIA itself.
 
 <Aside type="caution">
 If you ran `npx create-gaia my-app` for a scaffolded project, this section is not for you. Start with the [Quick Start](/) instead.
 </Aside>
 
-## Adopter / contributor split
+## Project / contributor split
 
-GAIA distinguishes two audiences and routes its surface accordingly. Two release mechanisms strip contributor-only material from the adopter tarball:
+GAIA routes its surface to two audiences. Two mechanisms strip contributor-only material from the release bundle:
 
-1. **Path-level exclusion**. Entire files and directories listed in `.gaia/release-exclude` never enter the tarball produced by the GitHub Release workflow. Examples: `.claude/commands/gaia-release.md`, `.gaia/cli/src/`, `.gaia/cli/health/`, `wiki/entities/`, `wiki/meta/`.
-2. **Block-level exclusion**. Content between `<!-- gaia:maintainer-only:start -->` and `<!-- gaia:maintainer-only:end -->` markers inside files that DO ship. The shipped file is a subset of the source.
+1. **Path-level exclusion.** Files and directories listed in `.gaia/release-exclude` never enter the bundle the release workflow builds. Examples: `.claude/commands/gaia-release.md`, `.claude/commands/distribution-vet.md`, `.claude/skills/release-notes`, the two `code-audit-maintainer-*` agents, `.claude/rules/maintainers/`, `.gaia/cli/src/`, `.gaia/tests/`, `.gaia/scripts/tests/`, `.githooks/pre-push`, `wiki/entities/`, and `wiki/meta/`.
+2. **Block-level exclusion.** Content between `<!-- gaia:maintainer-only:start -->` and `<!-- gaia:maintainer-only:end -->` markers inside files that do ship. The shipped file is a subset of the source.
 
-Both pass through the bundle-time scrub during release. The on-disk `.gaia/release-exclude` is the authoritative manifest of path-level rules.
+Both pass through the bundle-time scrub during release. `.gaia/release-exclude` is the authoritative manifest of path-level rules, and each of its categories carries the reason its paths are withheld.
 
 ## What's in this section
 
-- [CI workflows](/contributors/ci/): `release.yml`, `cli-tests.yml`, `audit-ci-tests.yml`, `distribution.yml`, `forensics-triage.yml`.
-- [CLI surface](/contributors/cli/): `gaia` binary subcommands that contributors invoke directly, plus where their source lives.
-- [`/health-audit`](/contributors/health-audit/): autonomous health audit and auto-heal loop with circuit breakers.
-- [`/gaia-release`](/contributors/release/): audience scope and what releases produce. The detailed runbook is internal to the maintainer.
+- [CI workflows](/contributors/ci/): `release.yml`, `cli-tests.yml`, `audit-ci-tests.yml`, `shell-lint.yml`, `forensics-triage.yml`.
+- [CLI surface](/contributors/cli/): `gaia` binary subcommands, the build layout, and where their source lives.
+- [`/gaia-release`](/contributors/release/): audience, scope, and what releases produce. The detailed runbook is internal to the maintainer.
 - [Contributor wiki content](/contributors/wiki/): `wiki/entities/`, `wiki/meta/`, and the `gaia:maintainer-only` block convention.
+
+Beyond these pages, the GAIA repo carries maintainer-only tooling that is not documented here: the `/distribution-vet` ship-or-withhold vet, the `release-notes` skill, the two maintainer members of the Code Audit Team, and the verification runner under `.gaia/tests/`. Their source and headers are the reference.
+
+## Before a release
+
+`/health-audit` is removed in 2.0.0. The pre-release health check is [`/gaia-fitness`](/maintenance/fitness/) followed by [`/gaia-cleanse`](/maintenance/cleanse/), the same commands every project runs.
 
 ## Source-of-truth pointers
 
-- `.gaia/release-exclude`: path-level exclusion manifest
-- `gaia/.gaia/cli/src/`: CLI source
-- `gaia/.gaia/cli/health/runbook.md`: health audit runbook
-- `gaia/wiki/entities/`, `gaia/wiki/meta/`: contributor wiki content
-- `gaia/.github/workflows/`: CI workflows (mix of contributor-only and adopter-shipped)
+- `.gaia/release-exclude`: the path-level exclusion manifest
+- `.gaia/cli/src/`: CLI source
+- `wiki/entities/`, `wiki/meta/`: contributor wiki content
+- `.github/workflows/`: CI workflows (a mix of contributor-only and shipped)
