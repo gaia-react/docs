@@ -1,0 +1,131 @@
+---
+title: Code Audit Team
+description: The pre-merge audit every GAIA pull request passes before it can merge. Members chosen by file, per-member clearance, one severity scale, a self-running fix loop, and the GAIA-Audit required check.
+sidebar:
+  order: 3
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Every pull request in a GAIA project is audited before it merges. The audit is not one reviewer but a team: each member owns a set of files, and a pull request is reviewed by every member whose files it touches. The audit runs locally in your Claude Code session. Nothing runs Claude on GitHub Actions.
+
+A hook enforces it. `gh pr merge` is denied until every member the diff dispatched has cleared it, and the `GAIA-Audit` required check stops a merge from the github.com button skipping it.
+
+## Members
+
+The roster lives in `.gaia/audit-ci.yml` under `auditors:`. Each entry maps file globs to a member. Two members ship:
+
+| Member | Owns | Reviews for |
+|---|---|---|
+| `code-audit-frontend` (the default member) | The app and its tooling: `frontend/app/**`, `frontend/test/**`, `frontend/.storybook/**`, `frontend/.playwright/**`, the package manifests and lockfile, build and lint configs, `frontend/.claude/**`, `frontend/CLAUDE.md`, and root tooling such as `.npmrc` and `.nvmrc` | Security, performance, architectural fit, robustness and edge cases, accessibility, and maintainability: the defects that need reasoning about intent and data flow, beyond what lint and types catch. Library-specific rules for shadcn/ui, `cn`, Conform, the form components, React patterns, and react-i18next load from `frontend/.claude/agents/code-audit-frontend/`. |
+| `code-audit-github-workflows` | `.github/workflows/*.yml` and `.github/actions/**/*.yml` | Supply-chain, script-injection, permission, and secret-handling defects in workflow YAML. |
+
+Globs are matched first-match-wins over the roster, with the default member's globs evaluated last, so a workflow file belongs to `code-audit-github-workflows`. A path no member owns must be declared under `unowned:` in the same file; the roster verifier refuses a file nobody owns and nobody declared, and refuses a dead glob.
+
+Members only report. They never edit a file. Fixes come from a separate fixer, and a deterministic verifier checks each repair before it lands.
+
+### Editing the roster
+
+`.gaia/audit-ci.yml` ships with GAIA and you edit its values to tune the audit: add globs for code you add beside `frontend/`, declare paths that need no review under `unowned:`, or set the light-review keys below. A config without an `auditors:` block fails closed instead of falling back to a built-in list.
+
+## Per-member clearance
+
+Each member's clearance is keyed to the branch's own change to the files it owns, plus GAIA's gate machinery. That has three consequences you will notice:
+
+- **Members run in parallel**, in any order.
+- **A commit outside a member's files never re-dispatches it.** A CHANGELOG line or a wiki page re-audits nothing.
+- **Merging the base branch in does not re-audit**, unless the merge commit carries its own edit or a base edit lands within three lines of the branch's changes.
+
+A re-dispatched member reviews only what changed since its own last clearance or refusal, plus the findings it still has open.
+
+### Light review
+
+A small change since a member's last full review can go to a cheaper Sonnet reviewer when the member opts in with `light_review: true` in `.gaia/audit-ci.yml`. `light_line_cap` bounds the size of the change (at most 50 lines), and `light_hard_full` lists globs that always get a full review. `code-audit-frontend` is opted in by default, with its configs, manifests, test trees, and harness files always routed to a full review. Whenever the light route cannot be established, the full member runs.
+
+## Severity
+
+Every finding is graded on one scale:
+
+| Severity | Effect on the clearance |
+|---|---|
+| **Critical** | Must be fixed. |
+| **Major** | Must be fixed, or acknowledged with a stated reason. |
+| **Minor** | Never withholds a clearance. Fixed by default. |
+
+A fourth grade, `severity:investigate`, marks a tech-debt issue whose severity cannot be judged yet. See [`/gaia-debt`](/maintenance/debt/#labels).
+
+Every finding, Minor included, gets a disposition: fixed by default, or accepted as a residual, waived, or filed, each with a reason. Architectural findings go to you.
+
+**Out-of-scope findings** (defects the audit notices outside the pull request's own change) are filed as `tech-debt` issues through the [`file-tech-debt`](/maintenance/debt/#how-issues-are-filed) skill. A non-security finding in a file the pull request already changes can be recorded as a waive in the pull request body instead, but only when it clears two disqualifiers (for example, the change did not author it). **Security findings are never filed publicly.** They become issues only when the repository reads as private; otherwise they stay in a redacted local record under `.gaia/local/audit/security/`, and you are told only how many there were and where the records are.
+
+## The audit loop
+
+An `audit-loop-unit` sub-agent runs the audit rounds a few at a time, off your main session. In each round, the dispatched members review, a fixer repairs what they found, a verifier checks the repairs, and the Quality Gate runs before the round commits. Your session holds only a short report per unit, so a long audit does not fill your context.
+
+The loop needs **Claude Code 2.1.292 or later**. Run `claude update` if a unit stops and names the version.
+
+### The branch checkpoint
+
+Every round's fixes buy the next round, so left alone the loop has no stop of its own. A hook bounds it per branch. It checks in with you when:
+
+- your session's context reaches its checkpoint line,
+- rounds stop converging (the count of findings the branch authored stops falling, or each repair introduces new findings on the lines it wrote), or
+- the hard round cap is reached.
+
+At a checkpoint Claude shows you the evidence (rounds run, findings per round, the verdict, what remains by severity, and the spend) and asks one pinned question:
+
+- **Continue audit in this session** or **Continue audit in a new session**: grant one more unit of rounds. The new-session option prints a continuation prompt in a fenced code block to paste after `/clear`.
+- **Accept the remainder**: offered only when no remaining finding is Critical or security-class. Runs one closing round with no fixer, and records what remains under `## Accepted residuals (recorded, not fixed)` in the pull request body.
+- **Stop and file the remainder**: files the remaining findings as tech-debt issues and leaves the pull request open.
+
+Only a person can answer. If the question is not available, type one of these as the whole prompt:
+
+```text
+audit-grant <n>
+```
+
+```text
+audit-accept
+```
+
+`audit-accept` is also the deliberate override when accept is not offered. Claude never types, writes, or simulates either line, and a hook denies Claude writes to the checkpoint's state. An unattended session never asks and never grants: it pushes the round's fixes, leaves the pull request open, and prints the `audit-grant` line for you to type later.
+
+**Why:** an unattended loop spends without bound, and "is another round worth it" would otherwise be decided mid-loop by the session least able to judge it. See the [gate reference](/reference/gates/#audit-checkpoint).
+
+## Posting GAIA-Audit
+
+Claude posts the `GAIA-Audit` success status last, once every dispatched member holds a clearance for the current change, every finding from every round is fixed or recorded, and the last push has landed. Posting it any earlier would mark the pull request done while findings were still being decided. The success post flips the draft pull request to ready for review.
+
+A refusal posts a `GAIA-Audit` failure straight away, which retracts any earlier success for the same head, so a GitHub auto-merge cannot land over it.
+
+Pull requests the audit does not need to review (every changed file out of scope, or a manifest-only `chore(deps)` bump from `/update-deps`) are stamped by the merge hook itself, with `skipped: out of scope` or `skipped: chore(deps) manifest-only`.
+
+<Aside type="note">
+A pull request merged from the GitHub UI without going through Claude (a raw Dependabot pull request, for example) is never stamped, so it waits on `GAIA-Audit` indefinitely. Ask Claude to merge it once: the hook classifies it, posts the stamp, and allows the merge.
+</Aside>
+
+## What lands in the pull request
+
+- **`## Audit rounds`**: total rounds, rounds per member, light reviews, and human grants.
+- **`## Accepted residuals (recorded, not fixed)`**: accepted findings, each with a dedup key. [`/gaia-residue`](/maintenance/residue/) reads these later.
+- **A findings comment**, posted on every `gh pr merge`, carrying every round's findings from every member. Security-class and Critical findings are left out of it and appear only as a count.
+
+Each `gh pr merge` also prints the pull request's [cost](/reference/cost/).
+
+## Reading a refusal
+
+The merge hook denies `gh pr merge` with one reason and one next step. The common ones:
+
+| You see | What it means | Next step |
+|---|---|---|
+| A member has no clearance for the current change | That member has not reviewed the latest commit on its files, or refused it | Let Claude run the audit loop. A refusal is retired only by fixing the finding (which changes the reviewed files) or by acknowledging a Major with a reason. |
+| The base tip is not a commit in this checkout | The gate measures the change against the base branch GitHub reports, and it is not fetched | `git fetch origin` |
+| GitHub cannot be reached | The gate cannot read the pull request's base | Fix the `gh` failure it prints; check `gh auth status` |
+| More than one merge base with the base tip | The branch's own change is ambiguous | `git merge --no-edit refs/remotes/origin/<base>` |
+| A cross-repository (fork) pull request | A local audit would run the fork's own audit scripts with your credentials | Review the harness diff by hand, push the branch to your own repository, and audit that pull request |
+
+After changing a pull request's base branch on GitHub, reset the recorded base with `git config --unset branch.<branch>.gaia-audit-base`.
+
+A queued merge is waited on with `bash .gaia/scripts/pr-wait-merge.sh --pr <N>`, which stops as soon as the base conflicts or a required check fails.
+
+Every gate the audit can raise has a row in the [gate reference](/reference/gates/).

@@ -1,17 +1,19 @@
 ---
 title: /gaia-plan
-description: Plan a feature using task orchestration. Produces a plan directory and a kickoff prompt for a fresh orchestrator session.
+description: Plan a feature using task orchestration. Produces a plan folder and a kickoff prompt for a fresh orchestrator session.
 ---
 
-Plan a complex feature by decomposing it into parallel workstreams with frozen interface contracts. `/gaia-plan` does not implement anything. It produces a plan directory, then hands you a single copy-paste prompt to launch a fresh orchestrator session that executes the plan.
+import { Aside } from '@astrojs/starlight/components';
+
+`/gaia-plan` breaks a complex feature into phases of parallel workstreams with frozen interface contracts. It does not implement anything. It writes a plan folder and hands you one prompt to paste into a fresh session, where an orchestrator executes the plan.
 
 ## When to use it
 
-Reach for `/gaia-plan` when the work spans multiple files or modules, has identifiable parallel slices (UI plus service layer plus tests, or backend plus frontend plus migration), or benefits from isolating each slice in its own subagent context.
+Reach for `/gaia-plan` when the work spans several files or modules, has slices that can run in parallel (UI, service layer, tests), or benefits from giving each slice its own fresh sub-agent context.
 
-For one-line bug fixes or single-file edits, skip the planning ceremony and just edit.
+For one-line fixes or single-file edits, skip the ceremony and prompt Claude directly.
 
-For feature work that has not been clarified yet, run [`/gaia-spec`](/workflow/spec/) first. It chains into `/gaia-plan` after save.
+For a feature whose intent is not settled yet, run [`/gaia-spec`](/workflow/spec/) instead. It plans its SPEC in the same session, so you do not run `/gaia-plan` separately.
 
 ## How to invoke
 
@@ -19,106 +21,84 @@ For feature work that has not been clarified yet, run [`/gaia-spec`](/workflow/s
 /gaia-plan a feature description in plain English
 ```
 
-Or, with a SPEC reference (typically passed automatically by `/gaia-spec`):
+From a saved SPEC:
 
 ```
-/gaia-plan SPEC-005: rework auth, see .gaia/local/specs/SPEC-005/SPEC.md
+/gaia-plan SPEC-005
 ```
 
-If you invoke `/gaia-plan` with no description, it asks for one before continuing.
+Non-interactive:
+
+```
+/gaia-plan auto a feature description
+```
+
+`auto` asks no questions: the planner runs on Opus, and decomposition-audit findings are applied or recorded in the plan's README. A description is required.
+
+With no description at all, `/gaia-plan` asks for one.
 
 ## What gets produced
 
-`/gaia-plan` writes a plan directory at:
+| Plan | Folder |
+|---|---|
+| From a SPEC | `.notebook/specs/SPEC-NNN/plan/` (a second plan for the same SPEC is `plan-2/`) |
+| With no SPEC | `.notebook/plans/PLAN-NNN/`, numbered from the notebook catalog |
 
-```
-.gaia/local/plans/<kebab-slug>/
-```
-
-The slug derives from the description. When invoked from a SPEC, the slug is prefixed with the SPEC id (e.g. `spec-005-cards-layout`) so you can tell at a glance which plan came from which spec. If two plans would share a slug, GAIA appends `-2`, `-3`, and so on, so running several at once never overwrites either.
-
-Inside the directory:
+Inside it:
 
 | File | Purpose |
 | --- | --- |
-| `README.md` | Task graph: phase order, which tasks run in parallel within each phase, and the frozen interface contracts shared across tasks. References the source SPEC if there was one. |
-| `ORCHESTRATOR.md` | Runbook for the orchestrator session that executes the plan. Branch policy, phase order with quality gates, sub-agent prompt templates, pre-merge audit obligation, git flow, stop conditions. |
-| `KICKOFF.md` | The exact prompt a fresh Claude Code session reads to start orchestrating. Self-contained, no assumed context. |
-| `task-<name>.md` | One per parallel workstream. Self-contained for a fresh-context sub-agent. Includes interface contracts, files to touch (with line-range hints), acceptance criteria, and dependencies on other tasks. |
-| `SUMMARY.md` | Created and maintained by the orchestrator during execution. Append-only ledger of phase commits and sub-agent findings. |
+| `README.md` | The task graph: phase order, which tasks run in parallel in each phase and on which model, the frozen interface contracts shared across tasks, and the source SPEC. |
+| `ORCHESTRATOR.md` | The runbook the orchestrator follows: isolation, phase order with quality gates, sub-agent prompt templates, the pre-merge audit, the git flow, and stop conditions. |
+| `KICKOFF.md` | The prompt a fresh session reads to start orchestrating. |
+| `task-<name>.md` | One per workstream, self-contained for a fresh sub-agent: contracts, files to touch, acceptance criteria, dependencies. |
+| `PROGRESS.md` | Written during execution: one entry per completed or halted phase. |
 
 ## The flow
 
-1. **Description capture.** If `$ARGUMENTS` is empty, the skill asks. If a SPEC reference is detected, the SPEC itself becomes the source of truth and the dispatch summary is just a label.
-2. **Model check.** If the current session is not on Opus, the skill offers to spawn the planning agent on Opus. Plans benefit from the higher-capacity model.
-3. **Plan directory resolution.** Slug is derived (or seeded from the SPEC id), suffixed on collision, then created under `.gaia/local/plans/`.
-4. **Planner dispatch.** A planning agent writes the plan files, and only ever writes inside the plan directory.
-5. **Verification.** The skill checks that the core plan files were written. If any are missing, it surfaces the problem instead of guessing.
-6. **Decomposition audit.** For non-trivial plans, the skill offers to stress-test the decomposition before hand-off, and running it is the recommended choice. See [Decomposition audit](#decomposition-audit).
-7. **Hand-off.** The skill prints a short summary of the plan directory, then the kickoff prompt as a fenced code block you select and copy yourself. The trailing line reads `Type /clear and paste the prompt above.`
+1. **Pre-flight.** The same housekeeping `/gaia-spec` runs, plus the offer to pull when your GAIA version lags.
+2. **Resolve the SPEC**, if one was named. A SPEC reference that resolves to nothing stops with an error rather than silently planning without it.
+3. **Pick the planner model.** On Opus or Fable the planner inherits your model. Otherwise Claude asks: Opus (recommended), Fable, or your current model. The planner runs at your session's effort, so a higher `/effort` drafts a deeper plan.
+4. **Plan.** A planner sub-agent writes the folder. A planner that runs heavy on context hands off to a fresh one.
+5. **Verify.** A deterministic check confirms every required file and step, and that every UAT the SPEC defines is routed to a task.
+6. **Decomposition audit.** On any non-trivial plan (parallel tasks, several phases, or a shared contract), parallel lenses audit the task graph and the contracts, plus SPEC coverage for a SPEC's plan, before a cold orchestrator builds against them. A trivial plan skips it.
+7. **Report.** A cost line (or, for a SPEC's plan, a box covering the spec and the plan), then the prompt:
 
-The kickoff prompt looks exactly like:
+   ```text
+   Read /absolute/path/to/plan/KICKOFF.md and execute it.
+   ```
 
-```
-Read /abs/path/.gaia/local/plans/<slug>/KICKOFF.md and execute it.
-```
+   Type `/clear` and paste it.
 
-Paste it into a fresh Claude Code session, started cold, to run the plan. The orchestrator's behavior lives entirely in `KICKOFF.md`.
+## Execution
 
-## Decomposition audit
+The orchestrator runs in the fresh session:
 
-After the planner writes its files and verification confirms they exist, `/gaia-plan` offers to audit the decomposition itself before handing off. For non-trivial plans (parallel tasks, multiple phases, or shared frozen contracts), running it is the recommended choice; a trivial single-phase plan can skip it.
+- **Isolation** follows your team's [isolation policy](/workflow/work-lifecycle/#3-isolate), worktrees by default. The branch is named `<type>/spec-<nnn>-<slug>` for a SPEC's plan or `<type>/plan-<nnn>-<slug>` otherwise, where `<type>` is the Conventional Commits type of the change. The PR Conventions check expects the pull request title's type to match.
+- **Each phase** dispatches its tasks to sub-agents, Sonnet by default. Sub-agents only edit files: they never commit, push, or run git that rewrites the shared working tree. The orchestrator commits each phase after the Quality Gate passes.
+- **A task that runs heavy** on context hands off to a fresh agent. When one task yields too often, the plan halts for you.
+- **The pull request** opens as a draft and goes through the [Code Audit Team](/workflow/code-audit-team/) before it merges.
 
-Three auditors run in parallel, each targeting a different way a decomposition goes wrong:
+### Resuming a plan
 
-- **Decomposition & dependency soundness** checks that tasks placed in the same phase do not share state or edit the same files, that phase order respects real data and interface dependencies, and that every task reads the shared interface contracts the same way.
-- **Contract grounding** checks every file path, export, type, and function signature a task names against the real repo. A contract that points at something that does not exist would send a sub-agent building on a false assumption.
-- **SPEC coverage** runs only when the plan came from a SPEC. It maps each SPEC requirement to a covering task and flags anything left uncovered, contradicted, or scoped back in that the SPEC ruled out.
+Running the kickoff again on a plan that already completed phases shows each verified phase with its commit and asks:
 
-Localized findings, like a wrong path or a missing acceptance criterion, are applied straight to the plan files. Structural findings, like a phase graph that needs reworking, re-spawn the planner with a correction directive and re-verify the regenerated plan before hand-off.
+- **Resume** at the first incomplete phase
+- **Restart from Phase 1**
+- **Abandon**: stop without re-running, committing, merging, or deleting anything
 
-The point is to catch a broken decomposition before hand-off, rather than mid-build after an orchestrator session has already started.
+A plan generated before a GAIA update keeps the steps it was generated with until you regenerate it.
 
-## Orchestrator vs sub-agents
+### UAT specs
 
-The orchestrator owns coordination. It is spawned in a fresh context after you paste the kickoff prompt. It commits, pushes, opens the PR, runs quality gates between phases, dispatches sub-agents, and never edits source files itself.
+For a plan from a SPEC, each browser-flow UAT is rendered into a Playwright spec under `frontend/.playwright/e2e/` **before Phase 1**, committed on its own and marked as expected to fail (`test.fail()`). Each one must pass before the phase that owns it can commit. Executors are told not to rewrite a rendered spec's assertions to make it pass, since the spec is the SPEC's contract.
 
-Sub-agents own implementation. The orchestrator dispatches one per task per phase with a fresh-context prompt. Each sub-agent edits files, then returns a structured summary that ends with a `## Notes for orchestrator` section (findings, deviations from plan, follow-ups for after merge). Sub-agents never commit, push, or touch git.
+Before the audit, the orchestrator checks that every rendered spec still asserts its contract (an `uat-fidelity-judge` agent reads each one). When the implementation and a UAT logically diverge, the plan halts so the SPEC can be reopened, instead of quietly changing what was agreed.
 
-The orchestrator merges sub-agent notes into `SUMMARY.md` after every phase, so context survives compression.
+The SPEC is closed around the merge of its implementation.
 
-## Pre-merge audit
+<Aside type="note">
+A 1.x plan branch named `plan/spec-<nnn>-...` or `spec-<nnn>-...` is legacy. GAIA no longer creates those names. See [Upgrading from 1.x](/getting-started/upgrading/#every-other-machine) to rename an unmerged one.
+</Aside>
 
-Before any `gh pr merge` invocation, the orchestrator spawns the `code-review-audit` agent against the current branch. If the audit reports critical or unresolved important issues, the orchestrator stops and surfaces them. The merge stays blocked until that audit passes clean.
-
-## Branch policy
-
-If the orchestrator starts on `main`, it asks how to isolate the work: a feature branch in place (recommended) or a linked git worktree (experimental). On any other branch, it first scans for a live orchestrator already running on that branch. If none is found, it treats the current branch as the work branch and proceeds without prompting. If one is found, it surfaces the three-choice prompt covered in [Running more than one at once](#running-more-than-one-at-once).
-
-## Stop conditions
-
-The orchestrator stops on any sub-agent failure or quality-gate failure. It surfaces the failure, appends it to `SUMMARY.md` under a `(HALTED)` block, and waits for human direction. It does not "fix and continue."
-
-Quality gates between phases run `pnpm typecheck && pnpm lint`. A non-zero exit halts the run before the next phase dispatches.
-
-## Final summary and self-cleanup
-
-After all implementation phases pass and the final commit is pushed, the orchestrator reads `SUMMARY.md` and prints a brief summary to the user: phases completed, sub-agents run, files touched, commits pushed (count plus short SHAs), PR URL, quality-gate status, and the highest-signal findings or deviations or follow-ups drawn from the ledger.
-
-After the user confirms the PR is ready to merge, the orchestrator deletes its own plan folder. If `.gaia/local/plans/` is gitignored (the GAIA default), the deletion is invisible to git and skipped from commit. Otherwise, the deletion lands as the final commit on the PR.
-
-## Running more than one at once
-
-Parallel `/gaia-plan` invocations stay isolated on disk. Each plan gets its own directory, with the `-2`, `-3` suffix from [What gets produced](#what-gets-produced) resolving any slug collision, so building two plans at once never overwrites either.
-
-Execution is the part that can actually clash, since two orchestrators editing the same branch would step on each other. When you start a plan on a branch that already has a live orchestrator, GAIA detects the in-flight run and asks how to proceed: isolate the new work in a [git worktree](#worktree-mode-experimental) (recommended), continue on the shared branch and accept the conflict risk, or defer. Plans on different branches, or a plan running alongside a spec, need no coordination.
-
-## Worktree mode (experimental)
-
-If the orchestrator ran in worktree mode, it waits until the PR shows as merged, then removes the worktree. It confirms the merge first so your work is safely on the PR before the isolated copy goes away.
-
-If the orchestrator was running inside an isolated subagent, it can't remove the worktree itself. Instead it stops and hands you a copy-paste prompt with the worktree path. Paste that into a fresh session to finish the cleanup.
-
-## Related
-
-- [`/gaia-spec`](/workflow/spec/) is the upstream of `/gaia-plan`. The chain-trigger after spec save dispatches `/gaia-plan` automatically when accepted.
+Source: `.claude/skills/gaia/references/plan.md`.

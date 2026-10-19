@@ -1,0 +1,71 @@
+---
+title: Git hooks and conventions
+description: The native git hooks, Conventional Commits, PR title rules, draft pull requests, and the GitHub workflows that ship with a GAIA project.
+sidebar:
+  order: 4
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+GAIA enforces its commit and pull request conventions at three layers: native git hooks that run on every commit, Claude Code hooks that check a command before it runs, and a few GitHub workflows that run on pull requests.
+
+## Native git hooks
+
+The hooks live in `.githooks/` and run through git's `core.hooksPath`. `pnpm install` sets it, through the root `prepare` script. Husky is not used.
+
+| Hook | What it runs |
+|---|---|
+| `pre-commit` | For each package a staged file belongs to: typecheck, lint-staged (ESLint, Prettier, Stylelint on staged files), and the tests for staged files. It also refuses when GAIA's generated settings have drifted. |
+| `commit-msg` | commitlint against `commitlint.config.mjs`. A message that is not a Conventional Commit is refused, and so is any commit when commitlint cannot run. |
+
+The test step launches headless Chromium for stories and hook tests, so run `pnpm install:browsers` once per machine.
+
+### Checking a clone
+
+A clone whose hooks are not active reports nothing, so a broken setup looks exactly like a passing one. Check it:
+
+```bash
+git config --get core.hooksPath
+```
+
+It must print `.githooks`. If it does not, run `pnpm install` or `git config core.hooksPath .githooks`. Any non-empty `CI` variable, including `CI=false`, makes `prepare` skip the setup.
+
+**Why:** the pre-commit floor is what keeps a commit that fails typecheck, lint, or its tests from landing. Claude cannot skip it either: a Claude Code hook denies `git commit` and `git push` with `--no-verify`, `-n` on a commit, or `-c core.hooksPath=<path>`. See the [gate reference](/reference/gates/#no-verify).
+
+## Conventional Commits
+
+Commit messages and pull request titles follow [Conventional Commits](https://www.conventionalcommits.org/): `<type>(<optional scope>): <subject>`. The types are `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style`, `test`, and `wiki`, listed in `.gaia/conventional-commits.json`. The 1.x `debt` type is retired; a debt fix uses the type of the change it makes.
+
+## Pull request titles
+
+A squash merge lands the pull request title as the commit subject on the default branch, followed by ` (#<number>)`. GAIA lints that whole string, so the 100-character header limit applies to the title plus its suffix. A title that passes the commit-msg hook can still be one character too long once the suffix is added.
+
+Before `gh pr create` or `gh pr edit` runs with a title, a Claude Code hook lints it with the same commitlint and config CI uses, and denies a title that would fail. It also denies `gh pr create --fill` (and `-f`) with no `--title`, because the derived title cannot be checked. Pass `--title`.
+
+[`/setup-gaia`](/getting-started/setup-gaia/#phase-squash-only-merges) offers squash-only merges with the PR title as the commit subject, so the title lint keeps describing what lands.
+
+## Draft pull requests
+
+Every pull request Claude opens for this repository opens as a draft. A hook denies a `gh pr create` without `--draft`. The audit's `GAIA-Audit` success post flips the pull request to ready for review, and a refusal converts it back to draft.
+
+**Why:** reviewers are notified when a pull request is ready, and in a GAIA project that moment is the audit clearing. One opened ready notifies them before any audit ran. Pull requests to another repository, and private repositories on plans where GitHub refuses drafts, are allowed without `--draft`.
+
+## Branches
+
+Every branch GAIA creates is named by one library in the form `<kind>/<rest>`. See [Work lifecycle](/workflow/work-lifecycle/#2-name). Commits and pushes to `main` or `master` are denied, as are force-pushes naming them; work on a branch and open a pull request.
+
+## GitHub workflows that ship
+
+Three workflows ship in `.github/workflows/`. None of them runs Claude.
+
+| Workflow | When it runs | What it does |
+|---|---|---|
+| **Tests** (`tests.yml`) | Pushes and pull requests to `main` | Runs the test suites the change needs. A `chore(deps)` pull request skips only when every changed file is a dependency manifest. Playwright runs one worker per core. |
+| **Chromatic** (`chromatic.yml`) | `main`, and pull requests that are ready for review. Drafts are skipped. | Visual snapshots of every story, once in a light mode and once in a dark mode, so each story costs two snapshots per build. A branch pushed several times as a draft pays for one build, when it is marked ready. Runs with no `GITHUB_TOKEN` scope. |
+| **PR Conventions** (`pr-conventions.yml`) | Pull requests (opened, edited, pushed) | Advisory. Checks the head branch name, lints the title as the squash subject, and checks that a plan branch's type (`<type>/spec-<nnn>`) matches the title's type. Safe on fork pull requests: no secrets and a read-only token. |
+
+The Tests and Chromatic workflows pin third-party actions to commit SHAs and cap each job's run time. The audit itself runs locally; see [Code Audit Team](/workflow/code-audit-team/).
+
+<Aside type="note">
+GAIA 1.x could run Claude on GitHub Actions (GAIA CI). 2.0.0 removes it: no scheduler, no Claude PR-audit workflow, no bot token. If an older project still has those workflows, see [Upgrading from 1.x](/getting-started/upgrading/).
+</Aside>

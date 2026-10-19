@@ -1,0 +1,134 @@
+---
+title: Work lifecycle
+description: How every piece of committed work moves from the first edit to a merged pull request and a cleaned-up checkout, and how GAIA isolates parallel work.
+sidebar:
+  order: 2
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Every change Claude commits follows one lifecycle, whether a command drives it (`/gaia-plan`, `/gaia-debt`, a maintenance command) or you just asked for a fix in plain language:
+
+1. **Claim** the issue, if the work closes one.
+2. **Name** the branch.
+3. **Isolate** the work in a worktree or a feature branch, per your team's policy.
+4. **Commit** through the Quality Gate and open a **draft** pull request.
+5. **Audit** the pull request with the [Code Audit Team](/workflow/code-audit-team/).
+6. **Merge**, only when you ask.
+7. **Clean up** back to a pulled default branch.
+
+A draft pull request is part of every committed task, even when you did not ask for one. An edit you say you will review or commit yourself stays uncommitted on your current branch and never enters the lifecycle.
+
+## 1. Claim
+
+When the work closes a GitHub issue, Claude reads the issue's labels first. An issue already labeled `in-progress` belongs to someone else, so Claude says so and picks different work instead of racing. Otherwise it claims the issue:
+
+```bash
+gh issue edit <n> --add-label in-progress
+```
+
+The claim is released automatically when the pull request that closes the issue (with `Closes #<n>` in its body) merges through `gh pr merge` in a Claude session. Any other ending leaves the claim set, so remove it by hand with `gh issue edit <n> --remove-label in-progress`.
+
+**Why:** two agents or two people who start the same ticket do the work twice and then fight over the merge. See the [gate reference](/reference/gates/#issue-claim).
+
+A `tech-debt` issue is never claimed by hand: run `/gaia-debt <n>` instead, which owns that claim. See [`/gaia-debt`](/maintenance/debt/).
+
+## 2. Name
+
+Claude never hand-names a branch. One library mints every name GAIA creates, in the form `<kind>/<rest>`:
+
+| Work | Branch |
+|---|---|
+| Ad-hoc work | `<type>/[<issue>-]<slug>`, for example `fix/142-login-redirect` |
+| A plan from a SPEC | `<type>/spec-<nnn>-<slug>` |
+| A plan with no SPEC | `<type>/plan-<nnn>-<slug>` |
+| A debt drain | `debt/<n>-<slug>`, or `debt/<a>-<b>-batch` for a batch |
+| Maintenance commands | `deps/`, `update/`, `wiki/`, `cleanse/`, `codify/`, `fitness/`, or `residue/` plus a timestamp |
+
+`<type>` is the Conventional Commits type of the change (`feat`, `fix`, `chore`, and the rest). The pull request title uses the same type, and the advisory PR Conventions check compares them. See [Git hooks and conventions](/workflow/git-conventions/).
+
+## 3. Isolate
+
+Your team's isolation policy lives in `.gaia/project.json` as `isolation_policy`:
+
+| Policy | What happens |
+|---|---|
+| `always-worktree` (default) | Every task runs in its own git worktree, so tasks run in parallel without touching each other or your checkout. No question is asked. |
+| `prefer-worktree` | Claude suggests a worktree and you can choose a branch instead. |
+| `prefer-branch` | Claude suggests a feature branch in your current checkout and you can choose a worktree instead. Starting a parallel task while on a branch still uses a worktree. |
+
+A repo admin changes the policy with `/setup-gaia --reconfigure`. Saying "in a worktree" or "on a branch" in your request answers the question in place of asking it, but under `always-worktree` a branch request still becomes a worktree, and Claude says so in one line.
+
+<Aside type="note">
+Uncommitted edits already in your checkout come along. On a feature branch they stay where they are. A worktree starts clean from the default branch, so Claude copies the edits into it as a patch and leaves your original copies untouched.
+</Aside>
+
+### Worktrees provision themselves
+
+GAIA uses Claude Code's native worktrees under `.claude/worktrees/`. On entry, GAIA renames the worktree's branch to its minted name and provisions the tree:
+
+- **Shared state is linked, not copied.** GAIA's machine-local state (`.gaia/local`), the [notebook](#where-specs-plans-and-research-live), and the main checkout's `frontend/.env` are linked into the worktree, so nothing written there vanishes with the tree, and secrets are never copied.
+- **Dependencies and typed routes install in the background.**
+- **Each checkout owns its ports.** The main checkout keeps 5173 (dev) and 6006 (Storybook); each worktree gets a stable slot of its own for dev, Storybook, and Playwright. A server refuses a port that is already taken instead of drifting to another one. Read a tree's ports with `bash .gaia/scripts/ports.sh`.
+- **A guard keeps edits in the right tree.** An edit whose path resolves into a different checkout than the session's worktree is denied, because a stale absolute path from before the switch would otherwise land in the wrong copy silently. See the [gate reference](/reference/gates/#worktree-path-mismatch).
+
+If a tree's links break, repair them with `bash .gaia/scripts/link-worktree.sh`. A tree with no port file refuses `pnpm dev`, `pnpm storybook`, and `pnpm pw`; fix it with `bash .claude/hooks/provision-worktree.sh <worktree path>`.
+
+At every session start, GAIA lists merged worktrees that no live session is using, with the commands to remove them.
+
+## 4. Commit and open the draft pull request
+
+Every commit passes the Quality Gate (typecheck, lint, tests, Playwright, a dev-server smoke test, and the build) and the commit hooks. The branch is pushed and the pull request opens as a draft with a Conventional Commits title. When the work closes an issue, `Closes #<n>` goes in the pull request body, never in a commit message: a squash merge copies commit messages into the merge commit, and GitHub would close the issue from there whatever the body says.
+
+**Why draft:** reviewers should be notified when a pull request is ready, and in a GAIA project that moment is the audit posting its `GAIA-Audit` success. A pull request opened ready notifies reviewers before any audit ran. The success post flips it to ready. See the [gate reference](/reference/gates/#draft-pull-requests).
+
+## 5. Audit
+
+Claude runs the full pre-merge audit on every pull request, ad-hoc work included. There is no lighter path. See [Code Audit Team](/workflow/code-audit-team/).
+
+When you did not ask Claude to merge, it stops here and reports the pull request as ready to merge, leaving the branch, worktree, and pull request in place.
+
+## 6. Merge
+
+Claude squash-merges when you ask, then waits for the merge to land:
+
+```bash
+bash .gaia/scripts/pr-wait-merge.sh --pr <N>
+```
+
+The script exits on a verdict (`MERGED`, `CONFLICTING`, `CHECK_FAILED`, `TIMEOUT`, `CLOSED`), stopping as soon as the base conflicts or a required check fails instead of waiting forever. Only `MERGED` reaches cleanup. A hook denies hand-rolled polling loops for the same reason: a loop that waits only for `MERGED` never ends once the merge has become impossible.
+
+## 7. Clean up
+
+After `MERGED`, Claude removes the worktree (or switches off the feature branch), deletes the local branch, fetches, and pulls the default branch. It runs `pnpm install --frozen-lockfile` only when the pull changed `pnpm-lock.yaml`.
+
+Cleanup never forces a pull and never stashes. Before removing a worktree it checks for uncommitted files and unpushed commits; when it finds either, it keeps the tree and the branch and tells you what is left and how to remove them. When the main checkout is on a branch another session holds, Claude skips the pull and says so.
+
+## Where specs, plans, and research live
+
+Specs, plans, and research live in one gitignored `.notebook/` folder at the main checkout:
+
+- `.notebook/specs/SPEC-NNN/` (a SPEC's plan nests inside it)
+- `.notebook/plans/PLAN-NNN/` for plans with no SPEC
+- `.notebook/research/<date>-<topic>/`
+
+Every worktree links to the main checkout's copy, so nothing written there is lost when a worktree is removed. Merged or abandoned SPEC folders are kept for `GAIA_SPEC_RETENTION_DAYS` days (default 30) before they are deleted. Closed, uncited research is deleted only after you confirm.
+
+## Resuming long work
+
+Work that spans sessions resumes from one small file, `STATE.md`, rewritten in place in its run folder (`.gaia/local/runs/<branch>/`) or research folder. A resumed session reads that file and the run's artifact list and nothing else.
+
+Claude cannot see its own context usage, so the statusline watches it. When a session's context reaches the red band, Claude finishes the current step, saves its place, and asks one question:
+
+- **Continue here**: keep working until the next band.
+- **Clear and resume**: Claude prints a continuation prompt in a fenced code block. Run `/clear` and paste it.
+
+At the fire and skull bands Claude always recommends clearing. Unattended sessions never ask: they save and continue, and at the last band they save, print the continuation prompt, and stop.
+
+You can also ask Claude for a continuation prompt at any time. It always arrives in a fenced code block, ready to paste.
+
+## Commands that run only in the main checkout
+
+`/setup-gaia` and the maintenance commands (`/gaia-wiki`, `/gaia-residue`, `/gaia-codify`, `/gaia-fitness`, `/gaia-cleanse`, `/update-deps`, `/update-gaia`) refuse inside a linked worktree and name the main checkout to run them from. They cut their own worktree for the work. See the [Maintenance overview](/maintenance/#how-maintenance-commands-run).
+
+Commands that start new work (SPECs, plans, debt drains, ad-hoc work) offer to pull first when your checkout's GAIA version lags the remote. Resuming earlier work is never interrupted by that offer.
