@@ -1,179 +1,108 @@
 ---
-title: /gaia-audit
-description: Audit memory, rules, and wiki for duplication, contradictions, stale entries, and over-budget autoloads, then apply the fixes behind a single review gate.
+title: /gaia-cleanse
+description: Cleanse memory and auto-loaded files (CLAUDE.md, rules) of duplication with the wiki, contradictions with the wiki, stale entries, and over-budget base context, behind one review gate.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-`/gaia-audit` reviews the project's knowledge stores (machine-local memory, project rules, the wiki, and autoloaded `CLAUDE.md` files) for duplication, contradictions, stale entries, and bloated base context. It runs in two stages: a research stage writes a report, then a single decision gate asks you what to do before an apply stage executes anything.
+`/gaia-cleanse` reviews what Claude remembers and what it loads at every session start (machine-local memory, `CLAUDE.md` files, and rules) against the wiki, the project's source of truth. It finds entries that duplicate the wiki, contradict it, reference things that no longer exist, or push the auto-loaded context over budget, then asks one question before changing anything.
 
-The wiki is the source of truth. Memory is machine-local only. Autoloaded files carry a token cost on every session, so the audit pushes detail behind lazy wikilinks and keeps the autoloaded surface as a pointer set.
+It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, in a worktree of its own, ending in a pull request.
+
+In 1.x this command was `/gaia-audit`. There is no alias.
 
 ## When to use it
 
-Run `/gaia-audit` periodically: after a stretch of work, or when your base context size feels too large. GAIA also nudges you. When debt accrues, the statusline shows `Run /gaia-audit (<reason>)`; see [Statusline nudge](#statusline-nudge) for the triggers.
+Run it after a stretch of work, or when your base context feels heavy. The statusline nudges you with `🔎 /gaia-cleanse (<reason>)`, showing the highest-priority reason only:
+
+- `resume draft`: a report is waiting to be applied.
+- `<N> new memories`: machine-local memory has grown by 10 or more entries since the last applied cleanse.
+- `<N> days since review`: 30 or more days since the last applied cleanse.
+- `over budget`: an auto-loaded file is over its budget (an oversized `CLAUDE.md`, nested `CLAUDE.md`, or rule).
 
 ## How to invoke
 
-There are three invocations.
-
-Default. Research, review at a gate, then apply on confirmation:
-
 ```
-/gaia-audit
+/gaia-cleanse
 ```
 
-Scoped. Narrow what the research stage inspects to a hint, then run the same gate:
+Research, review at the gate, then apply on your yes.
 
 ```
-/gaia-audit "hot.md and rules only"
+/gaia-cleanse "memory only"
 ```
 
-The hint is synthesis guidance. It can narrow which stores or files the research stage looks at, but it cannot change the report schema, the action types, the guardrails, or any specific edit. An empty hint is identical to the default full run.
-
-Apply only. Re-run the apply stage against the most recent report:
+A scope hint narrows which stores or files the research looks at. It can only narrow: it never changes the report format, the action types, the guardrails, or a specific edit.
 
 ```
-/gaia-audit --apply
+/gaia-cleanse --apply
 ```
 
-Use `--apply` to resume a report that was interrupted, or to retry after fixing drift that caused some actions to skip. It targets the newest report that is still `draft` or `applied-partial`. See [The re-apply window](#the-re-apply-window) for the grace period. If the target report predates the verification round (or the round was skipped when it was written), `--apply` runs the round non-interactively before applying, with no prompt.
+Re-run the apply stage against the most recent report, to resume an interrupted run or retry after fixing what made actions skip.
 
-## The verification round
-
-When the research stage finds at least one action, GAIA offers a classification-verification round before the decision gate. It hardens Stage 1's classifications against ground truth: three lenses run in parallel and check each proposed action's claim against the actual stores, the wiki, and the repo, then drop a mis-classified action (a `delete` that would remove something still needed, say), correct others, or re-run the research once for a structural finding.
-
-The round is recommended but optional. In an interactive run you are asked once whether to run it, with Run as the default recommendation; on Run, the report is hardened and stamped, then the decision gate follows. It never blocks: skip it, or run it in a context that cannot spawn the parallel lenses, and GAIA proceeds straight to the decision gate, which is the safety net. A clean audit (zero actions) skips both the round and the gate.
-
-Because memory edits are machine-local with no git undo, the round exists to catch a wrong or destructive edit before any approval or apply path consumes it.
-
-## The decision gate
-
-Calling `/gaia-audit` is the intent to audit, not a commitment to apply. What happens next depends on what the research stage found.
-
-If the audit comes back clean, with zero actions, there is nothing to approve: the command finalizes the report and clears the statusline nudge automatically, with no prompt.
-
-Otherwise, the main conversation summarizes the findings (hardened by the verification round above) and asks one question with three options:
-
-- **Apply.** Run the apply stage now. This is the one-keystroke fast path.
-- **Discuss / refine.** Talk the report through. Edits happen in the report in place (it stays a `draft`), then the gate is asked again.
-- **Decline.** Delete the report. Nothing changes.
-
-Nothing in any knowledge store is touched until you choose **Apply**.
-
-<Aside type="tip" title="Safe by default">
-Calling `/gaia-audit` only researches and reports. Nothing in memory, rules, or the wiki changes until you choose Apply at the gate.
-</Aside>
-
-## What gets audited
+## What it looks at
 
 | Store | Path | Auto-loaded? |
 | --- | --- | --- |
-| Machine-local project memory | `~/.claude/projects/<project>/memory/` | `MEMORY.md` (first 200 lines), individual entries on demand |
-| Machine-local agent memory | `~/.claude/agent-memory/` | Per-agent, on demand |
-| Project agent memory | `.claude/agent-memory/` | Per-agent, on demand |
-| Project root `CLAUDE.md` | `CLAUDE.md` | Yes, every session |
-| Wiki hot cache | `wiki/hot.md` | Yes, every session |
-| Wiki index | `wiki/index.md` | On demand |
-| Wiki README | `wiki/README.md` | On demand |
-| Wiki domain pages | `wiki/<domain>/` | On demand |
-| Project rules | `.claude/rules/*.md` | Yes when `paths:` frontmatter matches |
-| Project commands | `.claude/commands/*.md` | On invocation only |
-| Nested `CLAUDE.md` | `**/CLAUDE.md` (e.g. monorepo packages) | Yes when cwd matches |
+| Machine-local project memory | `~/.claude/projects/<project>/memory/` | `MEMORY.md` (first 200 lines); entries on demand |
+| Machine-local agent memory | `~/.claude/agent-memory/` | Per agent, on demand. Reported, never edited: it is shared by every project on the machine. |
+| Project agent memory | `.claude/agent-memory/` | Per agent, on demand |
+| Root `CLAUDE.md` | `CLAUDE.md` | Every session |
+| Nested `CLAUDE.md` files | `**/CLAUDE.md` (for example `frontend/CLAUDE.md`) | When the working directory matches |
+| Project rules | `.claude/rules/*.md` | At session start, or on a `paths:` match |
+| Wiki | `wiki/` | On demand. The reference the others are checked against. |
 
-The audit checks each entry against the other stores and classifies it as:
+Each entry is classified:
 
-- **DUPLICATE**: fact already canonical in the wiki; mark the local copy for deletion.
-- **CONFLICT**: an entry that asserts the opposite of an authoritative source on the same subject. Two scopes resolve differently. A memory entry or rule that contradicts the wiki resolves toward the wiki. Two committed project files that disagree (for example a command and a skill that name different models for the same stage) resolve toward whichever file is canonical for that fact, judged per finding. Resolutions are written as ordinary `replace` or `delete` actions.
-- **PROMOTE**: durable knowledge only in memory; propose moving it to a specific wiki page.
-- **KEEP-LOCAL**: genuinely machine-local (personal preference, machine path, unique dev env); keep as-is.
-- **STALE**: references a file, branch, or feature no longer present; mark for deletion.
+- **DUPLICATE**: the fact is already canonical in the wiki, so the local copy is removed.
+- **PROMOTE**: durable knowledge that lives only in memory moves to a named wiki page.
+- **KEEP-LOCAL**: genuinely machine-local (a personal preference, a machine path); left alone.
+- **STALE**: references a file, branch, or feature that no longer exists.
+- **CONFLICT**: a memory entry that contradicts the wiki is resolved toward the wiki.
 
-Contradiction detection has two deliberate exclusions: a `paths:`-scoped rule that duplicates the wiki on purpose is sanctioned, not a conflict; and a wiki-page-vs-wiki-page disagreement is out of scope here. For that, use `/gaia-wiki consolidate`.
+Store counts, budgets, and dead-path signals come from GAIA's own CLI (`gaia fitness inventory` and `gaia fitness check`); the model judges only what a script cannot.
 
-A rule that carries a `gaia-harden:` provenance marker (one [`/gaia-harden`](/maintenance/harden/) promoted from a recurring finding) falls under the same path-scoped exclusion. It always carries a `paths:` glob, so the audit inventories it, word-budgets it, and applies the same DUPLICATE and obsolescence prune rules as a hand-authored rule. The marker grants no exemption, and a rule is never marked STALE just because its pattern stopped recurring.
+### What it does not touch
 
-Then it computes auto-load budgets:
+- **Conflicts between instruction files.** Two `CLAUDE.md` files, rules, skills, commands, or agents that disagree with each other are not judged here; run `/doctor prompt-audit` for those. An instruction file that contradicts the wiki is reported and filed as a `tech-debt` issue, never edited.
+- **Files you do not own.** It edits only your project's own files and memory, and asks you per file. A finding in a GAIA-shipped file is reported for [`/update-gaia`](/maintenance/update-gaia/) to fix; a third-party file goes to its vendor; machine-wide agent memory is yours to edit by hand.
+- **The wiki's own redundancy and broken links.** Those belong to [`/gaia-wiki`](/maintenance/wiki/).
+- **Rules from `/gaia-codify`.** A rule carrying a `gaia-harden:` provenance marker is treated like any other rule, except it is never pruned just because its pattern stopped recurring. A quiet pattern is the rule working.
 
-| File | Budget |
-| --- | --- |
-| `wiki/hot.md` | ≤200 words |
-| `CLAUDE.md` (root) | ≤400 words |
-| Any nested `CLAUDE.md` | ≤400 words |
-| Any single `.claude/rules/*.md` | ≤200 lines |
+## The flow
 
-Anything over budget is flagged with a proposed fix: inline facts moved to the wiki, duplicated sections consolidated, or oversized files split into narrower ones.
+1. **Research.** A Sonnet sub-agent writes a report to `.gaia/local/cleanse/KNOWLEDGE-<timestamp>.md` (gitignored) with every proposed action spelled out exactly: paths, the current content it expects, and the replacement.
+2. **Verification round** (recommended, optional). When the report has at least one action, three parallel checks test each action's claim against the real stores, the wiki, and the repository, and drop or correct a mis-classified one. Memory edits have no git undo, so this catches a wrong delete before you approve it.
+3. **One decision gate**, in your session:
+   - **Apply**: asks which of your own files it may edit, then applies the report on its own branch, files any out-of-scope problem as a `tech-debt` issue, commits, opens a pull request, and merges it.
+   - **Discuss / refine**: talk it through; the report is edited in place and the gate asked again.
+   - **Decline**: delete the report. Nothing is applied, filed, or published.
 
-## The two-stage flow
+A clean run (zero actions) skips the round and the gate and applies itself, once a recount confirms it covered every store.
 
-**Stage 1: research (Sonnet).** Reads the stores, classifies entries, computes budgets, and writes a report to `.gaia/local/audit/KNOWLEDGE-{YYYY-MM-DD-HHMM}.md` with `status: draft`. It records the repo's current state so the apply stage can tell whether anything changed before it runs, and it writes nothing outside `.gaia/local/audit/`.
-
-**Stage 2: apply.** Reads the most recent unfinished report and stops with a clear error if it was generated on another machine or clone. For each action it checks that the file still matches what the report saw, applies it or skips it with a recorded reason, then confirms the change landed.
-
-The split into two stages is internal. The only points where you decide anything are the optional verification-round question and the single decision gate above.
+<Aside type="tip" title="Safe by default">
+Running `/gaia-cleanse` researches and reports. Nothing in memory, rules, or the wiki changes until you choose Apply.
+</Aside>
 
 ## Action types
 
 | Action | What it does |
 | --- | --- |
-| `delete` | Remove a memory or rules file whose facts are canonical in the wiki, gated on the file's SHA-256 matching what the report saw. |
-| `delete-entry` | Remove a specific block (e.g. a heading section in `MEMORY.md`) by verbatim match. |
-| `promote` | Move durable knowledge from memory to a named wiki page. Performs the target action (`append_section`, `insert_after_heading`, or `create_new`), prepends a log entry to `wiki/log.md`, appends an index entry to `wiki/index.md`, then deletes the source if the action says to. |
-| `replace` | Shrink inline content in an autoloaded file to a wikilink, or swap a contradicting line for the canonical value. The current block must match byte-for-byte. In report output and action IDs this type shows as `shrink` (for example `shrink-001`). |
+| `delete` | Removes a memory or rules file whose facts are canonical in the wiki, only if the file still matches what the report saw. |
+| `delete-entry` | Removes one block, such as a heading section in `MEMORY.md`, by exact match. |
+| `promote` | Moves durable knowledge from memory to a named wiki page, then removes or trims the source. |
+| `shrink` | Replaces inline content in an auto-loaded file with a wikilink. The current block must match exactly. |
 
-The apply stage runs the actions in a safe order, so a delete never removes something another action still needs.
+Every action carries a drift signal. When a file changed since the report, that action is skipped and noted, never forced. A file with uncommitted changes is skipped before anything runs.
 
-## Report lifecycle and resume
+## Reports and resume
 
-Each report carries a `status:` field:
+A report is `draft` until applied, then `applied` or `applied-partial` (some actions skipped, so `--apply` retries the rest). Drafts are never pruned. Finalized reports keep the newest five and delete anything beyond that older than 30 days.
 
-- **`draft`** is what the research stage writes. A draft survives an interrupted run and is resumable with `/gaia-audit --apply`. It is never pruned automatically.
-- **`applied`** means every action landed cleanly.
-- **`applied-partial`** means some actions skipped or failed. The report is kept so `--apply` can retry only the remainder.
+`--apply` checks the report's age: up to 24 hours proceeds, 24 to 72 hours proceeds with a warning, and over 72 hours stops and asks for a fresh run.
 
-The research stage prunes its own report directory before writing a new one: it keeps the newest five `applied` or `applied-partial` reports unconditionally, then deletes anything older than 30 days beyond that floor. Drafts are never pruned. Declining at the gate deletes the report immediately.
+Memory edits live outside the repository under `~/.claude/` and are never committed. A run that only changed memory opens no pull request.
 
-## The re-apply window
+The run ends with a [cost line](/reference/cost/).
 
-When you run `/gaia-audit --apply`, the apply stage checks the report's age on a tiered grace:
-
-- Up to 24 hours old: proceed.
-- 24 to 72 hours old: proceed with a warning that drift checks will catch any staleness.
-- Over 72 hours old: stop, and ask you to run a fresh audit.
-
-The age check is only a rough guard. The real protection is the per-action check that compares each file against what the report saw, so any file that changed is caught regardless of age.
-
-## Drift handling
-
-Each action ships with a drift signal: either `expect_sha256` (file-level) or a verbatim `before:` / `expect:` snippet. The apply stage checks the signal before applying:
-
-- Match: apply, flip the checkbox to `[x]`.
-- Mismatch: skip, flip to `[~]` with reason `sha drift` or `snippet drift`.
-- Error during apply: flip to `[!]` with the error.
-- Target missing: `[!]` with `target missing`.
-
-If a target file has uncommitted changes, the audit skips it and marks it `SKIP (dirty)` before any action runs.
-
-## After the run
-
-The apply stage verifies each flipped action mechanically before reporting: a `promote` is confirmed present at its target (and its source gone), a `delete` is confirmed gone. Any action that does not verify is downgraded and the report is marked `applied-partial`, so `--apply` retries only what is left. The run ends with a counted summary.
-
-The output is a working-tree diff, not a commit. The apply stage never runs `git add` or `git commit`. It prints a `recovery:` line so you can undo any change: `git restore <path>` for tracked edits, `git checkout -- <path>`, or `git clean` for newly created files. There is no separate snapshot store; git is the snapshot for tracked files. Review the diff and commit if satisfied.
-
-Reports live under `.gaia/local/audit/` and are gitignored. They are machine-local and never committed.
-
-## Statusline nudge
-
-GAIA surfaces `Run /gaia-audit (<reason>)` in the statusline when any of three conservative, debounced signals fires. The `<reason>` is the literal string shown in parentheses. Only the highest-priority signal appears at a time, in this order:
-
-- `resume draft`: a `draft` report is waiting to be resumed.
-- `machine drift`: machine-local memory has grown by 10 or more entries, or 30 or more days have passed since the last applied audit.
-- `over budget`: an autoloaded file is over budget (`wiki/hot.md` over 200 words, root `CLAUDE.md` over 400 words, or any `.claude/rules/*.md` over 200 lines).
-
-The nudge is suppressed inside git worktrees. All thresholds are tunable.
-
-## Related
-
-`/gaia-audit` is distinct from the `code-review-audit` agent. The agent reviews code changes on a branch before merge for security, performance, and correctness. `/gaia-audit` reviews knowledge stores for duplication, contradictions, and bloat. Different inputs, different outputs, different purposes.
-
-For wiki-internal redundancy (multiple wiki pages saying the same thing) and broken wikilinks, use `/gaia-wiki`.
+Source: `.claude/skills/gaia/references/cleanse.md`.

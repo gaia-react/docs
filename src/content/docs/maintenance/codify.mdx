@@ -1,124 +1,70 @@
 ---
-title: /gaia-harden
-description: Human-gated Policy-Memory Loop. Reviews recurring code-review-audit findings and, with your approval, drafts the lowest-context-weight enforcement form into the working tree.
+title: /gaia-codify
+description: Turn a finding the Code Audit Team keeps making into a guard (a deterministic check, a skill, or a path-scoped rule), at the lowest context weight, with your approval.
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+`/gaia-codify` looks at what the [Code Audit Team](/workflow/code-audit-team/) keeps finding across merged pull requests and proposes a guard so the pattern stops recurring. For each recurring finding it recommends the lightest form that would work, explains it in plain language, and asks you once to accept the plan. Nothing is authored or switched on without your answer.
 
-`/gaia-harden` is the human gate on the Policy-Memory Loop. When the same anti-pattern recurs across three or more distinct merged PRs at `warning` or `error` severity within a rolling 90-day window, the statusline nudges you with `Run /gaia-harden (N recurring patterns)`. Calling `/gaia-harden` reads the live candidate queue, judges the lightest durable enforcement form for each finding, and presents a per-candidate approve / decline / defer / redirect choice. Nothing is authored or activated without your answer.
+It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, on a branch of its own, ending in a pull request. It is a typed command; Claude never starts it on its own. In 1.x it was `/gaia-harden`. There is no alias.
 
 ## When to use it
 
-The statusline tells you. When recurring code-review findings accumulate, you will see:
+The statusline nudges you with `🔨 /gaia-codify (<reason>)`:
 
-```
-Run /gaia-harden (N recurring patterns)
-```
+- Before your first completed review, it counts recurring patterns: `/gaia-codify (3 recurring patterns)`.
+- After a completed review, it stays quiet until something changes, then names it: a new recurring pattern, a pattern rising materially, or a change in how findings are counted.
 
-where `N` is the number of open candidates. Run `/gaia-harden` then to work through them.
+A hook posts each pull request's machine-readable findings on every `gh pr merge`, which is what the tally reads.
 
-You can also call `/gaia-harden list` at any time to see the current candidates without entering the interactive flow, or `/gaia-harden why <finding_class>` to inspect a specific one.
+## What counts as recurring
 
-## How to invoke
+A finding class becomes a candidate once it appears on **3 or more distinct merged pull requests within the last 90 days**, at any severity, and no rule promoted earlier covers it. Findings the audit could not place in a class are counted too, and surface as their own signal when they recur.
 
-Default (interactive review, same as what the statusline nudge points at):
+The tally reads your merged pull requests through `gh`. When it cannot, the run says so ("this is not an all-clear") instead of reporting nothing.
 
-```
-/gaia-harden
-```
+## How it judges the form
 
-List the live candidates and their recommended forms without prompting:
+For each candidate, it first checks whether an existing rule, skill, hook, or Quality Gate step already covers the territory, and recommends editing that before creating anything new. Then it picks the lightest form that fits:
 
-```
-/gaia-harden list
-```
+| Pattern | Recommended form | What `/gaia-codify` does |
+|---|---|---|
+| A deterministic tool already catches it | Make that check blocking, or add it to the Quality Gate | Edits the existing wiring |
+| It can be caught by a lint rule, hook, or test | A deterministic check | Writes a sketch of the hook and script for you to finish. Nothing is switched on. |
+| The lesson is a procedure ("do these steps in this order") | A skill | Writes a `SKILL.md` outline for you to finish. Nothing is switched on. |
+| A judgment call no tool can catch | A path-scoped prose rule | Writes the rule file under `.claude/rules/`, scoped by `paths:` to where the finding recurs |
 
-Explain one candidate: the PRs it recurred on, the recommended form, and the rationale:
+Prose is the weakest form: it advises rather than enforces and costs context on every matching task. So before recommending a rule, it asks what cheap evidence would show the rule changes behavior. When it cannot name any, it recommends defer or decline instead.
 
-```
-/gaia-harden why rule/use-effect-derived-state
-```
+## The flow
 
-## What triggers a candidate
+1. **Explain each candidate in plain language**: what keeps going wrong, one concrete example (the file and what was wrong there), how often as a share ("on 106 of the last 394 audited pull requests, about 1 in 4"), what the recommendation would actually do, and why.
+2. **Show the whole plan** as one table.
+3. **Ask once**:
+   - **Accept all recommendations** (recommended)
+   - **Change some**: pick rows, then choose **approve**, **decline**, **defer**, or **redirect** (a different form) for each
+   - **Stop without changes**: nothing is authored or recorded
+4. **Apply** each disposition. Approved rule edits land in the working tree on the run's own branch.
+5. **Publish** approved changes as one pull request at the end, merged only on your answer.
 
-The `code-review-audit` agent tags each eligible finding with a stable `finding_class` and a `severity`. A `finding_class` becomes a candidate when:
+### Decline and defer
 
-- it appears at `warning` or `error` severity (`suggestion` is ineligible),
-- across at least **3 distinct merged PRs**,
-- within a rolling **90-day window**, and
-- no promoted rule already covers it, and the decline ledger does not suppress it.
+- **Decline** records, on this machine only, that you are not acting on the pattern. It comes back once the pattern rises materially (at least 3 more pull requests). The ledger lives in `.gaia/local/codify/` and is never shared, so a teammate still sees the nudge.
+- **Defer** records nothing of its own. The candidate still appears in the next review; the nudge stays quiet until the pattern rises or the counting changes.
 
-The list is recomputed from your merged PRs each time you run `/gaia-harden`. A pattern you never act on drops off once it ages past the 90-day window.
+## Promoted rules
 
-## Judge-the-form logic
+A rule `/gaia-codify` writes carries a one-line provenance marker after its frontmatter:
 
-For each candidate, `/gaia-harden` weighs three things before recommending exactly one enforcement form. The bias is always to the lowest-context-weight form the pattern admits.
-
-**Edit vs new (checked first).** Before recommending a new artifact, the command checks whether an existing rule, skill, or hook already covers the finding's territory. If one does, the recommendation is to edit it, not create a new one.
-
-**Which form (lowest context weight that fits).** The `finding_class` prefix and the pattern's nature determine the form:
-
-| Pattern type | Recommended form |
-| --- | --- |
-| Oracle-class (`react-doctor/`, `axe/`, `knip/`, `cve/`) | Tighten the existing deterministic check: make it blocking or add it to the quality gate. Never a new prose rule. |
-| Mechanizable pattern (catchable by a lint rule, hook, or test) | A deterministic check. Produces a hook+script sketch only; nothing is activated. |
-| Correct procedure (a sequence of steps) | A skill via `skill-creator`. Produces a scaffold only; nothing is activated. |
-| Judgment-based anti-pattern (no reliable mechanization) | A path-scoped prose rule, drafted complete. |
-
-**Will it change behavior (checked last).** A recurring finding proves the anti-pattern is real. It does not prove the recommended form will stop it. Before presenting a recommendation, the command asks what cheap evidence would show the form actually changes behavior, and whether that evidence exists. The bar is low: a couple of before-and-after task replays, or a single case of the agent ignoring guidance of the same kind. This matters most for prose rules, which advise rather than enforce. When the recommended form is a prose rule and no such evidence is available, because the pattern is too judgment-laden to catch reliably or a capable agent already honors the principle, the command says so and frames the candidate as a defer or decline. The decision is always yours; it never auto-declines.
-
-For each candidate, `/gaia-harden` presents the `finding_class`, its distinct-PR count and the PR numbers, the recommended form, and a one-line rationale. You then choose: **approve**, **decline**, **defer**, or **redirect** (override the form choice).
-
-## What gets drafted on approve
-
-<Aside type="caution">
-Approving a deterministic check or a skill drafts a scaffold only. Nothing is wired into `settings.json` or activated; you finish and wire it yourself. Only prose rules are drafted complete.
-</Aside>
-
-### Prose rule (drafted complete)
-
-The rule is written to `.claude/rules/<slug>.md`. It is always path-scoped: a `paths:` frontmatter glob is derived from the candidate's `area_tags`. The rule body uses present-tense prose naming the anti-pattern and the correct pattern. The first line after the frontmatter carries a provenance marker:
-
-```
-<!-- gaia-harden: promoted from recurring finding_class <class>; pruned by /gaia-audit on obsolescence/redundancy/supersession/duplication only, never for non-recurrence -->
+```markdown
+<!-- gaia-harden: promoted from recurring finding_class <class>; pruned by /gaia-cleanse on obsolescence/redundancy/supersession/duplication only, never for non-recurrence -->
 ```
 
-The marker documents the rule's origin and instructs `/gaia-audit` not to treat non-recurrence as a staleness signal. A quiet pattern under a live rule means the rule is working.
+The marker is what drops the class from future tallies. [`/gaia-cleanse`](/maintenance/cleanse/) treats a marked rule like any other, except it never prunes one because its pattern stopped recurring: a quiet pattern is the rule working.
 
-### Deterministic check (scaffold only)
+The run ends with a [cost line](/reference/cost/).
 
-A hook+script sketch: a proposed hook entry and a script outline. The sketch is never wired into `.claude/settings.json`, never made executable, and no `.claude/rules/` file is written for it. You finish and wire the check yourself.
+## Upgrading from 1.x
 
-### Skill (scaffold only)
+Declines recorded by 1.x `/gaia-harden` no longer apply, and each declined candidate re-surfaces once. On each machine other than the one that ran the migration, run `rm -f .gaia/local/harden/declines.json`. See [Upgrading from 1.x](/getting-started/upgrading/#every-other-machine).
 
-GAIA hand-writes a `SKILL.md` scaffold (name, description, trigger conditions, ordered steps) for you to drop under `.claude/skills/<name>/`. If the `skill-creator` plugin skill happens to be installed, GAIA uses it as a convenience instead, but it is not bundled and neither `/setup-gaia` nor `/gaia-init` provisions it, so do not rely on its presence. Nothing is activated either way.
-
-### Oracle-class enforcement edit
-
-An edit to the existing enforcement wiring: the tool's rule file, the `code-review-audit` agent, the quality gate doc, or the CI workflow. A new prose rule is never drafted for an oracle-class finding.
-
-All approved work lands in the working tree only. It ships through your normal PR review.
-
-## Decline and defer
-
-**Decline.** The decline is written to the machine-local, gitignored ledger at `.gaia/local/harden/declines.json`. It is never shared: a teammate still sees the nudge and can approve the same candidate independently. The ledger is evidence-based: the declined class stays suppressed for you until at least **3 more distinct PRs** carrying that `finding_class` merge after the decline. This is a window-snapshot comparison, not a running tally: PRs aging out of the 90-day window can lower the current count, so re-surfacing is not guaranteed simply because 3 more PRs merge.
-
-**Defer.** Nothing is persisted. The candidate stays in the next tally pass and ages out naturally if the pattern stops recurring before anyone acts.
-
-## Guardrails
-
-- `/gaia-harden` never runs `git add`, `git commit`, or `git push`.
-- It never auto-activates a skill or wires a deterministic check.
-- Every drafted prose rule has a mandatory `paths:` glob: no always-loaded frontmatter-less rules are ever produced.
-- A decline is machine-local only: it never vetoes the candidate for a teammate.
-- A defer persists nothing.
-- The Policy-Memory Loop keys only on recurring `finding_class` counts from the merged-PR window.
-
-## Pruning promoted rules
-
-Promoted rules are not permanent in the "never touch" sense: `/gaia-audit` is the single pruner. It treats a provenance-marked rule as an ordinary rule and prunes it only on obsolescence, redundancy, supersession, or duplication. Non-recurrence is never a prune signal.
-
-## Related
-
-- [`code-review-audit` agent](/reference/agents/): the source of the `finding_class` emissions the loop counts.
-- [`/gaia-audit`](/maintenance/audit/): the single pruner for promoted rules and all other knowledge-store hygiene.
+Source: `.claude/skills/gaia/references/codify.md`.

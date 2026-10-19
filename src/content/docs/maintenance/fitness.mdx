@@ -1,96 +1,84 @@
 ---
 title: /gaia-fitness
-description: Health check and auto-heal for your project's Claude integration. Triage, heal, verify, with a letter grade.
+description: Lint your project's Claude integration with a fixed rule catalog and get an F-to-A+ grade, plus an advisory judgment pass. Heals only your own files, one file at a time, each on a yes.
 ---
 
-`/gaia-fitness` checks the health of your project's Claude integration and repairs what it safely can. One invocation, no flags: calling `/gaia-fitness` is the statement of intent to be fit. It runs three phases in sequence: triage, heal, verify, and reports a per-category and overall grade from F up to A+.
+import { Aside } from '@astrojs/starlight/components';
 
-It checks the Claude *surface* (hooks, skill/command/agent frontmatter, rule files, `CLAUDE.md`, `.claude/settings.json`, GAIA itself, and wiki structure), not your application code. For app code review before merge, use the `code-review-audit` agent. For knowledge-store bloat, duplication, and contradictions, use [`/gaia-audit`](/maintenance/audit/).
+`/gaia-fitness` checks your project's Claude integration (skills, commands, agents, rules, hooks, settings, `CLAUDE.md` files, and the wiki) and reports an F-to-A+ grade. A deterministic linter does the checking and the grading. An advisory judgment pass covers what a script cannot judge, and never moves the grade.
+
+It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, with any fixes on a branch of its own, ending in a pull request. It is a typed command; Claude never starts it on its own.
 
 ## When to use it
 
-Run `/gaia-fitness` after editing under `.claude/`, such as modifying or adding new commands, skills, agents, hooks, etc.
+Run it after adding or editing skills, rules, commands, or agents, or when Claude starts ignoring guidance you know is there.
 
-You can also call it after pulling a GAIA update with [`/update-gaia`](/maintenance/update-gaia/) if you made any customizations to GAIA, or periodically as a routine check.
+## What it checks
 
-## How to invoke
+`gaia fitness check` runs a fixed catalog of rules over the files your project owns, grouped into categories: authoring, `CLAUDE.md`, frontmatter, hooks, memory, prompt, rules, settings, and wiki. List the whole catalog, with what each rule detects:
 
+```bash
+.gaia/cli/gaia fitness rules
 ```
-/gaia-fitness
+
+Each category is graded from its findings: a structural defect is an F, errors and warnings step the grade down, and a few info findings cost at most an A-. The overall grade is the lowest category grade.
+
+**Only your own files are graded.** A finding in a file GAIA ships is listed separately, under an upstream section, with [`/update-gaia`](/maintenance/update-gaia/) as its fix.
+
+The run also records Claude Code's own built-in checks (`claude doctor`, `claude plugin validate`) as ran or skipped. For the Claude Code diagnostics and prompt review it does not run, use `/doctor` and `/doctor prompt-audit` interactively.
+
+### The judgment pass
+
+When there is something to judge, one read-only Sonnet agent (`fitness-judge`) makes four calls no script can:
+
+- **Description substance**: does a skill's or command's description say when to use it?
+- **Trigger overlap**: do two skills claim the same requests?
+- **Rule scope**: does a rule's content fit the files its `paths:` globs load it for?
+- **Terminology**: does one skill use one term for one thing?
+
+Its findings are reported as advisory and ungraded, and they are never healed.
+
+## The flow
+
+1. **Pre-flight.** If the repository is mid-rebase, mid-merge, mid-cherry-pick, bisecting, or on a detached HEAD, the run reports and grades but skips healing, and names how to resolve the state.
+2. **Check and judge.** The linter, the built-ins, and the judgment pass run.
+3. **Report.** The report card prints as a box, followed by the built-ins, the judgment findings, and each finding's remediation.
+4. **Heal.** For each finding the linter marks fixable, a Sonnet sub-agent proposes the complete new file. You see the diff and answer **Apply** or **Skip**, one file at a time. Fixes are written only to your project's own files: the writer re-checks ownership, refuses a path that escapes the project through a symlink, and refuses a file that changed since you saw the diff. A GAIA-shipped file is never edited. A fix judged too invasive gets a recommended approach instead of a diff.
+5. **Verify.** One re-run of the linter reports what cleared and anything new, with a fresh card. There is no second heal cycle.
+6. **Publish gate**, asked once when at least one fix was applied:
+   - **Publish** (recommended): commit, push, open a pull request, and merge it through the audit gate.
+   - **Open PR only**: commit, push, and open a draft pull request without merging.
+   - **Keep for review**: leave the changes on the run's branch, uncommitted, with the commands to review or discard them.
+
+A clean run prints `No findings. Overall A+. No changes made, no branch created.` A run with nobody to answer (a headless session) reports and stops without healing.
+
+The run ends with a [cost line](/reference/cost/).
+
+## Suppressing a finding
+
+When a finding is deliberate, suppress it in `.claude/gaia-fitness.json`, by rule id and path, each with a reason:
+
+```json
+{
+  "version": 1,
+  "ignore": [
+    {
+      "rule_id": "authoring.playbook.max-lines",
+      "path": ".claude/skills/my-skill/SKILL.md",
+      "reason": "Generated reference; splitting it would break the generator."
+    }
+  ]
+}
 ```
 
-No flags. No arguments.
+A malformed config is itself a finding.
 
-## What gets checked
-
-Triage dispatches seven category checks in parallel. Each produces a set of findings, each finding tagged with a severity (`info`, `warning`, `error`):
-
-| Category | What it checks |
-| --- | --- |
-| Hook integrity | Hook commands wired in `.claude/settings.json` (and `settings.local.json`) exist and are executable, and every hook event name is valid. |
-| Skill / command / agent frontmatter | `name` and `description` present and non-placeholder across `.claude/skills/**`, `.claude/commands/**`, `.claude/agents/**`, with no name collisions. |
-| Rule hygiene | `.claude/rules/*.md`: valid `paths:` glob syntax, no skill `@`-imports, glob-versus-content coherence, and that rules cited in `CLAUDE.md` exist. |
-| `CLAUDE.md` hygiene | Root and folder-map `CLAUDE.md` files: size against guidance, resolvable `@`-imports, existing folder-map targets, and no dead or machine-local path references. |
-| Settings hygiene | `.claude/settings.json`: valid JSON, redundant permission entries, secret-shaped `env` values, and whether `.claude/settings.local.json` is gitignored. |
-| GAIA-install fitness | Drift between GAIA-managed files and the contents the installed version shipped, plus whether a newer GAIA release is available. |
-| Wiki fitness | Wiki state-file staleness, orphan pages, and dead path references in wiki prose. |
-
-The checks over-flag on purpose. Before grading, `/gaia-fitness` adjudicates each finding against the actual repo and drops the false positives (an unfamiliar-but-valid hook event, a permission pair that only looks redundant, and so on). What survives gets graded.
-
-## Grading
-
-Each category gets a letter grade. A+ means zero findings. From there the grade keys off the worst severity present, then the count at that severity:
-
-- All findings at `info`: A band. `A` for one or two, `A-` for three or more.
-- A `warning` is the worst severity: B band. `B+` for one, `B` for two, `B-` for three or more.
-- An `error` is the worst severity: C and D bands. `C+` for one, `C` for two, `C-` for three, then `D+` for four, `D` for five, `D-` for six or more.
-- A structurally broken category (an unparseable `settings.json`, a missing `CLAUDE.md`): F.
-
-The **overall grade is the floor of the seven category grades**. The integration is only as fit as its weakest surface.
-
-An `A` means only advisory `info` findings remain. They surface in the FINDINGS block with remediation text but signal no structural breakage.
-
-## The three phases
-
-**Triage.** Run the seven checks, adjudicate the findings, compute the grades. Each surviving finding is then classified as fixable (a mechanical edit a fixer can apply confidently without product context: a missing frontmatter field, a bad path, a `.gitignore` line) or unfixable (needs product context or invasive restructuring: splitting an oversized `CLAUDE.md`, rewriting a rule's scope, reworking hook logic).
-
-**Heal.** Fixable findings get repaired automatically. GAIA retries each fix a few times, and if a finding does not clear, it stops and marks it unresolved. A fixer that judges a repair too invasive to apply without product context leaves it alone and surfaces it in the report with a recommended approach. **Nothing is ever committed.** The working tree is left for you to review.
-
-**Verify.** After each heal cycle the affected category checks re-run and the grades recompute. If the overall grade reaches A+, the loop exits clean.
-
-## Branch behavior
-
-Where the fixes land depends on which branch you are on when you run it:
-
-- **On your repo's default branch** (detected from the repo, typically `main`), with at least one fixable finding: `/gaia-fitness` creates and switches to a new branch named `chore/gaia-fitness-<timestamp>` before applying anything, so the default branch stays untouched.
-- **On any other branch**, with at least one fixable finding: it heals in place on your current branch.
-- **No fixable findings** (including a clean A+ run): no branch is created, `HEAD` stays put, nothing changes.
-
-## Unsafe repo state
-
-Before any heal-phase change, `/gaia-fitness` checks whether the repo is safe to mutate. If `HEAD` is detached, or a rebase, merge, cherry-pick, or bisect is in progress, it switches to a triage-only path: it runs the checks, prints the grades, tells you heal was skipped and why, gives the resolution steps (for example, `git rebase --abort` or `git checkout <branch>`), and stops. No working-tree change, no branch.
-
-## After the run
-
-`/gaia-fitness` shows the result as a text card right in the chat reply.
-
-The card has three sections:
-
-1. **Header row.** The command name (`/gaia-fitness`) on the left, with the `OVERALL` label and the overall grade right-aligned.
-2. **Category rows.** One row per category, alphabetically sorted. Each row shows the category name, a compact severity note (for example, `2 errors, 1 warning`), and the category grade. A clean category shows no note.
-3. **FINDINGS block** (omitted on a clean run). When there are adjudicated findings, a `FINDINGS` section follows the category rows. Findings are grouped by category, and each entry shows the severity tag (`[error]`, `[warning]`, or `[info]`), the file path, and the remediation text, word-wrapped to fit the terminal width. Unresolved or unfixable findings appear here with their recommended approach.
-
-On a clean run (zero adjudicated findings, overall A+), the FINDINGS block is omitted. The card shows only the header and category rows, all graded A+.
-
-The card sizes itself to fit your terminal, and long remediation text wraps.
-
-Then, depending on what happened:
-
-- **A branch was created.** Review with `git diff main`, commit when satisfied, or discard with `git checkout main && git branch -D chore/gaia-fitness-<timestamp>`.
-- **Healed in place.** Review with `git diff`, commit when satisfied, or discard with `git checkout -- .`.
-- **Triage-only.** Re-run `/gaia-fitness` after you have resolved the unsafe state.
-- **Zero findings.** Nothing to do.
+<Aside type="caution">
+In 1.x you could add a custom fitness category to `wiki/decisions/Claude Integration Fitness.md`. 2.0.0 runs only the CLI catalog and its fixed judgment pass, so a custom category no longer runs. Copy it out before `/update-gaia` replaces that page, and keep the check as a rule under `.claude/rules/` or as a skill.
+</Aside>
 
 ## Related
 
-`/gaia-fitness` checks the Claude integration surface. For knowledge-store duplication, contradictions, and autoload budgets, use [`/gaia-audit`](/maintenance/audit/). For wiki-internal redundancy and broken wikilinks, use [`/gaia-wiki`](/maintenance/wiki/). For your application code on a branch before merge, use the [`code-review-audit` agent](/reference/agents/).
+[`/gaia-cleanse`](/maintenance/cleanse/) reviews what your project's memory and auto-loaded files say. `/gaia-fitness` reviews whether the integration is built well.
+
+Source: `.claude/skills/gaia/references/fitness.md`.

@@ -1,90 +1,104 @@
 ---
 title: /gaia-debt
-description: Drain the tech-debt backlog one issue at a time, highest severity then oldest first, on a fresh branch through the audit gate, closing the issue on merge.
+description: Fix the tech-debt backlog, highest severity then oldest first, one issue or a related batch per run, on a fresh isolated branch through the audit gate, closing the issues on merge.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-`/gaia-debt` drains the `tech-debt` backlog that [`/gaia-audit`](/maintenance/audit/) files as GitHub issues. It reads the open `tech-debt` issues, orders them deterministically (highest severity first, then oldest first), recommends the top candidate, and resolves **exactly one** issue per invocation on a fresh branch through the same `code-review-audit` gate every feature PR passes. The fix PR carries `Closes #N` so the merge closes the issue natively.
+`/gaia-debt` fixes the `tech-debt` backlog: the GitHub issues the [Code Audit Team](/workflow/code-audit-team/), [`/gaia-residue`](/maintenance/residue/), and [`/gaia-cleanse`](/maintenance/cleanse/) file for problems they found outside the change they were reviewing. Each run resolves **one fix unit**, a single issue or a batch of related issues, on its own branch, carries it through the same audit gate every feature pull request passes, and merges it. The pull request carries one `Closes #N` per issue, so the merge closes them.
 
 ## When to use it
 
-The statusline tells you. When open `tech-debt` issues accumulate, you will see:
+When open `tech-debt` issues exist, the statusline shows:
 
 ```
-Run /gaia-debt (N issues)
+🐛 /gaia-debt (N issues)
 ```
 
-where `N` is the open count. Run `/gaia-debt` then to drain the top candidate.
+`N` is the open count, not counting issues someone has already claimed.
 
 ## How to invoke
-
-Default (interactive drain, the same thing the statusline nudge points at):
 
 ```
 /gaia-debt
 ```
 
-List the ordered backlog without draining anything:
+No argument: Claude orders the backlog and offers the top of it as a menu. When the top issue belongs to a cluster of related issues (same file, same directory and finding class), the batch is offered too.
 
 ```
-/gaia-debt list
+/gaia-debt 142
 ```
 
-Explain where one issue sits in the ordering and why it is recommended:
+One issue number fixes that issue. If it heads a cluster, Claude offers to take the cluster with it.
 
 ```
-/gaia-debt why 142
+/gaia-debt 142 157 161
 ```
 
-`drain` runs the full human-gated flow. `list` and `why` author nothing and prompt for nothing.
+Several numbers name your own batch, fixed together on one branch and one pull request. The batch is scored against a size budget; an over-budget batch offers smaller subsets or lets you force it.
+
+Add `worktree` or `branch` (optionally after `use`) at the end to pick the isolation mode, for example `/gaia-debt 142 use branch`. Your team's [isolation policy](/workflow/work-lifecycle/#3-isolate) can still override it.
+
+Anything else stops with the accepted form. A named number that cannot be drained (closed, not `tech-debt`, claimed, or parked) stops with its reason. The 1.x `fix`, `list`, and `why` subcommands are gone.
 
 ## How the backlog is ordered
 
-The order is a pure sort over the issues' severity labels and creation timestamps. No model call ranks the backlog, so `list`, `why`, and `drain` all agree on the order and anyone can reproduce it:
+A plain sort, with no model call:
 
-- **Severity descending.** `severity:critical` sorts above `severity:important`, which sorts above `severity:suggestion`. An issue with no severity label falls into the suggestion band, so a hand-filed issue is still a valid candidate.
-- **Oldest first within a band.** Two issues of equal severity sort by creation time, oldest first.
+1. **Severity**, highest first: `severity:critical`, then `severity:major`, then `severity:minor`. An issue with no severity label sorts with minor.
+2. **Age**, oldest first.
 
-Cross-band fairness and anti-starvation are out of scope: a steady stream of critical issues will always be recommended ahead of an old suggestion.
+Issues labelled `in-progress`, `debt:spec-pending`, or `debt:spec-active`, and issues graded `severity:investigate`, are set aside and never offered. When everything left is `investigate`, Claude says so and names each open question instead of reporting an empty backlog.
 
-## The drain flow
+Each offer also notes when an issue's cited file no longer exists (`[stale: path gone]`).
 
-`drain` is interactive and human-gated. It never auto-advances to the next issue, and it resolves exactly one issue per run.
+## What one run does
 
-1. **Recommend and present.** The top candidate is recommended, but the full ordered backlog is printed so you can override. Pick a different issue and the command honors it.
-2. **Security screen.** Before opening any PR, the selected issue is screened. If it reads as a security concern (see below), the flow diverts instead of opening a public fix PR.
-3. **Confirm the handler class.** The issue may carry an advisory `Handler: prompt` (a single-file fix) or `Handler: plan` (cross-module or contract-changing). The command reads the code and can override it; when the honest class is `plan`, it says so before implementing so you know the fix is larger than a one-file edit.
-4. **Fix on a fresh branch.** A branch is cut from the default branch, the fix is implemented following the project's conventions (TDD, surgical changes), the [Quality Gate](/reference/rules/) runs, and the change is committed and pushed.
-5. **Open the PR.** `gh pr create` opens the PR with `Closes #N` in the body.
+1. **Claims** every issue in the unit with the `in-progress` label, straight after you pick, so a teammate's session never starts the same issue. A claim leaked by a session that died mid-fix is released on the next run.
+2. **Re-checks each issue against your code** before cutting a branch: every cited `file:line` must still hold what the issue says, every count the fix depends on must still hold, and each issue's comments are read (a newer comment that corrects the body governs). A mismatch releases the claim and stops, because which of the issue and the code is wrong is your call. In a batch, a failing issue is dropped and the rest continue.
+3. **Screens for security.** On a public or internal repository, a security-sensitive issue is never fixed in a public pull request. It is set aside, its claim released, and you are told only how many.
+4. **Screens for size.** An issue whose fix needs a design SPEC is handed to [`/gaia-spec`](/workflow/spec/) instead: Claude prints the handoff and parks the issue under `debt:spec-pending` (handed off) or `debt:spec-active` (a SPEC is underway).
+5. **Isolates** the fix on a `debt/<n>-<slug>` branch (or `debt/<a>-<b>-batch`), in a worktree by default.
+6. **Fixes** every issue in the unit, runs the Quality Gate once, commits, and opens a draft pull request with one `Closes #N` per issue. The commit type is the type of the change (`fix`, `refactor`, `test`); the 1.x `debt` type is refused.
+7. **Audits and merges** with no second confirmation, then checks that the merge closed exactly the intended issues, and cleans up.
 
-<Aside type="caution">
-`/gaia-debt` does **not** merge. The fix PR clears the **same** `code-review-audit` marker gate as any feature PR, and you or your orchestrator merge it. The command never runs `gh pr merge`, and never bypasses or pre-empts the gate.
+A stop at the audit's branch checkpoint, a merge still queued, or a failing check keeps the claim, since the work is still in flight. A pull request closed without merging releases it.
+
+The run ends with a [cost line](/reference/cost/).
+
+**Why claim tech-debt issues only through `/gaia-debt`:** it owns the claim and the stale-claim release. A claim set by hand on a `tech-debt` issue is released on the next run as stale.
+
+## Labels
+
+Every tech-debt issue carries a severity, and filed issues carry footprint and difficulty grades:
+
+| Label | Meaning |
+|---|---|
+| `severity:critical` | Wrong, or will produce broken work. Drained first. |
+| `severity:major` | A significant gap or defect. Drained before minor findings. |
+| `severity:minor` | Real but small. Fixed by default, never ignorable. |
+| `severity:investigate` | Severity cannot be judged yet. The issue must name the open question and what would settle it. At most three may be open at once, and they are never drained until re-graded. |
+| `footprint:narrow` | One logical unit in one file, no contract change. |
+| `footprint:wide` | Spans files, changes a contract, or is structural. |
+| `footprint:spec` | Must start with a design SPEC. Drains through `/gaia-spec`. |
+| `difficulty:easy` | The fix is determined by the issue and the cited code. |
+| `difficulty:medium` | The fix has a design decision the surrounding code settles. |
+| `difficulty:hard` | The fix has a design decision the surrounding code does not settle. |
+| `in-progress` | Someone is working the issue right now. |
+| `debt:spec-pending`, `debt:spec-active` | Parked on a SPEC handoff, or a SPEC underway. |
+
+The grades are advisory: Claude can upgrade or downgrade a footprint after reading the code. To return an `investigate` issue to the backlog, answer its question and re-grade it in one edit: `gh issue edit <n> --remove-label severity:investigate --add-label severity:<tier> --body-file <path>`, with the answer in the body. See [Labels](/reference/labels/) for the full registry.
+
+## How issues are filed
+
+The `file-tech-debt` skill is the one way a finding becomes a `tech-debt` issue, used by the audit loop, `/gaia-residue`, `/gaia-cleanse`, and by you ("file this as tech-debt"). It:
+
+- builds a dedup key (`<!-- gaia-debt-key: v1 class=... path=... line=... -->`) and skips a finding that already has an open issue, or one declined (closed as not planned, or labelled `wontfix`);
+- checks the labels and key offline before creating the issue, refusing a malformed filing instead of leaving it for a drain to trip over;
+- files **security findings only when the repository reads as private**, checked twice. Otherwise it writes a redacted local record under `.gaia/local/audit/security/` and reports a count and that path, nothing more.
+
+<Aside type="note">
+`/gaia-debt` fixes issues; it does not file them. Use `file-tech-debt`, or let the audit file them, to add to the backlog.
 </Aside>
 
-## Security screen
-
-A `tech-debt` issue that reads as a security concern is treated as security-class (fail-safe: when in doubt, it is security-class). Before draining one, the command re-reads the repo visibility and applies a gate:
-
-- **Public or internal repo** → the flow **diverts** to a count-only operator pointer and stops. It never opens a public `Closes #N` PR, because that would complete a coordinated-disclosure failure by pointing at the very issue it fixes.
-- **Confirmed private repo** → the fix stays inside the private repo, so draining proceeds normally.
-
-A security-class issue's detail never reaches a public PR, PR comment, or Actions log.
-
-## After the PR
-
-Once the fix PR is open, the command refreshes the debt-count sentinel so the statusline recomputes the open count on its next tick. The count also updates automatically when the PR merges.
-
-## Guardrails
-
-- **Exactly one issue per invocation.** There is no batch drain.
-- **Deterministic ordering.** The order is a fixed sort over severity labels and creation time, never a model ranking.
-- **The command does not merge.** It opens the fix PR through the normal PR merge workflow; the audit gate and you decide the merge.
-- **Security screen before any public PR.** A security-class issue diverts on a public or internal repo and drains only on a confirmed-private one.
-- **No issues backend, no-op.** With no GitHub Issues backend (repo unresolvable, `gh` unauthenticated, Issues disabled, or no write access), the command reports it and stops.
-
-## Related
-
-- [`/gaia-audit`](/maintenance/audit/): files the `tech-debt` issues this command drains.
-- [`/gaia-harden`](/maintenance/harden/): the sibling loop that promotes recurring `code-review-audit` findings into enforcement.
-- [`code-review-audit` agent](/reference/agents/): the gate every drain PR clears before merge.
+Source: `.claude/skills/gaia/references/debt.md`, `.claude/skills/file-tech-debt/SKILL.md`.

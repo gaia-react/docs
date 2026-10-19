@@ -1,0 +1,36 @@
+---
+title: /gaia-serena-sync
+description: Add languages your project has grown to Serena's index, on your explicit yes. Inert when Serena is not set up.
+---
+
+`/gaia-serena-sync` finds languages your project now contains that [Serena](https://github.com/oraios/serena) is not indexing, and on your yes adds them to Serena's configuration.
+
+Serena picks one language list when it first starts in a project and freezes it into `.serena/project.yml`. It never re-detects. A project that later grows another language (a Go service beside `frontend/`, a Python script folder) gets no symbol search for it until the list catches up.
+
+It runs from the main checkout only. It is a typed command; Claude never starts it on its own.
+
+## When to use it
+
+When the statusline shows:
+
+```
+🔭 /gaia-serena-sync (missing: go)
+```
+
+The nudge is computed in the background every 6 hours, so it can lag a little behind your tree. The command recomputes the drift live.
+
+## What it does
+
+1. **Checks Serena is active.** When Serena is not a registered MCP server, or `.serena/project.yml` does not exist, it says so and stops. It changes nothing for a project that does not use Serena.
+2. **Recomputes the drift.** When every language is already indexed, it says Serena is in sync and stops.
+3. **Names the missing languages** and prints the manual edit, for example: add `go` to the `language_servers:` list in `.serena/project.yml` (`languages:` on a file from before Serena 1.7). That instruction is shown on every path, so you always have the manual route.
+4. **Asks once** for the whole set: **Apply** (recommended) or **Skip**. Nothing is written before you answer.
+5. **On Apply**, appends every missing language to the list, keeps every existing entry and every other field as it was, and clears the statusline nudge. Then **restart Serena** (or your Claude session): Serena reads the file only at startup.
+
+When the file uses a form GAIA will not edit safely (YAML anchors, no list to append to, or both `language_servers:` and `languages:` present), it explains why and leaves the manual instruction. It never runs `serena project create`, which can regenerate the file and overwrite `.serena/project.local.yml`.
+
+## Serena in a GAIA project
+
+`/gaia-init` and `/setup-gaia` register Serena v1.7.0 for your user. GAIA's `code-search` rule routes symbol questions (where is X defined, what calls Y) to Serena and leaves decisions and rationale to the wiki. The `serena-cc-override` rule nudges Claude toward Serena's symbol tools at session start. For the strongest effect, start sessions with Serena's system-prompt override; see [`/gaia-init`](/getting-started/gaia-init/#5-claude-tooling).
+
+Source: `.claude/skills/gaia/references/serena-sync.md`.

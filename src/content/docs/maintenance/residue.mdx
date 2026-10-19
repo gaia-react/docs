@@ -1,0 +1,88 @@
+---
+title: /gaia-residue
+description: Triage the trade-offs reviewers accepted at merge, recorded in merged pull request bodies. Dismiss, keep, or promote each one to a tech-debt issue.
+---
+
+`/gaia-residue` works through the audit residue your project has piled up: the trade-offs reviewers accepted at merge instead of fixing. For each one you decide what happens to it. It never changes code.
+
+It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, on a branch of its own, ending in one pull request. It is a typed command; Claude never starts it on its own.
+
+## What a residual is
+
+When the [Code Audit Team](/workflow/code-audit-team/) clears a pull request, some findings are not fixed. A reviewer can accept one as a known trade-off, or waive an out-of-scope finding in a file the pull request already changes. Instead of disappearing, each of those is written into the merged pull request's body, under `## Accepted residuals (recorded, not fixed)` or `## Out-of-scope machinery findings (recorded, not filed)`, with a dedup key. Each entry is a **residual**.
+
+`/gaia-residue` reads those entries back and asks you to decide each one:
+
+- **Dismiss** (the default): the trade-off stands and needs nothing more.
+- **Keep**: snooze it. It comes back in 14 days (`GAIA_RESIDUE_KEEP_DAYS`).
+- **Promote**: file it as a `tech-debt` issue, so [`/gaia-debt`](/maintenance/debt/) can fix it. Promotion is the exception and needs a reason; promoting freely grows the backlog instead of draining it.
+
+A dismissal or a keep is recorded in `.gaia/audit-residual-dismissals.jsonl`, a committed, append-only file. A promotion is recorded by the issue it files.
+
+## Aged and newer residuals
+
+A residual is **aged** once the pull request that recorded it merged 30 or more days ago. Only aged residuals count toward the statusline nudge. Newer ones exist, but stay quiet until they age.
+
+## When the nudge appears
+
+The statusline shows `🧹 /gaia-residue (N residuals)` once **5 or more** aged residuals are still open. "Open" means not already dismissed, kept, or promoted. On a narrow terminal the nudge shrinks to its icon, with a count of hidden nudges beside the row.
+
+With 1 to 4 aged residuals the nudge stays hidden: too few to be worth a prompt.
+
+Outside a run, the count refreshes every 6 hours, so a residual that just turned 30 days old can take up to 6 hours to show. A run refreshes the count as soon as it finishes.
+
+## What one run does
+
+`/gaia-residue` takes no arguments.
+
+1. It reads the residuals from your merged pull requests, oldest first, in batches of 25. `GAIA_RESIDUE_CAP` changes the batch size.
+2. For each one it shows the full description: the disposition it was recorded with, the failure mode, the cited file and line, and that line's current text. A residual whose cited line is gone is labelled a likely-already-fixed dismiss candidate, but it still needs your answer.
+3. You answer **Dismiss**, **Keep**, or **Promote**, with the answer the evidence supports marked recommended. Dismissals can be confirmed in one step for the whole batch. A promotion asks one more question for the severity, and whether the finding is security-sensitive.
+4. It keeps going, batch after batch and without asking, until **no aged residual is left**. When 26 or more are aged, one run takes more than one batch. It clears every aged residual rather than stopping once the count drops under 5, because stopping at 4 would bring the nudge back as soon as one more residual turned 30 days old.
+5. It updates the nudge count straight away.
+6. The whole sweep lands as **one pull request**, `chore(residue): ...`, on a branch of its own (a worktree by default). The run asks once whether to merge it or leave it open for review.
+
+## The batch size never hides the nudge
+
+The nudge counts every open aged residual, not just the ones in the next batch. With 40 aged residuals the nudge says 40, whatever the batch size.
+
+## The optional sweep of newer residue
+
+Once nothing aged is left, the run asks before each further batch:
+
+```text
+Sweep the next 25 newer residuals?
+```
+
+with the choices **Sweep the next 25 (of 125 remaining)** or **Stop here**. The number in the question is the size of the next batch (smaller on the last one), and "remaining" counts every open residual, newer ones included.
+
+Sweeping them is optional tidying. Stopping costs nothing: the run publishes what it recorded, and the newer residuals come back as aged residuals 30 days after their pull request merged.
+
+## When the nudge can stay up after a run
+
+A promotion that could not file an issue leaves its residual open, so it still counts toward the nudge. That happens when GitHub is unreachable, the filing fails, or the finding is security-sensitive: [security findings are never filed](/maintenance/debt/#how-issues-are-filed) in the public tracker, only kept as a local record.
+
+The run does not retry those in the same pass. It ends by saying how many are stuck, that they keep the nudge up, and what to do:
+
+- run `/gaia-residue` again once filing works, or
+- for a security-sensitive one, deal with it privately, then dismiss or keep it on a later run.
+
+If the GitHub reads fail at the start, the run says so plainly ("this is not an all-clear") instead of reporting that nothing is open.
+
+## Long runs
+
+A big sweep can run long. When context gets heavy between batches, the run offers to keep going or to clear and resume. Nothing is lost either way: every decision is saved as it is made, and the whole sweep still lands as one pull request at the end. If you clear and never paste the continuation prompt, the next `/gaia-residue` offers to finish or publish that run first.
+
+## Guardrails
+
+- It never edits a file a residual cites, and never fixes anything. Fixing is `/gaia-debt`'s job.
+- It never files an issue without your answer for that specific residual.
+- A keep always expires.
+
+The run ends with a [cost line](/reference/cost/).
+
+## Not the same as the residue sweep
+
+[`/update-gaia`](/maintenance/update-gaia/) prints a different command after an update, `bash .gaia/scripts/state-registry-lib.sh residue-sweep`. That one deletes machine-local files that retired GAIA features left behind under `.gaia/local`. It has nothing to do with audit residuals.
+
+Source: `.claude/skills/gaia/references/residue.md`.

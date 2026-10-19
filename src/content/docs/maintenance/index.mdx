@@ -1,51 +1,57 @@
 ---
 title: Maintenance
-description: 'The GAIA commands that keep the GAIA setup itself in shape: the integration surface, loaded context, tech-debt backlog, recurring review findings, and wiki.'
+description: 'The GAIA commands that keep a project in shape as it grows: the Claude integration, loaded context, tech-debt backlog, recurring review findings, accepted residuals, Serena, the wiki, dependencies, and GAIA itself.'
 ---
 
-GAIA ships commands for doing work and commands for keeping the GAIA setup itself in shape. This page covers the second kind: the commands that check and repair GAIA's own setup as a project grows.
+GAIA ships commands for doing work and commands for keeping the project in shape. This page covers the second kind. You rarely need to remember them: each one surfaces as a statusline nudge when it is due.
 
-As a project accumulates work, five parts of that setup drift or accumulate independently:
+## Maintenance commands
 
-- the **Claude integration surface**: hooks, command and skill frontmatter, rule wiring, `.claude/settings.json`;
-- the **loaded context** Claude reads every session: machine-local memory, project rules, and autoloaded `CLAUDE.md` files;
-- the **tech-debt backlog**: `tech-debt` issues filed for findings deferred out of scope, waiting to be drained one at a time;
-- **recurring review findings**: patterns that code-review-audit flags repeatedly but that have not yet been codified as a rule, skill, or check;
-- the **wiki** itself: pages that overlap or contradict each other, and broken wikilinks.
+| Command | Statusline nudge | What it does |
+| --- | --- | --- |
+| [`/gaia-fitness`](/maintenance/fitness/) | none | Lints the Claude integration (skills, commands, agents, rules, hooks, settings, `CLAUDE.md` files, wiki) with a fixed rule catalog, grades it F to A+, and heals your own files one at a time on a yes. |
+| [`/gaia-cleanse`](/maintenance/cleanse/) | 🔎 | Cleanses memory and auto-loaded files of duplication with the wiki, contradictions with the wiki, stale entries, and over-budget base context. Researches, then asks before it applies. |
+| [`/gaia-debt`](/maintenance/debt/) | 🐛 | Fixes the `tech-debt` backlog, highest severity then oldest first, one issue or a related batch per run, through the audit gate. Closes the issues on merge. |
+| [`/gaia-codify`](/maintenance/codify/) | 🔨 | Turns a finding the Code Audit Team keeps making into a guard: a deterministic check, a skill, or a path-scoped rule, with your approval. |
+| [`/gaia-residue`](/maintenance/residue/) | 🧹 | Triages the trade-offs reviewers accepted at merge: dismiss, keep, or promote each to a tech-debt issue. Never fixes code. |
+| [`/gaia-serena-sync`](/maintenance/serena-sync/) | 🔭 | Adds languages your project has grown to Serena's index, on your yes. |
+| [`/gaia-wiki`](/maintenance/wiki/) | 🧠 | Runs wiki sync, consolidate, and lint with fixes, as one commit and one pull request. Takes no arguments. |
 
-Each part has its own command. They run independently and do not call one another.
+## Update commands
 
-## Maintenance Commands
-
-| Command | What it does |
-| --- | --- |
-| [`/gaia-fitness`](/maintenance/fitness/) | Health check and auto-heal for the Claude integration surface. Triage, heal, verify, and report an F-to-A+ grade. |
-| [`/gaia-audit`](/maintenance/audit/) | Audit memory, wiki, and auto-loaded files for duplication, conflicting instructions, and stale content. Researches, then asks before it applies. |
-| [`/gaia-debt`](/maintenance/debt/) | Drain the `tech-debt` backlog one issue at a time, highest severity then oldest first, on a fresh branch through the audit gate. Closes the issue on merge. |
-| [`/gaia-harden`](/maintenance/harden/) | Human-gated hardening. Reviews recurring code-review-audit findings and, with approval, drafts the lowest-context-weight enforcement form (rule, skill, or deterministic check) into the working tree. Defaults to `review` mode. |
-| [`/gaia-wiki`](/maintenance/wiki/) | Wiki maintenance. With no arguments, runs the full sync, consolidate, and lint chain; each stage can also be invoked by name. |
+| Command | Statusline nudge | What it does |
+| --- | --- | --- |
+| [`/update-deps`](/maintenance/update-deps/) | 📦 | Resolves security advisories, then updates outdated packages by group, through one quality gate. |
+| [`/update-gaia`](/maintenance/update-gaia/) | 🚀 | Pulls the latest GAIA release into your project with a three-way merge, verifying the release bundle first. |
 
 ## Which one to run
 
 Pick by symptom:
 
-- The integration feels off, a hook is not firing, a rule is not loading, a command misbehaves: run [`/gaia-fitness`](/maintenance/fitness/).
-- The base context feels heavy, or machine-local memory has grown large: run [`/gaia-audit`](/maintenance/audit/).
-- The `tech-debt` backlog has grown, or the statusline shows a `Run /gaia-debt (N issues)` count: run [`/gaia-debt`](/maintenance/debt/).
-- Recurring findings from code-review-audit keep surfacing for the same class of issue: run [`/gaia-harden`](/maintenance/harden/).
-- The wiki has grown and pages overlap, or wikilinks break: run [`/gaia-wiki`](/maintenance/wiki/).
+- The integration feels off, a skill is not triggering, a rule is not loading: [`/gaia-fitness`](/maintenance/fitness/).
+- The base context feels heavy, or machine-local memory has grown large: [`/gaia-cleanse`](/maintenance/cleanse/).
+- The `tech-debt` backlog has grown: [`/gaia-debt`](/maintenance/debt/).
+- The audit keeps flagging the same class of problem: [`/gaia-codify`](/maintenance/codify/).
+- Accepted residuals have piled up in merged pull requests: [`/gaia-residue`](/maintenance/residue/).
+- The project grew a language Serena is not indexing: [`/gaia-serena-sync`](/maintenance/serena-sync/).
+- The wiki trails the code, or wiki pages overlap: [`/gaia-wiki`](/maintenance/wiki/).
 
-The boundary between `/gaia-audit` and `/gaia-wiki` is deliberate. `/gaia-audit` reconciles the loaded context against the wiki (the source of truth) and resolves disagreements between project files; it does not touch wiki-page-vs-wiki-page conflicts. Those belong to `/gaia-wiki consolidate`.
+The boundary between `/gaia-cleanse` and `/gaia-wiki` is deliberate. `/gaia-cleanse` reconciles memory and auto-loaded files against the wiki. Redundancy and broken links inside the wiki belong to `/gaia-wiki`. Conflicts between two instruction files belong to Claude Code's own `/doctor prompt-audit`.
 
-## Update Commands
+## How maintenance commands run
 
-Keeping dependencies and GAIA itself current is a different kind of upkeep:
+Every maintenance command (`/gaia-wiki`, `/gaia-residue`, `/gaia-codify`, `/gaia-fitness`, `/gaia-cleanse`, `/update-deps`, `/update-gaia`) follows the same pattern:
 
-| Command | What it does |
-| --- | --- |
-| [`/update-deps`](/maintenance/update-deps/) | Bump outdated packages group-by-group, run migrations for major-version bumps, and validate the full quality gate. |
-| [`/update-gaia`](/maintenance/update-gaia/) | Pull the latest GAIA release into your project without overwriting your customizations. |
+1. **It starts from the main checkout.** Inside a linked worktree it refuses and names the main checkout to run it from.
+2. **It offers to pull first** when your checkout's GAIA version lags the remote.
+3. **It does its work on a branch of its own**, right before its first write: a worktree cut from the default branch by default, following your team's [isolation policy](/workflow/work-lifecycle/#3-isolate). It never writes onto the branch your checkout holds. The branch is named for the command and a timestamp, for example `deps/2026-10-20-1432`.
+4. **It commits, opens a draft pull request, and, on a run started from the main branch, merges it** through the [Code Audit Team](/workflow/code-audit-team/), waiting up to ten minutes for a queued merge. Some ask before merging: `/gaia-residue` asks once, and `/gaia-fitness` and `/gaia-codify` publish only on your answer.
+5. **It cleans up** the worktree and branch and pulls the default branch. A worktree holding unresolved work is kept, with the commands to remove it.
 
-## Running this upkeep automatically
+A run that ends with nothing to publish removes its empty branch and worktree.
 
-Several of these jobs can run on a schedule instead of by hand. [GAIA CI](/maintenance/gaia-ci/) puts wiki sync, dependency refresh, a security audit, and stale-branch cleanup on a cron, opens PRs, and auto-merges them on green CI. Each job can run in CI, run locally, or stay off. See [GAIA CI](/maintenance/gaia-ci/) for what the jobs do and how to choose, and [`/setup-gaia`](/getting-started/setup-gaia/) for wiring it to GitHub.
+Each run ends with a [cost line](/reference/cost/) showing what it spent.
+
+## GAIA CI is gone
+
+GAIA 1.x could run wiki sync, dependency updates, a security audit, and stale-branch cleanup on GitHub Actions. 2.0.0 removes that: Claude no longer runs on GitHub Actions. The commands above run locally, and the statusline tells you when each one is due. The Tests, Chromatic, and PR Conventions workflows still ship; see [Git hooks and conventions](/workflow/git-conventions/#github-workflows-that-ship).

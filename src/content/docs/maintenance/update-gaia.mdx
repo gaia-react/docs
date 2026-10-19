@@ -3,15 +3,19 @@ title: /update-gaia
 description: Pull the latest GAIA release into your project without overwriting your customizations.
 ---
 
-`/update-gaia` pulls the latest GAIA release into your project using a three-way merge strategy. It compares your file, the baseline tarball your project was installed from, and the latest tarball. It applies updates where GAIA owns content and surfaces conflicts where you do. It is wired to the statusline: when a new release is available, the statusline shows a `Run /update-gaia` indicator that loads the skill when clicked.
+import { Aside } from '@astrojs/starlight/components';
 
-## When to use it
+`/update-gaia` pulls the latest GAIA release into your project with a three-way merge per file: your file, the release your project is on, and the latest release. GAIA's changes come in, your customizations stay, and you answer one question per real conflict. When a new release is available, the statusline shows a `🚀 /update-gaia` indicator.
 
-Run `/update-gaia` when the statusline signals a new release is available, or any time you want to pull in the latest GAIA improvements.
+It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, in a worktree of its own, ending in a pull request.
+
+<Aside type="caution">
+On GAIA 1.x? `/update-gaia` cannot take a 1.x project to 2.0.0. See [Upgrading from 1.x](/getting-started/upgrading/).
+</Aside>
 
 ## How to invoke
 
-Click the `Run /update-gaia` statusline indicator, or trigger by phrasing:
+Click the `🚀 /update-gaia` statusline indicator, or ask in plain language:
 
 - "update GAIA"
 - "pull the latest GAIA"
@@ -19,61 +23,63 @@ Click the `Run /update-gaia` statusline indicator, or trigger by phrasing:
 
 ## Ownership classes
 
-The three-way merge is governed by ownership classes defined in `.gaia/manifest.json`:
+The merge is governed by the classes in `.gaia/manifest.json`:
 
-| Class | Who controls it | On drift |
-| --- | --- | --- |
-| `owned` | GAIA fully. Overwritten silently when unchanged from baseline. | Prompts if you have local changes. |
-| `shared` | GAIA seeds, you customize. | Emits a `.gaia-merge/<path>.patch` for manual resolution. Exception: `package.json`, `pnpm-workspace.yaml`, and `.gaia/audit-ci.yml` get field-aware key-level merges instead of whole-file conflict patches (see below). |
-| `wiki-owned` | GAIA-seeded wiki pages (concepts, decisions, modules). Same as `shared`. | Emits a patch for manual resolution. |
-| adopter-owned (implicit) | Anything not in the manifest, plus sentinels like `wiki/hot.md`, `wiki/log.md`, `CHANGELOG.md`, `.gaia/VERSION`, `.gaia/manifest.json`. | Never touched. |
+| Class | Who controls it |
+| --- | --- |
+| `owned` | GAIA fully. |
+| `shared` | GAIA seeds it, you customize it. |
+| `wiki-owned` | GAIA-seeded wiki pages, handled like `shared`. Sections you added are kept. |
+| Yours (implicit) | Anything not in the manifest, plus `wiki/log.md`, `.gaia/VERSION`, `.gaia/manifest.json`, and `.gaia/update-decisions.json`. Never touched by the merge. |
+
+A file you did not change takes GAIA's new version. A file GAIA did not change keeps yours. When both changed, GAIA combines them where it can and asks you where it cannot.
+
+`package.json`, `pnpm-workspace.yaml`, and `.gaia/audit-ci.yml` are merged key by key instead of as whole files, so your own dependencies, overrides, build approvals, and roster entries are never visited. Generated blocks inside shipped files are regenerated after the merge with their shipped command.
 
 ## What it does
 
-1. Reads `.gaia/VERSION` to determine the baseline.
-2. Resolves the latest release tag via `gh release list --repo gaia-react/gaia` (falls back to the GitHub API).
-3. Shows the release notes and asks you to confirm.
-4. Downloads the baseline and latest tarballs into `.gaia/cache/` (gitignored).
-5. Runs the three-way merge per file directly. Owned files are overwritten or conflict-patched; shared and wiki-owned files are merged or conflict-patched. `package.json`, `pnpm-workspace.yaml`, and `.gaia/audit-ci.yml` are all classed `shared` but receive field-aware key-level merges rather than whole-file patches (see below).
-6. Walks any conflicts with you one at a time; reads `.gaia-merge/<path>.patch` for each.
-7. For `pnpm-workspace.yaml`, uses `gaia update merge-workspace` to compute per-key verdicts. This is a field-aware merge of both the GAIA-managed settings keys and the `overrides` and `allowBuilds` maps. Overrides and build approvals live here (pnpm 11 no longer reads them from `package.json`); an adopter-only entry is never visited or clobbered. For `.gaia/audit-ci.yml`, uses `gaia update merge-audit-ci` to compute per-key and per-author-entry verdicts.
-8. Prompts before deleting any file that the latest release removed.
-9. Counts open PRs whose `GAIA-Audit` trailer was stamped with the old version. The upcoming version bump invalidates them, so they re-run the full CI audit on their next push; the summary surfaces the count so you can merge or close them first to avoid the re-audit churn.
-10. Migrates any flat `.gaia/local/specs/SPEC-<id>.md` files into the per-SPEC folder layout the new runbooks expect. Idempotent, and a no-op when your specs are already foldered. A naming collision (a flat file and a folder for the same id) is surfaced as a blocking action item, never auto-resolved.
-11. Prints a summary with counts (overwritten, added, skipped, conflicts, deleted, backed up, trailer invalidations, specs migrated) and per-file counts for `package.json` and `pnpm-workspace.yaml` (applied, conflicts, suggestions). Then writes the new version to `.gaia/VERSION` and copies the latest manifest into `.gaia/manifest.json`. The VERSION bump is deferred to this point so an interrupted run stays resumable at the baseline version.
-12. When the release CHANGELOG documents an adopter action you still owe (a dependency GAIA dropped that you still have, or a removed file still in your tree), surfaces it as an opt-in **suggested cleanup** block with the exact `pnpm` command. Advisory only: nothing is removed for you.
+1. **Checks where it is running.** Refuses inside a linked worktree other than its own update worktree. Reads `.gaia/VERSION` as the baseline and resolves the latest release. Never downgrades.
+2. **Pulls first if your checkout lags.** When your main checkout's GAIA version is behind the remote's, it fast-forwards your checkout instead of updating, then offers to continue from the pulled copy.
+3. **Checks for a teammate's update.** A run claims the update with an empty commit and a draft pull request, so two teammates never update at once. A teammate's live claim stops your run and names their pull request. The statusline also shows when a teammate's update is in progress.
+4. **Refuses a 1.x baseline.** See [Upgrading from 1.x](/getting-started/upgrading/).
+5. **Downloads and verifies the bundles.** Each release ships as `gaia-bundle-<tag>.tar.gz` with a `.sha256`. Both the baseline and the latest bundle are checked against their published checksums before anything else happens, and cached under `.gaia/local/cache/shared/update-gaia/`. A mismatch stops the run; a second mismatch on a fresh download is a damaged or tampered release to report upstream.
+6. **Selects migration notes** shipped in the verified bundle (see [Migration notes](#migration-notes)).
+7. **Shows the full changelog range** from your version to the latest, every intervening release, and asks **Proceed** or **Abort**. Abort changes nothing.
+8. **Cuts an update worktree** on an `update/v<version>-<timestamp>` branch, from the default branch, whichever branch your main checkout holds. Your checkout's branch, files, and `node_modules` stay as you left them.
+9. **Merges every file**, then asks you one question per real conflict, up to four per prompt, with the recommended answer first. Answers include keeping yours, taking GAIA's, combining, and **Decide later**. Every answer is recorded in `.gaia/update-decisions.json`, which is committed with the update, so the next update does not ask again. A deferred item is carried to the next update.
+10. **Follows after-merge migration notes** and carries any new [setup features](/getting-started/setup-gaia/#phase-owed-setup-features) the release adds.
+11. **Writes the new version** and manifest, runs the Quality Gate, and shows a summary: every file by outcome, every answer, every item still deferred, and any action the release notes say you owe (a dependency GAIA dropped, a file it removed), with the exact command. Those are suggestions; nothing is removed for you.
+12. **Asks once to commit**, then pushes and opens a draft pull request, `chore(gaia): update to <tag>`, which merges through the [Code Audit Team](/workflow/code-audit-team/).
+13. **Prints the residue sweep** to run once the pull request merges: `bash .gaia/scripts/state-registry-lib.sh residue-sweep --apply` from the main checkout. It deletes `.gaia/local` files retired features left behind.
 
-Backups land in `.gaia-backup/<timestamp>/`. Conflict patches land in `.gaia-merge/`.
+`/update-gaia` sends one usage ping per update. See [Usage ping](/getting-started/gaia-init/#usage-ping).
 
-## Field-aware merges
+**Why the checksum and the 1.x fence:** a tampered or corrupted bundle would be merged straight into your harness, and a 1.x baseline would read every moved app file as deleted upstream and offer to delete your app. See the [gate reference](/reference/gates/#update-gaia-checksum).
 
-`package.json`, `pnpm-workspace.yaml`, and `.gaia/audit-ci.yml` are all classed `shared`, but a whole-file three-way merge produces noise for them (every project diverges `package.json` at init; every override addition drifts `pnpm-workspace.yaml`; every developer's `audit_authors` entry drifts `.gaia/audit-ci.yml`). All three get key-level merges instead.
+## Stopping and resuming
 
-**`package.json`** merges at JSON-key granularity across the managed sections: `dependencies`, `devDependencies`, `scripts`, `engines`, and `packageManager`. Identity keys (`name`, `version`, `description`, `author`, etc.) are never compared or patched. For each managed key, the outcome is one of: **apply** (GAIA changed it, you are still at the baseline pin), **conflict** (GAIA changed it, you re-pinned independently, left as yours with a note), or **suggestion** (GAIA added a key or changed one you removed, surfaced opt-in, never auto-inserted). Applied changes are written in place; conflicts and suggestions go to `.gaia-merge/package.json.notes`.
+Every stop after the update worktree exists leaves it in place, changes nothing in your main checkout, and prints the worktree's path and the commands to discard it:
 
-**`pnpm-workspace.yaml`** merges at key/entry granularity using `gaia update merge-workspace`. The seven GAIA-managed settings keys (`minimumReleaseAge`, `trustPolicy`, etc.) are compared whole-value; the `overrides` and `allowBuilds` maps are compared per entry. An adopter-only override or build approval is never visited. Same apply/conflict/suggestion buckets as `package.json`; notes go to `.gaia-merge/pnpm-workspace.yaml.notes`. If the file is missing in the baseline (pre-pnpm 11 project) or unparseable, the skill falls back to a whole-file conflict patch.
-
-**`.gaia/audit-ci.yml`** merges at key/entry granularity using `gaia update merge-audit-ci`. The seven GAIA-managed scalar knobs (`gate_label`, `budget_seconds`, `max_turns`, `push_fixes`, `default_mode`, `override_label`, `retrigger_workflows`) are compared whole-value; `audit_authors`, a space-separated `login=mode` list each developer appends their own entry to, is compared per login. An adopter-only developer entry is never visited or clobbered. Same apply/conflict/suggestion buckets as `package.json`; notes go to `.gaia-merge/audit-ci.yml.notes`. If the file is absent from the baseline (projects that predate this file) or unparseable, the skill falls back to a whole-file conflict patch.
-
-A release that touches no managed keys in any of these files produces a clean skip with no notes file.
-
-## After the run
-
-Review patches in `.gaia-merge/`, reconcile any `.gaia-merge/package.json.notes`, `.gaia-merge/pnpm-workspace.yaml.notes`, or `.gaia-merge/audit-ci.yml.notes` files, then run `pnpm install` if `package.json` or `pnpm-workspace.yaml` was changed. Run the quality gate and inspect `git diff` before committing. The skill does not auto-commit. When satisfied:
-
-```
-git commit -m "chore: update GAIA to <tag>"
+```text
+git worktree remove --force <worktree path>
+git branch -D <branch>
 ```
 
-Once that commit lands, `/update-gaia` pushes the branch and opens a pull request for you (`chore: update GAIA to <tag>`). A re-run on the same branch updates the existing PR instead of opening a second one; if `gh` is unavailable it tells you to open the PR manually.
+Re-run `/update-gaia` to resume. A run interrupted before its version write repeats the merge and the answers safely. A run whose version is written but not committed resumes at the Quality Gate when you re-run it inside the update worktree.
 
-If the update pulls a newer `code-review-audit.yml` template and your installed copy is stale but unmodified, GAIA refreshes it inside the same update PR and notes that CI will self-mod-skip the audit on that PR (expected, not a failure). If you have customized that workflow, it is left untouched and a `.gaia-merge/code-review-audit.yml.patch` is written for you to reconcile with `/setup-gaia`.
+## Migration notes
+
+A release can ship migration notes in its bundle, under `.gaia/migrations/<version>.md`, for steps a file merge cannot do: moving a directory tree, rewriting a config, removing a retired feature. `/update-gaia` reads notes only from the verified bundle, never from your working tree or a URL, and runs those between your version and the latest, in version order.
+
+- **After-merge** notes run after the merge and before the version write. They are safe to repeat.
+- **Blocking** notes stop the update before anything is branched or merged. `/update-gaia` names the note and asks whether to follow it now. The note takes you to its own version; re-run `/update-gaia` afterwards for anything later.
+
+The 2.0.0 note is the one blocking note so far. See [Upgrading from 1.x](/getting-started/upgrading/).
 
 ## Gotchas
 
-- Must run from the main checkout, not a linked worktree. The skill rejects worktree invocations early.
-- Must run from `main` or `master`, or from an existing chore branch. If on `main`, the skill creates `chore/update-gaia-<timestamp>`.
-- Refuses to downgrade. If `.gaia/VERSION` is ahead of the latest release, the skill warns and exits.
-- Requires a baseline tarball. If your installed version predates the manifest mechanism, the skill stops and tells you to cherry-pick manually.
+- Run it from the main checkout. Inside any other linked worktree it refuses and tells you whether an update is pending.
+- An update to the same version that is already applied but not committed is reported as such, never as "up to date". Commit it, or run `git checkout -- .gaia/VERSION` to start over.
+- A custom fitness category you added to `wiki/decisions/Claude Integration Fitness.md` in 1.x no longer runs. Copy it out before an update replaces that page, and keep it as a rule under `.claude/rules/` or a skill.
 
 Source: `.claude/skills/update-gaia/SKILL.md`.

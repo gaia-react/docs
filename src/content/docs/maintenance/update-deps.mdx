@@ -1,116 +1,118 @@
 ---
 title: /update-deps
-description: Bump outdated packages group-by-group, run migrations for major-version bumps, and validate the full quality gate.
+description: Resolve security advisories and update outdated packages through one quality gate, in place of Dependabot updates, landing as one pull request.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-`/update-deps` discovers outdated packages, shows you a grouped preview so you can snooze anything you are not ready for, applies migrations for major-version bumps, and validates the project through the full quality gate. It is wired to the statusline: when work is pending, the statusline shows a `Run /update-deps` indicator that loads the skill when clicked.
+`/update-deps` keeps your dependencies current and your security advisories resolved, in place of Dependabot's version and security pull requests. Advisories come first, each fixed the least invasive way. Then outdated packages, previewed by group so you can snooze what you are not ready for. Everything passes one quality gate, in its own worktree, and lands as one `chore(deps)` pull request that merges once checks are green.
+
+It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, in a worktree of its own cut from the default branch, whichever branch your checkout holds. Run by [`/gaia-init`](/getting-started/gaia-init/), it asks nothing and leaves its changes for the init commit instead.
 
 ## When to use it
 
-Run `/update-deps` when the statusline signals pending work, or any time you want to bring dependencies current. For routine maintenance on a stable project, this replaces manual `pnpm outdated` inspection.
+The statusline shows `📦 /update-deps (N outdated, M security)` when packages are outdated or advisories are open. It counts both Dependabot alerts and `pnpm audit` advisories, and leaves out groups you snoozed. Click it, or ask "update dependencies", "bump deps", or "fix Dependabot alerts".
 
 ## How to invoke
 
-Click the `Run /update-deps` statusline indicator, or trigger by phrasing:
+```
+/update-deps
+```
 
-- "update dependencies"
-- "bump deps"
-- "run dependabot"
+The full interactive run: preview, decide, apply.
 
-## Interactive preview and snooze
+```
+/update-deps --security
+```
 
-Before applying anything, the skill shows a grouped preview. Updates are bucketed into four sections: **Major**, **Non-semver**, **Minor**, **Patch**. Companion groups (packages that always move together) appear as a single block under the section of their most-severe member.
+Only the security advisories, plus the major bumps they need. Every other outdated package is left alone.
 
-When nothing is snoozed, the preview offers three choices:
+```
+/update-deps --scope react-router
+```
 
-- **Update all** (default): apply every group.
-- **Choose what to skip**: name the packages or groups to defer. Each name expands to its whole companion group. The remaining apply set is echoed back for confirmation. If you skip everything, the skill exits without creating a branch.
-- **Cancel**: exit with no changes and no ledger write.
+One companion group, with no preview. The security phase only reports here.
 
-When one or more groups are snoozed, the preview marks each with a trailing `[snoozed until <date>]` and default-skips it. The choices become four:
+`--security` and `--scope` cannot be combined.
 
-- **Update the rest** (default): apply every group except the snoozed ones, leaving the snoozes intact.
-- **Choose what to skip**: as above.
-- **Update everything incl. snoozed**: apply every group and clear the snoozes.
-- **Cancel**: exit with no changes and no ledger write.
+## Security advisories first
 
-Skipped groups are recorded in `.gaia/local/declined-updates.json` (gitignored, local only). A snoozed group is default-skipped in every preview until it resurfaces, which happens when a newer version ships or after 14 days, whichever comes first. CI ignores the ledger entirely.
+`/update-deps` reads open advisories from `pnpm audit` and from Dependabot alerts when it can read them. Dependabot alerts are read as data only: advisory text is never pasted into a command, file, question, or comment.
 
-`CI=true` and `--scope <group>` runs skip the preview and apply the full set (or the named group) unattended.
+Advisories appear first in the preview, ranked, each with its proposed resolution. The resolutions, least invasive first:
 
-## How it picks targets
+1. **In-range refresh**: the fixed version is already inside your allowed range, so a lockfile refresh picks it up.
+2. **Chain-head bump**: the package at the head of the dependency chain moves to a version that pulls in the fix. A major chain-head bump is asked first and runs with its migration.
+3. **Security-floor override**: an `overrides:` entry in `pnpm-workspace.yaml` forces a patched version of the vulnerable sub-dependency.
+4. **Alert dismissal**: when no fix exists, or you decide to live with it, Claude asks once per advisory whether to dismiss the Dependabot alert, naming every alert, the reason (`tolerable_risk` or `not_used`), and the comment it will post. Nothing is dismissed without your yes.
 
-Updates are grouped so companion packages move together. When any package in a group is outdated, the entire group ships in the same install. Groups include:
+A resolution that fails the quality gate is reverted, and the advisory is reported still open with the reason.
 
-`react-router`, `react`, `tailwindcss`, `storybook`, `vitest`, `playwright`, `eslint`, `testing-library`, `typescript`, `i18next`, `msw`, `vite`, `zod-conform`, `fontawesome`, `stylelint`, `prettier`, `husky`
+## Preview and decision
 
-Packages outside any group form singleton groups.
+Updates are grouped into **Security**, **Major**, **Non-semver**, **Minor**, and **Patch**. A companion group shows as one block and updates as one unit. The groups include react-router, react, tailwindcss, shadcn, storybook, vitest, playwright, i18next, msw, vite, zod-conform, stylelint, prettier, and eslint. Packages outside a group update on their own, and `typescript` is deliberately its own group.
 
-## Waves
+You choose:
 
-After grouping, updates are classified into two waves:
+- **Update all** (or **Update the rest** when you have snoozed groups)
+- **Choose what to skip**: name packages or groups to snooze, an advisory key to decline, or `sub-dependencies` to skip that part this run
+- **Update everything incl. snoozed**, when snoozes exist
+- **Cancel**: no branch, no changes
 
-- **Wave A**: minor and patch bumps, bundled into one install.
-- **Wave B**: major-version bumps, each group processed individually with its own migration guide and code edits.
+A snooze is local to your machine (`.gaia/local/declined-updates.json`) and lapses when a newer version ships or after 14 days.
 
-## Manual and scheduled runs agree
+## What runs
 
-Discovering outdated packages, grouping them, and sorting them into waves work the same way whether you run `/update-deps` yourself or let the `gaia-ci-update-deps` workflow from [`/setup-gaia`](/getting-started/setup-gaia/) run it on a schedule, so both agree on what is outdated.
+1. **Override audit.** Every `overrides:` entry is tested: it is removed only when removing it causes no peer-dependency error **and** no new advisory, so a security floor is never dropped by accident.
+2. **Minor and patch updates** (Wave A).
+3. **Major updates**, one group at a time (Wave B), each with its migration. If the gate fails after one remediation pass, that group is reverted and reported as skipped.
+4. **Sub-dependencies** refresh to the newest versions their parents allow, skipping releases too new to trust. Reverted as a whole if the gate fails.
+5. **Security resolutions**, then the override audit again.
+6. **Quality gate**: `pnpm typecheck`, `pnpm lint`, `pnpm test --run`, `pnpm pw`, and `pnpm build`.
+7. **Publish**: one commit, `chore(deps): ...` (`chore(deps-dev):` when only devDependencies moved), a draft pull request, merged once checks are green, then local cleanup.
 
-## Override audit
+A pull request that changes only dependency manifests clears the audit gate through its `chore(deps)` bypass; one that also carries a migration edit gets the full [Code Audit Team](/workflow/code-audit-team/) audit.
 
-Before Wave A runs, the skill audits every entry in the `overrides:` map in `pnpm-workspace.yaml` (pnpm 11 reads overrides here; the `pnpm.overrides` field in `package.json` is no longer honored). For each override, two tests determine whether removing it is safe:
+It also reports when the global `playwright-cli` binary is behind.
 
-1. **Peer-dep test**: does removing it produce a `pnpm ls` peer-dep error?
-2. **Security-floor test**: does removing it introduce any new advisory that was absent from the baseline `pnpm audit` output?
+## Release-age window
 
-An override is declared obsolete only when removing it passes both tests. A peer-dep test alone would silently delete security-floor pins (CVE pins never produce a peer-dep error), so both tests are required. The audit runs again after Wave A and Wave B complete, in case a version bump elsewhere resolved the original conflict.
+pnpm refuses to install a release younger than 3 days (`minimumReleaseAge` in `pnpm-workspace.yaml`), and the setting is strict. **Why:** a compromised package version is usually caught and pulled within days, so waiting keeps a poisoned release out of your lockfile. See the [gate reference](/reference/gates/#release-age-window).
 
-## Pinned versions
+## Version holds
 
-Packages pinned in `package.json` (no `^` or `~`) stay pinned to the exact target. Unpinned specs use `^<latest>`.
+To cap a package below its latest release, add a `gaia.updateDepsHold` map to the root `package.json`. It maps a package name to a version-prefix ceiling:
 
-## Config version holds
-
-For a package you want capped below the latest release, add a `gaia.updateDepsHold` map to `package.json`. It maps a package name to a version-prefix ceiling:
+```json
+{
+  "gaia": {
+    "updateDepsHold": {
+      "vite": "8.0"
+    }
+  }
+}
+```
 
 - `"8.0"` holds the package at the highest published `8.0.x`.
 - `"8.0.16"` freezes it at exactly that version.
 - `"8"` holds it at the highest `8.x`.
 
-A hold is different from a snooze. A snooze is local, temporary, and lapses after 14 days; a hold is committed to `package.json`, applies in CI runs too, and never lapses until you remove it. Held packages are never installed above their ceiling, and the preview surfaces them on a line like:
+A hold is committed and never lapses until you remove it. A hold caps only the package it names; hold a coupled sibling too when its peer range demands more. Held packages are listed above the preview:
 
 ```
 Held by config (not offered): vite (current 8.0.16, ceiling 8.0)
 ```
 
-## Quality gate
+## Where dependencies live
 
-After applying updates, the skill runs the full quality gate:
+The project is a pnpm workspace with one lockfile at the root. App dependencies are in `frontend/package.json` (add one with `pnpm -C frontend add <pkg>`); harness dependencies and `gaia.updateDepsHold` are in the root `package.json`. `overrides:` and `minimumReleaseAge` are in the root `pnpm-workspace.yaml`.
 
-```
-pnpm typecheck
-pnpm lint
-pnpm test --run
-pnpm pw
-pnpm build
-```
+After any change to `msw`, `pnpm -C frontend msw:init` regenerates `frontend/public/mockServiceWorker.js`; a test fails when it drifts from the installed msw.
 
-## Wave B remediation cap
-
-For major-version bumps, the skill makes one remediation pass if the quality gate fails after applying migration changes, then re-runs the gate once. If the gate still fails after that single re-run, the entire group is reverted and logged as skipped. There is no unbounded retry loop.
-
-## Gotchas
-
-- Must run from the main checkout, not a linked worktree. The skill rejects worktree invocations early and surfaces the cached outdated count from main so you know whether action is even pending.
-- On `main` or `master`, the skill creates `chore/update-deps-<timestamp>` and opens a PR after updates apply. On any other branch, it runs in place and pushes without opening a PR.
-- The final report only lists what was actually installed. Anything filtered out beforehand is left off on purpose.
-- The statusline count already leaves out snoozed groups.
-
-<Aside type="caution">
-On any branch other than main or master, `/update-deps` commits in place and pushes to the remote without opening a PR. Run it from a branch where an automatic push is fine.
+<Aside type="note">
+[`/setup-gaia`](/getting-started/setup-gaia/) leaves Dependabot alerts on and turns Dependabot's own security pull requests off, so `/update-deps` is the one source of dependency pull requests. If your repository has a Dependabot npm entry or a Renovate config, remove the overlap, or both open duplicate pull requests.
 </Aside>
+
+The run ends with a [cost line](/reference/cost/).
 
 Source: `.claude/skills/update-deps/SKILL.md`.
