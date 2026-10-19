@@ -32,7 +32,7 @@
 
 exclusions:
   - path: .gaia/cli/src/mentorship/display-rule.ts
-    reason: obscurity-by-design (mentorship display rule contract is protected; documenting it defeats the protection)
+    reason: obscurity-by-design (mentorship display rule contract is protected; documenting it defeats the protection). The mentorship layer is removed in GAIA 2.0.0 and the file no longer exists; kept so a 1.x-era source survey still classifies it EXCLUDED. Removal needs a studio/ decision.
     added: 2026-05-08
 
   - path: .gaia/cli/src/mentorship/display-rule-memory.ts
@@ -52,21 +52,23 @@ exclusions:
     added: 2026-05-08
 
   - name: gaia release*
-    reason: Steven-only — release subcommands belong to the maintainer, not to adopters or contributors. The binary technically ships the surface, but documenting any of preflight / bump / changelog / scrub-wiki / manifest / scrub / runtime-deps / commit-and-tag is wrong audience. Possible upstream release-exclude gap; out of docs scope to fix.
+    reason: Steven-only. Release subcommands belong to the maintainer, not to adopters or contributors. Since 2.0.0 the release namespace lives only in the release-excluded .gaia/cli/gaia-maintainer binary, but listing its subcommands is still wrong audience, contributor docs included.
     added: 2026-05-08
 
   - name: gaia telemetry*
-    reason: deferred — telemetry surface ships to adopters but documenting it now does more harm than good (the streams are still settling, and surfacing them invites premature scraping). May surface in contributor docs later if telemetry becomes a contributor-improvement target. Re-evaluate if/when that decision lands.
+    reason: deferred. The 1.x `gaia telemetry` emit surface is gone from the 2.0.0 adopter binary. The 2.0.0 adoption ping (`gaia ping`) IS documented, as opt-out only, on getting-started/gaia-init.mdx (Usage ping) - one fire-and-forget POST to telemetry.gaiareact.com with a few categorical fields, a pseudonymous per-install projectId, the GAIA version and a coarse platform, never paths or free text, disabled by GAIA_TELEMETRY_PING_DISABLE=1. Do not document the server side, the payload beyond that, or how projectId is derived. The local usage ledger (.gaia/local/telemetry/usage.jsonl) is documented separately on reference/cost.mdx and is not covered by this entry.
     added: 2026-05-08
+    updated: 2026-10-20
 
   - path: wiki/concepts/Telemetry.md
-    reason: deferred — same rationale as gaia telemetry* (paired exclusion to keep the wiki concept page out of drift reports while telemetry is undocumented).
+    reason: deferred, paired with gaia telemetry* above. The page no longer exists at GAIA 2.0.0; kept for 1.x-era surveys.
     added: 2026-05-08
 
   - path: .claude/hooks/telemetry-task-postuse.sh
-    reason: deferred — same rationale as gaia telemetry* (the hook is the in-process emit surface; documenting it discloses what telemetry-emit does and when).
+    reason: deferred, paired with gaia telemetry* above. The hook is removed in GAIA 2.0.0; kept for 1.x-era surveys.
     added: 2026-05-08
 
   - name: gaia mentorship*
-    reason: deferred — quiet-launch decision. Mentorship is the consumer of telemetry pattern detection; documenting status / enable / disable invites attention to the adaptation system before it's ready for it. Re-evaluate when the quiet-launch posture lifts.
+    reason: deferred. The mentorship layer and its gaia mentorship verbs are removed in GAIA 2.0.0, so there is no adopter surface left to document; docs mention only that it is gone where the CHANGELOG makes that actionable. Removal of this entry needs a studio/ decision.
     added: 2026-05-08
+    updated: 2026-10-20
