@@ -53,6 +53,8 @@ To add a package such as a backend beside `frontend/`, ask Claude: GAIA ships a 
 - **`@gaia-react/lint`** for ESLint, Stylelint, and commitlint: over 1,200 lint rules. Prettier formats and Knip finds unused code.
 - **Toolchain:** Node 22.22.0 or newer, pnpm 12 (pinned in `packageManager`), and Vitest 5.
 
+Fetcher action paths are defined once in `frontend/app/action-paths.ts`, so renaming a route fails a test instead of returning 404, and `hydration.spec.ts` is the Playwright example for asserting a page loads with no `console.error` or page errors.
+
 A fresh scaffold starts neutral and brand-free: a zero-chroma primary scale, system fonts, and a simple layout. The `design-baseline` rule treats that styling as a placeholder until you settle your own design.
 
 For the reasoning behind each choice, ask Claude: the decisions live in the project wiki.

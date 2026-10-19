@@ -24,6 +24,12 @@ GAIA ships commands for doing work and commands for keeping the project in shape
 | [`/update-deps`](/maintenance/update-deps/) | 📦 | Resolves security advisories, then updates outdated packages by group, through one quality gate. |
 | [`/update-gaia`](/maintenance/update-gaia/) | 🚀 | Pulls the latest GAIA release into your project with a three-way merge, verifying the release bundle first. |
 
+## The statusline
+
+GAIA's statusline draws its nudges on the right, each led by its emoji icon: `⚙️ /setup-gaia`, `🚀 /update-gaia`, `🔭 /gaia-serena-sync`, `📦 /update-deps`, `🔎 /gaia-cleanse`, `🔨 /gaia-codify`, `🐛 /gaia-debt`, `🧹 /gaia-residue`, and `🧠 /gaia-wiki`. It also shows when a teammate's GAIA update is in progress. The nudges fit the terminal width: on a narrow terminal they shrink to icons, with a `+N` for those hidden, and refit within 15 seconds of a resize. The debt and residue counts refresh as soon as those commands finish.
+
+Inside a linked worktree the statusline shows only a blocking setup prompt, since the maintenance commands run from the main checkout. The left side shows GAIA's own bar (project, branch, model and effort, and a context bar), or your global statusline if you chose to keep it in [`/setup-gaia`](/getting-started/setup-gaia/#phase-statusline-left-side).
+
 ## Which one to run
 
 Pick by symptom:

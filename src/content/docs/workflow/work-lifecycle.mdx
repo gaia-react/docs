@@ -78,7 +78,7 @@ At every session start, GAIA lists merged worktrees that no live session is usin
 
 ## 4. Commit and open the draft pull request
 
-Every commit passes the Quality Gate (typecheck, lint, tests, Playwright, a dev-server smoke test, and the build) and the commit hooks. The branch is pushed and the pull request opens as a draft with a Conventional Commits title. When the work closes an issue, `Closes #<n>` goes in the pull request body, never in a commit message: a squash merge copies commit messages into the merge commit, and GitHub would close the issue from there whatever the body says.
+Every commit passes the Quality Gate (typecheck, lint, tests, Playwright, a dev-server smoke test, and the build) and the commit hooks. The smoke test runs through `bash .gaia/scripts/dev-smoke.sh`, which starts this checkout's own dev server, checks a route answers, and stops only the server it started, so a gate run never kills another session's server. The branch is pushed and the pull request opens as a draft with a Conventional Commits title. When the work closes an issue, `Closes #<n>` goes in the pull request body, never in a commit message: a squash merge copies commit messages into the merge commit, and GitHub would close the issue from there whatever the body says.
 
 **Why draft:** reviewers should be notified when a pull request is ready, and in a GAIA project that moment is the audit posting its `GAIA-Audit` success. A pull request opened ready notifies reviewers before any audit ran. The success post flips it to ready. See the [gate reference](/reference/gates/#draft-pull-requests).
 

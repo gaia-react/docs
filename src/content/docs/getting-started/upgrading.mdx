@@ -176,6 +176,11 @@ The note applies GAIA's side and lists what your own code needs. The release not
 - **`FormError`'s `hide` prop** is now `isHidden`.
 - **Label renames.** `priority:high`, `priority:critical`, and `needs-human-review` in your own workflows or templates become `severity:major`, `severity:critical`, and `needs-human`.
 - **React Compiler** is on by default. Run `pnpm lint` and your full suites; to roll back, set `isReactCompilerEnabled = false` in `frontend/react-compiler.config.ts`.
+- **Vitest 5** turns on `clearMocks` by default and fails an un-awaited `.resolves` or `.rejects`, so a few of your own tests may need small fixes.
+- **Client environment allowlist.** Server variables stay server-only. If a story of yours reads `window.process.env`, pass the value in as a story arg instead; if a test depends on a value from your `.env`, set it in your shell or give it a default in `frontend/test/setup.ts`.
+- **Same-site redirects.** `resolveLocalRedirect` and `LocalRedirectSchema` replace `isLocalRedirect`; the migration switches GAIA's own actions.
+- **Dropped packages and pages.** `react-router-dom` is no longer used (`pnpm remove react-router-dom`). The example privacy and terms pages and `@tailwindcss/typography` no longer ship; keep the pages when the migration asks if you use them, otherwise run `pnpm -C frontend remove @tailwindcss/typography`. GAIA's branded `Header`, `Footer`, and logo no longer ship either; the migration keeps your customized copies as your own files.
+- **Removed i18n?** If your project removed i18n, delete the `LANGUAGES` import and `testIgnore` from `frontend/playwright.config.ts`, or Playwright cannot load its config.
 
 Commands you knew in 1.x have new names or are gone. See [What changed in the commands](#what-changed-in-the-commands).
 
