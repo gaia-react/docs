@@ -1,0 +1,262 @@
+---
+title: Gates
+description: Every check in a GAIA project that can stop you or Claude, what it prevents, when it fires, and how to clear it.
+sidebar:
+  order: 0
+---
+
+GAIA runs the process a well-run engineering team runs, and a newcomer meets all of it at once. This page lists every gate: anything that can stop a command, a commit, a pull request, or a merge. Each one names what it stops, the failure it prevents, when it fires, and how to clear it.
+
+A gate is not a judgment of you or of Claude. Each one exists because the failure it prevents happens quietly and costs more to find later than to stop now. Every denial names the allowed spelling or the next step.
+
+## Commits and branches
+
+### Commits on the default branch
+
+- **Stops:** `git commit` on `main` or `master`, a plain `git push` from them, a push whose refspec names `main`, `master`, or `HEAD`, and force-pushes naming them.
+- **Why:** a commit made straight on the default branch skips the pull request and the audit that every other change passes, and a force-push rewrites history your teammates have already pulled.
+- **When:** before the `git` command runs (`block-main-destructive-git`).
+- **Clear it:** create a feature branch, push it by name, and open a pull request. Claude does this for you as part of the [work lifecycle](/workflow/work-lifecycle/).
+
+### Moving another session's checkout
+
+- **Stops:** a `git checkout` or `git switch` that would move the main checkout off a branch another session holds there with an open pull request.
+- **Why:** another session is working on that branch in the same folder. Switching pulls its files out from under it mid-task and forfeits its audit round.
+- **When:** before the `git` command runs.
+- **Clear it:** after a merge, use the worktree cleanup, which never runs `git checkout`. If the branch is your own, run the command yourself with the `!` prefix.
+
+### No-verify
+
+- **Stops:** `git commit` or `git push` with `--no-verify`, `-n` on a commit, or `-c core.hooksPath=<path>`.
+- **Why:** the pre-commit hook is the floor that keeps code failing typecheck, lint, or its tests out of history. A floor the agent can skip is advisory.
+- **When:** before the `git` command runs (`block-no-verify`).
+- **Clear it:** fix what the pre-commit hook reports. If the token only appears inside your commit message text, rephrase the message.
+
+### Pre-commit floor
+
+- **Stops:** a commit whose staged files fail typecheck, lint-staged, or their tests, or when the package registry cannot be read or GAIA's generated settings have drifted.
+- **Why:** it is the deterministic floor that keeps code failing typecheck, lint, or its own tests out of history, whatever the session decided.
+- **When:** at `git commit`, through the native `.githooks/pre-commit`.
+- **Clear it:** fix the failures it prints. If no hook runs at all, check `git config --get core.hooksPath` prints `.githooks`; run `pnpm install` if not.
+
+### Commit message format
+
+- **Stops:** a commit message that is not a Conventional Commit (`<type>(<scope>): <subject>`), and any commit when commitlint cannot run.
+- **Why:** commit subjects, branch types, and pull request titles share one Conventional Commits vocabulary, and the pull request title becomes the squash subject on the default branch. A type GAIA does not know cannot be checked downstream.
+- **When:** at `git commit`, through `.githooks/commit-msg`.
+- **Clear it:** use one of the types in `.gaia/conventional-commits.json`. When commitlint is missing, run `pnpm install`.
+
+### Quality Gate
+
+- **Stops:** Claude committing source changes before typecheck, lint, tests, Playwright, the dev-server smoke test, and the build pass with zero warnings.
+- **Why:** the commit hook checks only staged files. The full gate catches what breaks elsewhere, including warnings that would otherwise ship.
+- **When:** before any commit that touches source or gate-affecting config. Docs-only and wiki-only commits skip it.
+- **Clear it:** fix what it reports. Claude then stops and asks to commit, except inside a workflow that commits on its own (the audit fix round, `/gaia-debt`, a plan's phase commits).
+
+### Test seen failing first (RED gate)
+
+- **Stops:** `git commit` of a new test on the deterministic surface (utilities, parsers, hooks) that has never been seen failing at its current content.
+- **Why:** a test that started green may not test anything. Watching it fail first is the proof it can catch the bug it is named for.
+- **When:** before `git commit` (`red-verify-commit-check`). Stories, Playwright tests, type-only tests, and renames are exempt.
+- **Clear it:** run the test scoped to its file so the failure is recorded (`pnpm test --run <test-file>`), make it fail first, then make it pass.
+
+## Pull requests and merge
+
+### Issue claim
+
+- **Stops:** Claude starting work on a GitHub issue already labelled `in-progress`.
+- **Why:** two agents or two people who start the same ticket do the work twice, then fight over the merge.
+- **When:** before a branch or worktree is cut for work that closes an issue.
+- **Clear it:** pick different work, or wait for the claim to be released when its pull request merges. A stale claim on a `tech-debt` issue is released by the next `/gaia-debt` run; any other you can remove with `gh issue edit <n> --remove-label in-progress`.
+
+### Draft pull requests
+
+- **Stops:** a `gh pr create` for this repository without `--draft`.
+- **Why:** reviewers are notified when a pull request is ready, and in a GAIA project that moment is the audit clearing. A pull request opened ready notifies them before any audit ran.
+- **When:** before `gh pr create` runs (`block-pr-create-without-draft`).
+- **Clear it:** add `--draft`. The audit's success post marks it ready. A private repository where GitHub refuses drafts is allowed without it.
+
+### Pull request title
+
+- **Stops:** a `gh pr create` or `gh pr edit` whose title fails the commit lint once ` (#<n>)` is appended, and `--fill` with no `--title`.
+- **Why:** a squash merge lands the title as the commit subject on the default branch. A title that passed every local check then failed CI after the pull request was already open.
+- **When:** before the `gh` command runs (`block-invalid-pr-title`); the advisory PR Conventions workflow repeats the check in CI.
+- **Clear it:** pass a Conventional Commits `--title` short enough to fit 100 characters with its suffix.
+
+### Fork pull requests
+
+- **Stops:** checking out or fetching the head of a pull request from a fork, and auditing or merging one, or one `gh` cannot classify.
+- **Why:** the audit runs scripts from the checked-out tree. A fork's head in your working tree turns those scripts into the fork's code, running with your credentials.
+- **When:** before `gh pr checkout` or a `git fetch` of `pull/<n>/head` (`block-fork-pr-checkout`), and at the start of the merge workflow.
+- **Clear it:** review the harness diff by hand (`.claude/`, `.gaia/`, `.github/`), push the branch to your own repository, and audit that pull request.
+
+### Merge without the audit
+
+- **Stops:** `gh pr merge` until every Code Audit Team member the diff dispatches has cleared the current change.
+- **Why:** unreviewed code reaching the default branch is the failure the whole audit exists to prevent.
+- **When:** before `gh pr merge` runs (`pr-merge-audit-check`).
+- **Clear it:** let Claude run the [audit loop](/workflow/code-audit-team/#the-audit-loop). Out-of-scope and manifest-only `chore(deps)` pull requests are cleared by the hook itself.
+
+### Audit base unreadable
+
+- **Stops:** `gh pr merge` when the gate cannot trust the base it measures the change against: GitHub unreachable, the base tip not fetched, or more than one merge base.
+- **Why:** each clearance is keyed to the branch's own change against the base GitHub reports. Against a base it cannot verify, the gate cannot tell whether the cleared change is the one being merged.
+- **When:** before `gh pr merge` runs.
+- **Clear it:** the denial names one step: `git fetch origin`, `gh auth status`, or `git merge --no-edit refs/remotes/origin/<base>`. After retargeting a pull request on GitHub, run `git config --unset branch.<branch>.gaia-audit-base`.
+
+### GAIA-Audit required check
+
+- **Stops:** merging a pull request on GitHub until the `GAIA-Audit` status is posted as success for its head.
+- **Why:** without a required check, a pull request merged from the github.com button skips the audit entirely.
+- **When:** on GitHub, at merge. Registered by [`/setup-gaia`](/getting-started/setup-gaia/).
+- **Clear it:** merge through Claude, which posts the status after the audit. A pull request no member needs to review is stamped `skipped:` by the merge hook.
+
+### Audit checkpoint
+
+- **Stops:** the next round of the audit loop.
+- **Why:** every round's fixes buy the next round, so an unattended loop spends without bound, and "is another round worth it" would be decided by the session least able to judge it.
+- **When:** when your context reaches its checkpoint line, when rounds stop converging, or at the hard round cap (`audit-loop-bound`).
+- **Clear it:** answer the pinned question, or type `audit-grant <n>` or `audit-accept` as the whole prompt. Only a person can answer. See [the branch checkpoint](/workflow/code-audit-team/#the-branch-checkpoint).
+
+### Worthiness verdict
+
+- **Stops:** `gh pr merge` when a story or Playwright test the pull request changed has no worthiness verdict for its current content.
+- **Why:** those tests have no stable failing run to prove they can catch a bug, so an independent review of each one stands in for the RED gate.
+- **When:** before `gh pr merge` runs (`worthiness-presence-check`).
+- **Clear it:** let Claude run the worthiness review on the changed tests.
+
+### Hand-rolled merge wait
+
+- **Stops:** a shell loop that polls `gh pr view` or `gh pr checks` without reading `mergeable`.
+- **Why:** a loop that exits only on `MERGED` cannot end once the merge becomes impossible. A conflict turns the queued merge into a loop that spins until someone notices.
+- **When:** before the Bash command runs (`block-handrolled-pr-poll`).
+- **Clear it:** `bash .gaia/scripts/pr-wait-merge.sh --pr <N>`.
+
+## Secrets and protected files
+
+### Reading secrets
+
+- **Stops:** reading `.env` and `.env.<name>` files (but not `.env.example`), keys, certificates, credential files, and anything under a `secrets` directory, through Read, Grep, or Bash; and bare `env` or `printenv` dumps.
+- **Why:** anything Claude reads lands in the session transcript and is sent to the model. A secret read once is exposed.
+- **When:** before the tool call runs (`block-sensitive-read`).
+- **Clear it:** reference the variable by name, set a value for one command with `env NAME=value <cmd>`, and keep real values out of what Claude reads.
+
+### Writing secrets
+
+- **Stops:** writes containing an AWS key, a GitHub token, a private key, or a secret-named assignment with a real-looking value, and any write to a `.env` file except `.env.example`.
+- **Why:** a secret written into a tracked file is one commit away from the repository's history.
+- **When:** before Edit, Write, or MultiEdit runs (`block-secrets-write`).
+- **Clear it:** put the value in your gitignored `frontend/.env` yourself and reference it by name. `.env.example` takes placeholders.
+
+### GAIA's manifest
+
+- **Stops:** writes to `.gaia/manifest.json`.
+- **Why:** the manifest lists only the files GAIA ships, and `/update-gaia` overwrites files the manifest says GAIA owns. A file of yours added there would be treated as GAIA's.
+- **When:** before Edit, Write, or a writing Bash command runs (`block-manifest-write`).
+- **Clear it:** nothing to clear; your files never belong there. `/update-gaia` writes it through a marked exemption.
+
+### Generated frontend settings
+
+- **Stops:** direct edits to `frontend/.claude/settings.json`, and a commit when it has drifted from what the generator produces.
+- **Why:** the file is generated from the root `.claude/settings.json` plus `frontend/.claude/settings.overlay.json`, so a hand edit is overwritten the next time it is generated.
+- **When:** before the Edit runs (a permission rule), and at `git commit` (the pre-commit hook).
+- **Clear it:** edit the root settings or the overlay, then run `./.gaia/cli/gaia packages sync-settings` and stage the result.
+
+### Audit markers and loop state
+
+- **Stops:** Claude writing audit clearance files, the audit loop's state, its context readings, or running the grant recorders by hand.
+- **Why:** if Claude could write them, it could forge a clearance or a human's grant.
+- **When:** before the tool call runs (`block-audit-loop-write` and permission rules).
+- **Clear it:** none for Claude. A corrupt state file is moved aside by a person from a terminal outside Claude Code.
+
+### ESLint config
+
+- **Asks** before any edit to an `eslint.config.*` file.
+- **Why:** a config edit can silence a rule as easily as it can make a sanctioned migration, and only you know which one you meant.
+- **When:** before Edit or Write runs (`block-eslint-config-edit`).
+- **Clear it:** approve the prompt when the edit is the one you want.
+
+### Destructive deletes
+
+- **Stops:** `rm -rf` of `/`, an absolute path outside the scratch whitelist, `$HOME`, `.`, `*`, dotfile or brace globs, `.git`, `.claude` and its children, and `node_modules`, plus `--no-preserve-root`.
+- **Why:** each of these deletes the repository, its history, its Claude setup, or your home directory in one command, with no undo.
+- **When:** before the Bash command runs (`block-rm-rf`).
+- **Clear it:** delete by an explicit relative path. Remove one file under `.claude/` with a flagless `rm <file>`. Run `pnpm install` instead of deleting `node_modules`.
+
+## Worktrees and parallel work
+
+### Worktree path mismatch
+
+- **Stops:** an edit whose path resolves into a different checkout than the worktree the session works in.
+- **Why:** a stale absolute path from before the switch is a different, equally valid file, so the edit would land in the wrong checkout silently.
+- **When:** before Edit, Write, or MultiEdit runs (`block-worktree-path-mismatch`).
+- **Clear it:** use the path inside the session's worktree.
+
+### Main-checkout-only commands
+
+- **Stops:** `/setup-gaia`, `/gaia-debt`, and the maintenance commands run from inside a linked worktree.
+- **Why:** a linked worktree holds someone else's work. These commands provision the clone or cut their own branch, and must not write onto another task's branch.
+- **When:** at the start of the command.
+- **Clear it:** run it from the main checkout the refusal names.
+
+### Lagging GAIA version
+
+- **Stops:** a fresh start of new work (a SPEC, a plan, a debt drain, a maintenance run, ad-hoc work) while your checkout's GAIA version is behind the remote's.
+- **Why:** the new work would branch from a stale default branch.
+- **When:** at the start of the command. Resuming earlier work is never gated.
+- **Clear it:** choose **Pull now and restart**.
+
+### Ports
+
+- **Stops:** `pnpm dev`, `pnpm storybook`, or `pnpm pw` on a port another checkout holds, and in a worktree with no port file.
+- **Why:** two servers drifting onto each other's ports test the wrong tree's code.
+- **When:** at server start.
+- **Clear it:** in a worktree, run `bash .claude/hooks/provision-worktree.sh <worktree path>`. Ask before stopping a server another tree owns.
+
+## Dependencies
+
+### Release-age window
+
+- **Stops:** installing a package version published less than 3 days ago (`minimumReleaseAge: 4320`, strict).
+- **Why:** publicized npm compromises have been pulled within hours, mostly within a day. Three days clears that range, with margin for a release published before a weekend.
+- **When:** at `pnpm install` or `pnpm add`.
+- **Clear it:** wait for the version to age. Exempt one only when it is needed sooner and its provenance has been checked by hand, scoped to the exact version in `minimumReleaseAgeExclude` with a comment saying who checked it.
+
+## Updates and setup
+
+### /update-gaia checksum
+
+- **Stops:** an update whose release bundle does not match its published `.sha256`, or that is missing one.
+- **Why:** a damaged or tampered bundle would be merged straight into your Claude setup and hooks.
+- **When:** before the update question, in [`/update-gaia`](/maintenance/update-gaia/).
+- **Clear it:** re-run. A second mismatch on a fresh download is a damaged or tampered release; report it upstream.
+
+### 1.x baseline
+
+- **Stops:** `/update-gaia` from a GAIA 1.x project.
+- **Why:** 2.0.0 moved the app into `frontend/`. A three-way merge from 1.x would read every app file as deleted upstream and offer to delete your app.
+- **When:** before any download or change.
+- **Clear it:** follow [Upgrading from 1.x](/getting-started/upgrading/).
+
+### Teammate's update in progress
+
+- **Stops:** your `/update-gaia` while a teammate's update claim is live.
+- **Why:** two people updating at once produce two conflicting update pull requests.
+- **When:** before any download, branch, or worktree.
+- **Clear it:** wait for the teammate's update pull request to merge or close; the refusal names it.
+
+### Outside a GAIA project
+
+- **Stops:** `/gaia-init` anywhere but the root of a project scaffolded by `npx create-gaia`.
+- **Why:** init renames the project, strips branding, and rewrites files throughout the folder it runs in. Without GAIA's manifest there is no GAIA project to initialize, and in the GAIA source itself it would rewrite GAIA.
+- **When:** at the start of `/gaia-init`.
+- **Clear it:** run it in a project created with `npx create-gaia`.
+
+## Tests and lint
+
+### Code Audit Team roster
+
+- **Stops:** the audit when `.gaia/audit-ci.yml` has a glob matching no file, a file no member owns that is not declared `unowned:`, or no `auditors:` block.
+- **Why:** a file nobody owns is merged without any member having read it.
+- **When:** when the audit resolves its members.
+- **Clear it:** grant the path to a member, declare it under `unowned:`, or remove the dead glob.

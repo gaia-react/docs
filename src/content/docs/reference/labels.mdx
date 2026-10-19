@@ -1,0 +1,72 @@
+---
+title: Labels
+description: The GitHub labels GAIA creates on your repository, what each one means, and how gaia labels sync keeps them in step.
+sidebar:
+  order: 5
+---
+
+GAIA's GitHub labels come from one registry, `.gaia/labels.json`. `gaia labels sync` creates the labels your repository is missing and renames old spellings in place, so every issue keeps its label. It reports color drift instead of overwriting your colors.
+
+[`/setup-gaia`](/getting-started/setup-gaia/) and [`/update-gaia`](/maintenance/update-gaia/) run the sync. You can also run it yourself:
+
+```bash
+.gaia/cli/gaia labels sync
+```
+
+Add `--dry-run` to see what it would change, or `--adopt` to apply the registry's colors over your own. A token without label-write scope gets the manual `gh label` commands to run instead.
+
+## Tech debt
+
+| Label | Meaning |
+|---|---|
+| `tech-debt` | An out-of-scope review finding, tracked for a later fix by [`/gaia-debt`](/maintenance/debt/) |
+| `severity:critical` | Wrong, or will produce broken work; fixed first |
+| `severity:major` | A significant gap or defect; fixed before minor findings |
+| `severity:minor` | Real but small; fixed by default, never ignorable |
+| `severity:investigate` | Severity not yet determined; research required before it can be graded |
+| `difficulty:easy` | The fix is determined by the issue text and the cited code |
+| `difficulty:medium` | The fix has a design decision the surrounding code settles |
+| `difficulty:hard` | The fix has a design decision the surrounding code does not settle |
+| `footprint:narrow` | One logical unit in one file, no contract change |
+| `footprint:wide` | Spans files, changes a contract, or is structural |
+| `footprint:spec` | Must start with a design SPEC; drains through `/gaia-spec` |
+| `debt:spec-pending` | Handed to `/gaia-spec`; parked until the SPEC starts |
+| `debt:spec-active` | A SPEC is underway for this issue, or holds it open on a recorded trigger |
+
+The severity labels form one red ramp, darkest for critical.
+
+## Work in progress
+
+| Label | Meaning |
+|---|---|
+| `in-progress` | Someone is working this issue right now; do not pick it up. Set by the [issue claim](/workflow/work-lifecycle/#1-claim) and released when the closing pull request merges. |
+| `needs-human` | A machine stopped here; a person needs to review. |
+
+## Issue types
+
+| Label | Meaning |
+|---|---|
+| `bug` | Existing behavior is broken or wrong |
+| `enhancement` | A new feature or request |
+| `documentation` | Improvements or additions to documentation |
+| `security` | A security defect or dependency CVE |
+| `wontfix` | Deliberately declined; do not re-file. The tech-debt filer skips a finding whose issue carries it. |
+| `dependencies`, `github_actions` | Dependabot's own labels |
+
+## Not created
+
+GitHub's default `good first issue` and `help wanted` labels are deliberately absent from GAIA's registry: they solicit drive-by contributions from people with no context for the work.
+
+## Renamed in 2.0.0
+
+`gaia labels sync` renames these in place, keeping every issue's label:
+
+| 1.x | 2.0.0 |
+|---|---|
+| `severity:important` | `severity:major` |
+| `severity:suggestion` | `severity:minor` |
+| `priority:high` | `severity:major` |
+| `priority:critical` | `severity:critical` |
+| `needs-human-review` | `needs-human` |
+
+Update the old names in your own workflows or templates by hand; find them with `git grep -n -E 'priority:(high|critical)|needs-human-review'`. The 1.x `gaia-ci` label is deprecated; `gaia labels sync --prune-deprecated` removes it.

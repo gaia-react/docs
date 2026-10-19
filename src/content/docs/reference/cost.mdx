@@ -1,0 +1,79 @@
+---
+title: Cost and usage ledger
+description: How GAIA records every model call to a local ledger and prints what each pull request, command, and initiative cost.
+sidebar:
+  order: 6
+---
+
+GAIA records every model call to a local usage ledger and prints what work cost, in one shape: tokens, dollars, and elapsed time.
+
+The ledger is `.gaia/local/telemetry/usage.jsonl`, at the main checkout, shared by every worktree. It stays on your machine and is never sent anywhere. Pricing makes no network request.
+
+## What you see
+
+One spend prints as one line:
+
+```text
+Cost: 5.2M tokens, $3.41, 6m39s
+```
+
+Two or more print as a box:
+
+```text
+SPEC-NNN Cost
+
++---------------------------------------+
+|  Spec: 40.9M tokens, $26.15, 31m52s   |
+|  Plan: 46.7M tokens, $23.09, 48m19s   |
++---------------------------------------+
+| Total: 87.6M tokens, $49.24, 1h20m14s |
++---------------------------------------+
+```
+
+Each row is rounded to the 0.1M tokens and the cent it shows, and the Total adds the rounded rows, so the column always sums.
+
+### Where it prints
+
+- **Every `gh pr merge`** prints a `PR #<N> Cost` box with **Execute**, **Audit**, and **Total** rows: the work on the branch, and what the Code Audit Team spent reviewing it. When only one of the two spent anything, it prints a single Cost line.
+- **`/gaia-spec` and `/gaia-plan`** end with one labelled box: **Spec**, **Plan**, **Execute**, and **Total** rows, or one line when only one row has spend. A plan's orchestrator prints the full-cycle cost when the work merges.
+- **Every other workflow** (the maintenance commands, `/gaia-debt`, `/gaia-residue`) ends with a Cost line.
+
+### Notes under the figures
+
+A `Note:` line under the figures says when a figure needs qualifying:
+
+- usage was still being saved when it was read, so the figures may be low (the note names the command that reads the final numbers);
+- a model has no price, so the cost is a minimum, and that row reads `at least $X.XX`;
+- a recovered run counts one session only.
+
+When nothing can be priced, the price reads `cost unavailable`. A figure is never made up.
+
+## What an idea cost
+
+```bash
+bash .gaia/scripts/usage.sh initiative <ref>
+```
+
+Totals an initiative from its first research to its merge, including runs continued after `/clear`. `<ref>` is a SPEC (`SPEC-012`), a plan (`PLAN-004`), an issue (`issue:142`), or a research folder (`research:<date>-<topic>`). Add `--line` for one line or `--box` for the box. `bash .gaia/scripts/usage.sh` lists its other subcommands.
+
+A branch's spend is tied to its initiative automatically when the branch name carries it (`debt/142-...`, `fix/142-...`, a SPEC's plan branch). Otherwise link it once:
+
+```bash
+bash .gaia/scripts/usage.sh link branch:<branch> research:<date>-<topic>
+```
+
+When a long run is cleared and resumed, the continuation prompt carries a join line that binds the new session to the same run, so its cost record covers every session.
+
+Spend from before the ledger's first record is never captured.
+
+## Prices
+
+Pricing uses the rate table that ships with GAIA, `.gaia/scripts/token-rates.json`, which covers current Claude models and reaches you through `/update-gaia`. Prices are applied when a figure is read, never stored, so a corrected rate moves every past figure on the next read.
+
+To set your own prices, or price a model the table lacks, write `.gaia/local/telemetry/token-rates.override.json`:
+
+```json
+{ "models": { "claude-opus-5-5": [ { "input": 4, "output": 20 } ] } }
+```
+
+Prices are dollars per million input and output tokens. Each model you list replaces that model's shipped rates; models you omit keep theirs. An override that does not parse is ignored, and every readout says so once. GAIA never writes or deletes this file.

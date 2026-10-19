@@ -1,76 +1,69 @@
 ---
 title: Agents
-description: Reference for the subagents GAIA ships with Claude Code.
+description: Reference for the sub-agents GAIA ships, what dispatches each one, and what it is allowed to do.
 sidebar:
   order: 3
 ---
 
-Agents are subagents Claude Code can spawn from the main conversation. Each agent runs in its own isolated context, performs a focused task, and reports back a single result. Agents are defined as Markdown files at `.claude/agents/*.md` with frontmatter that names the agent, describes when to invoke it, and pins a model.
+GAIA ships seven sub-agents in `.claude/agents/`. None is invoked directly: each is dispatched by a workflow at the point it needs one. Each pins a model and runs at `medium` effort whatever your session's `/effort`, unless `CLAUDE_CODE_EFFORT_LEVEL` is set; the pinned effort needs Claude Code 2.1.292 or later.
 
-For Claude Code's own subagent documentation, see [the Subagents reference on docs.claude.com](https://docs.claude.com/en/docs/claude-code/sub-agents).
+| Agent | Model | Dispatched by | Edits files? |
+|---|---|---|---|
+| [`code-audit-frontend`](#code-audit-frontend) | Opus | the audit loop | No |
+| [`code-audit-github-workflows`](#code-audit-github-workflows) | Opus | the audit loop | No |
+| [`audit-loop-unit`](#audit-loop-unit) | Opus | the merge workflow | Commits fix rounds |
+| [`audit-light-reviewer`](#audit-light-reviewer) | Sonnet | the audit loop, on a light route | No (read-only) |
+| [`worthiness-evaluator`](#worthiness-evaluator) | Opus | the `tdd` skill | No |
+| [`uat-fidelity-judge`](#uat-fidelity-judge) | Opus | a SPEC plan's orchestrator | Writes its verdict file only |
+| [`fitness-judge`](#fitness-judge) | Sonnet | `/gaia-fitness` | No (read-only) |
 
-## code-review-audit
+## The Code Audit Team
 
-Path: `.claude/agents/code-review-audit.md`. Model: `opus`.
+The pre-merge audit is a team: each member owns the files its globs claim in `.gaia/audit-ci.yml`, and a pull request is reviewed by every member whose files it touches. Members only report; a separate fixer repairs, and a deterministic verifier checks each repair. Every finding is graded Critical, Major, or Minor. See [Code Audit Team](/workflow/code-audit-team/) for the roster, clearances, and the loop.
 
-Comprehensive code review, security audit, performance analysis, and architectural assessment. Goes beyond what ESLint and TypeScript catch by reasoning about intent, data flow, and architectural fit. **Mandatory before any PR merge.**
+### code-audit-frontend
 
-### When to invoke
+The default member. Owns the app and its tooling: `frontend/app/**`, tests, Storybook and Playwright trees, manifests, build and lint configs, root tooling such as `.npmrc`, and `frontend/.claude/**`. It reviews what lint and types cannot: security (a critical priority), performance, architectural fit, robustness and edge cases, accessibility, and maintainability. It also flags quadratic lookups split across a component or function boundary.
 
-- Before merging a PR. The `pr-merge-audit-check` hook blocks `gh pr merge` until the agent has produced a clean run for the current HEAD.
-- After a substantial change or refactor, when verification beyond the quality gate is warranted.
-- On request, for a focused review of the current branch.
+Three specialist sub-agents review React patterns and accessibility, TypeScript and architecture, and translations. Library-specific rules load from `frontend/.claude/agents/code-audit-frontend/`: `cn`, Conform, the form components, React buckets, react-i18next, and shadcn. React Doctor, Knip, and dependency advisories feed it too, as advisory input.
 
-### What it reviews
+Every Critical or Major finding of its own is handed to a fresh-context refuter before it is reported, so a finding that cannot survive an independent check is dropped or demoted. Each reply ends with a `Files reviewed` count, so an early stop is caught rather than read as clean.
 
-- **Security**: injection paths, auth/authorization gaps, secret exposure, CSRF/SSRF, data leakage through loaders, timing attacks.
-- **Performance**: N+1 patterns, unnecessary re-renders, bundle size, SSR cost in loaders, network waterfalls.
-- **Architecture**: separation of concerns, single responsibility, dependency direction, state placement, module-level duplication.
-- **Robustness**: missing validation, race conditions, null safety, error states, boundary conditions.
-- **Accessibility**: keyboard reachability, semantic HTML, focus management, ARIA usage.
-- **Maintainability**: magic values, dead code, coupling, comment quality.
+### code-audit-github-workflows
 
-The review runs in two phases. First it surfaces every candidate finding tagged with severity and confidence, keeping low-confidence ones rather than dropping them. Then each Critical or Important finding is double-checked by a fresh subagent that overturns it only with concrete counter-evidence, like a specific guard, a test, or proof the failure path can't be reached. The report waits until that second pass finishes.
+Owns `.github/workflows/*.yml` and `.github/actions/**/*.yml`. Reviews workflow YAML for script injection, unsafe `pull_request_target` use, unpinned third-party actions, over-broad permissions, and secret handling.
 
-The main agent runs the whole review: specialist subagents (React patterns, TypeScript / architecture, translation), supporting tools (`react-doctor`, `pnpm knip --reporter json`, `pnpm audit --json`), and the per-finding refuters. None of these spawn further subagents of their own. The `pnpm audit` pass is the Dependency-CVE advisory: it reports high and critical findings for you to decide on and never blocks the audit marker or `gh pr merge`. See the `dep-audit` rule.
+### audit-loop-unit
 
-Per-phase progress breadcrumbs (scope resolved, oracles done, holistic review done, adversarial verify done, report stamped) are written to `.gaia/local/audit/progress.log` and surfaced in the GitHub Actions step summary.
+Runs a window of audit rounds off your main session: dispatches the members, the fixer, and the verifier, runs the Quality Gate, commits and pushes each round's fixes, and returns a thin report. Your session holds only that report, so a long audit does not fill its context. It never merges and never posts `GAIA-Audit`; the main session does both. It is the one agent allowed to dispatch agents of its own, which needs Claude Code 2.1.292 or later.
 
-### Output
+### audit-light-reviewer
 
-The agent produces a structured report:
+Reviews a small change since a member's last full review, when the member opted in with `light_review: true`. Read-only. Whenever the light route cannot be established, the full member runs instead.
 
-- **Summary**: overview, overall quality, top findings.
-- **Critical Issues (Must Fix)**: security and bugs that block merge. Each finding gives `path:line`, the issue, and a concrete fix.
-- **Important Issues (Should Fix)**: performance and architectural concerns at scale. Same shape.
-- **Suggestions (Must Fix or Escalate)**: refactoring and minor improvements. Every suggestion must be resolved before the audit passes. Auto-fix it in the working tree or explicitly escalate with documented rationale. Escalated suggestions block the marker.
-- **What's Done Well**: included only when there are concrete patterns worth reinforcing.
+## Tests and acceptance
 
-### Audit marker and trailer
+### worthiness-evaluator
 
-When the report is clean (no Critical Issues, all Important Issues resolved in the working tree, and the Suggestions section empty or every suggestion auto-fixed), the agent stamps HEAD with a `GAIA-Audit:` commit trailer and writes a marker file at `.gaia/local/audit/<HEAD-sha>.ok`. The marker unblocks `gh pr merge` locally; the trailer travels with the commit through the network so CI can recognize an already-audited tree and skip its own audit run.
+An advisory reviewer for tests on the emergent surface (stories and Playwright), where the failing-first RED gate does not apply. The `tdd` skill dispatches it after tests go green. It reads only the tests the work changed plus their sibling suites, and edits nothing.
 
-If findings remain, the agent does not write the marker. Address findings, commit, and re-invoke the agent on the new HEAD.
+Each test is judged on two axes:
 
-### Local vs CI audit mode
+- **Honesty**: can the test fail for a real reason? It must assert through the public interface (roles, accessible names, visible text), not implementation detail, and survive an internal refactor.
+- **Worthiness**: is it worth keeping? It should exercise your own code rather than a dependency, and a composition test should not re-prove what a child's suite already covers.
 
-By default the audit runs in CI on every PR, and you wait for the `GAIA-Audit` commit status to go green before merging. Teams can let individual developers run it locally instead. In local mode the audit runs at merge time in your own session, streaming as it goes, and CI's audit step stands down for that author while still running for everyone else.
+One verdict per test: `keep`, `fix`, or `delete`. A `fix` names the defect; a `delete` is always a proposal you confirm, with its evidence. A merge hook checks that every changed test of this kind has a verdict for its current content.
 
-The team default and the per-developer enrollments live in `.gaia/audit-ci.yml`, which ships with the project and is meant to be edited. Both are set through the single [`/setup-gaia`](/getting-started/setup-gaia/) command: its team audit-mode policy step writes the team default, and its per-developer step records each developer's own choice. Local mode relies on `GAIA-Audit` being registered as a required status check on the default branch; if it is not, the audit falls back to CI.
+### uat-fidelity-judge
 
-## worthiness-evaluator
+Before a SPEC plan's pull request is audited, reads the SPEC and each rendered Playwright UAT spec and judges whether each test body still asserts its contract. Writes one JSON verdict file. A failure halts the plan.
 
-Path: `.claude/agents/worthiness-evaluator.md`. Model: `opus`.
+## Integration health
 
-An advisory reviewer for tests on the emergent surface (components and Playwright), where the failing-first RED gate does not apply. The `tdd` skill dispatches it after tests go green. It reads only the test files the phase changed plus their sibling suites, and it edits nothing.
+### fitness-judge
 
-### What it judges
+The advisory judgment pass of [`/gaia-fitness`](/maintenance/fitness/): description substance, trigger overlap between skills, rule scope against `paths:` globs, and terminology within a skill. Read-only, and it never moves the grade.
 
-Each test is scored on two axes:
+## Retired
 
-- **Honesty**: can the test fail for a real reason? It must assert through the public interface (roles, accessible names, visible text), not internal call signatures or implementation detail, and survive an internal refactor.
-- **Worthiness**: is the test worth keeping? It should exercise your own code rather than a dependency or a platform formatter, and a composition test should not re-prove what a child's own suite already covers.
-
-### Output
-
-One verdict per test: `keep`, `fix`, or `delete`. A `fix` names the specific defect. A `delete` is always a proposal you confirm, never applied automatically, and it carries the evidence behind it. The verdicts surface in the end-of-task summary alongside the rest of the TDD roll-up.
+The single `code-review-audit` agent of 1.x is replaced by the Code Audit Team. Its `GAIA-Audit:` commit trailer is retired; the `GAIA-Audit` status check is unchanged and still required.

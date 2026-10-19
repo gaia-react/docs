@@ -1,40 +1,68 @@
 ---
 title: Rules
-description: Reference for the path-scoped rule files GAIA loads into Claude's context.
+description: Reference for the rule files GAIA loads into Claude's context, always or when the work touches a matching path.
 sidebar:
   order: 2
 ---
 
-Rules live at `.claude/rules/*.md`. Each rule is a short Markdown file that Claude loads into context when the work touches a matching path. The `instruction-files` rule itself enforces the convention: paths inside template-distributed files must be repo-relative, never absolute, so they resolve correctly on every machine.
+Rules are short Markdown files Claude loads into context. A rule's frontmatter `paths:` field is the gate: when Claude reads or edits a file matching one of those globs, the rule loads. A rule with no `paths:` field loads at every session start.
 
-A rule's frontmatter `paths:` field is the gate. When Claude edits or reads a file matching one of those globs, the rule body is included automatically. Rules without a `paths:` field are always loaded.
+Rules are advice the model reads, not enforcement. What must hold regardless of what the model decides is enforced by [hooks](/reference/hooks/), the commit hooks, and the merge audit.
 
-## Always loaded
+GAIA ships rules in two places:
+
+- **`.claude/rules/`** at the root: rules for the whole repository. Their globs are relative to the repository root.
+- **`frontend/.claude/rules/`**: rules for the React app. They load when the work is under `frontend/`, and their globs are relative to `frontend/`.
+
+## Always loaded (root)
 
 | Rule | What it enforces |
 |---|---|
-| `coding-guidelines` | File-naming conventions (PascalCase components, camelCase hooks, kebab-case other), think-before-coding (surface assumptions, push back when a simpler approach exists), simplicity-first (no speculative abstractions or impossible-scenario error handling; real failure modes such as non-zero exits, loop non-convergence, and network failures still get handled and bounded), surgical changes, goal-driven execution, mandatory TDD, mandatory quality-gate run before commit. |
-| `dep-audit` | Dependency-CVE advisory. The audit agent runs `pnpm audit --json` pre-merge and reports high and critical findings for the operator to decide on. Read-only, so it never blocks the audit marker or `gh pr merge`. Distinct from the blocking CI `pnpm audit` pass. |
-| `knip` | When and when not to run `pnpm knip`; the audit agent runs it pre-merge, manual runs only after a refactor, deletion, or dependency replacement, never mid-task or inside the Quality Gate. |
-| `pr-merge` | Before any `gh pr merge`, run the audit and marker handshake, then confirm the PR reports `MERGED` before any local branch cleanup; use `--auto` (not `--admin`) when branch protection blocks the merge. |
-| `quality-gate` | Run the steps in `wiki/decisions/Quality Gate.md` before any commit that touches source, unless nothing in the gate's scope is staged. |
-| `shell-cwd` | No `cd` in Bash tool calls; use absolute paths. A persistent `cd` breaks the relative-path hooks registered in `settings.json`. |
+| `coding-guidelines` | Kebab-case files and folders; simplicity first (no handling for states that cannot occur, but real failures handled and bounded); surgical changes; goal-driven execution; mandatory TDD and the Quality Gate before a commit. React file layout lives in `coding-guidelines-react`. |
+| `context-discipline` | Keep the main thread lean and fan read-heavy work out to sub-agents; choose models from the Workflow Doctrine table; research lives in `.notebook/research/<date>-<topic>/`; long work resumes from one `STATE.md`; a prompt meant for pasting goes in a fenced code block. |
+| `issue-claim` | Before work that closes a GitHub issue, check for and set the `in-progress` claim; follow the work lifecycle; claim `tech-debt` issues only through `/gaia-debt`. |
+| `pr-merge` | Before any `gh pr merge`, run the audit and post `GAIA-Audit` last; the audit loop runs on its own until the branch checkpoint, which only a human answers. |
+| `quality-gate` | Run the Quality Gate before any commit that touches source, unless nothing in the gate's scope is staged. |
+| `serena-cc-override` | When Serena is registered, prefer its symbol tools over Read and Grep for symbol-level work. Inert without Serena. |
+| `shell-cwd` | No `cd` in Bash calls; use absolute paths, so hooks registered by repo-relative path keep resolving. |
+| `subagent-dispatch` | A dispatched agent writes its result to a JSON file, which a no-op detector classifies, so a missing reply is re-dispatched instead of read as "found nothing". |
 
-## Path-scoped
+## Path-scoped (root)
 
-| Rule | What it enforces | Paths |
+| Rule | What it enforces | Loads on |
 |---|---|---|
-| `accessibility` | Keyboard reachability, alt text, focus management on modals, semantic HTML over ARIA roles, color never the sole indicator. | `app/components/**/*`, `app/pages/**/*` |
-| `api-service` | Pointer to the API Service Pattern wiki page and the `new-service` skill; no inline rules. | `app/services/**/*`, `test/mocks/**/*` |
-| `code-search` | Prefer Serena's MCP tools for symbol-level queries on TS/TSX; fall back to Read+grep for prose, comments, and files outside `app/**`/`test/**`. | `app/**/*.ts`, `app/**/*.tsx`, `test/**/*.ts`, `test/**/*.tsx` |
-| `design-baseline` | Treats GAIA's shipped neutral styling as a placeholder, not a chosen design system; confirm the design direction before extending design tokens or committing to a visual language, until the project records its own real design decisions. | `app/styles/**`, `app/components/**`, `app/pages/**`, `app/routes/**` |
-| `i18n` | Every user-facing string comes from `t()`; one `useTranslation()` per component; namespace conventions and key file layout under `app/languages/en/`. | `app/pages/**/*`, `app/components/**/*`, `app/languages/**/*` |
-| `instruction-files` | All paths in template-distributed files under `.claude/` must be repo-relative; provides an audit grep for absolute-path leaks. | `.claude/**` |
-| `playwright` | E2E spec layout, semantic selectors over CSS, web-first assertions only, hydration helper before interaction, MSW behavior in dev, parallelism and CI settings. | `.playwright/**/*`, `playwright.config.*` |
-| `react-router-docs` | For React Router framework-mode work (routes, loaders, actions, middleware, navigation, error boundaries), read the docs shipped in `node_modules/react-router/docs`, which match the pinned version, rather than the web; check the remix-utils decision map before hand-rolling csrf, honeypot, or safe-redirect primitives. Covers React Router's own API; route/page structure conventions live in `routes`. | `app/routes/**/*`, `app/pages/**/*`, `app/root.tsx`, `app/middleware/**/*`, `react-router.config.ts` |
-| `repo-relative-paths` | No hardcoded machine-specific absolute paths anywhere in the repo; use a repo-relative path, or derive the root once with `git rev-parse --show-toplevel` when an absolute path is genuinely required. Repo-wide superset of `instruction-files`. | `.gaia/**`, `.specify/**`, `app/**`, `test/**`, `scripts/**`, `docs/**` |
-| `routes` | Pointer to thin-route conventions in the wiki and the `new-route` skill; route files hold only loader, action, meta, and a one-line page render. | `app/routes/**/*`, `app/pages/**/*` |
-| `state-pattern` | Context creation lives in `app/state/`; naming conventions for Provider/`useX`/`useMaybeX`; never export the Context; provider composition via `app/state/index.tsx`. | `app/state/**/*` |
-| `storybook` | Story file location and typing, slash-separated titles, decorator order, fullscreen layout with `wrap: 'p-4'` for padding, variant-name table, Chromatic dark-mode handling. | `app/**/*.stories.tsx`, `.storybook/**/*` |
-| `tailwind` | Tailwind v4 only (config in `app/styles/tailwind.css`, no `tailwind.config.ts`); semantic `@utility` tokens over raw paired classes; no arbitrary hex colors in `[]`. | `app/**/*.tsx`, `app/**/*.css` |
-| `wiki-style` | Present-tense prose; no UAT/SPEC/PR/commit references in body prose; no historical phrasing; no unreleased or speculative roadmap stated as current behavior; ships an audit grep for violations. | `wiki/**/*.md`, `app/**/*.{ts,tsx,js,jsx,css}`, `.claude/{skills,commands,agents,rules}/**/*.md`, `.claude/hooks/**/*.sh`, `.specify/extensions/gaia/README.md`, `.specify/extensions/gaia/commands/**/*.md`, `.specify/extensions/gaia/lib/**/*.sh`, `.specify/extensions/gaia/rules/**/*.md`, `.specify/extensions/gaia/templates/**/*.md` |
+| `ambient-context-resolution` | Scripts take the repository root, base, and commit from their input, not from the working directory or `HEAD`. | `.gaia/scripts/**/*.sh`, `.claude/hooks/**/*.sh`, `.github/workflows/**/*.yml`, `.gaia/**/*.ts` |
+| `code-comments` | A comment says something the code does not; the merge auditor applies the same standard. | app, test, Playwright, and Storybook source under `frontend/`, plus `.gaia/**` |
+| `code-search` | Prefer Serena's MCP tools for symbol-level queries; grep stays right for prose, strings, non-code files, and unindexed languages. | code files in any language |
+| `file-placement` | Where new hooks and scripts go and how a hook is registered. | `.claude/hooks/**`, `.gaia/scripts/**` |
+| `guards-must-fail` | A guard and its tests must be shown failing before they are trusted. | hooks, scripts, workflows, and Playwright specs |
+| `no-abbreviations` | Descriptive names in every language, alongside the `naming-conventions` skill. | code files in any language |
+| `user-questions` | Ask a choice as an `AskUserQuestion` menu with the recommended option first; print any pasteable prompt or command in a fenced code block. | skills, commands, agents |
+| `wiki-style` | Present-tense prose; no historical phrasing or roadmap stated as current; no SPEC, PR, or commit references in body prose. | `wiki/**/*.md`, app source, and harness Markdown |
+| `working-doc-ids` | No SPEC, plan, or audit ids, or your own issue and PR numbers, in code and prose. | app, test, and harness source |
+
+## Frontend (`frontend/.claude/rules/`)
+
+| Rule | What it enforces | Loads on |
+|---|---|---|
+| `accessibility` | Keyboard reachability, alt text, focus management, semantic HTML over ARIA roles, color never the only indicator. | `app/components/**`, `app/pages/**` |
+| `api-service` | Points to the API Service Pattern and the `new-service` skill. | `app/services/**`, `test/mocks/**` |
+| `coding-guidelines-react` | React file and folder layout and naming: kebab-case folders, `index.tsx`, `use-<name>.ts` hooks, `tests/` folders. | `app/**`, `test/**`, `.playwright/**`, `.storybook/**` |
+| `design-baseline` | GAIA's neutral styling is a placeholder, not a design system; confirm the design direction before extending tokens. | `app/styles/**`, `app/components/**`, `app/pages/**`, `app/routes/**` |
+| `i18n` | Every user-facing string comes from `t()`; namespace and key-file conventions. | `app/routes/**`, `app/pages/**`, `app/components/**`, `app/languages/**` |
+| `playwright` | Spec layout, semantic selectors, web-first assertions, the hydration helper, MSW in dev. | `.playwright/**`, `playwright.config.*` |
+| `ports` | Each checkout owns its dev, Storybook, and Playwright ports; read them from `bash .gaia/scripts/ports.sh`, never hardcode 5173 or 6006. | app, test, and server configs |
+| `react-router-docs` | Read the React Router docs shipped in `node_modules/react-router/docs`, which match the pinned version, and check remix-utils before hand-rolling a primitive. | routes, pages, `app/root.tsx`, middleware |
+| `routes` | Thin route files (loader, action, meta, one-line page render); UI in `app/pages/`. | `app/routes/**`, `app/pages/**` |
+| `shadcn-ui` | The vendored `ui` components are not edited; add components with `pnpm shadcn add`. | `app/components/ui/**` |
+| `state-pattern` | Context lives in `app/state/`, with Provider, `useX`, and `useMaybeX` naming. | `app/state/**` |
+| `storybook` | Story location and typing, titles, decorator order, layout, and Chromatic light and dark modes. | `app/**/*.stories.tsx`, `.storybook/**` |
+| `tailwind` | Role tokens only, no raw palette classes or arbitrary colors; Tailwind v4 config in CSS. | `app/**/*.tsx`, `app/**/*.css` |
+
+## Retired in 2.0.0
+
+`dep-audit`, `knip`, `instruction-files`, and `repo-relative-paths` are removed; their guidance lives where it is used, and the repo-relative path principle is in the root `CLAUDE.md`. `/update-gaia` offers to remove the old files.
+
+## Adding your own
+
+Add a Markdown file under `.claude/rules/` (or `frontend/.claude/rules/` for an app-only rule), with a `paths:` glob unless it truly needs to load every session: an always-loaded rule costs context in every session. [`/gaia-codify`](/maintenance/codify/) writes path-scoped rules from recurring audit findings, and [`/gaia-cleanse`](/maintenance/cleanse/) and [`/gaia-fitness`](/maintenance/fitness/) keep rules lean.
