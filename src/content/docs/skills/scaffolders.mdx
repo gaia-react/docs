@@ -5,70 +5,76 @@ sidebar:
   order: 2
 ---
 
-These skills are used by Claude when it generates new files, following the project's conventions.
+These skills generate new files in the React app following the project's conventions. They wrap the bundled `gaia scaffold` CLI, so you do not memorize flags: describe what you want and the skill asks for anything missing. Each one runs the CLI from the repository root (`./.gaia/cli/gaia scaffold ...`) and writes into the `frontend/` package. Paths below are relative to `frontend/`.
 
-The skills are the user-facing surface. They wrap the bundled `gaia scaffold` CLI so you don't memorize flags. Run them by describing what you want; the skill prompts for anything missing.
+Files and folders under `app/components`, `app/pages`, and `app/hooks` are kebab-case, and `@gaia-react/lint` enforces it.
 
 ## New Component
 
-Scaffolds a React component as a folder under `app/components/` (or a sub-folder you specify) with `index.tsx`, an optional Storybook story, and a Vitest test scaffold.
+First checks whether the shadcn/ui registry already provides the component (a dialog, tabs, a popover). If it does, it runs `pnpm shadcn add <name>`, which vendors the file flat into `app/components/ui/<name>.tsx`; GAIA never edits those files. Otherwise it scaffolds a component folder: `app/components/<name>/index.tsx` and `tests/index.stories.tsx`, a story with a play function that is the component's test. There is no separate test file.
 
-**Confirms:** name (PascalCase), parent directory (default `app/components`), props (or "none"), include a story (default yes).
+**Confirms:** name (kebab-case or PascalCase; the folder is the kebab form), parent folder (default `app/components/`), and props.
 
 **Triggers** when you ask to create a component, scaffold a card, make a button, or add a new component.
 
-**Example phrasing:** "create a PriceCard component", "scaffold a button under app/components/Form", "make a new component called UserAvatar with a name and url prop".
+**Example phrasing:** "create a price-card component", "scaffold a user-avatar with a name and url prop".
 
-Underlying CLI: `gaia scaffold component <Name> [--no-story] [--parent <dir>] [--props "a:string,b:number"] [--json]`.
+Underlying CLI: `gaia scaffold component <name> [--parent <dir>] [--props "a:string,b:number"] [--json]`. `--props` takes comma-separated `name:type` pairs; types with commas inside them (`Record<string, unknown>`, tuples, function types) work. `app/components/ui` is refused as a parent.
 
-`--props` takes comma-separated `name:type` pairs. Comma-bearing types like `Record<string, unknown>`, tuples, and multi-argument function types work inside a single entry, for example `--props "label:string,data:Record<string, unknown>"`.
-
-Source: `.claude/skills/new-component/SKILL.md`.
+Source: `frontend/.claude/skills/new-component/SKILL.md`.
 
 ## New Hook
 
-Scaffolds a custom React hook with a Vitest test file.
+Scaffolds a custom React hook, `app/hooks/use-<name>.ts` (named export `useName`), with a `vitest-browser-react` test at `app/hooks/tests/use-<name>.test.ts`.
 
-**Confirms:** name (must start with `use`), params, return type.
+**Confirms:** name (`use-kebab` or `useCamel`), params, and return type.
 
-**Triggers** when you ask to create a hook, make a `useFoo` hook, scaffold a custom React hook, or add a hook under `app/hooks`. Also triggers when describing reusable React state or effect logic that warrants extraction into a named `use*` hook.
+**Triggers** when you ask to create a hook, make a `useFoo` hook, or describe reusable state or effect logic worth extracting.
 
-**Example phrasing:** "make a useCountdown hook", "scaffold useDebouncedValue with a value and delay parameter", "extract this into a useFormSubmission hook".
+**Example phrasing:** "make a useCountdown hook", "extract this into a useFormSubmission hook".
 
 Underlying CLI: `gaia scaffold hook <useFoo> [--params "a:string,b:number"] [--returns "ReturnType"] [--json]`.
 
-Source: `.claude/skills/new-hook/SKILL.md`.
+Source: `frontend/.claude/skills/new-hook/SKILL.md`.
 
 ## New Route
 
-Scaffolds a new route with its page component, test, story, and optional i18n keys. Files land in `app/routes/<group>/<name>.tsx` plus `app/pages/<Group>/<Pascal>Page/index.tsx` (for example `UserProfilePage`). The route file stays a thin shell (`loader`, `action`, `meta`, Zod schemas, one-line default export); UI lives in the page component.
+Scaffolds a route file, `app/routes/<group>.<name>.tsx` (flat `@react-router/fs-routes` naming), and its page, `app/pages/<name>/page.tsx` with `tests/page.stories.tsx`. The story is the page's test. The route file stays a thin shell (`loader`, `action`, `meta`, one-line default export); the UI lives in the page.
 
-**Confirms:** name (kebab-case), group (`_public+` or `_session+`), and which of `--loader`, `--action`, `--i18n` to include.
+With a service bound, it writes the whole data path for one of three data variants:
 
-**Triggers** when you ask to create a route, add a new page, scaffold a path like `/dashboard`, or wire up a new route under `_public+` or `_session+`.
+| `--data` | What it writes |
+|---|---|
+| `server` | a server `loader` the page reads with `useLoaderData` |
+| `client` | a `clientLoader` and a `HydrateFallback` |
+| `query` | a `clientLoader` that primes the TanStack Query cache, and a page that reads `useSuspenseQuery` (needs Query installed) |
 
-**Example phrasing:** "add a /pricing page in _public+", "scaffold /settings/profile under _session+ with a loader and action", "create a new route /forgot-password with i18n".
+`--shape list` writes `<group>.<name>.tsx`; `--shape detail` writes `<group>.<name>_.$id.tsx`. The page story is driven by MSW.
 
-Underlying CLI: `gaia scaffold route <name> --group <_public+|_session+> [--loader] [--action] [--i18n] [--dry-run] [--json]`.
+**Confirms:** name (kebab-case), group (`_public` or `_session`), and the data, action, and i18n options.
 
-`--dry-run` prints the files it would write without touching disk, so you can confirm the output paths first. With `--i18n`, the new locale file is also wired into `app/languages/en/pages/index.ts`. If that barrel is missing, the command writes the locale file but stops with an actionable error instead of reporting success, so you can add the import by hand or re-run from the repo root.
+**Triggers** when you ask to create a route, add a page, scaffold a path like `/dashboard`, or wire up a route under `_public` or `_session`.
 
-Source: `.claude/skills/new-route/SKILL.md`.
+**Example phrasing:** "add a /pricing page in _public", "scaffold a projects list page in _session backed by the projects service".
+
+Underlying CLI: `gaia scaffold route <name> --group <_public|_session> [--data <server|client|query> --service <name> --shape <list|detail>] [--layer <folder>] [--loader] [--action] [--i18n] [--dry-run] [--json]`.
+
+`--dry-run` prints the files it would write without touching disk. `--loader` (a title and meta loader) cannot be combined with `--data`. With `--action` and `--data`, it writes a create (list) or update (detail) action validated by the service's input schema. With `--i18n`, the locale file is wired into the locale barrel; if the barrel is missing, the command stops with an actionable error.
+
+Source: `frontend/.claude/skills/new-route/SKILL.md`.
 
 ## New Service
 
-Scaffolds an API service: request functions, Zod parsers, URL constants, types, and (optionally) MSW mock handlers. Files land under `app/services/gaia/<name>/` with matching mocks under `test/mocks/<name>/`.
+Scaffolds an API service in the domain-layer folder under `app/services/`: request functions built on Ky with Zod-validated responses, schemas, URL constants, and types, with optional MSW mock handlers under `test/mocks/<name>/`. When `@tanstack/react-query` is installed and the service has a `get`, it also writes `queries.ts` with query keys and `queryOptions` factories.
 
-**Confirms:** name (kebab-case), endpoints (subset of `get`, `post`, `put`, `delete`), schema as `name:type` pairs, include MSW mocks.
+**Confirms:** name (kebab-case), endpoints (a subset of `get`, `post`, `put`, `delete`), the schema as `name:type` pairs, and whether to include mocks.
 
-**Triggers** when you ask to add a service, create the API for a resource, scaffold a new GAIA service, or wire up CRUD for a resource.
+**Triggers** when you ask to add a service, create the API for a resource, or wire up CRUD for a resource.
 
-**Example phrasing:** "add a projects service with get and post", "scaffold a users API with id, email, and a status enum", "wire up CRUD for tasks with mocks".
+**Example phrasing:** "add a projects service with get and post", "wire up CRUD for tasks with mocks".
 
-Underlying CLI: `gaia scaffold service <name> --endpoints "get,post,put,delete" --schema "id:string,name:string,status:enum(active,archived)" [--mocks] [--json]`.
+Underlying CLI: `gaia scaffold service <name> --endpoints "get,post,put,delete" --schema "id:string,name:string,status:enum(active,archived)" [--layer <folder>] [--mocks] [--json]`. Schema types are `string`, `number`, `boolean`, `datetime`, and `enum(a,b,...)`; append `?` to make a field optional. `--queries-only` adds `queries.ts` to an existing service.
 
-Schema types: `string`, `number`, `boolean`, `datetime`, `enum(a,b,...)`. Append `?` to mark a field optional.
+The skill stops short of wiring the service into a page or hook, so you decide where it belongs. [New Route](#new-route) with `--data` does that wiring for a route.
 
-The skill stops short of wiring the service into a consuming page or hook. That step stays manual so you can decide where the service belongs.
-
-Source: `.claude/skills/new-service/SKILL.md`.
+Source: `frontend/.claude/skills/new-service/SKILL.md`.

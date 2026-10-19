@@ -21,6 +21,8 @@ input, and the recommended fix; you (or Claude, in normal conversation) apply it
 
 ## How to invoke
 
+It drives this checkout's dev server, so it refuses inside a linked worktree; run it from the main checkout.
+
 The skill is gated to explicit render-performance intent. It loads on the
 `/gaia-react-perf` handle or on a natural-language ask that names rendering.
 
@@ -47,9 +49,9 @@ flow) never enters the conversation. Only the reduced summary is read.
 ### 1. Capture
 
 The skill writes a short, temporary Playwright spec that drives your target
-interaction using the committed capture helper at `.playwright/react-perf/capture.ts`.
+interaction using the committed capture helper at `frontend/.playwright/react-perf/capture.ts`.
 The helper records every render your interaction triggers and writes the raw data
-to `.gaia/local/cache/<run>/renders.json`.
+to `.gaia/local/cache/<run>/renders.json` at the repository root.
 
 ```ts
 import {expect, test} from '@playwright/test';
@@ -68,12 +70,14 @@ test('drive the target micro-interaction and capture renders', async ({page}) =>
   await expect(toggle).toBeVisible();
   await toggle.click();
 
-  // keep: true is required, or the run dir auto-deletes on process exit before
-  // the reduce step can read it.
-  const result = await collectRenderDump(page, {keep: true});
+  // isRunDirectoryKept: true is required, or the run dir auto-deletes on process
+  // exit before the reduce step can read it.
+  const result = await collectRenderDump(page, {isRunDirectoryKept: true});
   console.log(`RAW_DUMP_PATH=${result.rawPath}`);
 });
 ```
+
+A drive spec of your own written against 1.x passes `{keep: true}`; rename it to `{isRunDirectoryKept: true}`, since the old name is no longer read.
 
 Run it. The Playwright config auto-starts the dev server, and the capture requires
 a development build (a production build is rejected, because render timings are
@@ -188,6 +192,14 @@ framework-level row (a router or library internal that the name heuristic did no
 catch) is not app-fixable, and a sub-perceptible app finding well under the frame
 budget is not worth fixing.
 
+## Under the React Compiler
+
+React Compiler is on by default, so compiled components count as memoized: the capture treats a component carrying a compiler memo cache as `isMemo: true`. A memo-defeated record on a compiled component therefore means its inputs arrive unstable from code the compiler does not compile (a third-party component, or a file opted out with `"use no memo"`), not that a manual memo is missing.
+
+The recommended fix is structural first: hoist a stable value to a module-level constant. A value that depends on render state is memoized by the compiler, so when one still arrives unstable, the fallback is to fix the compiler bailout (a Rules of React violation) or apply an escape case from the [`react-code`](/skills/code/#react-code) skill, never a memoize-everything pass.
+
+To measure what the compiler itself saves, compare update-phase render counts between captures taken with `isReactCompilerEnabled` off and on in `frontend/react-compiler.config.ts`.
+
 ## When to use it, and when not
 
 Use it to find the reference instability behind a specific over-render: a memo
@@ -212,4 +224,4 @@ Two more limits worth knowing:
   An unusual component name can slip the filter, which is one more reason a human
   stays in the loop on the fix.
 
-Source: `.claude/skills/gaia-react-perf/SKILL.md`.
+Source: `frontend/.claude/skills/gaia-react-perf/SKILL.md`.

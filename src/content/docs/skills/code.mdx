@@ -1,118 +1,121 @@
 ---
 title: Code skills
-description: Skills that govern how Claude writes and edits TypeScript, React, Tailwind, tests, and browser automation in your project.
+description: Skills that govern how Claude writes and edits TypeScript, React, Tailwind, tests, names, and browser automation in your project.
 sidebar:
   order: 1
 ---
 
-Nine skills that govern code generation and review. Each one loads automatically when its trigger phrasing matches the conversation. You don't invoke them by name.
+Skills that govern code generation and review. Each one loads automatically when its trigger phrasing matches the conversation. You don't invoke them by name.
+
+The React app's skills live in `frontend/.claude/skills/` and load in sessions that work on the app. `tdd` and `naming-conventions` live in the root `.claude/skills/` and apply anywhere in the repository.
 
 ## TypeScript
 
-Patterns and conventions for TypeScript across the project: camelCase identifiers, `type` over `interface`, explicit return types on exported functions, no enums, no `switch`, max three positional parameters, Zod's `z.literal()` over `z.enum()`, and naming guidance modeled on Apple's Swift API Design Guidelines.
+Patterns and conventions for TypeScript: `type` over `interface`, explicit return types on exported functions, no enums (`as const` objects with derived types instead), no `switch`, at most three positional parameters, `undefined` over `null` for absence you control, and Zod 4's `z.literal([...])` over `z.enum()`.
 
-**Triggers** when writing or reviewing TypeScript: typing exports, choosing between `type` and `interface`, defining Zod schemas, structuring function parameters, naming identifiers, or enforcing patterns like avoiding switch statements and enums.
+**One source of truth.** Before defining a constant list, union type, schema, or lookup map, search for an existing one and import it. Every other shape of the set is derived from the one source, and maps keyed by a union use `satisfies Record<Union, ...>`, so adding a member is a type error everywhere it is not handled.
 
-**Example phrasing:** "type this Zod schema", "should this be a type or an interface", "name this hook better".
+**Triggers** when writing or reviewing TypeScript: typing exports, choosing between `type` and `interface`, defining Zod schemas, defining a shared constant list or union, structuring function parameters, or avoiding switch statements and enums.
 
-Source: `.claude/skills/typescript/SKILL.md`.
+**Example phrasing:** "type this Zod schema", "should this be a type or an interface", "add a status to this union".
+
+Source: `frontend/.claude/skills/typescript/SKILL.md`.
+
+## Naming Conventions
+
+Descriptive, self-documenting names in any language: TypeScript, bash, workflow YAML, Dockerfiles. Flags vague names, abbreviations, and redundant type noise. The always-loaded `no-abbreviations` rule applies the same standard to everything Claude writes.
+
+**Triggers** when naming or renaming an identifier, variable, constant, function, parameter, environment variable, workflow job, or Dockerfile `ARG`/`ENV`, or reviewing names.
+
+**Example phrasing:** "name this hook better", "is `cfg` a good name here", "rename these env vars".
+
+Source: `.claude/skills/naming-conventions/SKILL.md`.
 
 ## React Code
 
-Conventions for React components, pages, routes, hooks, and forms. Includes checks for `useEffect`, `useCallback`, and `useState`; a form-element check that swaps native `<input>` for the project's `Form/*` components; a translation check that requires every user-visible string to come from `t()`; and a React 19 idiom check that enforces `ref` as an ordinary prop (no `forwardRef`), `use()` over `useContext`, `<Context>` shorthand over `<Context.Provider>`, guarding the `&&` numeric-0 leak in JSX, and staying in React Router's form handling instead of reaching for `useActionState`, `useFormStatus`, or `useOptimistic`. Covers component extraction thresholds and route/page architecture (`app/routes/` thin shells, `app/pages/` for UI).
+Conventions for React components, pages, routes, hooks, and forms, applied through four checks before Claude writes code:
 
-Before adding a dependency or hand-rolling a primitive, the skill walks a platform-first ladder: existing GAIA code, then browser-native APIs (`Intl`, `URL`, `crypto.randomUUID()`, `structuredClone()`, modern CSS), then an already-installed dependency, then a new dependency, then custom code as a last resort. It stops at the first rung that fits. The biggest practical savings come from `Intl` standing in for date and number formatting libraries and native collection methods standing in for utility libraries, both already enforced by lint.
+- **Hook check** for `useEffect`, `useCallback`, and `useState` misuse.
+- **Form element check.** Native `<input>`, `<select>`, `<textarea>`, checkboxes, and buttons become the shadcn/ui controls in `~/components/ui/` (`Input`, `NativeSelect`, `Textarea`, `Checkbox`, `RadioGroup`, `Button`), composed into `Field` parts and wired with Conform. `@conform-to/zod` is always imported from its `/v4` subpath; the bare import is a runtime error lint flags.
+- **Translation check**: every user-visible string comes from `t()`.
+- **React 19 idiom check**: `ref` as an ordinary prop (no `forwardRef`), `use()` over `useContext`, `<Context>` over `<Context.Provider>`, guarding the `&&` numeric-0 leak, and React Router's form handling instead of `useActionState`, `useFormStatus`, or `useOptimistic`.
 
-**Triggers** when writing or reviewing React components, hooks (`useEffect`, `useCallback`, `useState`), event handlers, or component extraction decisions. Also triggers when debugging stale closures, infinite re-renders, or unnecessary re-renders caused by memoization issues; when deciding whether to add a dependency, reach for a web-platform API, or hand-roll a primitive; or when choosing a React 19 idiom: `ref` as a prop vs `forwardRef`, `use()` vs `useContext`, `<Context>` shorthand vs `<Context.Provider>`, guarding `&&` conditional rendering against the numeric-0 leak, or routing form handling to React Router instead of `useActionState` / `useFormStatus` / `useOptimistic`.
+**Memoization is compiler-first.** React Compiler is on by default, so plain code needs no `useMemo`, `useCallback`, or `memo`. A manual memo is allowed only where a value crosses into code the compiler does not compile, or where a component bails out of compilation and the memo is measured to matter, and each one carries a comment naming its case.
+
+**Data loading** follows one route data layer: URL-owned data through a server `loader` by default (or a `clientLoader`), component-owned data through TanStack Query when it is enabled.
+
+Before adding a dependency or hand-rolling a primitive, the skill walks a platform-first ladder: existing project code, then browser-native APIs (`Intl`, `URL`, `crypto.randomUUID()`, `structuredClone()`, modern CSS), then an installed dependency, then a new one, then custom code. It also covers component extraction and the route/page split (`app/routes/` thin shells, `app/pages/` for UI).
+
+**Triggers** when writing or reviewing React components, hooks, or event handlers, deciding on component extraction, deciding whether a manual memo or `"use no memo"` is justified, debugging stale closures or infinite re-renders, weighing a new dependency, or choosing a React 19 idiom.
 
 **Example phrasing:** "this useEffect is firing twice", "extract this section into its own component", "wire up a Conform form for sign-up".
 
-Source: `.claude/skills/react-code/SKILL.md`.
+Source: `frontend/.claude/skills/react-code/SKILL.md`.
 
 ## React Performance
 
-You point it at one specific interaction, like a button click, and it finds the component that re-renders when it shouldn't and explains what's forcing the extra work. It diagnoses, it does not auto-fix. See [React performance](/skills/react-performance/) for the full capture-reduce-diagnose-verify workflow.
+You point it at one specific interaction, like a button click, and it finds the component that re-renders when it shouldn't and explains what is forcing the extra work. It diagnoses; it does not auto-fix. Also invocable as `/gaia-react-perf <target>`. See [React performance](/skills/react-performance/) for the full workflow.
 
-**Triggers** on explicit render-performance asks: "profile renders", "measure renders", "why is X re-rendering", or "diagnose render performance". Does NOT trigger on vague "feels slow" or "janky". Requires a concrete micro-interaction target (a button click or local state change on a specific page), not a page navigation or "the whole app".
+**Triggers** on explicit render-performance asks: "profile renders", "measure renders", "why is X re-rendering", or "diagnose render performance". It does not trigger on vague "feels slow" or "janky"; React Doctor covers those.
 
-**Example phrasing:** "profile renders on the dashboard table", "why does the theme toggle re-render the header", "measure renders on the checkout form".
-
-Source: `.claude/skills/gaia-react-perf/SKILL.md`.
+Source: `frontend/.claude/skills/gaia-react-perf/SKILL.md`.
 
 ## Styling
 
-### `tailwind`
+### Tailwind
 
-Tailwind conventions: built-in scale first, `rem` for custom values (never `px`), `twJoin` for conditional classes, `twMerge` for caller-overridable defaults, `Record<Variant, string>` lookup tables for multi-class variants, role-based `@theme` token names that survive being prefixed with every utility (`bg-`, `text-`, `border-`, `ring-`, etc.).
+Every color is a shadcn role token (`bg-background`, `text-foreground`, `text-muted-foreground`, `bg-primary`, `border-input`, `text-destructive`), never a raw palette class or an arbitrary color, so one token carries both light and dark themes. `@gaia-react/lint` fails raw palette classes and arbitrary values.
 
-**Triggers** when writing Tailwind class names, combining conditional classes, building component variants, choosing between `twJoin` and `twMerge`, defining `@theme` tokens, picking between `rem` and `px`, or working with responsive breakpoints.
+`cn` (from the `cn` package) is the only class utility. It joins classes and resolves conflicts, so a caller's `className`, passed last, overrides a component default. A conditional class is `cond && 'class'`; lint rejects object conditionals and empty-branch ternaries. Multi-class variants use `cva`. Custom values use `rem`, never `px`, and a new role token is named for what the element is.
 
-**Example phrasing:** "this needs a hover variant", "name this color token", "should I use twJoin or twMerge here".
+**Triggers** when writing Tailwind classes, combining classes with `cn`, writing conditional classes, building variants, defining `@theme` tokens, picking `rem` or `px`, or working with breakpoints.
 
-Source: `.claude/skills/tailwind/SKILL.md`.
+**Example phrasing:** "this needs a hover variant", "name this color token", "let the caller override the padding".
+
+Source: `frontend/.claude/skills/tailwind/SKILL.md`.
 
 ### Skeleton Loaders
 
-Build skeleton loading states that are pixel-perfect matches of the real content. Uses real HTML elements (`<p>`, `<span>`, `<h2>`, `<button>`) with the same font classes plus a shared `shimmer` class for the gradient animation; non-text elements stay as empty `<div>`s. Includes the 200ms delay pattern that suppresses skeleton flash on fast loads.
+Skeleton loading states that are pixel-perfect matches of the real content. Uses real HTML elements with the same font classes plus a shared `shimmer` class; non-text elements stay as empty `<div>`s. Includes the 200ms delay pattern that suppresses a flash on fast loads.
 
-**i18n:** Static translatable text in skeleton JSX (labels, headings, button text, placeholders) must use `t()` or `<Trans>`, the same call the real component uses, so the skeleton width matches the revealed text exactly. Only approximate placeholders standing in for dynamic runtime values (content from API data where the real value is unknown at render time) stay hardcoded.
+Static translatable text in a skeleton uses `t()` or `<Trans>`, the same call the real component uses, so widths match. The skeleton root carries `aria-hidden`, and the region receiving the content carries `aria-busy="true"` or a visually hidden `role="status"` live region.
 
-**Accessibility:** Put `aria-hidden` on the skeleton root element so assistive technology skips the decorative placeholders. The region that will receive the content must either carry `aria-busy="true"` while loading or include a visually-hidden `role="status"` live region so screen-reader users know content is on the way.
+**Triggers** when adding loading states, building skeletons for async data, handling pending route transitions, or preventing layout shift.
 
-**Triggers** when adding loading states, building skeletons for async data, handling pending loader states in route transitions, implementing the shimmer animation pattern, or preventing layout shift during data fetching.
-
-**Example phrasing:** "add a skeleton for this profile card", "the layout jumps when data loads", "this skeleton flashes on fast loads".
-
-Source: `.claude/skills/skeleton-loaders/SKILL.md`.
+Source: `frontend/.claude/skills/skeleton-loaders/SKILL.md`.
 
 ## Test Driven Development
 
-Based on Matt Pocock's excellent [TDD Skill](https://www.aihero.dev/skill-test-driven-development-claude-code), tailored for GAIA's stack and conventions.
+Based on Matt Pocock's [TDD Skill](https://www.aihero.dev/skill-test-driven-development-claude-code), tailored for GAIA. A vertical-slice red-green-refactor loop: one failing test, the code that passes it, then the next. Tests verify behavior through public interfaces. `tdd` runs the loop; its React companion, `tdd-react`, holds the frontend testing reference.
 
-Test-driven development with a vertical-slice red-green-refactor loop. Treats horizontal slicing (write all tests first, then all code) as an antipattern. Tests verify behavior through public interfaces, not implementation details. Includes a per-cycle checklist and a planning step that asks for the public interface before writing the first red test.
+**Stories are the component tests.** A component is tested by its Storybook story with a play function, run in real Chromium. React Testing Library, happy-dom, and jsdom are gone. Hook tests use `vitest-browser-react`. HTTP is mocked with MSW. Every story is checked for accessibility by `addon-a11y`, and a story that weakens its accessibility check fails the tests unless it opts out with a stated reason.
 
-The failing-test-first (RED) requirement applies only where a test can reliably fail first: pure utilities, service parsers, and hooks. Component and Playwright tests skip it, since their environment and DOM state can't guarantee a clean failing run.
-
-For those component and Playwright tests, the skill reviews each one for honesty and worthiness and returns a keep, fix, or delete verdict. Fixes for dishonest tests, like a test coupled to implementation detail or one asserting a tautology, apply automatically as ordinary edits for review. Delete proposals need your confirmation and show their evidence inline, so you decide without opening files. Everything lands in a single end-of-task summary.
-
-New components scaffolded with `new-component` start with an accessibility test that renders a real instance, so it can catch a real violation instead of passing against an empty DOM.
-
-It is automatically used by Claude when working in GAIA projects.
+**The RED gate.** On the deterministic surface (pure utilities, service parsers, hooks), a commit hook refuses a new test that was never seen to fail first. Stories and Playwright tests are exempt, since their environment cannot guarantee a clean failing run. For those, the `worthiness-evaluator` agent judges each new test for honesty and worthiness and returns keep, fix, or delete; fixes apply as ordinary edits, and deletes need your confirmation. A merge hook checks that every changed test of that kind was judged.
 
 **Triggers** when building features or fixing bugs with TDD, mentioning "red-green-refactor", asking for integration tests, or asking for test-first development.
 
-**Example phrasing:** "let's TDD this", "write a red test for the login flow", "I want a tracer bullet for the new endpoint".
+**Example phrasing:** "let's TDD this", "write a red test for the login flow".
 
-Source: `.claude/skills/tdd/SKILL.md`.
+Source: `.claude/skills/tdd/SKILL.md`, `frontend/.claude/skills/tdd-react/SKILL.md`.
 
 ## Playwright CLI
 
-Microsoft's official [Playwright CLI](https://github.com/microsoft/playwright-cli) skill for browser automation.
+Microsoft's [Playwright CLI](https://github.com/microsoft/playwright-cli) skill for browser automation, vendored byte-for-byte from upstream. Navigate, click, type, screenshot, manage cookies and storage, run parallel sessions, and read element refs from generated snapshot files. It shells out to the global `playwright-cli` binary, which `/update-deps` reports when it falls behind.
 
-Navigate, click, type, screenshot, manage cookies and storage, run multiple parallel sessions, and read element refs from auto-generated snapshot files.
+**Triggers** when navigating websites, filling forms, taking screenshots, testing web applications, or extracting information from pages. You can also say "use playwright for ...".
 
-**Triggers** when navigating websites, interacting with web pages, filling forms, taking screenshots, testing web applications, or extracting information from web pages.
-
-**Example phrasing:** "screenshot the staging site at /pricing", "fill out the signup form on localhost:5173", "extract the headline text from this URL".
-
-You can also tell Claude directly to "use playwright for xxx".
-
-Source: `.claude/skills/playwright-cli/SKILL.md`.
+Source: `frontend/.claude/skills/playwright-cli/SKILL.md`.
 
 ## ESLint Fixes
 
-Generally speaking, Claude does the right thing when it encounters ESLint errors. This skill handles some known cases where Claude has resolved specific ESLint errors incorrectly.
+Claude usually does the right thing with ESLint errors. This skill handles known cases where it resolved specific errors badly, and autofix conflicts where one rule fights another. If you see Claude resolving an error in an undesirable way (disabling the rule instead of fixing the cause), ask it to improve the `eslint-fixes` skill for that error. Every `eslint-disable` needs a `-- reason`.
 
-If you ever find that Claude is resolving an ESLint error in an undesirable way (e.g. by disabling the rule instead of fixing the underlying issue or making things worse), you can ask Claude directly to improve the eslint-fixes skill to handle that particular ESLint error in a better way. If you do discover one, please consider [filing an issue](https://github.com/gaia-react/gaia/issues) so it can be added to the skill in GAIA itself.
-
-Source: `.claude/skills/eslint-fixes/SKILL.md`.
+Source: `frontend/.claude/skills/eslint-fixes/SKILL.md`.
 
 ## Accessibility Fixes
 
-Resolve specific axe-core accessibility violations in your project. Covers common rule failures: `color-contrast`, `label`, `label-title-only`, `image-alt`, `button-name`, `link-name`, `region`, `landmark-one-main`, `heading-order`, `aria-allowed-attr`, `aria-required-attr`, `aria-required-children`, `aria-required-parent`, `aria-valid-attr-value`, `focus-trap`, `tabindex`, `html-has-lang`, `document-title`, `duplicate-id`, `listitem`, and `definition-list`. For any violation not in that list, apply the same fix-then-verify loop. The fix patterns reach for the project's semantic Tailwind tokens and `Form/*` components, so corrections hold in both light and dark mode. General accessibility guidance lives in the `accessibility` rule; this skill handles the concrete fix once a violation is reported.
+Fixes specific axe-core violations: `color-contrast`, `label`, `image-alt`, `button-name`, `link-name`, `region`, `heading-order`, the `aria-*` rules, `tabindex`, `duplicate-id`, and others, with a fix-then-verify loop for anything not listed. Fixes reach for role tokens and the `ui` controls, so they hold in both themes. General guidance lives in the `accessibility` rule; this skill handles the concrete fix once a violation is reported.
 
-**Triggers** when any axe rule id appears in test output from `test/a11y.ts` (Vitest), `.playwright/a11y.ts` (Playwright), or the `code-review-audit` agent's accessibility bucket.
+**Triggers** when an axe rule id appears in output from a story under Vitest (`addon-a11y`), the Playwright helper (`frontend/.playwright/a11y.ts`), or `code-audit-frontend`'s accessibility findings.
 
-**Example phrasing:** "fix the color-contrast violation on the status badge", "axe says this button has no accessible name", "resolve the heading-order error".
-
-Source: `.claude/skills/a11y-fixes/SKILL.md`.
+Source: `frontend/.claude/skills/a11y-fixes/SKILL.md`.
