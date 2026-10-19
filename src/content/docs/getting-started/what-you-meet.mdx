@@ -1,0 +1,44 @@
+---
+title: What you meet, and when
+description: GAIA installs whole, and each part fires when the work reaches it. The order in which a new project meets its rules, commit gates, the pre-merge audit, and the maintenance commands.
+sidebar:
+  order: 1
+---
+
+GAIA installs whole: every rule, hook, gate, and command is there from the first session. You do not switch parts on. Each one fires when the work reaches it, so a new project meets them in a predictable order.
+
+## First session
+
+- **Rules load.** The always-loaded rules shape what Claude writes from the first prompt. Path-scoped rules load as the work touches their files. See [Rules](/reference/rules/).
+- **Skills trigger from plain prompts.** Ask for a component and `new-component` scaffolds it; edit a hook and `react-code` applies. See [Skills](/skills/).
+- **Guards are on.** Hooks deny reading secrets, destructive deletes, and commits to `main`, whether or not you skip permission prompts. See [Hooks](/reference/hooks/).
+- **The statusline** shows `⚙️ /setup-gaia` until this machine's setup is done.
+
+## First commit
+
+- **Isolation.** Claude claims the issue, if there is one ([why](/reference/gates/#issue-claim)), names the branch, and works in its own worktree ([why](/reference/gates/#worktree-path-mismatch)). See [Work lifecycle](/workflow/work-lifecycle/).
+- **Quality Gate.** Typecheck, lint, tests, Playwright, a dev-server smoke test, and the build pass before Claude commits ([why](/reference/gates/#quality-gate)).
+- **Test seen failing first.** A new test on the deterministic surface must have failed before it passes ([why](/reference/gates/#test-seen-failing-first-red-gate)).
+- **Commit hooks.** The native pre-commit hook runs typecheck, lint, and tests on staged files ([why](/reference/gates/#pre-commit-floor)), and commit-msg checks the Conventional Commits format ([why](/reference/gates/#commit-message-format)). Neither can be skipped ([why](/reference/gates/#no-verify)).
+
+## First pull request
+
+- **Draft and title.** The pull request opens as a draft ([why](/reference/gates/#draft-pull-requests)) with a title that passes the squash-subject lint ([why](/reference/gates/#pull-request-title)).
+- **Code Audit Team.** Every member whose files the change touches reviews it before it can merge ([why](/reference/gates/#merge-without-the-audit)). See [Code Audit Team](/workflow/code-audit-team/).
+- **The audit loop.** Rounds of review, fix, and verify run off your session until the change clears.
+- **The branch checkpoint.** When your context runs heavy or the rounds stop converging, the loop stops and asks you ([why](/reference/gates/#audit-checkpoint)).
+- **GAIA-Audit.** Claude posts the status last, and GitHub requires it ([why](/reference/gates/#gaia-audit-required-check)).
+- **Merge**, when you ask. The merge prints the pull request's [cost](/reference/cost/), posts the findings comment, and releases the issue claim.
+
+## First week
+
+- **Tech-debt issues appear.** Problems the audit found outside the change it was reviewing are filed as `tech-debt` issues, never fixed in place. Security findings are not filed publicly. See [How issues are filed](/maintenance/debt/#how-issues-are-filed).
+- **Maintenance nudges.** The statusline starts naming commands when they are due: `🐛 /gaia-debt` once tech-debt issues are open, `📦 /update-deps` when packages are outdated or advisories are open, `🚀 /update-gaia` when a release is out, `🧠 /gaia-wiki` once the wiki trails the code by 20 commits, and `🔎 /gaia-cleanse` once memory grows or a month passes. See [Maintenance](/maintenance/).
+
+## Later
+
+- **[`/gaia-debt`](/maintenance/debt/)** fixes the backlog, highest severity first, through the same audit.
+- **[`/gaia-residue`](/maintenance/residue/)** appears once 5 or more trade-offs accepted at merge are 30 days old.
+- **[`/gaia-codify`](/maintenance/codify/)** appears once the audit has made the same kind of finding on 3 or more pull requests within 90 days, and proposes a guard so it stops recurring.
+
+Every check above, and every other one, is in the [gate reference](/reference/gates/) with what it stops, why, when it fires, and how to clear it.

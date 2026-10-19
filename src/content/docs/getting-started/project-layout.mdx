@@ -1,0 +1,58 @@
+---
+title: Project layout
+description: How a GAIA project is laid out, the root workspace and the frontend package, and the frontend stack it ships with.
+sidebar:
+  order: 4
+---
+
+A GAIA project is a pnpm workspace. The root holds the shared Claude setup and tooling; the React app and its frontend-only setup live in the `frontend/` package.
+
+## The root
+
+| Path | What it holds |
+|---|---|
+| `CLAUDE.md` | Project instructions Claude reads at every session start |
+| `.claude/` | Shared commands, skills, agents, hooks, rules, and settings |
+| `.gaia/` | GAIA's CLI (`.gaia/cli/gaia`), scripts, statusline, the Code Audit Team roster (`audit-ci.yml`), team settings (`project.json`), the label registry, and machine-local state under `.gaia/local/` (gitignored) |
+| `.githooks/` | Native git hooks: `pre-commit` and `commit-msg` |
+| `.github/` | The Tests, Chromatic, and PR Conventions workflows, and your `CODEOWNERS` |
+| `wiki/` | The project wiki Claude maintains, an Obsidian vault |
+| `.notebook/` | Specs, plans, and research (gitignored, at the main checkout) |
+| `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml` | The workspace: one lockfile, harness dependencies, `overrides:`, and pnpm's supply-chain settings |
+
+Root scripts (`pnpm dev`, `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm pw`, `pnpm build`) run the `frontend` package, so either `pnpm lint` or `pnpm -C frontend lint` works.
+
+## frontend/
+
+| Path | What it holds |
+|---|---|
+| `frontend/CLAUDE.md` | Instructions for sessions working on the app |
+| `frontend/.claude/` | The app's skills, rules, and Code Audit Team extensions. Its `settings.json` is generated from the root settings plus `settings.overlay.json`. |
+| `frontend/app/` | The React Router app: `routes/`, `pages/`, `components/` (with shadcn/ui in `components/ui/`), `hooks/`, `services/`, `state/`, `languages/`, `styles/` |
+| `frontend/test/` | Test setup, mocks, and utilities |
+| `frontend/.storybook/` | Storybook config, including the accessibility settings in `a11y.ts` |
+| `frontend/.playwright/` | Playwright specs and helpers |
+| `frontend/.env` | Your environment file (gitignored). `frontend/.env.example` is the template. |
+| `frontend/package.json` | App dependencies |
+
+Files and folders under `app/components`, `app/pages`, and `app/hooks` are kebab-case: a component is `components/<name>/index.tsx`, a page is `pages/<route path>/page.tsx`, and a hook is `use-<name>.ts`. Each folder keeps its tests and stories in a `tests/` folder beside the code.
+
+Each checkout, including each worktree, owns its own dev, Storybook, and Playwright ports. The main checkout uses 5173 and 6006. Read a tree's ports with `bash .gaia/scripts/ports.sh`.
+
+To add a package such as a backend beside `frontend/`, ask Claude: GAIA ships a monorepo playbook for it, and Claude asks whether every worktree should share one backend or run its own before running backend work in a worktree.
+
+## The frontend stack
+
+- **React and React Router.** Route discovery uses React Router's `@react-router/fs-routes`, with flat dot-delimited route file names (`_public.tsx`, `_session.dashboard.tsx`).
+- **React Compiler**, on by default in the build, dev server, Vitest, and Storybook. Configured in `frontend/react-compiler.config.ts`; set `isReactCompilerEnabled = false` there to roll it back.
+- **shadcn/ui** as the component layer: Base UI primitives, `class-variance-authority` variants, and `lucide-react` icons. Add components with `pnpm shadcn add <name>`. Forms compose the `ui` controls with Conform.
+- **Tailwind v4 with role tokens.** Every color is a shadcn role token defined in `frontend/app/styles/theme.css`; change your theme by editing token values. `cn` from the `cn` package combines classes.
+- **One route data layer.** Services are isomorphic Ky and Zod modules whose responses Zod validates. A route reads its data on the server, on the client, or through TanStack Query (off by default). `create()` passes keys through in camelCase; a snake_case backend opts into conversion with `create({isSnakeCaseEnabled: true})`.
+- **Stories as tests.** Components are tested by Storybook stories with play functions, run in real Chromium under Vitest; every story is checked for accessibility. Hook tests use `vitest-browser-react`. HTTP is mocked with MSW 3. Chromatic snapshots each story in a light and a dark mode.
+- **i18n** with react-i18next, unless you removed it at init.
+- **`@gaia-react/lint`** for ESLint, Stylelint, and commitlint: over 1,200 lint rules. Prettier formats and Knip finds unused code.
+- **Toolchain:** Node 22.22.0 or newer, pnpm 12 (pinned in `packageManager`), and Vitest 5.
+
+A fresh scaffold starts neutral and brand-free: a zero-chroma primary scale, system fonts, and a simple layout. The `design-baseline` rule treats that styling as a placeholder until you settle your own design.
+
+For the reasoning behind each choice, ask Claude: the decisions live in the project wiki.
