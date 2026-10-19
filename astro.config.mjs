@@ -7,6 +7,29 @@ import llmsTxt from 'starlight-llms-txt';
 export default defineConfig({
 	site: 'https://docs.gaiareact.com',
 	devToolbar: { enabled: false },
+	// Old 1.x URLs. GitHub Pages serves static files only, so Astro emits a
+	// meta-refresh page at each old path.
+	redirects: {
+		'/commands': '/workflow/',
+		'/commands/spec': '/workflow/spec/',
+		'/commands/plan': '/workflow/plan/',
+		'/commands/forensics': '/workflow/forensics/',
+		'/commands/audit': '/maintenance/cleanse/',
+		'/commands/harden': '/maintenance/codify/',
+		'/commands/fitness': '/maintenance/fitness/',
+		'/commands/wiki': '/maintenance/wiki/',
+		'/commands/update-deps': '/maintenance/update-deps/',
+		'/commands/update-gaia': '/maintenance/update-gaia/',
+		'/commands/handoff-pickup': '/workflow/work-lifecycle/#resuming-long-work',
+		'/getting-started/setup-gaia-ci': '/getting-started/setup-gaia/',
+		'/getting-started/setup-cloned-gaia-project': '/getting-started/setup-gaia/',
+		'/maintenance/audit': '/maintenance/cleanse/',
+		'/maintenance/harden': '/maintenance/codify/',
+		'/maintenance/gaia-ci': '/maintenance/#gaia-ci-is-gone',
+		'/workflow/handoff': '/workflow/work-lifecycle/#resuming-long-work',
+		'/workflow/pickup': '/workflow/work-lifecycle/#resuming-long-work',
+		'/contributors/health-audit': '/contributors/#before-a-release',
+	},
 	integrations: [
 		starlight({
 			title: 'GAIA Docs',
@@ -35,13 +58,13 @@ export default defineConfig({
 				llmsTxt({
 					projectName: 'GAIA',
 					description:
-						'GAIA is a React and TypeScript framework that ships with a Claude Code configuration layer: slash commands, skills, hooks, rules, and agents that give Claude structure and focus when working in the codebase. Scaffold a project with `npx create-gaia my-app`. This documentation covers installing GAIA and using its commands, skills, and supporting machinery.',
+						'GAIA is a React and TypeScript foundation that ships with a Claude Code layer: slash commands, skills, hooks, rules, agents, commit gates, and a pre-merge audit that give Claude structure and focus when working in the codebase. Scaffold a project with `npx create-gaia my-app`. This documentation covers installing GAIA, upgrading from 1.x, and using its commands, skills, gates, and supporting machinery.',
 					details: [
 						'GAIA has two audiences.',
 						'',
 						'Adopters run `npx create-gaia` and get a scaffolded project with the commands, skills, hooks, rules, and agents that ship in the release.',
 						'',
-						'Contributors work on the GAIA template repo itself and additionally have the release tooling, bundled CLI internals, CI workflows, and wiki internals documented under `contributors/`.',
+						'Contributors work on the GAIA repo itself and additionally have the release tooling, bundled CLI internals, maintainer CI workflows, and wiki internals documented under `contributors/`.',
 						'',
 						'The abridged documentation below covers adopter surface only. Contributor documentation is available as a separate set.',
 					].join('\n'),
@@ -64,7 +87,7 @@ export default defineConfig({
 							label: 'Contributor documentation',
 							paths: ['contributors/**'],
 							description:
-								'for people working on the GAIA template repo itself: CI workflows, the bundled CLI, releases, health audits, and wiki internals. Not needed if you installed GAIA with `npx create-gaia`.',
+								'for people working on the GAIA repo itself: maintainer CI workflows, the bundled CLI, releases, and wiki internals. Not needed if you installed GAIA with `npx create-gaia`.',
 						},
 					],
 				}),
@@ -74,18 +97,22 @@ export default defineConfig({
 					label: 'Getting started',
 					items: [
 						{ label: 'Quick Start', slug: 'index' },
+						{ label: 'What you meet, and when', slug: 'getting-started/what-you-meet' },
 						{ label: '/gaia-init', slug: 'getting-started/gaia-init' },
 						{ label: '/setup-gaia', slug: 'getting-started/setup-gaia' },
+						{ label: 'Project layout', slug: 'getting-started/project-layout' },
+						{ label: 'Upgrading from 1.x', slug: 'getting-started/upgrading' },
 					],
 				},
 				{
 					label: 'Workflow',
 					items: [
 						{ label: 'Overview', slug: 'workflow' },
+						{ label: 'Work lifecycle', slug: 'workflow/work-lifecycle' },
+						{ label: 'Code Audit Team', slug: 'workflow/code-audit-team' },
+						{ label: 'Git hooks and conventions', slug: 'workflow/git-conventions' },
 						{ label: '/gaia-spec', slug: 'workflow/spec' },
 						{ label: '/gaia-plan', slug: 'workflow/plan' },
-						{ label: '/gaia-handoff', slug: 'workflow/handoff' },
-						{ label: '/gaia-pickup', slug: 'workflow/pickup' },
 						{ label: '/gaia-forensics', slug: 'workflow/forensics' },
 					],
 				},
@@ -93,11 +120,12 @@ export default defineConfig({
 					label: 'Maintenance',
 					items: [
 						{ label: 'Overview', slug: 'maintenance' },
-						{ label: 'GAIA CI', slug: 'maintenance/gaia-ci' },
 						{ label: '/gaia-fitness', slug: 'maintenance/fitness' },
-						{ label: '/gaia-audit', slug: 'maintenance/audit' },
+						{ label: '/gaia-cleanse', slug: 'maintenance/cleanse' },
 						{ label: '/gaia-debt', slug: 'maintenance/debt' },
-						{ label: '/gaia-harden', slug: 'maintenance/harden' },
+						{ label: '/gaia-codify', slug: 'maintenance/codify' },
+						{ label: '/gaia-residue', slug: 'maintenance/residue' },
+						{ label: '/gaia-serena-sync', slug: 'maintenance/serena-sync' },
 						{ label: '/gaia-wiki', slug: 'maintenance/wiki' },
 						{ label: '/update-deps', slug: 'maintenance/update-deps' },
 						{ label: '/update-gaia', slug: 'maintenance/update-gaia' },
@@ -115,9 +143,12 @@ export default defineConfig({
 				{
 					label: 'Reference',
 					items: [
+						{ label: 'Gates', slug: 'reference/gates' },
 						{ label: 'Hooks', slug: 'reference/hooks' },
 						{ label: 'Rules', slug: 'reference/rules' },
 						{ label: 'Agents', slug: 'reference/agents' },
+						{ label: 'Labels', slug: 'reference/labels' },
+						{ label: 'Cost and usage ledger', slug: 'reference/cost' },
 					],
 				},
 				{
@@ -127,7 +158,6 @@ export default defineConfig({
 						{ label: 'Overview', slug: 'contributors' },
 						{ label: 'CI workflows', slug: 'contributors/ci' },
 						{ label: 'CLI surface', slug: 'contributors/cli' },
-						{ label: 'Health audit', slug: 'contributors/health-audit' },
 						{ label: 'Release', slug: 'contributors/release' },
 						{ label: 'Wiki internals', slug: 'contributors/wiki' },
 					],
