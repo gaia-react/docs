@@ -2,11 +2,31 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import llmsTxt from 'starlight-llms-txt';
+import rehypeExternalLinks from 'rehype-external-links';
 
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://docs.gaiareact.com',
 	devToolbar: { enabled: false },
+	// Links to other sites open in a new tab.
+	markdown: {
+		rehypePlugins: [
+			[
+				rehypeExternalLinks,
+				{
+					target: '_blank',
+					rel: ['noopener', 'noreferrer'],
+					// Screen readers announce the new tab.
+					content: {
+						type: 'element',
+						tagName: 'span',
+						properties: { className: ['sr-only'] },
+						children: [{ type: 'text', value: ' (opens in a new tab)' }],
+					},
+				},
+			],
+		],
+	},
 	// Old 1.x URLs. GitHub Pages serves static files only, so Astro emits a
 	// meta-refresh page at each old path.
 	redirects: {

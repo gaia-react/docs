@@ -21,5 +21,8 @@
       "esbuild",
       "sharp"
     ]
+  },
+  "devDependencies": {
+    "rehype-external-links": "^3.0.0"
   }
 }
