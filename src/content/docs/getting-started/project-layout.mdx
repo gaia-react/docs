@@ -37,7 +37,7 @@ The scripts at the root (`pnpm dev`, `pnpm typecheck`, `pnpm lint`, `pnpm test`,
 
 Files and folders under `app/components`, `app/pages`, and `app/hooks` are kebab-case: a component is `components/<name>/index.tsx`, a page is `pages/<route path>/page.tsx`, and a hook is `use-<name>.ts`. Each folder keeps its tests and stories in a `tests/` folder beside the code.
 
-Each copy of the repo, your main one and each worktree, gets its own dev, Storybook, and Playwright ports, so they never collide. The main copy uses 5173 and 6006. To see a copy's ports, run `bash .gaia/scripts/ports.sh` in it.
+Each copy of the repo, your main one and each worktree, gets its [own dev, Storybook, and Playwright ports](/workflow/work-lifecycle/#ports-per-worktree), so they never collide. The main copy uses 5173 and 6006. To see a copy's ports, run `bash .gaia/scripts/ports.sh` in it.
 
 To add another package beside `frontend/`, such as a backend, see [Why no backend?](#why-no-backend).
 
@@ -82,4 +82,4 @@ GAIA's repo is built for this. It is a pnpm workspace, so each backend you add b
 - **A Code Audit Team member that covers it.** Code no member covers is not merged unreviewed. Until a member's file patterns cover the backend, the merge waits for `code-audit-frontend`, the default member, to review its files, and that member reviews with a React focus. The steps have Claude register a member for your backend's stack, or give its file patterns to a member whose focus fits. See [Code Audit Team](/workflow/code-audit-team/).
 - **A quality gate for its stack.** The shipped [Quality Gate](/reference/gates/#quality-gate) checks only `frontend/`, so the steps have Claude add a gate that names the backend's own checks.
 
-Worktrees get their own ports for `frontend/` only. A backend has no port slot, and its database is shared by every worktree unless you set up one per worktree. Before Claude runs backend work in a worktree, it asks whether every worktree should share one backend or run its own.
+Worktrees get their [own ports](/workflow/work-lifecycle/#ports-per-worktree) for `frontend/` only. A backend has no port slot, and its database is shared by every worktree unless you set up one per worktree. Before Claude runs backend work in a worktree, it asks whether every worktree should share one backend or run its own.
