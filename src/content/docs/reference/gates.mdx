@@ -299,7 +299,7 @@ A gate is not a judgment of you or of Claude. Each one exists because the proble
 - **When:** when the audit works out which members to run.
 - **Clear it:** restore the `auditors:` block from the GAIA template.
 
-Gaps in coverage do not stop the audit. A file no member covers, and that is not listed under `unowned:`, resolves to no members, and the merge hook treats that as nothing to review. After you change the roster, run the roster check by hand to find these gaps:
+Gaps in coverage do not stop the audit. A file no member covers still has to be reviewed, even when it is listed under `unowned:`: the merge waits for `code-audit-frontend`, the default member, unless every file the pull request changes is outside the audit's scope (wiki pages, `.claude/` files, GAIA metadata, and docs). After you change the roster, run the roster check by hand to find these gaps:
 
 ```bash
 bash .gaia/scripts/verify-audit-roster.sh

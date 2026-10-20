@@ -26,7 +26,7 @@ Members only report problems. They never edit a file. A separate fixer makes the
 
 ### Editing the roster
 
-`.gaia/audit-ci.yml` ships with GAIA, and you edit its values to adjust the audit: add patterns for code you add beside `frontend/`, list paths that need no review under `unowned:`, or set the light-review keys below. If the file has no `auditors:` block, the audit refuses to run rather than falling back to a built-in list.
+`.gaia/audit-ci.yml` ships with GAIA, and you edit its values to adjust the audit: add patterns for code you add beside `frontend/`, list paths that deliberately have no owner under `unowned:` (this only quiets the roster check; it does not skip review), or set the light-review keys below. If the file has no `auditors:` block, the audit refuses to run rather than falling back to a built-in list.
 
 ## Per-member clearance
 
