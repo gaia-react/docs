@@ -80,6 +80,6 @@ To install a specific version of GAIA instead of the latest:
 npx create-gaia@latest my-app --version v2.0.0
 ```
 
-Other flags: `--no-install` skips the dependency install, `--no-git` skips `git init` and the first commit, and `--no-claude` skips launching Claude Code and prints the manual steps instead.
+Other flags: `--no-install` skips the dependency install, `--no-git` skips `git init` and the first commit, and `--no-claude` skips launching Claude Code. It prints the next steps instead: `cd` into the project, run `claude --permission-mode auto`, then run `/gaia-init` in Claude Code. You get the same steps when the `claude` command is not installed.
 
 
