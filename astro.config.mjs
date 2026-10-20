@@ -125,7 +125,7 @@ export default defineConfig({
 					items: [
 						{ label: 'Overview', slug: 'workflow' },
 						{ label: 'Work lifecycle', slug: 'workflow/work-lifecycle' },
-						{ label: 'The Notebook', slug: 'workflow/notebook' },
+						{ label: 'Notebook', slug: 'workflow/notebook' },
 						{ label: 'Statusline', slug: 'workflow/statusline' },
 						{ label: 'Test-driven development', slug: 'workflow/tdd' },
 						{ label: 'Code Audit Team', slug: 'workflow/code-audit-team' },

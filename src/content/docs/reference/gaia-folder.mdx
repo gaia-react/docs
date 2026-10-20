@@ -167,7 +167,7 @@ Run it from the main checkout. Without `--apply` it only lists what it found. It
 
 Two more GAIA folders sit at the root of your project, beside `.gaia/`:
 
-- **`.notebook/`** holds your SPECs, plans, and research. It is gitignored and lives in the main checkout. See [The Notebook](/workflow/notebook/).
+- **`.notebook/`** holds your SPECs, plans, and research. It is gitignored and lives in the main checkout. See the [Notebook](/workflow/notebook/).
 - **`.gaia-backup/`** holds a copy of every file `/update-gaia` overwrote, in one folder per run. It is gitignored. Once you commit an update, git history is the lasting record, and the next update clears out the old backups.
 
 When GAIA sets up a worktree and finds a real folder where a link should go, it moves that folder aside to `<name>.bak.<timestamp>`, such as `.gaia/local.bak.<timestamp>`, instead of deleting it. These backups are gitignored too. Look through one before you delete it: it can hold state written in the worktree before it was set up.

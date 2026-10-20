@@ -74,7 +74,7 @@ The rest of this page lists every gate. For each one you get what it stops, the 
 - **Stops:** a commit, pull request, or issue whose text cites something only one machine has: a SPEC, UAT, or plan number, or a concrete path under `.notebook/` or `.gaia/local/`. It reads commit messages, the lines a commit adds (prose in full, and code comments that take a whole line), and the title and body of a `gh pr create`, `gh pr edit`, `gh issue create`, or `gh issue edit`.
 - **Why:** nobody else can open a document that exists on one machine, and another machine's SPEC with the same number is a different document. A merged commit or pull request keeps the reference for good.
 - **When:** at `git commit`, through `.githooks/commit-msg` and `.githooks/pre-commit`, and before the `gh` command runs (`block-machine-local-ref-gh-text`).
-- **Clear it:** write out what the reference stood for: the behavior, decision, or evidence. A placeholder such as `SPEC-NNN` passes. See [The Notebook](/workflow/notebook/).
+- **Clear it:** write out what the reference stood for: the behavior, decision, or evidence. A placeholder such as `SPEC-NNN` passes. See the [Notebook](/workflow/notebook/).
 
 ### Quality Gate
 
