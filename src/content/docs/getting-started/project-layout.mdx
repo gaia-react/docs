@@ -17,7 +17,7 @@ A GAIA project is a pnpm workspace: one repo holding more than one package. The 
 | `.githooks/` | Git's own hooks: `pre-commit` and `commit-msg` |
 | `.github/` | The Tests, Chromatic, and PR Conventions workflows, and your `CODEOWNERS` |
 | `wiki/` | The project wiki Claude maintains, an Obsidian vault |
-| `.notebook/` | Specs, plans, and research (gitignored, in your main copy of the repo, not in worktrees) |
+| `.notebook/` | [The notebook](/workflow/notebook/): specs, plans, and research (gitignored, in your main copy of the repo, not in worktrees) |
 | `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml` | The workspace: one lockfile for the whole repo, the dependencies GAIA's own tooling needs, and pnpm's settings that protect against compromised packages |
 
 The scripts at the root (`pnpm dev`, `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm pw`, `pnpm build`) run in the `frontend` package, so `pnpm lint` and `pnpm -C frontend lint` do the same thing.

@@ -125,6 +125,7 @@ export default defineConfig({
 					items: [
 						{ label: 'Overview', slug: 'workflow' },
 						{ label: 'Work lifecycle', slug: 'workflow/work-lifecycle' },
+						{ label: 'The notebook', slug: 'workflow/notebook' },
 						{ label: 'Code Audit Team', slug: 'workflow/code-audit-team' },
 						{ label: 'Git hooks and conventions', slug: 'workflow/git-conventions' },
 						{ label: '/gaia-spec', slug: 'workflow/spec' },
