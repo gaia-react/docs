@@ -32,6 +32,18 @@ A good test checks behavior through the code's public interface, the way a calle
 
 Tests mock only at the edges of the system: network requests, time, and randomness. Your own components, hooks, and services run for real.
 
+### Which TDD style
+
+TDD has two classic schools, which Martin Fowler compares in [Mocks Aren't Stubs](https://martinfowler.com/articles/mocksArentStubs.html#ClassicalAndMockistTesting):
+
+- **Detroit (classicist)** uses real objects wherever it can and checks the result: what the code returns, or what the user sees.
+- **London (mockist)** works outside-in from the user's side of the system, replaces every collaborator with a mock, and checks how the code calls them.
+
+GAIA takes from both:
+
+- **Outside-in, like London.** A SPEC's [acceptance tests](#acceptance-tests-from-a-spec) are written first and fail until the feature works, and each tracer test starts from something a user can see.
+- **Real collaborators and checked results, like Detroit.** Inside that outer loop, mocks stay at the edges of the system. A test asserts on what the user ends up seeing, never on whether a mock was called.
+
 ## Where tests go
 
 In the React app, each behavior is tested at the lowest layer that can check it. A button's disabled state is a story test, a route's redirect is an end-to-end test, and a loader's parsing is a service test.
