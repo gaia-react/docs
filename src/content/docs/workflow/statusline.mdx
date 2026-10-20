@@ -70,8 +70,8 @@ Nudges always appear in this order, which is also their priority when space runs
 | <code style={{ background: '#1a1b26' }}><S c="#4ade80">🔎 /gaia-cleanse (12 new memories)</S></code> | Claude's memory or startup files need a review. See [`/gaia-cleanse`](/maintenance/cleanse/). |
 | <code style={{ background: '#1a1b26' }}><S c="#93c5fd">💪 /gaia-fitness (grade B+)</S></code> | Your Claude setup has something to improve, an update combined your edits with GAIA's in harness files, or your team has changed those files often since the last check. See [`/gaia-fitness`](/maintenance/fitness/#the-statusline-nudge). |
 | <code style={{ background: '#1a1b26' }}><S c="#e879f9">🔨 /gaia-codify (2 recurring patterns)</S></code> | The audit keeps finding the same kind of problem. See [`/gaia-codify`](/maintenance/codify/). |
-| <code style={{ background: '#1a1b26' }}><S c="#60a5fa">🐛 /gaia-debt (3 issues)</S></code> | Open `tech-debt` issues are waiting. See [`/gaia-debt`](/maintenance/debt/). |
-| <code style={{ background: '#1a1b26' }}><S c="#e5e7eb">🧹 /gaia-residue (6 residuals)</S></code> | Trade-offs accepted at merge have piled up. See [`/gaia-residue`](/maintenance/residue/). |
+| <code style={{ background: '#1a1b26' }}><S c="#fca5a5">🐛 /gaia-debt (3 issues)</S></code> | Open `tech-debt` issues are waiting. See [`/gaia-debt`](/maintenance/debt/). |
+| <code style={{ background: '#1a1b26' }}><S>🧹 /gaia-residue (6 residuals)</S></code> | Trade-offs accepted at merge have piled up. See [`/gaia-residue`](/maintenance/residue/). |
 | <code style={{ background: '#1a1b26' }}><S c="#67e8f9">🧠 /gaia-wiki (24 commits)</S></code> | The wiki has fallen behind the code. See [`/gaia-wiki`](/maintenance/wiki/). |
 
 Each command's page explains what triggers its nudge and what the reason text means.
@@ -86,13 +86,13 @@ The `/update-gaia` nudge has three more forms:
 
 Until this machine has run its setup, the right side shows one nudge and nothing else:
 
-<Row><S c="#e879f9">⚙️ /setup-gaia (Required)</S></Row>
+<Row><S c="#f0abfc">⚙️ /setup-gaia (Required)</S></Row>
 
 While [`/gaia-init`](/getting-started/gaia-init/) is still setting up a new project, the right side stays empty.
 
 ### In a linked worktree
 
-Maintenance commands run from the main checkout, so a linked worktree shows no nudges. The one exception is <code style={{ background: '#1a1b26' }}><S c="#e879f9">⚙️ /setup-gaia (Required)</S></code>, which shows everywhere until setup is done.
+Maintenance commands run from the main checkout, so a linked worktree shows no nudges. The one exception is <code style={{ background: '#1a1b26' }}><S c="#f0abfc">⚙️ /setup-gaia (Required)</S></code>, which shows everywhere until setup is done.
 
 ### On a narrow terminal
 
