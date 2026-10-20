@@ -42,6 +42,7 @@ export default defineConfig({
 		'/commands/update-gaia': '/maintenance/update-gaia/',
 		'/commands/handoff-pickup': '/workflow/work-lifecycle/#resuming-long-work',
 		'/getting-started/setup-gaia-ci': '/getting-started/setup-gaia/',
+		'/getting-started/what-you-meet': '/getting-started/onboarding/',
 		'/getting-started/setup-cloned-gaia-project': '/getting-started/setup-gaia/',
 		'/maintenance/audit': '/maintenance/cleanse/',
 		'/maintenance/harden': '/maintenance/codify/',
@@ -117,9 +118,9 @@ export default defineConfig({
 					label: 'Getting started',
 					items: [
 						{ label: 'Quick Start', slug: 'index' },
-						{ label: 'What you meet, and when', slug: 'getting-started/what-you-meet' },
 						{ label: '/gaia-init', slug: 'getting-started/gaia-init' },
 						{ label: '/setup-gaia', slug: 'getting-started/setup-gaia' },
+						{ label: 'Onboarding', slug: 'getting-started/onboarding' },
 						{ label: 'Project layout', slug: 'getting-started/project-layout' },
 						{ label: 'Upgrading from 1.x', slug: 'getting-started/upgrading' },
 					],

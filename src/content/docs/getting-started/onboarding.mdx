@@ -1,11 +1,9 @@
 ---
-title: What you meet, and when
-description: Everything in GAIA is installed from the start, and each part kicks in when your work reaches it. The order in which a new project meets its rules, commit checks, the pre-merge audit, and the maintenance commands.
-sidebar:
-  order: 1
+title: Onboarding
+description: How GAIA onboards a new project while you work. Everything is installed from the start, and rules, commit checks, the pre-merge audit, and the maintenance commands each step in the first time your work reaches them.
 ---
 
-Everything in GAIA is installed from the start: every rule, hook, check, and command is there in your first session. You don't switch anything on. Each part kicks in when your work reaches it, so a new project meets them in a predictable order.
+GAIA onboards you while you work. Every rule, hook, check, and command is installed from your first session, and you don't switch anything on. Each part steps in the first time your work reaches it, so every new project goes through the same sequence: first session, first commit, first pull request, first week, and later.
 
 ## First session
 
@@ -16,8 +14,8 @@ Everything in GAIA is installed from the start: every rule, hook, check, and com
 
 ## First commit
 
-- **Its own branch and folder.** If the work closes an issue, Claude claims it first ([why](/reference/gates/#issue-claim)). Then it names the branch and works in its own git worktree, a separate copy of the repo on that branch ([why](/reference/gates/#worktree-path-mismatch)). See [Work lifecycle](/workflow/work-lifecycle/).
-- **Quality Gate.** Before Claude commits, typecheck, lint, tests, Playwright, a quick check that the dev server starts, and the build must all pass ([why](/reference/gates/#quality-gate)).
+- **Its own branch and folder.** If the work closes an issue, Claude claims it first ([why](/reference/gates/#issue-claim)). Then it names the branch and, by default, works in its own git worktree, a separate copy of the repo on that branch ([why](/reference/gates/#worktree-path-mismatch)). Your team's isolation policy can choose a feature branch in your checkout instead. See [Work lifecycle](/workflow/work-lifecycle/).
+- **Quality Gate.** Before a commit that touches source, Claude runs a simplify pass, a check for untranslated text, typecheck, lint, tests, Playwright, a quick check that the dev server starts, and the build, and all must pass ([why](/reference/gates/#quality-gate)). A commit of only Markdown, `.claude/` files, or wiki pages skips it.
 - **Test seen failing first.** A new test for plain logic (utilities, parsers, hooks) must be seen failing before it passes, which proves it can catch a bug ([why](/reference/gates/#test-seen-failing-first-red-gate)).
 - **Commit hooks.** The native pre-commit hook runs typecheck, lint, and tests on staged files ([why](/reference/gates/#pre-commit-floor)), and the commit-msg hook checks the message follows Conventional Commits ([why](/reference/gates/#commit-message-format)). Neither can be skipped ([why](/reference/gates/#no-verify)).
 
