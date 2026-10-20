@@ -63,15 +63,19 @@ For the reasoning behind each choice, ask Claude: the decisions live in the proj
 
 GAIA ships one frontend framework, already chosen, and no backend. The two are treated differently on purpose.
 
-**The frontend is chosen for you.** React Router 8 can build nearly any web app frontend. It can render pages on the server or run entirely in the browser as a single-page app (GAIA ships with server rendering on), and it is widely used and well established. Other frameworks, such as Next.js and TanStack Start, differ in ways that rarely decide whether you can build your app, so choosing between them mostly comes down to preference. Settling the choice up front is one less decision to make before you start building.
+### The frontend is chosen for you
+
+React Router 8 can build nearly any web app frontend. It can render pages on the server or run entirely in the browser as a single-page app (GAIA ships with server rendering on), and it is widely used and well established. Other frameworks differ in ways that rarely decide whether you *can* build your app, so choosing between them mostly comes down to preference. Settling the choice up front is one less decision to make before you start building.
 
 If React Router truly cannot do something your project needs, you can ask Claude to replace it. Expect a large change: GAIA's frontend rules, skills, scaffolders, and Code Audit Team extensions are written for React Router and would have to change with it.
 
-**The backend is left to you.** Backends differ in ways that matter: language, hosting, database, and what your team already knows. Often the choice isn't yours at all, because your company already runs one. A hosted service such as Supabase, a service in Python or Kotlin, and an existing company API all fit.
+### The backend is left to you
 
-The repo is built to take one. Because it is a pnpm workspace, a backend becomes another package beside `frontend/`, with its own `CLAUDE.md`, rules, and skills. Ask Claude to add it; GAIA ships the steps. Set up two more things with it:
+Backends differ in ways that matter: language, hosting, database, and what your team already knows. Often the choice isn't yours at all, because your company already runs one. A hosted service such as Supabase, a service in TypeScript, Python, or Ruby, and an existing company API all fit.
 
-- **A Code Audit Team member that covers it.** Until a member's file patterns cover the backend, its files are reviewed by `code-audit-frontend`, the default member, which reviews with a React focus. Ask Claude to register a member for your backend's language, or to give its file patterns to a member whose focus fits. See [Code Audit Team](/workflow/code-audit-team/).
-- **A quality gate for its stack.** The shared [Quality Gate](/reference/gates/#quality-gate) checks only `frontend/`, so a package in another language needs a gate that names its own checks.
+The repo is built for this. It is a pnpm workspace, so each backend you add becomes another package beside `frontend/`, with its own `CLAUDE.md`, rules, and skills. Ask Claude to add one; GAIA ships the steps. Set up two more things with each:
+
+- **A Code Audit Team member that covers it.** Code no member covers is not merged unreviewed. Until a member's file patterns cover the backend, the merge waits for `code-audit-frontend`, the default member, to review its files, and that member reviews with a React focus. Ask Claude to register a member for your backend's stack, or to give its file patterns to a member whose focus fits. See [Code Audit Team](/workflow/code-audit-team/).
+- **A quality gate for its stack.** The shipped [Quality Gate](/reference/gates/#quality-gate) checks only `frontend/`, so a backend needs a gate that names its own checks.
 
 Worktrees get their own ports for `frontend/` only. A backend has no port slot, and its database is shared by every worktree unless you set up one per worktree. Before Claude runs backend work in a worktree, it asks whether every worktree should share one backend or run its own.
