@@ -65,7 +65,11 @@ GAIA ships one frontend framework and no backend. This is an intentional choice.
 
 ### The frontend is chosen for you
 
-[React Router 8](https://reactrouter.com/) can be used to build nearly any web app you need. It can render pages on the server or run entirely in the browser as a single-page app (GAIA ships with server rendering on), and it is widely used and well established. It isn't tied to one hosting platform, so you can deploy it almost anywhere: any Node.js server, any platform that runs Docker containers (such as AWS, Google Cloud Run, Azure, or Fly.io), or hosts such as Vercel, Netlify, and Cloudflare. GAIA ships a `frontend/Dockerfile` as a starting point. Your host may need changes to it, and Claude can make them. React Router's [deployment guide](https://reactrouter.com/start/framework/deploying) covers each option. Other frameworks differ in ways that rarely decide whether you *can* build your app, so choosing between them mostly comes down to preference. Settling the choice up front is one less decision to make before you start building.
+[React Router 8](https://reactrouter.com/) can be used to build nearly any web app you need. It is widely used and well established, and it can render pages on the server or run entirely in the browser as a single-page app. GAIA ships with server rendering on.
+
+It also isn't tied to one hosting platform, so you can deploy it almost anywhere. See [Deployment](/getting-started/deployment/).
+
+Other frameworks differ in ways that rarely decide whether you *can* build your app, so choosing between them mostly comes down to preference. Settling the choice up front is one less decision to make before you start building.
 
 If React Router truly cannot do something your project needs, you can ask Claude to replace it. Expect a large change: GAIA's frontend rules, skills, scaffolders, and Code Audit Team extensions are written for React Router and would have to change with it.
 

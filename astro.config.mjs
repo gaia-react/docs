@@ -116,6 +116,7 @@ export default defineConfig({
 						{ label: '/setup-gaia', slug: 'getting-started/setup-gaia' },
 						{ label: 'Onboarding, as you build', slug: 'getting-started/onboarding' },
 						{ label: 'Project layout', slug: 'getting-started/project-layout' },
+						{ label: 'Deployment', slug: 'getting-started/deployment' },
 						{ label: 'Upgrading from 1.x', slug: 'getting-started/upgrading' },
 					],
 				},
