@@ -1,0 +1,44 @@
+---
+title: Token efficiency
+description: How much of Claude's context GAIA uses at session start, what loads only when it is needed, and how GAIA keeps long work from filling the context.
+sidebar:
+  order: 6
+---
+
+Everything GAIA adds to a session takes up part of Claude's context window, the fixed amount of text Claude can hold at once. GAIA keeps that part small: most of it loads only when a task needs it.
+
+## At session start
+
+GAIA adds about 7.7k tokens to a session before you type anything. That is under 4% of a 200k-token context window, and under 1% of a 1M one.
+
+| What loads in every session | Tokens |
+| --- | --- |
+| [Rules](/reference/rules/) that apply everywhere (8 files) | 3,877 |
+| Session-start text from GAIA's [hooks](/reference/hooks/) | 1,409 |
+| The root `CLAUDE.md` | 1,041 |
+| [Skill](/skills/) and command descriptions | 804 |
+| [Agent](/reference/agents/) descriptions | 541 |
+| **Total** | **7,672** |
+
+Measured in a new GAIA 2.0.0 project on Opus 5.5, in a session on a feature branch. On the default branch, the branch workflow text is left out of the session-start text, so the total is lower. The session-start text is added when a session starts, and again after `/clear` or compaction.
+
+Your own setup adds to this: MCP servers, plugins, and your global `~/.claude/CLAUDE.md` load in every project, with or without GAIA.
+
+## Only when needed
+
+| What loads on demand | When it loads | Tokens |
+| --- | --- | --- |
+| Root rules for specific paths (9 files) | Claude works on a file a rule covers | Up to 10.1k |
+| Frontend rules (13 files) | Claude works on a file in `frontend/` that a rule covers | Up to 12.4k |
+| A skill's instructions | The skill is used | Varies by skill |
+
+The rule figures are the most each set adds if every rule in it loads. A task usually loads only a few.
+
+[Hooks](/reference/hooks/) run outside the conversation. Most add nothing unless they block something, and then they add only the message they print. Two add text when you reach a point that needs it: the branch workflow text when you move onto a branch or worktree, and the checkpoint instructions when the context gets heavy (see [Context bands](/workflow/work-lifecycle/#context-bands)).
+
+## During long work
+
+- **The audit runs in a sub-agent.** The [audit loop](/workflow/code-audit-team/#the-audit-loop) runs its review rounds outside your main session, which holds only a short report per unit.
+- **Long work resumes from a small saved state.** When a session's context gets heavy, Claude saves its place and offers a continuation prompt, so you can clear and pick up where you left off. See [Resuming long work](/workflow/work-lifecycle/#resuming-long-work).
+
+To see what a piece of work cost in tokens, see [Cost and usage ledger](/reference/cost/).
