@@ -60,8 +60,8 @@ Three workflows ship in `.github/workflows/`. None of them runs Claude.
 
 | Workflow | When it runs | What it does |
 |---|---|---|
-| **Tests** (`tests.yml`) | Pushes and pull requests to `main` | Runs the test suites the change needs. A `chore(deps)` pull request skips them only when every changed file is a package manifest. Playwright runs one worker per CPU core. |
-| **Chromatic** (`chromatic.yml`) | `main`, and pull requests that are ready for review. Drafts are skipped. | Takes a screenshot of every story, once in light mode and once in dark mode, so each story costs two snapshots per build. A branch pushed several times as a draft pays for only one build, when it is marked ready. Runs with no `GITHUB_TOKEN` permissions. |
+| **Tests** (`tests.yml`) | Pull requests to `main`, and manual runs (`workflow_dispatch`). A push to `main` triggers the workflow but runs no job. | Runs the test suites the change needs. A `chore(deps)` pull request skips them only when every changed file is a package manifest. Playwright runs one worker per CPU core. |
+| **Chromatic** (`chromatic.yml`) | `main`, and pull requests that are ready for review. Drafts are skipped. | Takes a screenshot of every story, once in light mode and once in dark mode, so each story costs two snapshots per build. A branch pushed several times as a draft pays for only one build, when it is marked ready. The snapshot job's `GITHUB_TOKEN` can only read the repository contents. |
 | **PR Conventions** (`pr-conventions.yml`) | Pull requests (opened, edited, pushed) | Advisory only: it reports but does not block. Checks the branch name, checks the title as the future squash-merge commit line, and checks that a plan branch's type (`<type>/spec-<nnn>`) matches the title's type. Safe on pull requests from forks: it uses no secrets and a read-only token. |
 
 The Tests and Chromatic workflows pin third-party actions to exact commit SHAs and set a time limit on each job. The audit itself runs locally; see [Code Audit Team](/workflow/code-audit-team/).

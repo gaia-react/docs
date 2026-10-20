@@ -78,7 +78,7 @@ At every session start, GAIA lists merged worktrees that no live session is usin
 
 ## 4. Commit and open the draft pull request
 
-Every commit passes the Quality Gate (typecheck, lint, tests, Playwright, a quick dev-server check, and the build) and the commit hooks. The dev-server check runs `bash .gaia/scripts/dev-smoke.sh`, which starts this checkout's own dev server, checks that a page loads, and stops only the server it started. That way it never kills a server another session is using. The branch is pushed and the pull request opens as a draft with a Conventional Commits title. When the work closes an issue, `Closes #<n>` goes in the pull request body, never in a commit message. A squash merge copies commit messages into the final commit, and GitHub would close the issue from there no matter what the body says.
+Every commit passes the commit hooks. A commit that touches source or build configuration also passes the Quality Gate: a simplify pass, a check for untranslated user-facing text, typecheck, lint, tests, Playwright, a quick dev-server check, and the build. A commit of only Markdown, `.claude/` files, or wiki pages skips the gate. The dev-server check runs `bash .gaia/scripts/dev-smoke.sh`, which starts this checkout's own dev server, checks that a page loads, and stops only the server it started. That way it never kills a server another session is using. The branch is pushed and the pull request opens as a draft with a Conventional Commits title. When the work closes an issue, `Closes #<n>` goes in the pull request body, never in a commit message. A squash merge copies commit messages into the final commit, and GitHub would close the issue from there no matter what the body says.
 
 **Why draft:** reviewers should be notified when a pull request is ready, and in a GAIA project that is when the audit passes and posts its `GAIA-Audit` check. A pull request opened as ready notifies reviewers before any audit has run. When the audit passes, it marks the pull request ready. See the [gate reference](/reference/gates/#draft-pull-requests).
 
@@ -112,11 +112,19 @@ Specs, plans, and research live in one gitignored `.notebook/` folder at the mai
 - `.notebook/plans/PLAN-NNN/` for plans with no SPEC
 - `.notebook/research/<date>-<topic>/`
 
-Every worktree links to the main checkout's copy, so nothing written there is lost when a worktree is removed. Merged or abandoned SPEC folders are kept for `GAIA_SPEC_RETENTION_DAYS` days (default 30), then deleted. Closed research that nothing refers to is deleted only after you confirm.
+Every worktree links to the main checkout's copy, so nothing written there is lost when a worktree is removed. Abandoned SPEC folders are kept for `GAIA_SPEC_RETENTION_DAYS` days (default 30), then deleted. Merged ones are deleted after the same period only once their layers are consolidated and their cost is in the usage ledger. Closed research that nothing refers to is deleted only after you confirm.
 
 ## Resuming long work
 
-Work that spans sessions resumes from one small file, `STATE.md`, rewritten in place in its run folder (`.gaia/local/runs/<branch>/`) or research folder. A resumed session reads that file and the run's artifact list and nothing else.
+Work that spans sessions resumes from a small saved state, rewritten in place. Where it goes depends on the work:
+
+- a `/gaia-plan` run saves to its own progress files, at a committed phase boundary
+- `/gaia-spec` saves to its draft cache
+- a research folder saves to its own state file
+- other work on a branch saves to `.gaia/local/runs/<branch>/STATE.md`
+- work on the default branch saves to `.gaia/local/runs/session-<session id>/STATE.md`
+
+A resumed session reads that saved state and the run's artifact list and nothing else.
 
 Claude cannot see how full its own context is, so the statusline tracks it in four bands. GAIA asks you to clear long before Claude Code's own automatic compaction, which only starts when the context window is nearly full:
 
@@ -129,7 +137,7 @@ Claude cannot see how full its own context is, so the statusline tracks it in fo
 
 The red band sits at 300,000 tokens or half the window, whichever is smaller. Fire is 1.25 times red and skull is 1.5 times red. To ask even earlier, a person can lower the red band in `.gaia/local/protected/checkpoint-override.json`, for example `{"version":1,"context_checkpoint":{"ask_tokens":100000}}`. The file can only lower it, never raise it, and Claude cannot edit it.
 
-**Why so early:** models get less reliable as their context grows long, long before the window is full. They recall and use information less accurately, especially information in the middle of a long context. Researchers call this context rot. See Chroma's [Context Rot](https://www.trychroma.com/research/context-rot) study, [Lost in the Middle](https://arxiv.org/abs/2307.03172) (Liu et al.), and Anthropic's [Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents). A long session also costs more: every turn sends the whole conversation again, so each step in a full session is billed for everything before it, even at the [cached rate](https://platform.claude.com/docs/en/build-with-claude/prompt-caching). A fresh session that resumes from a short `STATE.md` is both sharper and cheaper. GAIA's band values are tuned estimates, not measured limits.
+**Why so early:** models get less reliable as their context grows long, long before the window is full. They recall and use information less accurately, especially information in the middle of a long context. Researchers call this context rot. See Chroma's [Context Rot](https://www.trychroma.com/research/context-rot) study, [Lost in the Middle](https://arxiv.org/abs/2307.03172) (Liu et al.), and Anthropic's [Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents). A long session also costs more: every turn sends the whole conversation again, so each step in a full session is billed for everything before it, even at the [cached rate](https://platform.claude.com/docs/en/build-with-claude/prompt-caching). A fresh session that resumes from a short saved state is both sharper and cheaper. GAIA's band values are tuned estimates, not measured limits.
 
 When the context reaches the red band, Claude finishes the current step, saves its place, and asks one question:
 
@@ -142,6 +150,6 @@ You can also ask Claude for a continuation prompt at any time. It always arrives
 
 ## Commands that run only in the main checkout
 
-`/setup-gaia` and the maintenance commands (`/gaia-wiki`, `/gaia-residue`, `/gaia-codify`, `/gaia-fitness`, `/gaia-cleanse`, `/update-deps`, `/update-gaia`) refuse inside a linked worktree and name the main checkout to run them from. They create their own worktree for the work. See the [Maintenance overview](/maintenance/#how-maintenance-commands-run).
+`/setup-gaia`, `/gaia-debt`, and the maintenance commands (`/gaia-wiki`, `/gaia-residue`, `/gaia-codify`, `/gaia-fitness`, `/gaia-cleanse`, `/gaia-serena-sync`, `/update-deps`, `/update-gaia`) refuse inside a linked worktree and name the main checkout to run them from. The ones that change the repository create their own worktree or branch for the work. See the [Maintenance overview](/maintenance/#how-maintenance-commands-run).
 
 Commands that start new work (SPECs, plans, tech-debt fixes, one-off changes) offer to pull first when your checkout's GAIA version is behind the remote. Resuming earlier work is never interrupted by that offer.

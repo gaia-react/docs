@@ -27,9 +27,9 @@ The command works out which situation your clone is in (a new project with no Gi
 
 ### Prerequisites (every run)
 
-Three checks run every time and never stop setup:
+Three checks run every time:
 
-- **Worktree repair.** If the clone is a git worktree created outside Claude Code, the links to the main copy's shared folders are recreated (`bash .gaia/scripts/link-worktree.sh`). In a normal clone this does nothing.
+- **Worktree links.** `bash .gaia/scripts/link-worktree.sh` checks the links a git worktree needs to the main copy's shared folders. In your main copy it does nothing. If it prints a `failed:` line (for example, Windows refused to create a symlink), setup stops and shows that line. Fix the cause and run `/setup-gaia` again.
 - **pnpm and node_modules.** If `corepack` is available, pnpm is enabled at the pinned version; otherwise it is installed globally with npm. `pnpm install` runs when `node_modules/` is missing.
 - **GitHub CLI check (warning only).** If `gh` is missing or not logged in, you get a warning and setup continues. The pull request merge workflow, `/gaia-plan`, and `/gaia-forensics` rely on `gh`, so install it from [cli.github.com](https://cli.github.com/) and run `gh auth login` when you can.
 
@@ -89,7 +89,7 @@ Applied after you create or pick a repo, and only when you are a repo admin and 
 - **`delete_branch_on_merge`**, so GitHub deletes each pull request's branch when it merges, however it was merged. Applied without asking on a repo this run created; on an existing repo, setup asks.
 - **Dependabot settings**: security alerts on, Dependabot's own security-fix pull requests off. [`/update-deps`](/maintenance/update-deps/) reads the alerts and fixes vulnerable packages itself, then tests the fix through the quality gate. If you already have a Dependabot npm entry or a Renovate config, setup first warns that you may get duplicate pull requests; it never edits either file.
 
-If one of these settings fails (403 if you are not an admin, 404 if there is no protection rule), the command prints the exact `gh api` command to run yourself and continues.
+If one of these settings fails (403 if you are not an admin, 404 if there is no protection rule), setup tells you what someone with admin access needs to run or change, and continues. For `GAIA-Audit` it prints the `gh api` command; for the Dependabot settings it prints the commands to run.
 
 ## Phase: team settings
 
@@ -127,7 +127,7 @@ A later GAIA release can add a new setup step. `/setup-gaia` runs any step liste
 
 ## Finish
 
-Project decisions recorded this run (`setup_decisions` in `.gaia/project.json`) are committed and pushed to the default branch as `chore(gaia): record setup decisions`, so they reach your team. This machine's setup is marked done, the usage ping is sent (see [Usage ping](/getting-started/gaia-init/#usage-ping)), and the command prints one of two closing lines:
+Project decisions recorded this run (`setup_decisions` in `.gaia/project.json`) are committed and pushed to the default branch as `chore(gaia): record setup decisions`, so they reach your team. This machine's setup is marked done. The usage ping is sent (see [Usage ping](/getting-started/gaia-init/#usage-ping)), except on a plain re-run of a project that was already set up and decided nothing new. Then the command prints one of two closing lines:
 
 - `You're all set: your GAIA project is ready.` when nothing this machine can do is left.
 - `Setup isn't finished: these project settings are still owed: ...` naming them, when a GitHub step was refused or skipped. Fix the cause and re-run.

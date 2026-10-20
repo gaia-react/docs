@@ -26,7 +26,7 @@ If install fails, the run stops and shows the error. Fix the cause and resume (s
 Before it asks about your project, `/gaia-init` asks how you want to answer the setup questions:
 
 - **Interactive** (recommended): GAIA asks each question and waits for your answer.
-- **Automatic**: GAIA picks the recommended default for every question and shows you the full list of chosen values before it proceeds, so you can review them first.
+- **Automatic**: GAIA picks the recommended default for every question. It shows you the full list of chosen values and then carries on without stopping. You can interrupt it, and you can change any setting afterward.
 
 Every question is a menu with the recommended option first. In interactive mode it asks:
 
@@ -97,10 +97,10 @@ After installing, `/gaia-init` checks each one and reports `[ok]` or `[FAIL]` fo
 
 ### 6. Team settings
 
-`/gaia-init` writes GAIA's two team defaults to `.gaia/project.json` without asking:
+`/gaia-init` applies GAIA's two team defaults without asking:
 
-- **Git isolation policy**: always use worktrees. Every `/gaia-plan`, `/gaia-debt`, and ad-hoc task works in its own git worktree, so tasks run in parallel without touching each other. See [Work lifecycle](/workflow/work-lifecycle/).
-- **Sandbox recommendation**: not recommended. Claude Code's operating-system sandbox for shell commands breaks `gh`, git over HTTPS, and `docker` until you allow each one, and GAIA's whole workflow depends on `gh`.
+- **Git isolation policy**: always use worktrees. Init leaves the setting out of `.gaia/project.json`, because an unset policy means this default. Every `/gaia-plan`, `/gaia-debt`, and ad-hoc task works in its own git worktree, so tasks run in parallel without touching each other. See [Work lifecycle](/workflow/work-lifecycle/).
+- **Sandbox recommendation**: not recommended, written to `.gaia/project.json`. Claude Code's operating-system sandbox for shell commands breaks `gh`, git over HTTPS, and `docker` until you allow each one, and GAIA's whole workflow depends on `gh`.
 
 The file is committed and shared with your team, and `/update-gaia` never overwrites it. A repo admin changes either setting later with `/setup-gaia --reconfigure`.
 
@@ -110,7 +110,7 @@ GAIA ships with a built-in [wiki](/maintenance/wiki/) that Claude maintains as i
 
 ### 8. Commit
 
-`/gaia-init` commits its own changes as one commit on your default branch, `chore: initialize project with /gaia-init`. [`/setup-gaia`](/getting-started/setup-gaia/) pushes only what is committed, and every later branch or worktree starts from the last commit. Committing makes sure nothing init wrote is left behind. If the commit fails, init says so and tells you to review `git status` and commit before running `/setup-gaia`.
+`/gaia-init` commits its own changes as one commit on the current branch, `chore: initialize project with /gaia-init`. [`/setup-gaia`](/getting-started/setup-gaia/) pushes only what is committed, and every later branch or worktree starts from the last commit. Committing makes sure nothing init wrote is left behind. If the commit fails, init says so and tells you to review `git status` and commit before running `/setup-gaia`.
 
 ## Usage ping
 

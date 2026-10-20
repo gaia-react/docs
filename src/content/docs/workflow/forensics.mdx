@@ -36,7 +36,7 @@ Forensics runs in nine read-only steps:
 2. **Classify.** Sorts the failure into one of eight kinds (`init`, `update`, `wiki-sync`, `quality-gate`, `hook`, `scaffold`, `dev-server`, `other`) by matching key phrases in your description. It quotes the phrase it matched and names the state file it relied on.
 3. **Diagnose.** Decides whether the failure comes from your setup (wrong Node version, a missing env var, uncommitted changes blocking a command) or is probably a bug. When the evidence points both ways, it picks your setup, since that is the more likely cause.
 4. **Redact.** Strips secrets, identity details, and machine-specific paths out of the report, then double-checks the result. If anything that still looks like a credential gets through, forensics stops instead of writing a report that could leak it.
-5. **Write.** Produces a report in a fixed format: frontmatter (kind, GAIA version, created date, optional issue URL) and four fixed sections: `## Symptom`, `## Classification`, `## Capture`, `## Reproduction context`.
+5. **Write.** Produces a report in a fixed format: frontmatter (the failure class, GAIA version, created date, optional issue URL) and four fixed sections: `## Symptom`, `## Classification`, `## Capture`, `## Reproduction context`.
 6. **Save.** Writes to `.gaia/local/forensics/<tree>/<timestamp>-<class>.md`, where `<tree>` identifies the checkout and the timestamp is in UTC, in the compact ISO-8601 form shown in the example below.
 7. **Act on the diagnosis.** For a setup problem, it prints the steps to fix it and stops. For a probable bug, it goes on to offer filing an issue.
 8. **Offer to file.** If `gh` is installed, asks once whether to file an issue on `gaia-react/gaia` with the `gaia-forensics` label. If `gh` is not installed, prints the local report path and exits. GitHub silently drops labels from people without triage access to the GAIA repo, which is most people. If the label does not attach, forensics still files the issue and warns you the label is missing.
@@ -84,7 +84,7 @@ These four rules always apply, whatever path the command takes.
 </Aside>
 
 - **Read-only.** Forensics only looks. It never changes, installs, downloads, or fixes anything.
-- **Writes in two places only.** The report goes to `.gaia/local/forensics/`, and usage goes to the local usage ledger.
+- **Writes in two places only, plus one temporary file.** The report goes to `.gaia/local/forensics/`, and usage goes to the local usage ledger. Filing an issue also writes one temporary file holding the issue body.
 - **One redaction for both copies.** The local file and the GitHub issue go through the same single pass that removes secrets, so after it they are identical.
 - **Fixed format.** Frontmatter fields, section headers, and section order never change, because sorting filed reports depends on them.
 

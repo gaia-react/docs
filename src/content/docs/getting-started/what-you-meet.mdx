@@ -27,7 +27,7 @@ Everything in GAIA is installed from the start: every rule, hook, check, and com
 - **Code Audit Team.** A set of AI reviewers, each responsible for certain files. Every reviewer whose files the change touches reviews it before it can merge ([why](/reference/gates/#merge-without-the-audit)). See [Code Audit Team](/workflow/code-audit-team/).
 - **The audit loop.** Rounds of review, fix, and re-check run in a separate agent, outside your session, until the change passes the audit.
 - **The branch checkpoint.** When your session's context reaches GAIA's [red band](/workflow/work-lifecycle/#resuming-long-work), or the rounds keep turning up new problems instead of settling, the loop stops and asks you whether to continue ([why](/reference/gates/#audit-checkpoint)).
-- **GAIA-Audit.** Once the audit passes, Claude posts a `GAIA-Audit` status check on the pull request. GitHub requires it before merging ([why](/reference/gates/#gaia-audit-required-check)).
+- **GAIA-Audit.** Once the audit passes, Claude posts a `GAIA-Audit` status check on the pull request. Once a repo admin has run [`/setup-gaia`](/getting-started/setup-gaia/), GitHub requires it before merging ([why](/reference/gates/#gaia-audit-required-check)).
 - **Merge**, when you ask. The merge prints the pull request's [cost](/reference/cost/), posts the findings comment, and releases the issue claim.
 
 ## First week

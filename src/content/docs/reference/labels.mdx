@@ -5,7 +5,7 @@ sidebar:
   order: 5
 ---
 
-GAIA's GitHub labels are all defined in one file, `.gaia/labels.json`. `gaia labels sync` creates the labels your repository is missing and renames labels whose names changed, so every issue keeps its label. When a label's color differs from GAIA's, it tells you instead of overwriting your color.
+GAIA's GitHub labels are all defined in one file, `.gaia/labels.json`. `gaia labels sync` creates the labels your repository is missing and renames labels whose names changed, so every issue keeps its label. It also updates a label's description to match GAIA's. When a label's color differs from GAIA's, it tells you instead of overwriting your color.
 
 [`/setup-gaia`](/getting-started/setup-gaia/) and [`/update-gaia`](/maintenance/update-gaia/) run the sync. You can also run it yourself:
 
@@ -49,10 +49,10 @@ The severity labels are shades of red, darkest for critical.
 | `bug` | Existing behavior is broken or wrong |
 | `enhancement` | A new feature or request |
 | `documentation` | Improvements or additions to documentation |
-| `security` | A security defect or dependency CVE |
+| `security` | A security defect or dependency CVE. Created only when `.github/dependabot.yml` exists. |
 | `wontfix` | Deliberately declined; do not file it again. When a finding matches an issue with this label, it is not filed as tech debt again. |
 | `dependencies`, `github_actions` | Dependabot's own labels |
 
 ## Not created
 
-GitHub's default `good first issue` and `help wanted` labels are deliberately absent from GAIA's registry: they invite one-off contributions from people who do not know the background of the work.
+GAIA never creates GitHub's default `good first issue` and `help wanted` labels: they invite one-off contributions from people who do not know the background of the work. If your repository already has them, the sync reports them as `blocked but present` and leaves them in place.

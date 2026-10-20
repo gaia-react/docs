@@ -82,7 +82,7 @@ test('drive the target micro-interaction and capture renders', async ({page}) =>
 Run it. The Playwright config starts the dev server for you.
 
 <Aside type="caution">
-The capture only works on a development build. Render timings are zero in production, so a production build is rejected.
+The capture only works on a development build. A production build is rejected.
 </Aside>
 
 ```sh
@@ -115,8 +115,7 @@ changed is a newly created object or function: a new reference, so `Object.is`
 sees it as different from the last render.
 
 Renders where nothing meaningful changed are not reported on their own, because
-chasing them leads to wrapping everything in memo for no real gain. Timing alone
-does not create a finding. Findings are ranked by how many renders were
+chasing them leads to wrapping everything in memo for no real gain. Findings are ranked by how many renders were
 memo-defeated times how long the slowest one took (`memoDefeatedCount` times
 `maxTotalTime`). A component is flagged on timing alone only when it and its
 children take longer than the frame budget to render.
@@ -130,21 +129,24 @@ children are actually expensive to render.
 ### 4. Hand off the fix
 
 Fix the structure first. If a value never changes, move it out of the component
-to a constant at the top of the file (module level) before reaching for a hook.
-Use a hook only when the value really depends on render state. `unstableInputs`
-tells you which case you have.
+to a constant at the top of the file (module level). A value that depends on
+render state is memoized for you by the React Compiler, so if it still arrives
+unstable, the compiler skipped the component (a bailout). Fix the cause of the
+bailout, or apply one of the exception cases in the [`react-code`](/skills/code/#react-code) skill. Don't add
+`useMemo` or `useCallback` by hand. `unstableInputs` tells you which case you have.
 
-| Unstable input | Structural fix (try first) | Hook fallback |
+| Unstable input | Structural fix (try first) | When it depends on render state |
 |---|---|---|
-| An inline object or array prop (`prop:<name>`) | Move the literal to a module-level `const` | `useMemo` only when the value depends on render state |
-| A callback prop (`prop:<name>`) | Move the handler to module level when it uses nothing from the component | `useCallback` with the right deps when it uses render state |
-| A context value built on every render (`context`) | Move a static value to a module-level const, or split the context so components that don't use the changed part stop re-rendering | `useMemo` the provider value when it depends on state |
-| A child component defined inside another component's body | Move the component to module level | Not a hook fix |
+| An inline object or array prop (`prop:<name>`) | Move the literal to a module-level `const` | Fix the compiler bailout, or apply an exception case |
+| A callback prop (`prop:<name>`) | Move the handler to module level when it uses nothing from the component | Fix the compiler bailout, or apply an exception case |
+| A context value built on every render (`context`) | Move a static value to a module-level const, or split the context so components that don't use the changed part stop re-rendering | Fix the compiler bailout, or apply an exception case |
+| A child component defined inside another component's body | Move the component to module level | Not a memoization fix |
 
-For that last row, `reactDoctorRule` is always `null`. The reduce works from a
-flat list of renders and cannot tell that a component was defined inside another,
-so it never labels this case. Recognize it from the component name and the
-unstable input, then move the component to module level.
+The reduce never labels that last case. It works from a flat list of renders and
+cannot tell that a component was defined inside another, so `reactDoctorRule`
+names only the prop or context instability it sees, or is `null`. Recognize the
+case from the component name and the unstable input, then move the component to
+module level.
 
 ### 5. Verify
 

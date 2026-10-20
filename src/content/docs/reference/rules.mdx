@@ -18,26 +18,26 @@ GAIA ships rules in two places:
 
 | Rule | What it enforces |
 |---|---|
-| `coding-guidelines` | Kebab-case files and folders. Keep code simple: no handling for situations that cannot happen, but real failures are handled with limits. Change only what the task needs. Work toward a clear goal. Use TDD, and run the Quality Gate before a commit. React file layout lives in `coding-guidelines-react`. |
+| `coding-guidelines` | Kebab-case files and folders. Keep code simple: no handling for situations that cannot happen, but real failures are handled with limits. Change only what the task needs. Use TDD. Leave formatting and auto-fixable lint to `pnpm lint`. React file layout lives in `coding-guidelines-react`. |
 | `context-discipline` | Keep the main session's context small by handing reading-heavy work to sub-agents. Choose models from GAIA's model table. Research goes in `.notebook/research/<date>-<topic>/`. Long work resumes from one `STATE.md` file. A prompt meant for pasting goes in a fenced code block. |
 | `issue-claim` | Before work that closes a GitHub issue, check for the `in-progress` label and add it. Follow the work lifecycle. Claim `tech-debt` issues only through `/gaia-debt`. |
 | `pr-merge` | Before any `gh pr merge`, run the audit and post `GAIA-Audit` as the last step. The audit loop runs on its own until it reaches the branch checkpoint, which only a person can answer. |
 | `quality-gate` | Run the Quality Gate before any commit that touches source, unless nothing in the gate's scope is staged. |
 | `serena-cc-override` | When Serena is set up, use its tools for finding functions, classes, and other code symbols, instead of Read and Grep. Does nothing without Serena. |
-| `shell-cwd` | No `cd` in Bash calls; use absolute paths. Hooks are registered by paths relative to the repository root, and a `cd` would break them. |
+| `shell-cwd` | No `cd` in Bash calls; use absolute paths. Each hook finds its script from the checkout the shell is in, so a `cd` into another checkout can switch the guards off without any warning. See [Hooks](/reference/hooks/). |
 | `subagent-dispatch` | A sub-agent writes its result to a JSON file, and a check reads that file to tell an empty result from a missing one. A missing reply is re-run instead of being read as "found nothing". |
 
 ## Path-scoped (root)
 
 | Rule | What it enforces | Loads on |
 |---|---|---|
-| `ambient-context-resolution` | Scripts get the repository root, base branch, and commit from their input, not from the current folder or `HEAD`. | `.gaia/scripts/**/*.sh`, `.claude/hooks/**/*.sh`, `.github/workflows/**/*.yml`, `.gaia/**/*.ts` |
-| `code-comments` | A comment says something the code itself does not; the merge audit checks comments by the same standard. | app, test, Playwright, and Storybook source under `frontend/`, plus `.gaia/**` |
+| `ambient-context-resolution` | Scripts get the repository root, base branch, and commit from their input, not from the current folder or `HEAD`. | `.gaia/scripts/**/*.sh`, `.claude/hooks/**/*.sh`, `.github/workflows/**/*.yml`, `.gaia/**/*.ts`, `**/*.bats` |
+| `code-comments` | A comment says something the code itself does not; the merge audit checks comments by the same standard. | app, test, Playwright, and Storybook source under `frontend/`, `.gaia/**/*.ts` and `.sh`, `.claude/hooks/**/*.sh`, `.github/**/*.sh`, and `**/*.bats` |
 | `code-search` | Use Serena's MCP tools to look up code symbols. Grep is still the right tool for prose, strings, non-code files, and languages Serena does not index. | code files in any language |
-| `file-placement` | Where new hooks and scripts go and how a hook is registered. | `.claude/hooks/**`, `.gaia/scripts/**` |
+| `file-placement` | New hooks go at the root of `.claude/hooks/`, and how to register one so it keeps working. Project scripts go outside `.gaia/`, never in `.gaia/scripts/`. | `.claude/hooks/**`, `.gaia/scripts/**` |
 | `guards-must-fail` | A guard and its tests must be seen failing before anyone trusts them. | hooks, scripts, workflows, and Playwright specs |
 | `no-abbreviations` | Descriptive names in every language, alongside the `naming-conventions` skill. | code files in any language |
-| `user-questions` | Ask a choice as an `AskUserQuestion` menu with the recommended option first; print any pasteable prompt or command in a fenced code block. | skills, commands, agents |
+| `user-questions` | Ask a choice as an `AskUserQuestion` menu: recommended option first, at most four options, one question per decision. | skills, commands, and agents (root and `frontend/`), plus a few wiki pages about the merge workflow and the Quality Gate |
 | `wiki-style` | Present-tense prose; no historical phrasing or roadmap stated as current; no SPEC, PR, or commit references in body prose. | `wiki/**/*.md`, app source, and harness Markdown |
 | `working-doc-ids` | No SPEC, plan, or audit IDs, and none of your own issue or PR numbers, in code or prose. | app, test, and harness source |
 

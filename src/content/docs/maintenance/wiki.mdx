@@ -58,7 +58,7 @@ Consolidate runs every time. It looks for four kinds of finding, most important 
 
 - **Supersession**: two pages in the same area cover the same subject, and the newer one should take in the older one.
 - **Reversed decisions**: a decision page whose body reverses an older decision page.
-- **Near-duplicate page names**: names that differ by a character or two, or where one starts the other.
+- **Near-duplicate page names**: names in the same area that differ by at most two characters (ignoring case, and treating `_` as `-`).
 - **Subject-orphaned pages**: pages nothing links to, that match no concept or module page, and that have not changed in 90 days.
 
 Each finding is one question:
@@ -93,7 +93,7 @@ The fetch times out after `GAIA_WIKI_FETCH_TIMEOUT_SECONDS` (default 5). Set it 
 
 ## What ships in the wiki
 
-GAIA ships wiki pages describing what it installs: concepts, decisions, and modules, including `wiki/concepts/GAIA Scripts.md` (one row per shipped script), `wiki/concepts/Worktrees.md`, and `wiki/concepts/Local Working State.md`. They describe GAIA's conventions as your project's own. Sections you add to a GAIA-shipped page are kept when [`/update-gaia`](/maintenance/update-gaia/) merges a new release.
+GAIA ships wiki pages describing what it installs: concepts, decisions, and modules, including `wiki/concepts/GAIA Scripts.md` (GAIA's scripts by family and folder), `wiki/concepts/Worktrees.md`, and `wiki/concepts/Local Working State.md`. They describe GAIA's conventions as your project's own. Sections you add to a GAIA-shipped page are kept when [`/update-gaia`](/maintenance/update-gaia/) merges a new release.
 
 ## Related
 

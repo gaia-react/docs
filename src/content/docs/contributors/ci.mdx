@@ -27,21 +27,24 @@ Triggers on `v*.*.*` tag pushes. Builds and publishes the release bundle.
 
 ## cli-tests.yml
 
-Triggers on pushes and pull requests to `main`, and on `workflow_dispatch`. Three jobs:
+Its jobs run on pull requests to `main` and on `workflow_dispatch`. The workflow also lists pushes to `main` as a trigger, but every job skips on a push. The `workflow_dispatch` run is how you produce the required check on a commit that got no pull-request run. Three jobs:
 
-- **Vitest (`.gaia/cli`)**: for the CLI, typecheck, lint, and the Vitest tests. It also runs the bats tests for region markers, checks that the committed CLI bundles match a fresh build from source, runs the fitness lint over GAIA's own harness, and checks that the third-party skills copied into the repo (vendored skills) match the hashes recorded under `.gaia/vendor`.
+- **Vitest (`.gaia/cli`)** (required): for the CLI, typecheck, lint, and the Vitest tests. It also runs the bats tests for region markers, checks that the committed CLI bundles match a fresh build from source, runs the fitness lint over GAIA's own harness, and checks that the third-party skills copied into the repo (vendored skills) match the hashes recorded under `.gaia/vendor`. On a pull request, most steps run only when the change touches the files they cover; a `workflow_dispatch` run runs every step.
 - **Distribution harness** (advisory): the distribution tests that need neither Docker nor a token.
 - **Shipped-surface leak check** (advisory): builds the release tree, then checks that no shipped file names a contributor-only path and that removing the maintainer-only blocks leaves no partial marker behind.
 
 ## audit-ci-tests.yml
 
-Triggers on pushes and pull requests to `main`, and on `workflow_dispatch`. Runs GAIA's bats tests for the shipped scripts and hooks (`.gaia/scripts/tests/`, `.github/audit/tests/`, `.gaia/tests/`), split across parallel jobs (shards). It also runs the commitlint tests and the tests for the RED gate (the check that a test was seen failing first) that need Node or Chromium. A final `Audit CI Tests` job passes only when every shard passes, so one required check covers them all.
+Like `cli-tests.yml`, its jobs run on pull requests to `main` and on `workflow_dispatch`, and skip on a push to `main`. Runs GAIA's bats tests for the shipped scripts and hooks (`.gaia/scripts/tests/`, `.github/audit/tests/`, `.gaia/tests/`), split across parallel jobs (shards). It also runs the commitlint tests and the tests for the RED gate (the check that a test was seen failing first) that need Node or Chromium. A final `Audit CI Tests` job passes only when every shard passes, so one required check covers them all.
 
 Projects get these scripts as code GAIA controls and never edit, so the tests only need to catch changes made on the GAIA repo.
 
 ## shell-lint.yml
 
-Triggers on pull requests to `main`. Advisory. Runs shellcheck over every tracked `*.sh` and `*.bats` file through `.gaia/tests/shell-lint.sh`, and checks that every tracked shell script parses under the `/bin/bash` 3.2 that ships with macOS, since GAIA's shell scripts must run there.
+Triggers on pull requests to `main`. Two advisory jobs:
+
+- **Shellcheck**: runs shellcheck over every tracked `*.sh` and `*.bats` file through `.gaia/tests/shell-lint.sh`.
+- **Bash 3.2 parse**: on a macOS runner, checks that every tracked `*.sh` file parses under the `/bin/bash` 3.2 that ships with macOS, since GAIA's shell scripts must run there.
 
 ## forensics-triage.yml
 

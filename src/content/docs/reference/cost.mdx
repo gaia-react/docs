@@ -30,13 +30,13 @@ SPEC-NNN Cost
 +---------------------------------------+
 ```
 
-Each row is rounded to 0.1M tokens and to the cent, and the Total adds up the rounded rows, so the numbers in the box always add up.
+Each row is rounded to 0.1M tokens and to the cent, and the Total adds up the rounded rows, so the token and dollar columns always add up. Time is different: each row shows how long its own run took, and the Total runs from the first spend to the last, so it includes any gap between runs and can be longer than the rows added together.
 
 ### Where it prints
 
 - **Every `gh pr merge`** prints a `PR #<N> Cost` box with **Execute**, **Audit**, and **Total** rows: the work on the branch, and what the Code Audit Team spent reviewing it. When only one of the two cost anything, it prints a single Cost line.
-- **`/gaia-spec` and `/gaia-plan`** end with one labelled box: **Spec**, **Plan**, **Execute**, and **Total** rows, or one line when only one row has a cost. When a plan's work merges, the plan prints the cost of the whole thing, from SPEC to merge.
-- **Every other workflow** (the maintenance commands, `/gaia-debt`, `/gaia-residue`) ends with a Cost line.
+- **`/gaia-plan`** ends with a box for a plan made from a SPEC: **Spec**, **Plan**, and **Total** rows (one line when only one row has a cost). `/gaia-spec` prints no cost of its own; its run shows up as the Spec row of that box. A plan made without a SPEC ends with a single Cost line. When a plan's work merges, the plan prints the cost of the whole thing, from SPEC to merge, with an **Execute** row for the branch's work.
+- **`/gaia-fitness`, `/gaia-cleanse`, `/gaia-codify`, `/gaia-debt`, `/gaia-residue`, and `/gaia-forensics`** end with a Cost line. `/gaia-wiki`, `/gaia-serena-sync`, `/update-deps`, and `/update-gaia` print no cost of their own.
 
 ### Notes under the figures
 
@@ -76,4 +76,4 @@ To set your own prices, or add a model the table does not have, create `.gaia/lo
 { "models": { "claude-opus-5-5": [ { "input": 4, "output": 20 } ] } }
 ```
 
-Prices are dollars per million input and output tokens. Each model you list replaces that model's shipped rates; models you leave out keep theirs. If the file is not valid JSON it is ignored, and each cost readout says so once. GAIA never writes or deletes this file.
+Prices are dollars per million input and output tokens. Each model you list replaces that model's shipped rates; models you leave out keep theirs. If the file is not a JSON object with a `models` object inside it (including when it is not valid JSON at all), it is ignored, and each cost readout says so once. GAIA never writes or deletes this file.

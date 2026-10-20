@@ -91,7 +91,7 @@ A plan generated before a GAIA update keeps the steps it was generated with unti
 
 ### UAT specs
 
-For a plan from a SPEC, each browser UAT is turned into a Playwright test under `frontend/.playwright/e2e/` **before Phase 1**. It is committed on its own and marked as expected to fail (`test.fail()`). The phase responsible for a test cannot commit until that test passes. Sub-agents are told not to change a test's assertions to make it pass, because the test is what the SPEC promised.
+For a plan from a SPEC, each UAT routed to an end-to-end test is turned into a Playwright test under `frontend/.playwright/e2e/` **before Phase 1**. It is committed on its own and marked as expected to fail (`test.fail()`). The phase responsible for a test cannot commit until that test passes. Sub-agents are told not to change a test's assertions to make it pass, because the test is what the SPEC promised.
 
 Before the audit, the orchestrator checks that every one of these tests still tests what the SPEC says (an `uat-fidelity-judge` agent reads each one). When the code and a UAT no longer agree, the plan stops so the SPEC can be reopened, instead of quietly changing what was agreed.
 

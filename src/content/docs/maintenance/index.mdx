@@ -48,10 +48,10 @@ The boundary between `/gaia-cleanse` and `/gaia-wiki` is deliberate. `/gaia-clea
 
 Every maintenance command (`/gaia-wiki`, `/gaia-residue`, `/gaia-codify`, `/gaia-fitness`, `/gaia-cleanse`, `/update-deps`, `/update-gaia`) follows the same pattern:
 
-1. **It starts from the main checkout.** Inside a linked worktree it refuses and names the main checkout to run it from.
+1. **It starts from the main checkout.** Inside a linked worktree it refuses and names the main checkout to run it from. The exceptions are `/update-deps` and `/update-gaia`, which also accept their own `deps/` or `update/` worktree, so a re-run continues there.
 2. **It offers to pull first** when your checkout's GAIA version is behind the remote's.
 3. **It does its work on a branch of its own**, created just before it first changes a file: a worktree cut from the default branch by default, following your team's [isolation policy](/workflow/work-lifecycle/#3-isolate). It never writes onto the branch your checkout holds. The branch is named for the command and a timestamp, for example `deps/2026-10-20-1432`.
-4. **It commits, opens a draft pull request, and, on a run started from the main branch, merges it** through the [Code Audit Team](/workflow/code-audit-team/), waiting up to ten minutes for a queued merge. Some ask before merging: `/gaia-residue` asks once, and `/gaia-fitness` and `/gaia-codify` publish only on your answer.
+4. **It commits, opens a draft pull request, and merges it** through the [Code Audit Team](/workflow/code-audit-team/), waiting up to ten minutes for a queued merge (fifteen for `/gaia-wiki`). Some ask before merging: `/gaia-residue` asks once, and `/gaia-fitness` and `/gaia-codify` publish only on your answer.
 5. **It cleans up** the worktree and branch and pulls the default branch. A worktree holding unresolved work is kept, with the commands to remove it.
 
 A run that ends with nothing to publish removes its empty branch and worktree.

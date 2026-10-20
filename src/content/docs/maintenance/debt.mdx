@@ -15,7 +15,7 @@ When open `tech-debt` issues exist, the statusline shows:
 🐛 /gaia-debt (N issues)
 ```
 
-`N` is the number of open issues, not counting issues someone is already working on.
+`N` is the number of open `tech-debt` issues, not counting issues someone is already working on (`in-progress`) or issues parked for a SPEC (`debt:spec-pending`, `debt:spec-active`).
 
 ## How to invoke
 
@@ -39,7 +39,7 @@ Several numbers make your own batch, fixed together on one branch and one pull r
 
 Add `worktree` or `branch` (optionally after `use`) at the end to choose where the fix happens, for example `/gaia-debt 142 use branch`. Your team's [isolation policy](/workflow/work-lifecycle/#3-isolate) can still override it.
 
-Any other argument stops and shows the accepted form. An issue number that can't be fixed this way (closed, not labelled `tech-debt`, already claimed, or parked) stops with the reason.
+Any other argument stops and shows the accepted form. An issue number that can't be fixed this way stops the run with the reason: it is not an issue in this repository (a pull request number, for example), it could not be read from GitHub, it is closed, it is not labelled `tech-debt`, it is already claimed, it is parked for a SPEC, or it is graded `severity:investigate`.
 
 ## How the backlog is ordered
 
@@ -70,7 +70,7 @@ The run ends with a [cost line](/reference/cost/).
 
 ## Labels
 
-Every tech-debt issue carries a severity. Filed issues also carry a footprint (how much code the fix touches) and a difficulty:
+Every tech-debt issue carries a severity. Issues GAIA files also carry a footprint (how much code the fix touches). A difficulty is added only when the cited code was read at filing time, so an issue without one is normal:
 
 | Label | Meaning |
 |---|---|

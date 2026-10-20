@@ -98,7 +98,7 @@ For [`/gaia-residue`](/maintenance/residue/): `residue-tally` counts the residua
 
 ### `gaia wiki`
 
-The steps behind [`/gaia-wiki`](/maintenance/wiki/): `state`, `commit-classify`, `state-init`, `state-bump`, `log-prepend`, `page-index`, `orphans`, `near-collisions`, `dead-paths`, `frontmatter`, `empty-sections`, `broken-links`, and `chain <begin|commit|finish|refresh-nudge>`, which runs the whole `/gaia-wiki` chain on one branch with one pull request. `chain begin` refuses `main` and `master`; `begin` and `finish` no longer accept `--branch-aware`. `sync land` is removed.
+The steps behind [`/gaia-wiki`](/maintenance/wiki/), including `chain`, which runs the whole `/gaia-wiki` chain on one branch with one pull request. The full subcommand table and the `chain` steps are in [Contributor wiki content](/contributors/wiki/#gaia-wiki-cli-primitives).
 
 ### `gaia ping`
 

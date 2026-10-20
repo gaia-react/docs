@@ -25,7 +25,7 @@ The full interactive run: preview, decide, apply.
 /update-deps --security
 ```
 
-Only the security advisories, plus the major bumps they need. Every other outdated package is left alone.
+Only the security advisories, plus any upgrade (major, minor, or patch) of the dependency that pulls in a vulnerable package, when a fix needs it. Every other outdated package is left alone.
 
 ```
 /update-deps --scope react-router
@@ -50,7 +50,7 @@ If a fix fails the quality gate, it is undone, and the advisory is reported as s
 
 ## Preview and decision
 
-Updates are grouped into **Security**, **Major**, **Non-semver**, **Minor**, and **Patch**. Packages that must move together (a companion group) show as one block and update together. The groups include react-router, react, tailwindcss, shadcn, storybook, vitest, playwright, i18next, msw, vite, zod-conform, stylelint, prettier, and eslint. Packages outside a group update on their own, and `typescript` is deliberately its own group.
+Updates are grouped into **Security**, **Major**, **Non-semver**, **Minor**, and **Patch**. Packages that must move together (a companion group) show as one block and update together. The groups include react-router, react, tailwindcss, shadcn, storybook, vitest, playwright, i18next, msw, vite, zod-conform, fontawesome, stylelint, prettier, and eslint. Packages outside a group update on their own; `typescript` and `@types/node` are deliberately left out of every group.
 
 You choose:
 
@@ -71,7 +71,7 @@ A snooze is local to your machine (`.gaia/local/declined-updates.json`) and laps
 6. **Quality gate**: `pnpm typecheck`, `pnpm lint`, `pnpm test --run`, `pnpm pw`, and `pnpm build`.
 7. **Publish**: one commit, `chore(deps): ...` (`chore(deps-dev):` when only devDependencies moved), a draft pull request, merged once checks are green, then local cleanup.
 
-A `chore(deps)` pull request that changes only dependency files (such as `package.json` and the lockfile) skips the full audit. One that also changes code for a migration gets the full [Code Audit Team](/workflow/code-audit-team/) audit.
+A `chore(deps)` pull request that changes only dependency files (such as `package.json` and the lockfile) skips the `code-audit-frontend` review. Any other audit member the change calls for still reviews it. One that also changes code for a migration gets the full [Code Audit Team](/workflow/code-audit-team/) audit.
 
 It also reports when the global `playwright-cli` binary is behind.
 
@@ -112,7 +112,5 @@ After any change to `msw`, `pnpm -C frontend msw:init` regenerates `frontend/pub
 <Aside type="note">
 [`/setup-gaia`](/getting-started/setup-gaia/) leaves Dependabot alerts on and turns Dependabot's own security pull requests off, so `/update-deps` is the one source of dependency pull requests. If your repository has a Dependabot npm entry or a Renovate config, remove the overlap, or both open duplicate pull requests.
 </Aside>
-
-The run ends with a [cost line](/reference/cost/).
 
 Source: `.claude/skills/update-deps/SKILL.md`.

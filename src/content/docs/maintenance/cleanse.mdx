@@ -7,7 +7,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 `/gaia-cleanse` reviews what Claude remembers and what it loads at every session start (machine-local memory, `CLAUDE.md` files, and rules) against the wiki, the project's source of truth. It looks for entries that repeat the wiki, disagree with it, or point at things that no longer exist, and for files that make the always-loaded context too large. Then it asks you one question before changing anything.
 
-It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, in a worktree of its own, ending in a pull request.
+It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, on a branch of its own (a worktree by default, per your team's isolation policy), ending in a pull request.
 
 ## When to use it
 

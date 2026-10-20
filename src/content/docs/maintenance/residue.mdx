@@ -51,7 +51,7 @@ The nudge counts every open aged residual, not just the ones in the next batch. 
 Once nothing aged is left, the run asks before each further batch:
 
 ```text
-Sweep the next 25 newer residuals?
+Sweep the next 25 newer residuals? More: https://docs.gaiareact.com/maintenance/residue/
 ```
 
 with the choices **Sweep the next 25 (of 125 remaining)** or **Stop here**. The number in the question is the size of the next batch (smaller on the last one), and "remaining" counts every open residual, newer ones included.
@@ -83,6 +83,6 @@ The run ends with a [cost line](/reference/cost/).
 
 ## Not the same as the residue sweep
 
-[`/update-gaia`](/maintenance/update-gaia/) prints a different command after an update, `bash .gaia/scripts/state-registry-lib.sh residue-sweep`. That one deletes machine-local files that retired GAIA features left behind under `.gaia/local`. It has nothing to do with audit residuals.
+[`/update-gaia`](/maintenance/update-gaia/) prints a different command after an update, `bash .gaia/scripts/state-registry-lib.sh residue-sweep --apply`, to run from the main checkout once the update merges. That one deletes machine-local files that retired GAIA features left behind under `.gaia/local`. It has nothing to do with audit residuals.
 
 Source: `.claude/skills/gaia/references/residue.md`.

@@ -31,6 +31,6 @@ When the file is written in a way GAIA can't safely edit (YAML anchors, no list 
 
 ## Serena in a GAIA project
 
-`/gaia-init` and `/setup-gaia` register Serena v1.7.0 for your user. GAIA's `code-search` rule sends questions about code symbols (where is X defined, what calls Y) to Serena, and questions about decisions and their reasons to the wiki. The `serena-cc-override` rule nudges Claude toward Serena's symbol tools at session start. For the strongest effect, start sessions with Serena's system-prompt override; see [`/gaia-init`](/getting-started/gaia-init/#5-claude-tooling).
+`/gaia-init` and `/setup-gaia` register Serena v1.7.0 for your user. GAIA's `code-search` rule sends questions about code symbols (where is X defined, what calls Y) to Serena instead of reading and grepping files. Questions about decisions and their reasons belong in the wiki; `wiki/concepts/Serena Integration.md` describes how the two split the work. The `serena-cc-override` rule nudges Claude toward Serena's symbol tools at session start. For the strongest effect, start sessions with Serena's system-prompt override; see [`/gaia-init`](/getting-started/gaia-init/#5-claude-tooling).
 
 Source: `.claude/skills/gaia/references/serena-sync.md`.

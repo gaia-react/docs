@@ -20,7 +20,7 @@ The list of members (the roster) lives in `.gaia/audit-ci.yml` under `auditors:`
 | `code-audit-frontend` (the default member) | The app and its tooling: `frontend/app/**`, `frontend/test/**`, `frontend/.storybook/**`, `frontend/.playwright/**`, the package manifests and lockfile, build and lint configs, `frontend/.claude/**`, `frontend/CLAUDE.md`, and root tooling such as `.npmrc` and `.nvmrc` | Security, performance, fit with the existing architecture, edge cases, accessibility, and maintainability: problems that take understanding what the code is meant to do and how data moves through it, beyond what lint and types catch. Library-specific rules for shadcn/ui, `cn`, Conform, the form components, React patterns, and react-i18next load from `frontend/.claude/agents/code-audit-frontend/`. |
 | `code-audit-github-workflows` | `.github/workflows/*.yml` and `.github/actions/**/*.yml` | Workflow YAML problems: unsafe third-party actions, script injection, too-broad permissions, and mishandled secrets. |
 
-Each file goes to the first member whose pattern matches it, and the default member's patterns are checked last, so a workflow file belongs to `code-audit-github-workflows`. A file no member is responsible for must be listed under `unowned:` in the same file. The audit refuses to run if a file has no member and is not listed there, or if a pattern matches no file at all.
+Each file goes to the first member whose pattern matches it, and the default member's patterns are checked last, so a workflow file belongs to `code-audit-github-workflows`. A file no member is responsible for belongs under `unowned:` in the same file. The audit itself does not check this. After you change the roster, run `bash .gaia/scripts/verify-audit-roster.sh` by hand: it fails when a file has no member and is not listed under `unowned:`, or when a pattern matches no file at all.
 
 Members only report problems. They never edit a file. A separate fixer makes the repairs, and a script checks each repair before it is kept.
 
@@ -75,7 +75,7 @@ Each round's fixes need reviewing in the next round, so left alone the loop woul
 At a checkpoint Claude shows you where things stand (rounds run, findings per round, its assessment, what remains by severity, and the cost so far) and asks one question with fixed answers:
 
 - **Continue audit in this session** or **Continue audit in a new session**: allow one more batch of rounds. The new-session option prints a continuation prompt in a code block. Run `/clear`, then paste it.
-- **Accept the remainder**: offered only when no remaining finding is Critical or security-related. Runs one last review round with no fixes, and records what remains under `## Accepted residuals (recorded, not fixed)` in the pull request body.
+- **Accept the remainder**: offered only when the loop has a reason to stop (for example, round 10 is reached, rounds stop making progress, or only Minor findings remain from round 6 on), no remaining finding is Critical or security-related, and every member left readable findings for the round. Runs one last review round with no fixes, and records what remains under `## Accepted residuals (recorded, not fixed)` in the pull request body.
 - **Stop and file the remainder**: files the remaining findings as tech-debt issues and leaves the pull request open.
 
 Only a person can answer. If the question is not available, type one of these as the whole prompt:

@@ -48,7 +48,7 @@ A written rule is the weakest option: it advises instead of enforcing, and Claud
 
 ### Decline and defer
 
-- **Decline** records, on this machine only, that you are not acting on the pattern. It comes back once the pattern grows by at least 3 more pull requests. The record lives in `.gaia/local/codify/` and is never shared, so a teammate still sees the nudge.
+- **Decline** records, on this machine only, that you are not acting on the pattern. It comes back once the pattern has grown by at least 3 more pull requests and its share of audited pull requests has risen by at least a quarter (5/4 of the share when you declined). While either count covers fewer than 20 audited pull requests, the raw counts are compared instead of shares. The record lives in `.gaia/local/codify/` and is never shared, so a teammate still sees the nudge.
 - **Defer** records nothing of its own. The candidate still appears in the next review; the nudge stays quiet until the pattern grows or the counting changes.
 
 ## Promoted rules

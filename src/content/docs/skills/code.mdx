@@ -43,7 +43,7 @@ Source: `.claude/skills/naming-conventions/SKILL.md`.
 
 Conventions for React components, pages, routes, hooks, and forms. Claude runs four checks before writing code:
 
-- **Hook check**: catches misuse of `useEffect`, `useCallback`, and `useState`.
+- **Hook check**: before a `useEffect`, decide whether it should be an Effect at all (an Effect is for syncing with something outside React, like a browser API or the network). No `useMemo`, `useCallback`, or `memo` (see below). For a `useState` with no initial value, use `undefined`, not `null`.
 - **Form element check**: plain HTML form elements (`<input>`, `<select>`, `<textarea>`, checkboxes, and buttons) are replaced with the shadcn/ui controls in `~/components/ui/` (`Input`, `NativeSelect`, `Textarea`, `Checkbox`, `RadioGroup`, `Button`). Those controls are grouped in `Field` parts and connected to the form with Conform, the form library. `@conform-to/zod` is always imported from its `/v4` subpath; importing it without the subpath fails at runtime, and lint catches it.
 - **Translation check**: every string the user sees comes from `t()`.
 - **React 19 idiom check**: `ref` as an ordinary prop (no `forwardRef`), `use()` rather than `useContext`, `<Context>` rather than `<Context.Provider>`, guarding against `count && <X />` rendering a stray `0`, and React Router's form handling instead of `useActionState`, `useFormStatus`, or `useOptimistic`.
@@ -72,7 +72,7 @@ Source: `frontend/.claude/skills/gaia-react-perf/SKILL.md`.
 
 ### Tailwind
 
-Every color uses a shadcn role token, a color named for its job rather than its hue (`bg-background`, `text-foreground`, `text-muted-foreground`, `bg-primary`, `border-input`, `text-destructive`). One token covers both the light and dark themes. `@gaia-react/lint` fails raw palette classes (like `bg-blue-500`) and arbitrary values.
+Every color uses a shadcn role token, a color named for its job rather than its hue (`bg-background`, `text-foreground`, `text-muted-foreground`, `bg-primary`, `border-input`, `text-destructive`). One token covers both the light and dark themes. `@gaia-react/lint` fails raw palette classes (like `bg-blue-500`), color literals, and arbitrary color classes. Other arbitrary values are allowed when no scale step or token fits.
 
 `cn` (from the `cn` package) is the only helper for combining classes. It joins classes and resolves conflicts between them, so a `className` passed in by the caller comes last and overrides the component's default. Write a conditional class as `cond && 'class'`; lint rejects the object form and ternaries with an empty branch. Variants with several classes use `cva`. Custom sizes use `rem`, never `px`, and a new role token is named for what the element is.
 
@@ -98,7 +98,7 @@ Based on Matt Pocock's [TDD Skill](https://www.aihero.dev/skill-test-driven-deve
 
 **Stories are the component tests.** A component's test is its Storybook story with a play function (a script that clicks and types like a user), run in a real Chromium browser. Hook tests use `vitest-browser-react`. Network requests are mocked with MSW (Mock Service Worker). `addon-a11y` checks every story for accessibility, and a story that weakens its accessibility check fails the tests unless the opt-out is recorded with a reason.
 
-**The RED gate.** For code that gives the same result on every run (pure utilities, service parsers, hooks), a commit hook refuses a new test that was never seen failing first. Stories and Playwright tests are exempt, because the environment they run in cannot guarantee a clean failing run. For those, the `worthiness-evaluator` agent reviews each new test: can it fail for a real reason, and is it worth keeping? It answers keep, fix, or delete. Fixes are applied as normal edits, and deletes need your confirmation. A hook at merge time checks that every changed test of that kind was reviewed.
+**The RED gate.** For code that gives the same result on every run (pure utilities, service parsers, hooks), a Claude Code hook on `git commit` refuses a new test that was never seen failing first. Tests whose subject does not behave the same on every run are exempt: stories, component interaction tests, async tests, and Playwright tests. They have no stable failing-then-passing run to observe. For those, the `worthiness-evaluator` agent reviews each changed test: can it fail for a real reason, and is it worth keeping? It answers keep, fix, or delete. Claude rewrites a test that fails the honesty check in place, as a normal edit you review, and every delete needs your confirmation. A hook at merge time checks that every changed test of that kind has a review entry.
 
 **Triggers** when building features or fixing bugs with TDD, mentioning "red-green-refactor", asking for integration tests, or asking for test-first development.
 
@@ -116,7 +116,7 @@ Source: `frontend/.claude/skills/playwright-cli/SKILL.md`.
 
 ## ESLint Fixes
 
-Claude usually handles ESLint errors well. This skill covers specific errors Claude has fixed badly in the past, and autofix conflicts where one rule undoes another. If you see Claude fixing an error the wrong way (for example, turning the rule off instead of fixing the cause), ask it to improve the `eslint-fixes` skill for that error. Every `eslint-disable` needs a `-- reason`.
+Claude usually handles ESLint errors well. This skill covers specific errors Claude has fixed badly in the past, and autofix conflicts where one rule undoes another. If you see Claude fixing an error the wrong way (for example, turning the rule off instead of fixing the cause), ask it to improve the `eslint-fixes` skill for that error. Lint requires every `eslint-disable` comment to give a reason after `--` (`@eslint-community/eslint-comments/require-description`).
 
 Source: `frontend/.claude/skills/eslint-fixes/SKILL.md`.
 

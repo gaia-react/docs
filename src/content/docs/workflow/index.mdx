@@ -21,7 +21,7 @@ Ask for a component, a fix, a refactor:
 
 The code skills (TypeScript, React, Tailwind, tests) and the scaffolders (which generate new components, hooks, routes, and services) start on their own, based on what you ask for. Most sessions never touch a slash command.
 
-Notice the prompt did not ask for a test. GAIA works test-first: for a feature or a bug fix, Claude writes a test that fails, then writes the code that makes it pass. A commit hook enforces this. It refuses to commit a new test that was never seen failing first.
+Notice the prompt did not ask for a test. GAIA works test-first: for a feature or a bug fix, Claude writes a test that fails, then writes the code that makes it pass. A Claude Code hook on `git commit` enforces this. It refuses to commit a new test that was never seen failing first. Some tests are exempt, such as stories and type-only tests; see the [RED gate](/reference/gates/#test-seen-failing-first-red-gate).
 
 ## Every committed change follows one lifecycle
 
@@ -35,7 +35,7 @@ When Claude commits work, with or without a command, it follows the same steps:
 6. **Merges** only when you ask.
 7. **Cleans up** back to a pulled default branch.
 
-Before each commit, the Quality Gate runs typecheck, lint, tests, Playwright, a quick check that the dev server starts, and the build. Meanwhile, hooks block risky actions in the background. See [Work lifecycle](/workflow/work-lifecycle/) for the details, and [Git hooks and conventions](/workflow/git-conventions/) for the commit and title rules.
+Before a commit that touches source, the Quality Gate runs a simplify pass, a check for untranslated text, typecheck, lint, tests, Playwright, a quick check that the dev server starts, and the build. Meanwhile, hooks block risky actions in the background. See [Work lifecycle](/workflow/work-lifecycle/) for the details, and [Git hooks and conventions](/workflow/git-conventions/) for the commit and title rules.
 
 ## When to reach for a command
 
@@ -51,7 +51,7 @@ The `/gaia-*` commands are for specific moments, not everyday driving:
 
 ## Resuming work
 
-Long work resumes from one small file, `STATE.md`, saved in the run's folder under `.gaia/local/runs/<branch>/`. When a session's context reaches GAIA's red band (300,000 tokens or half the window, whichever is smaller; 30% of a 1M-token window), well before Claude Code would compact it, Claude saves its place and asks whether to continue in this session or clear and resume. If you choose to clear, it prints a continuation prompt in a code block. Run `/clear`, then paste it. You can ask Claude for a continuation prompt at any time. See [Work lifecycle](/workflow/work-lifecycle/#resuming-long-work).
+Long work resumes from a small saved state, such as `STATE.md` in the run's folder under `.gaia/local/runs/<branch>/`. When a session's context reaches GAIA's red band (300,000 tokens or half the window, whichever is smaller; 30% of a 1M-token window), well before Claude Code would compact it, Claude saves its place and asks whether to continue in this session or clear and resume. If you choose to clear, it prints a continuation prompt in a code block. Run `/clear`, then paste it. You can ask Claude for a continuation prompt at any time. See [Work lifecycle](/workflow/work-lifecycle/#resuming-long-work).
 
 ## A feature, start to finish
 
@@ -67,7 +67,7 @@ You will not run every step for every task. Use as much of this process as the w
 ## Maintenance commands
 
 <Aside type="tip">
-You rarely reach for these yourself, and you do not have to memorize them. They surface on the statusline when they are due.
+You rarely reach for these yourself, and you do not have to memorize them. Most of them surface on the statusline when they are due; `/gaia-fitness` does not.
 </Aside>
 
 | When... | Reach for | Why |

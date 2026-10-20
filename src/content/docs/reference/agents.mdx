@@ -27,7 +27,7 @@ The default member. Responsible for the app and its tooling: `frontend/app/**`, 
 
 Three specialist sub-agents review React patterns and accessibility, TypeScript and architecture, and translations. Library-specific rules load from `frontend/.claude/agents/code-audit-frontend/`: `cn`, Conform, the form components, React buckets, react-i18next, and shadcn. It also reads the output of React Doctor, Knip, and dependency security advisories as hints.
 
-Before it reports a Critical or Major finding, a separate agent with no shared context tries to disprove it. A finding that does not hold up is dropped or downgraded. Each reply ends with a `Files reviewed` count, so a review that stopped early is caught instead of being read as clean.
+Before it reports a Critical or Major finding, a separate agent with no shared context tries to disprove it. A finding that does not hold up is dropped or downgraded. Each specialist's reply ends with a `Files reviewed` count, so a specialist that stopped early is caught and run again instead of being read as clean.
 
 ### code-audit-github-workflows
 
@@ -35,7 +35,7 @@ Responsible for `.github/workflows/*.yml` and `.github/actions/**/*.yml`. Review
 
 ### audit-loop-unit
 
-Runs a batch of audit rounds outside your main session. It starts the members, the fixer, and the checker, runs the Quality Gate, commits and pushes each round's fixes, and returns a short report. Your session keeps only that report, so a long audit does not fill its context. It never merges and never posts `GAIA-Audit`; the main session does both. It is the only agent allowed to start agents of its own, which needs Claude Code 2.1.292 or later.
+Runs a batch of audit rounds outside your main session. It starts the members, the fixer, and the checker, runs the Quality Gate, commits and pushes each round's fixes, and returns a short report. Your session keeps only that report, so a long audit does not fill its context. It never merges and never posts `GAIA-Audit`; the main session does both. It starts the members as agents of its own, and the members start their specialists and checkers one level below that. This nesting needs Claude Code 2.1.292 or later.
 
 ### audit-light-reviewer
 

@@ -19,8 +19,15 @@ A gate is not a judgment of you or of Claude. Each one exists because the proble
   - **Plain push:** it would land your local commits on the shared branch without the pull request and audit every change goes through.
   - **Force-push:** the branch's history is shared, so rewriting it pulls commits out from under every clone and branch built on it.
   - **A push that targets `main`, `master`, or `HEAD`:** refused from any branch; the refusal asks you to name the branch you are pushing and open a pull request, and gives no further reason.
-- **When:** before the `git` command runs (`block-main-destructive-git`).
+- **When:** before the `git` command runs (`block-main-destructive-git`). The hook checks the branch names `main` and `master` themselves, so a default branch with any other name is not covered.
 - **Clear it:** create a feature branch, push it by name, and open a pull request. Claude does this for you as part of the [work lifecycle](/workflow/work-lifecycle/).
+
+### Hard reset that drops commits
+
+- **Stops:** `git reset --hard HEAD~<n>` (any command that starts with `git reset --hard HEAD~`).
+- **Why:** the permission rule states no reason.
+- **When:** before the Bash command runs (a permission deny in `.claude/settings.json`).
+- **Clear it:** Claude cannot run it. If you mean to drop commits, run the command yourself in a terminal.
 
 ### Moving another session's checkout
 
@@ -52,16 +59,16 @@ A gate is not a judgment of you or of Claude. Each one exists because the proble
 
 ### Quality Gate
 
-- **Stops:** Claude committing source changes before typecheck, lint, tests, Playwright, the dev-server smoke test, and the build all pass with zero warnings.
+- **Stops:** Claude committing source changes before the gate's steps pass with zero warnings: a simplify pass, a check for hardcoded user-facing strings, typecheck, lint, tests, Playwright, the dev-server smoke test, and the build.
 - **Why:** the commit hook checks only the files you staged. The full gate catches what breaks elsewhere, including warnings that would otherwise ship.
-- **When:** before any commit that touches source code or config that affects these checks. Commits that change only docs or only the wiki skip it.
+- **When:** before any commit that touches source code or config that affects these checks. Commits that change only docs or only the wiki skip it. This is a rule Claude follows (`.claude/rules/quality-gate.md`), not a hook; the [pre-commit floor](#pre-commit-floor) is the part that runs no matter what.
 - **Clear it:** fix what it reports. Claude then stops and asks before committing, except inside a workflow that commits on its own (the audit fix round, `/gaia-debt`, a plan's phase commits).
 
 ### Test seen failing first (RED gate)
 
 - **Stops:** `git commit` of a new test for code with predictable output (utilities, parsers, hooks) when that test has never been seen failing in its current form.
 - **Why:** a test that passed from the start may not test anything. Watching it fail first proves it can catch the bug it is named for.
-- **When:** before `git commit` (`red-verify-commit-check`). Stories, Playwright tests, type-only tests, and renames are exempt.
+- **When:** before `git commit` (`red-verify-commit-check`). Only tests that are new in the commit need a recorded failure; editing or renaming a test that already exists never does. Exempt: stories and Playwright tests, type-only tests, tests whose title is computed (a template literal or a `test.each` row), tests the classifier finds have no predictable result (component interaction, async work, layout), and test files that arrive unchanged from a GAIA release. A component or page test the classifier exempts goes through the [worthiness check](#worthiness-verdict) instead.
 - **Clear it:** run the test on its own file so the failure is recorded (`pnpm test --run <test-file>`): make it fail first, then make it pass.
 
 ## Pull requests and merge
@@ -70,7 +77,7 @@ A gate is not a judgment of you or of Claude. Each one exists because the proble
 
 - **Stops:** Claude starting work on a GitHub issue already labelled `in-progress`.
 - **Why:** two agents or two people who start the same ticket do the work twice, then fight over the merge.
-- **When:** before a branch or worktree is created for work that closes an issue.
+- **When:** before a branch or worktree is created for work that closes an issue. This is a rule Claude follows (`.claude/rules/issue-claim.md`), not a hook, so nothing blocks the work mechanically.
 - **Clear it:** pick different work, or wait for the label to be removed when its pull request merges. On a `tech-debt` issue, the next `/gaia-debt` run removes a leftover label; on any other issue, remove it with `gh issue edit <n> --remove-label in-progress`.
 
 ### Draft pull requests
@@ -124,8 +131,8 @@ A gate is not a judgment of you or of Claude. Each one exists because the proble
 
 ### Worthiness verdict
 
-- **Stops:** `gh pr merge` when a story or Playwright test the pull request changed has not been reviewed for worthiness in its current form.
-- **Why:** these tests cannot be reliably watched failing first to prove they catch a bug, so an independent review of each one takes the place of the RED gate.
+- **Stops:** `gh pr merge` when a test the pull request changed has no worthiness record for its current content. This covers stories, Playwright tests, and component and page tests the classifier finds have no predictable result. An exact rename is skipped.
+- **Why:** these tests cannot be reliably watched failing first to prove they catch a bug, so a worthiness review of each one takes the place of the RED gate. The hook checks only that a record exists for the test's current content; it does not read the verdict or prove how the review was done.
 - **When:** before `gh pr merge` runs (`worthiness-presence-check`).
 - **Clear it:** let Claude run the worthiness review on the changed tests.
 
@@ -280,17 +287,25 @@ A gate is not a judgment of you or of Claude. Each one exists because the proble
 
 - **Stops:** `/gaia-init` anywhere but the root of a project created by `npx create-gaia`.
 - **Why:** init renames the project, removes GAIA branding, and rewrites files throughout the folder it runs in. Without GAIA's manifest there is no GAIA project to set up, and in the GAIA source itself it would rewrite GAIA.
-- **When:** at the start of `/gaia-init`.
+- **When:** at `/gaia-init`'s first `gaia init` step, which runs after pnpm, the dependency install, and your answers to the setup questions.
 - **Clear it:** run it in a project created with `npx create-gaia`.
 
 ## Tests and lint
 
 ### Code Audit Team roster
 
-- **Stops:** the audit when `.gaia/audit-ci.yml` has a file pattern that matches no file, has a file that no audit member covers and that is not listed under `unowned:`, or has no `auditors:` block.
-- **Why:** a file no member covers gets merged without anyone reviewing it.
+- **Stops:** the audit when `.gaia/audit-ci.yml` has no `auditors:` block.
+- **Why:** with no roster, there is no way to work out which members must review the change.
 - **When:** when the audit works out which members to run.
-- **Clear it:** assign the path to a member, list it under `unowned:`, or remove the pattern that matches nothing.
+- **Clear it:** restore the `auditors:` block from the GAIA template.
+
+Gaps in coverage do not stop the audit. A file no member covers, and that is not listed under `unowned:`, resolves to no members, and the merge hook treats that as nothing to review. After you change the roster, run the roster check by hand to find these gaps:
+
+```bash
+bash .gaia/scripts/verify-audit-roster.sh
+```
+
+It reports, among other things, a file no member covers and that `unowned:` does not list, and a pattern that matches no file. `bash .gaia/scripts/write-audit-remits.sh` repairs the members' copies of their own patterns.
 
 ### eslint-disable reason
 

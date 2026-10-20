@@ -18,7 +18,7 @@ A GAIA project is a pnpm workspace: one repo holding more than one package. The 
 | `.github/` | The Tests, Chromatic, and PR Conventions workflows, and your `CODEOWNERS` |
 | `wiki/` | The project wiki Claude maintains, an Obsidian vault |
 | `.notebook/` | Specs, plans, and research (gitignored, in your main copy of the repo, not in worktrees) |
-| `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml` | The workspace: one lockfile for the whole repo, the dependencies GAIA's own tooling needs, `overrides:`, and pnpm's settings that protect against compromised packages |
+| `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml` | The workspace: one lockfile for the whole repo, the dependencies GAIA's own tooling needs, and pnpm's settings that protect against compromised packages |
 
 The scripts at the root (`pnpm dev`, `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm pw`, `pnpm build`) run in the `frontend` package, so `pnpm lint` and `pnpm -C frontend lint` do the same thing.
 
@@ -50,11 +50,11 @@ To add another package beside `frontend/`, such as a backend, ask Claude. GAIA s
 - **One way to load route data.** Services use Ky for requests and Zod to check every response, and the same code runs on the server and in the browser. A route reads its data on the server, in the browser, or through TanStack Query (off by default). `create()` leaves keys in camelCase; if your backend uses snake_case, turn on conversion with `create({isSnakeCaseEnabled: true})`.
 - **Stories as tests.** Components are tested through Storybook stories with play functions (scripted interactions), run in a real Chromium browser under Vitest. Every story is checked for accessibility. Hook tests use `vitest-browser-react`. HTTP is mocked with MSW 3. Chromatic takes a screenshot of each story in a light and a dark mode.
 - **Translations (i18n)** with react-i18next, unless you removed them at init.
-- **`@gaia-react/lint`** for ESLint, Stylelint, and commitlint: over 1,200 lint rules. Prettier formats code, and Knip finds unused code.
+- **`@gaia-react/lint`** for ESLint, Stylelint, and commitlint. Prettier formats code, and Knip finds unused code.
 - **Toolchain:** Node 22.22.0 or newer, pnpm 12 (pinned in `packageManager`), and Vitest 5.
 
 The paths the app submits fetchers to are defined once in `frontend/app/action-paths.ts`, so renaming a route fails a test instead of returning a 404 at runtime. `hydration.spec.ts` is the Playwright example of checking that a page loads with no `console.error` or page errors.
 
-A new project starts plain and unbranded: a gray primary color scale, system fonts, and a simple layout. The `design-baseline` rule treats that styling as a placeholder until you settle on your own design.
+A new project starts plain and unbranded: neutral gray-scale shadcn color tokens, system fonts, and a simple layout. The `design-baseline` rule treats that styling as a placeholder until you settle on your own design.
 
 For the reasoning behind each choice, ask Claude: the decisions live in the project wiki.

@@ -74,7 +74,8 @@ When to add: a new meta page is appropriate when it documents how the wiki itsel
 
 - `begin` runs on the branch `/gaia-wiki` already created (a `wiki/<YYYY-MM-DD-HHMM>` branch, in a worktree by default) and refuses `main` and `master`.
 - `commit` commits every stage's `wiki/` edits as one commit titled `wiki: <date> <time> UTC`; a no-op when nothing changed; refuses when non-wiki changes are present.
-- `finish` pushes the branch, opens one pull request, posts a `GAIA-Audit` status marking the change as outside the audit's scope, and queues auto-merge. It deletes the branch if nothing changed.
+- `finish` pushes the branch and opens one pull request as a draft (or ready, on a private repository that refuses drafts). On a branch that requires `GAIA-Audit`, it posts that status marking the change as outside the audit's scope. It then marks the pull request ready and queues auto-merge. If marking it ready fails, the pull request stays an open draft and auto-merge is not queued.
+- When nothing changed, `finish` opens no pull request. In a normal checkout it deletes the empty branch. In a linked worktree it leaves the branch for the caller to remove, and with uncommitted changes it leaves everything in place for review.
 - `refresh-nudge` updates the statusline's wiki nudge after the merge, from the main checkout's new drift.
 
 ## gaia:maintainer-only block convention
@@ -88,7 +89,7 @@ tarball by the bundle-time scrub during release.
 <!-- gaia:maintainer-only:end -->
 ```
 
-The shipped file is a subset of the source: the scrub removes the markers and everything between them before the tarball is built. The literal phrase is `maintainer-only`; this is the on-disk identifier and matches the comment text in `.gaia/release-exclude` and the step name in `release.yml`. Public-facing references in the docs site use "Contributors."
+The shipped file is a subset of the source: the scrub removes the markers and everything between them before the tarball is built. The literal phrase is `maintainer-only`; this is the on-disk identifier and matches the comment text in `.gaia/release-exclude`. Public-facing references in the docs site use "Contributors."
 
 When to use the block convention rather than path-level exclusion: use blocks when most of a page is relevant to every project but a section needs to stay internal. Use path-level exclusion (an entry in `.gaia/release-exclude`) when the entire file is contributor-only.
 

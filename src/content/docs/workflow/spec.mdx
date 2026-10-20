@@ -36,7 +36,7 @@ Claude answers its own questions, picking the recommended option each time, and 
 ## Before it starts
 
 - **Model check.** The SPEC is written by your session's model. On a model other than Opus or Fable, Claude offers to stop so you can switch with `/model` first.
-- **Housekeeping.** Merged and abandoned SPEC folders older than `GAIA_SPEC_RETENTION_DAYS` days (default 30) are deleted. Closed research that has passed its keep-until date is offered for removal.
+- **Housekeeping.** Abandoned SPEC folders older than `GAIA_SPEC_RETENTION_DAYS` days (default 30) are deleted. A merged SPEC folder past that age is deleted only once its layers are consolidated and its cost is in the usage ledger; otherwise it is kept. Closed research that has passed its keep-until date is offered for removal.
 - **Pull check.** When your checkout has an older GAIA version than the remote, Claude offers to pull first.
 - **Resume.** When an unfinished draft exists, you choose to resume it or start new. Claude can tell when another open session is still writing a draft, so two sessions never resume the same one.
 
@@ -65,12 +65,12 @@ Confirming gate 2 saves the SPEC and locks it. To change a saved SPEC you must f
 
 - **It writes only to the notebook and GAIA's local cache**: `.notebook/specs/`, `.gaia/local/cache/`, and the usage ledger. It never edits `frontend/app/**` or any other source.
 - **Project decisions go into the SPEC, the wiki, or `.claude/rules/`**, never into machine-local memory.
-- **Your progress is saved as you go**, after every answer and every gate. Choose **Save partial and resume later** to stop, and the next `/gaia-spec` offers to resume.
+- **Your progress is saved as you go**, after every answer and every gate. To stop, type a save request (such as "save partial" or "resume later") into a question's **Other** answer, or choose to save from inside **Discuss this**. The next `/gaia-spec` offers to resume.
 - **Long sessions** pause when the context reaches the red band, like any other: Claude saves, then you continue here or clear and resume. See [Work lifecycle](/workflow/work-lifecycle/#resuming-long-work).
 
 ## After the plan runs
 
-Before it writes any code, the plan's orchestrator turns each browser UAT into a Playwright test that fails at first. It closes out the SPEC after the implementation merges. See [`/gaia-plan`](/workflow/plan/#uat-specs).
+Before it writes any code, the plan's orchestrator turns each UAT routed to an end-to-end test into a Playwright test that fails at first. It closes out the SPEC after the implementation merges. See [`/gaia-plan`](/workflow/plan/#uat-specs).
 
 The run ends with a [cost box](/reference/cost/) covering the spec and the plan.
 
