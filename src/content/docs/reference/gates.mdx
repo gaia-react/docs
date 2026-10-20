@@ -260,3 +260,17 @@ A gate is not a judgment of you or of Claude. Each one exists because the failur
 - **Why:** a file nobody owns is merged without any member having read it.
 - **When:** when the audit resolves its members.
 - **Clear it:** grant the path to a member, declare it under `unowned:`, or remove the dead glob.
+
+### eslint-disable reason
+
+- **Stops:** an `eslint-disable` comment with no `-- reason` after it (`@gaia-react/lint` 3.0.0).
+- **Why:** a later reader, human or agent, needs to know why the rule was turned off at that spot. Without the reason, nobody can tell whether the disable is still needed or safe to remove.
+- **When:** at lint, so at `git commit` through the pre-commit hook and in the Quality Gate.
+- **Clear it:** fix the code so the rule passes, or add the reason: `// eslint-disable-next-line <rule> -- <why>`.
+
+### Story accessibility opt-out
+
+- **Stops:** a story that skips its accessibility check (`parameters.a11y.test` set to `'todo'` or `'off'`, `parameters.a11y.disable`, the `a11y.manual` global, a `!test` tag, or a per-story `a11y` context, config, or options that differs from `.storybook/a11y.ts`) when its id and a reason are not recorded in `frontend/test/story-a11y-opt-out.test.tsx`.
+- **Why:** this check is the only light-theme accessibility scan a story gets; the Playwright scan covers dark. A story opted out silently would have no light-theme check left.
+- **When:** in the Storybook test run, so at `git commit` for staged stories and in the Quality Gate.
+- **Clear it:** fix the markup so the story passes. If the opt-out is truly needed, add the story id and its reason to the test's opt-out map.
