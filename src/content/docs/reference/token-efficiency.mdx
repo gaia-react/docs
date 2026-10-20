@@ -24,7 +24,7 @@ GAIA adds 7,672 tokens to a session before you type anything: 0.77% of the windo
 
 The session-start text was measured in a session on a feature branch. On the default branch, the branch workflow text is left out, so the total is lower. The session-start text is added when a session starts, and again after `/clear` or compaction.
 
-A session started from `frontend/` begins at about 10.4k tokens (1.04%). Claude Code still loads everything above, and adds `frontend/CLAUDE.md` (915) and the descriptions of the 14 frontend skills (1,788). The 14 include [React Doctor](https://github.com/millionco/react-doctor), which [`/setup-gaia`](/getting-started/setup-gaia/#install-tools) installs on each machine; without it there are 13.
+A session started from `frontend/` begins at about 10.4k tokens (1.04%). Claude Code still loads everything above, and adds `frontend/CLAUDE.md` (915) and the descriptions of the 14 frontend skills (1,788).
 
 Your own setup adds to this: MCP servers, plugins, and your global `~/.claude/CLAUDE.md` load in every project, with or without GAIA.
 
@@ -53,8 +53,6 @@ Until a skill is used, it costs only its description. When it is used, Claude re
 | `react-doctor` | 112 | 1,766 | 1,750 (1 file) | 3,516 (0.35%) |
 | `tdd-react` | 148 | 303 | 7,491 (1 file) | 7,794 (0.78%) |
 | `react-code` | 182 | 5,880 | 9,061 (4 files) | 14,941 (1.5%) |
-
-`react-doctor` is there only once it is installed on your machine.
 
 A description costs about 1% to 3% of the full skill.
 
