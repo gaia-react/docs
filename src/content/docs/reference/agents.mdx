@@ -41,6 +41,8 @@ Runs a batch of audit rounds outside your main session. It starts the members, t
 
 Reviews a small change made since a member's last full review, for members that turn this on with `light_review: true` in `.gaia/audit-ci.yml`. `light_line_cap` sets the largest change that qualifies (at most 50 lines), and `light_hard_full` lists patterns that always get a full review. Read-only. Whenever GAIA cannot confirm a change qualifies, the full member runs instead.
 
+It also takes the first review of a small, purely presentational change, before any member has read the branch. A script admits only presentational shapes (static text, swapping one HTML tag for another, static class changes, translation text with the same keys and placeholders, story `args:` values). See [Light review](/workflow/code-audit-team/#light-review).
+
 ## Tests and acceptance
 
 How these two fit into building with tests is described in [Test-driven development](/workflow/tdd/).

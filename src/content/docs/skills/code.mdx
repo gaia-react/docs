@@ -50,7 +50,7 @@ Conventions for React components, pages, routes, hooks, and forms. Claude runs f
 
 **Memoization is left to the compiler.** React Compiler is on by default. It caches values and components for you so they are not recomputed on every render, so plain code needs no `useMemo`, `useCallback`, or `memo`. A manual memo is allowed in only two cases: a value is passed into code the compiler does not compile, or the compiler skips a component (a bailout) and measurement shows the memo matters. Each manual memo carries a comment naming its case.
 
-**Data loading** follows one pattern. Data that belongs to the URL loads through the route's server `loader` by default (or a `clientLoader`). Data that belongs to a component loads through [TanStack Query](https://tanstack.com/query/latest), when your project has it enabled.
+**Data loading** follows one pattern. Data that belongs to the URL loads through the route's server `loader` by default (or a `clientLoader`). Data that belongs to a component loads through [TanStack Query](https://tanstack.com/query/latest), when your project has it enabled. A Query reference covers query keys, derived state with `select`, dependent and paginated queries, error handling, and optimistic updates.
 
 Before adding a dependency or writing a helper from scratch, the skill tries options in this order: code already in the project, then built-in browser APIs (`Intl`, `URL`, `crypto.randomUUID()`, `structuredClone()`, modern CSS), then a dependency you already have, then a new dependency, and only then custom code. It also covers when to split out a component, and how routes and pages divide the work: files in `app/routes/` stay thin, and the UI lives in `app/pages/`.
 

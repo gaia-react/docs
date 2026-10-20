@@ -249,6 +249,13 @@ The rest of this page lists every gate. For each one you get what it stops, the 
 - **When:** at server start.
 - **Clear it:** in a worktree, run `bash .claude/hooks/provision-worktree.sh <worktree path>`. Ask before stopping a server that another checkout owns.
 
+### Audit in an unprovisioned worktree
+
+- **Stops:** recording a Code Audit Team member's clearance in a worktree that was never set up.
+- **Why:** the clearance would land inside the worktree, where the merge gate never reads it, so the audit round would end with no verdict.
+- **When:** when the audit loop records a member's result.
+- **Clear it:** run `bash .claude/hooks/provision-worktree.sh <worktree path>`, then let Claude run the audit again.
+
 ## Dependencies
 
 ### Release-age window
