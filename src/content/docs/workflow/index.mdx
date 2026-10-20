@@ -11,7 +11,9 @@ This page shows how GAIA's pieces fit together in normal use, so you know what t
 
 ## Mostly, you just prompt Claude
 
-Working in GAIA is the same as working in Claude Code: describe what you want in plain language. GAIA loads its rules, skills, and guardrails when the session starts, so they apply to every ordinary request. You never call them yourself.
+Working in GAIA is the same as working in Claude Code: describe what you want in plain language. GAIA's rules, skills, and guardrails are in place from the start of every session, so they apply to every ordinary request. You never call them yourself.
+
+They take up little of Claude's context. Only a few short [rules](/reference/rules/) load in every session; the rest load only when Claude works on the files they cover. A [skill](/skills/) adds just its one-line description until it is used. [Hooks](/reference/hooks/) run outside the conversation, so they add nothing beyond a few lines at session start and the message when one blocks something.
 
 Ask for a component, a fix, a refactor:
 
