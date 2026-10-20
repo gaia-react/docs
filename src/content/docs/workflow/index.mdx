@@ -13,7 +13,24 @@ This page shows how GAIA's pieces fit together in normal use, so you know what t
 
 Working in GAIA is the same as working with any coding agent: you describe what you want, and it does the work. GAIA's rules, skills, and guardrails are in place from the start of every session, so they apply to every ordinary request. You never call them yourself.
 
-They take up little of Claude's context. Only a few short [rules](/reference/rules/) load in every session; the rest load only when Claude works on the files they cover. A [skill](/skills/) adds just its one-line description until it is used. [Hooks](/reference/hooks/) run outside the conversation, so they add nothing beyond a few lines at session start and the message when one blocks something.
+They take up little of Claude's context. GAIA adds about 7.7k tokens to a session before you type anything: under 4% of a 200k-token context window, and under 1% of a 1M one.
+
+| What loads in every session | Tokens |
+| --- | --- |
+| [Rules](/reference/rules/) that apply everywhere (8 files) | 3,877 |
+| Session-start text from GAIA's [hooks](/reference/hooks/) | 1,409 |
+| The root `CLAUDE.md` | 1,041 |
+| [Skill](/skills/) and command descriptions | 804 |
+| [Agent](/reference/agents/) descriptions | 541 |
+| **Total** | **7,672** |
+
+Measured in a new GAIA 2.0.0 project on Opus 5.5. The session-start text depends on the state of your branch, so it varies a little from session to session.
+
+Everything else loads only when it is needed:
+
+- **The other rules** load when Claude works on the files they cover: 9 root rules (10.1k tokens if every one loaded) and 13 frontend rules (12.4k). A task usually loads only a few of them.
+- **A skill** adds only its description until it is used.
+- **Hooks** run outside the conversation. After the session-start text, they add only the message when one blocks something.
 
 Ask for a component, a fix, a refactor:
 
