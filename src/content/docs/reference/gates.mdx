@@ -13,7 +13,7 @@ A gate is not a judgment of you or of Claude. Each one exists because the failur
 
 ### Commits on the default branch
 
-- **Stops:** `git commit` on `main` or `master`, a plain `git push` from them, a push whose refspec names `main`, `master`, or `HEAD`, and force-pushes naming them.
+- **Stops:** `git commit` on `main` or `master`, a plain `git push` from them, a push whose refspec names `main`, `master`, or `HEAD`, and force-pushes naming them (`--force`, `--force-with-lease`, or `-f`).
 - **Why:** a commit made straight on the default branch skips the pull request and the audit that every other change passes, and a force-push rewrites history your teammates have already pulled.
 - **When:** before the `git` command runs (`block-main-destructive-git`).
 - **Clear it:** create a feature branch, push it by name, and open a pull request. Claude does this for you as part of the [work lifecycle](/workflow/work-lifecycle/).
@@ -222,6 +222,20 @@ A gate is not a judgment of you or of Claude. Each one exists because the failur
 - **When:** at `pnpm install` or `pnpm add`.
 - **Clear it:** wait for the version to age. Exempt one only when it is needed sooner and its provenance has been checked by hand, scoped to the exact version in `minimumReleaseAgeExclude` with a comment saying who checked it.
 
+### Trust downgrade
+
+- **Stops:** installing a package version whose trust level (npm provenance) is lower than earlier releases of the same package (`trustPolicy: no-downgrade`).
+- **Why:** a package that used to ship with provenance and suddenly does not is a sign of a possible account takeover.
+- **When:** at every `pnpm install` or `pnpm add`, checked against the whole lockfile, `--frozen-lockfile` runs in CI included.
+- **Clear it:** pick a version with equal or better provenance. When the flagged version is a known-good old release from before the package added provenance, add it to `trustPolicyExclude` scoped to the exact `name@version`, with a comment naming the package that requires it.
+
+### Lockfile edits
+
+- **Stops:** Claude editing `pnpm-lock.yaml` by hand.
+- **Why:** hand edits routinely produce a broken or inconsistent lockfile. pnpm regenerates it consistently.
+- **When:** before the edit runs (a permission deny in `.claude/settings.json`).
+- **Clear it:** change `package.json` or `pnpm-workspace.yaml`, then run `pnpm install`, `pnpm add`, or `pnpm remove` and let pnpm rewrite the lockfile.
+
 ## Updates and setup
 
 ### /update-gaia checksum
@@ -237,6 +251,13 @@ A gate is not a judgment of you or of Claude. Each one exists because the failur
 - **Why:** 2.0.0 moved the app into `frontend/`. A three-way merge from 1.x would read every app file as deleted upstream and offer to delete your app.
 - **When:** before any download or change.
 - **Clear it:** follow [Upgrading from 1.x](/getting-started/upgrading/).
+
+### Notebook not moved
+
+- **Stops:** the spec and plan commands on a machine that still holds a 1.x specs or plans ledger and has not run the one-time move into `.notebook/`.
+- **Why:** a session must not allocate SPEC or plan numbers while the move is pending, or work from a half-moved notebook.
+- **When:** at the start of the command. The refusal names the command to run.
+- **Clear it:** from the main checkout, run `bash .gaia/scripts/notebook/move.sh run` once. It moves by rename, folds the old ledgers in, keeps them as backups, and deletes nothing. See [Upgrading from 1.x](/getting-started/upgrading/).
 
 ### Teammate's update in progress
 
