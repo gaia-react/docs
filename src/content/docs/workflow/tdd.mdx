@@ -3,9 +3,19 @@ title: Test-driven development
 description: How Claude builds features and fixes bugs test-first in a GAIA project, where each kind of test goes, and how GAIA checks that a test can actually catch a bug.
 ---
 
-Claude builds features and fixes bugs test-first. An always-loaded rule tells it to follow the `tdd` skill for this work, so you don't need to ask. Say "let's TDD this" when you want to be explicit.
+Claude builds features and fixes bugs test-first. An always-loaded rule tells it to follow the `tdd` skill for this work, so you don't need to ask.
 
 The skill runs a red-green-refactor loop: write one failing test (red), write just enough code to make it pass (green), tidy up (refactor), then move to the next behavior.
+
+## Why test first
+
+Writing the test before the code has three payoffs:
+
+- **The test is proven to work.** A test written after the code passes on its first run, so you never learn whether it can fail. It may check nothing at all. Seeing it fail first, then pass once the code exists, shows it detects the behavior it describes.
+- **The code ends up covered.** Code is only written to make a failing test pass, so every behavior has a test by the time it ships. Martin Fowler calls this [self-testing code](https://martinfowler.com/bliki/TestDrivenDevelopment.html).
+- **The design starts from the caller.** Writing the test first makes Claude decide how the code will be used before how it works, which keeps the interface separate from the implementation.
+
+Each loop is small, so a wrong turn costs one test, not a feature. Robert C. Martin describes the rhythm in [The Cycles of TDD](https://blog.cleancoder.com/uncle-bob/2014/12/17/TheCyclesOfTDD.html).
 
 ## The loop
 

@@ -141,7 +141,6 @@ export default defineConfig({
 					items: [
 						{ label: 'Overview', slug: 'maintenance' },
 						{ label: '/update-gaia', slug: 'maintenance/update-gaia' },
-						{ label: '/gaia-serena-sync', slug: 'maintenance/serena-sync' },
 						{ label: '/update-deps', slug: 'maintenance/update-deps' },
 						{ label: '/gaia-cleanse', slug: 'maintenance/cleanse' },
 						{ label: '/gaia-codify', slug: 'maintenance/codify' },
@@ -149,6 +148,7 @@ export default defineConfig({
 						{ label: '/gaia-residue', slug: 'maintenance/residue' },
 						{ label: '/gaia-wiki', slug: 'maintenance/wiki' },
 						{ label: '/gaia-fitness', slug: 'maintenance/fitness' },
+						{ label: '/gaia-serena-sync', slug: 'maintenance/serena-sync' },
 					],
 				},
 				{

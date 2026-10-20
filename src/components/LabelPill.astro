@@ -1,0 +1,57 @@
+---
+// GitHub-style label pill. Colors mirror gaia's .gaia/labels.json; update
+// them here when that file changes.
+const COLORS: Record<string, string> = {
+	'tech-debt': 'ededed',
+	bug: 'd1297e',
+	enhancement: 'a2eeef',
+	documentation: '0075ca',
+	security: 'a1121b',
+	'severity:critical': 'b60205',
+	'severity:major': 'e3555a',
+	'severity:minor': 'f5a3a3',
+	'severity:investigate': 'c4a7a7',
+	'difficulty:easy': 'bfe3df',
+	'difficulty:medium': '4c9c8f',
+	'difficulty:hard': '1b6b5f',
+	'footprint:narrow': 'd4c5f9',
+	'footprint:wide': '8957e5',
+	'footprint:spec': '4c2889',
+	'in-progress': 'ffd33d',
+	'debt:spec-pending': 'a6e3b8',
+	'debt:spec-active': '3b9b58',
+	wontfix: 'e5e5e5',
+	'needs-human': 'd93f0b',
+	dependencies: 'e1e4e8',
+	github_actions: 'c9c9c9',
+};
+
+interface Props {
+	name: string;
+}
+
+const { name } = Astro.props;
+const hex = COLORS[name] ?? 'ededed';
+const r = parseInt(hex.slice(0, 2), 16);
+const g = parseInt(hex.slice(2, 4), 16);
+const b = parseInt(hex.slice(4, 6), 16);
+// Pick dark or light text by perceived brightness, as GitHub does.
+const text = (r * 299 + g * 587 + b * 114) / 1000 > 150 ? '#1f2328' : '#ffffff';
+---
+
+<span class="label-pill" style={`--label-bg: #${hex}; --label-fg: ${text};`}>{name}</span>
+
+<style>
+	.label-pill {
+		display: inline-block;
+		padding: 0.1em 0.65em;
+		border: 1px solid rgb(0 0 0 / 0.12);
+		border-radius: 2em;
+		background: var(--label-bg);
+		color: var(--label-fg);
+		font-size: 0.8em;
+		font-weight: 600;
+		line-height: 1.5;
+		white-space: nowrap;
+	}
+</style>

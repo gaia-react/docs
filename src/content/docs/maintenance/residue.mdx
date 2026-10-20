@@ -7,6 +7,10 @@ description: Decide what to do with the trade-offs reviewers accepted instead of
 
 It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, on a branch of its own, ending in one pull request. Only you start it, by typing it; Claude never runs it on its own.
 
+## Why it helps
+
+Accepting a trade-off at review keeps a pull request moving, but a trade-off nobody looks at again is quietly forgotten. Filing every one as an issue would bury the backlog instead. `/gaia-residue` sits between the two: each accepted trade-off is recorded, and once it is old enough you decide once whether it still matters, so only the ones worth fixing become [tech debt](/workflow/tech-debt/).
+
 ## What a residual is
 
 When the [Code Audit Team](/workflow/code-audit-team/) clears a pull request, some findings are not fixed. A reviewer can accept one as a known trade-off, or let one pass because it is outside the change, in a file the pull request already touches. These are not lost: as [Tech debt](/workflow/tech-debt/#what-gets-recorded-instead-of-filed) explains, each one is written into the merged pull request's description, under `## Accepted residuals (recorded, not fixed)` or `## Out-of-scope machinery findings (recorded, not filed)`, with a key that keeps it from being counted twice. Each entry is a **residual**.

@@ -9,6 +9,8 @@ import { Aside } from '@astrojs/starlight/components';
 
 `/gaia-forensics` turns a problem with GAIA itself into a bug report with a fixed structure and with secrets removed. It only reads: it looks at your project's state and never changes, installs, or fixes anything.
 
+A useful bug report needs the details of what went wrong, but logs and paths often carry tokens, environment values, and paths that reveal your machine. Forensics gathers the details and strips those out, so you can file the report without editing it by hand first.
+
 ## When to use it
 
 Run it when something GAIA-related goes wrong, and you want to file a useful issue without manually scrubbing paths and tokens out of your logs. Good fit for:

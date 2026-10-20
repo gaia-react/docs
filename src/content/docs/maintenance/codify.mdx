@@ -7,6 +7,10 @@ description: Turn a problem the Code Audit Team keeps finding into a guard (an a
 
 It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, on a branch of its own, ending in a pull request. Only you start it, by typing it; Claude never runs it on its own.
 
+## Why it helps
+
+Every audit round that catches the same mistake again costs review time and tokens, and the fix lives only in that one pull request. `/gaia-codify` turns a mistake that keeps coming back into something that stops it before review: a check that fails, a skill Claude loads for that kind of work, or a rule that loads only for the files it covers. The lesson then stays with the project for every teammate and every future session, without making Claude read more on unrelated work, because each rule is scoped to the files it covers and a check adds nothing to Claude's context. The reasoning is in `wiki/concepts/Policy-Memory Loop.md` in your project.
+
 ## When to use it
 
 The statusline nudges you with `🔨 /gaia-codify (<reason>)`:
@@ -24,7 +28,7 @@ The count reads your merged pull requests through `gh`. When it cannot, the run 
 
 ## Finding classes
 
-Every finding the Code Audit Team records carries a finding class: a fixed name for the kind of problem it is. Recurrence is counted per class, so two findings about the same kind of problem in different files count as one pattern. A member picks a class only from the lists below. A finding that fits none of them is recorded as `holistic/unclassified`.
+Every finding the Code Audit Team records carries a finding class: a fixed name for the kind of problem it is. Recurrence is counted per class, so two findings about the same kind of problem in different files count as one pattern. The lists below are the classes GAIA ships with. A member picks a class only from these lists, plus any classes its own agent definition adds, so a member you add for your own code (see [Covering new code](/workflow/code-audit-team/#covering-new-code)) can bring its own. Claude never invents a class on the fly: a finding that fits none of them is recorded as `holistic/unclassified`.
 
 ### Tool findings
 
@@ -96,7 +100,7 @@ These match GAIA's coding conventions for React and TypeScript.
 
 ### Unclassified findings
 
-A finding recorded as `holistic/unclassified` is never a candidate, because there is no single kind of problem to write a guard for. When unclassified findings recur on 3 or more pull requests within 90 days, the run shows them as one extra row, marked as not a candidate, and records a suppression on this machine so the signal stays quiet until it rises noticeably. When the same kind of problem keeps landing here, the class list may be missing a class for it.
+A finding recorded as `holistic/unclassified` is never a candidate, because there is no single kind of problem to write a guard for. When unclassified findings recur on 3 or more pull requests within 90 days, the run shows them as one extra row, marked as not a candidate, and records a suppression on this machine so the signal stays quiet until it rises noticeably. When the same kind of problem keeps landing here, the class list may be missing a class for it, or the cluster needs looking into on its own. `/gaia-codify` points this out but never adds a class itself. A class added later applies only to new findings: the unclassified ones already recorded stay unclassified until they age out of the 90-day window.
 
 ## How it judges the form
 

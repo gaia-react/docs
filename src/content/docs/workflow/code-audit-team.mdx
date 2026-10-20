@@ -102,7 +102,7 @@ Every finding is graded on one scale:
 
 A fourth grade, `severity:investigate`, marks a tech-debt issue whose severity cannot be judged yet. See [Investigate issues](/workflow/tech-debt/#investigate-issues).
 
-Every finding, Minor included, gets an outcome. By default it is fixed. Otherwise it is accepted as a known trade-off (a residual), waived, or filed as an issue, each with a reason. Findings about architecture come to you to decide.
+Every finding, Minor included, gets an outcome. By default it is fixed. Otherwise it is accepted as a known trade-off (a [residual](/maintenance/residue/#what-a-residual-is)), waived, or filed as an issue, each with a reason. Findings about architecture come to you to decide.
 
 **Out-of-scope findings** (problems the audit notices outside the pull request's own change) are filed as `tech-debt` issues through the [`file-tech-debt`](/workflow/tech-debt/#how-an-issue-is-filed) skill. A non-security finding in a file the pull request already changes can instead be recorded as waived in the pull request body, but only when it passes two checks (for example, that this change did not introduce it). **Security findings are never filed publicly.** They become issues only when the repository is private. Otherwise they stay in a local record, with secrets removed, under `.gaia/local/audit/security/`, and you are told only how many there were and where the records are.
 

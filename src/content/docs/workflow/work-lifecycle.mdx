@@ -47,6 +47,8 @@ Claude never makes up a branch name. One shared script (`branch-name-lib.sh`) ge
 | A tech-debt fix (`/gaia-debt`) | `debt/<n>-<slug>`, or `debt/<a>-<b>-batch` for a batch |
 | Maintenance commands | `deps/`, `update/`, `wiki/`, `cleanse/`, `codify/`, `fitness/`, or `residue/` plus a timestamp |
 
+**Why:** GAIA reads branch names back as well as writing them. The prefix tells it which workflow made a branch and which issue or SPEC it belongs to, so a resumed plan or `/gaia-debt` can find its own work. One script for both writing and reading means the two can never disagree.
+
 `<type>` is the Conventional Commits type of the change (`feat`, `fix`, `chore`, and the rest). The pull request title uses the same type, and the advisory PR Conventions check compares them. See [Git hooks and conventions](/workflow/git-conventions/).
 
 ## 3. Isolate

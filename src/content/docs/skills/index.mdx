@@ -5,7 +5,7 @@ sidebar:
   order: 0
 ---
 
-A [skill](https://code.claude.com/docs/en/skills) is a folder of instructions that Claude loads when the task matches it. Each skill has a `SKILL.md`, and some have extra files in `references/` that Claude reads only when it needs them. GAIA ships skills in two places: the React app's skills in `frontend/.claude/skills/`, which load in sessions working on the app, and project skills in `.claude/skills/` at the project root, which apply anywhere in the repository.
+A [skill](https://code.claude.com/docs/en/skills) is a folder of instructions that Claude loads when the task matches it. Each skill has a `SKILL.md`, and some have extra files in `references/` that Claude reads only when it needs them. Until a task needs it, only a skill's short description sits in Claude's context, so GAIA can ship detailed guidance for many tasks without filling every session ([how skills load](https://code.claude.com/docs/en/skills)). GAIA ships skills in two places: the React app's skills in `frontend/.claude/skills/`, which load in sessions working on the app, and project skills in `.claude/skills/` at the project root, which apply anywhere in the repository.
 
 ## Frontend skills
 

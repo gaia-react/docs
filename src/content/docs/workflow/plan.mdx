@@ -74,7 +74,7 @@ Inside it:
 3. **Pick the planner model.** On Opus or Fable the planner inherits your model. Otherwise Claude asks: Opus (recommended), Fable, or your current model. The planner runs at your session's effort, so a higher `/effort` drafts a deeper plan.
 4. **Plan.** A planner sub-agent writes the folder. If the planner's context reaches the [red band](/workflow/work-lifecycle/#context-bands), it hands off to a fresh one.
 5. **Verify.** A script checks that every required file and step is there, and that every UAT (acceptance test) in the SPEC is assigned to a task.
-6. **Plan audit.** On any plan with parallel tasks, several phases, or a shared contract, reviewers check that tasks running at the same time do not depend on each other, that every file, type, and function the contracts name really exists, and for a SPEC's plan, that the plan covers the whole SPEC. This happens before an orchestrator with no memory of the planning builds from it. Critical and major findings come to you as one list to accept or revise, and minor ones are fixed without asking. A simple plan skips this step.
+6. **Plan audit.** Reviewers check the plan before anything is built from it. See [The plan audit](#the-plan-audit).
 7. **Report.** A cost line (or, for a SPEC's plan, a box covering the spec and the plan), then the prompt:
 
    ```text
@@ -82,6 +82,34 @@ Inside it:
    ```
 
    Type `/clear` and paste it.
+
+## The plan audit
+
+The [SPEC audit](/workflow/spec/#the-spec-audit) checks what to build before a plan exists, and the [Code Audit Team](/workflow/code-audit-team/) checks the code after it is built. Neither sees the plan itself: how the work is split into tasks, which tasks run side by side, and the contracts between them. The plan audit checks exactly that, before an orchestrator with no memory of the planning builds from it. A flaw caught here costs one edit to the plan, not a failed run.
+
+### When it runs
+
+A simple plan (one or two tasks, a single phase, nothing shared between tasks) skips the audit. Any plan with tasks running side by side, several phases, or a contract shared between tasks gets it, with no question asked. If Claude cannot start sub-agents, the audit is skipped with a note, and the per-phase quality gates and the Code Audit Team remain the safety net.
+
+### The lenses
+
+Each lens is a fresh sub-agent that reads the plan and your code for itself. Like the SPEC audit's, each lens has a short code:
+
+| Lens | What it checks |
+| --- | --- |
+| (DP) Decomposition and dependency soundness | Tasks marked to run side by side that actually share state, edit the same files, or need each other's output. A phase order that ignores a real dependency. A contract two tasks read differently. A parallel task that runs a project-wide check (lint, type checks, Playwright, a dev server) that would collide with its neighbors. It looks for a way every task passes its own checks while the combined result is broken. |
+| (CG) Contract grounding | Every file path, export, type, and function signature a task names really exists in your repository and installed packages. A contract that names something that does not exist would fail only at the end, when the pieces are put together. |
+| (COV) SPEC coverage | Only for a SPEC's plan. Every UAT and success criterion is covered by some task, no task contradicts the SPEC, and no task brings back work the SPEC ruled out of scope. |
+
+There is no refutation pass, unlike the SPEC audit: these checks have a clear yes-or-no answer against the code, so there is little room for a false alarm.
+
+### What you see
+
+Critical and major findings are printed as one list headed **Plan audit**, each with its evidence and the recommended fix, followed by one question: **Accept all as recommended** or **Revise**. Minor findings are applied without asking.
+
+A finding that affects one spot, such as a wrong contract or an uncovered UAT, is fixed in the plan's files directly. A finding that the task graph itself is wrong sends the plan back to the planner with the findings, and the rewritten plan goes through the file check (step 5) again.
+
+In [auto mode](#auto-mode), no question is asked: clear-cut fixes are applied, and a finding with more than one reasonable fix is written to `## Audit notes` in the plan's `README.md` for you to read before kickoff.
 
 ## Execution
 

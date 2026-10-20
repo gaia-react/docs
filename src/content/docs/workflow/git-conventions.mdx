@@ -36,6 +36,8 @@ It must print `.githooks`. If it does not, run `pnpm install` or `git config cor
 
 Commit messages and pull request titles follow [Conventional Commits](https://www.conventionalcommits.org/): `<type>(<optional scope>): <subject>`. The types are `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style`, `test`, and `wiki`, listed in `.gaia/conventional-commits.json`.
 
+The type at the front of every line makes the history easy to scan and filter: you can see at a glance which changes were features, fixes, or chores, and tools can build a changelog from it.
+
 ## Pull request titles
 
 A squash merge uses the pull request title as the commit's first line on the default branch, followed by ` (#<number>)`. GAIA checks that whole line, so the 100-character limit applies to the title plus that suffix. A title that passes the commit-msg hook can still be one character too long once the suffix is added.

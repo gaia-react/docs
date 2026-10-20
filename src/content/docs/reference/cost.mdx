@@ -7,7 +7,7 @@ sidebar:
 
 GAIA records every model call in a local usage ledger (a log file) and shows what your work cost, always in the same form: tokens, dollars, and time taken.
 
-:::note[Your data stays on your machine]
+:::tip[Your data stays on your machine]
 The ledger stays on your machine and is never sent anywhere. Working out the price does not use the network either. It is yours to read and use however you like. GAIA's separate, opt-out usage ping is described on [Telemetry](/reference/telemetry/); it never reads or sends the ledger.
 :::
 
@@ -34,7 +34,7 @@ SPEC-NNN Cost
 +---------------------------------------+
 ```
 
-Each row is rounded to 0.1M tokens and to the cent, and the Total adds up the rounded rows, so the token and dollar columns always add up. Time is different: each row shows how long its own run took, and the Total runs from the first spend to the last, so it includes any gap between runs and can be longer than the rows added together.
+Each row is rounded to 0.1M tokens and to the cent, and the Total adds up the rounded rows, so the token and dollar columns always add up. Time is wall-clock time, measured from a run's first model call to its last, so it includes any pauses while you read or answer. Each row shows how long its own run took, and the Total runs from the first spend to the last, so it includes any gap between runs and can be longer than the rows added together.
 
 ### Where it prints
 

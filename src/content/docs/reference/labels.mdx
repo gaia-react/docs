@@ -5,7 +5,9 @@ sidebar:
   order: 5
 ---
 
-GAIA's GitHub labels are all defined in one file, `.gaia/labels.json`. `gaia labels sync` creates the labels your repository is missing and renames labels whose names changed, so every issue keeps its label. It also updates a label's description to match GAIA's. When a label's color differs from GAIA's, it tells you instead of overwriting your color.
+import LabelPill from '../../../components/LabelPill.astro';
+
+GAIA's labels give every issue the same few facts: what kind of work it is, how urgent, how hard, and whether someone has it. [`/gaia-debt`](/maintenance/debt/) uses them to decide what to fix first, and anyone on the team can see the state of an issue at a glance. The labels are all defined in one file, `.gaia/labels.json`. `gaia labels sync` creates the labels your repository is missing and renames labels whose names changed, so every issue keeps its label. It also updates a label's description to match GAIA's. When a label's color differs from GAIA's, it tells you instead of overwriting your color.
 
 [`/setup-gaia`](/getting-started/setup-gaia/) and [`/update-gaia`](/maintenance/update-gaia/) run the sync. You can also run it yourself:
 
@@ -19,41 +21,39 @@ Add `--dry-run` to see what it would change, or `--adopt` to replace your colors
 
 | Label | Meaning |
 |---|---|
-| `tech-debt` | A review finding outside the pull request's scope, saved to be fixed later by [`/gaia-debt`](/maintenance/debt/) |
-| `severity:critical` | Wrong, or will produce broken work; fixed first |
-| `severity:major` | A significant gap or defect; fixed before minor findings |
-| `severity:minor` | Real but small; fixed by default, never skipped |
-| `severity:investigate` | Severity not known yet; needs research before it can be graded |
-| `difficulty:easy` | The issue text and the code it points to make the fix clear |
-| `difficulty:medium` | The fix needs a design decision, and the surrounding code shows which way to go |
-| `difficulty:hard` | The fix needs a design decision the surrounding code does not answer |
-| `footprint:narrow` | One piece of code in one file, with no change to how other code calls it |
-| `footprint:wide` | Touches several files, changes how other code calls it, or changes the structure |
-| `footprint:spec` | Needs a design SPEC first; fixed through `/gaia-spec` |
-| `debt:spec-pending` | Handed to `/gaia-spec`; on hold until the SPEC starts |
-| `debt:spec-active` | A SPEC is in progress for this issue, or is keeping it open until a recorded condition is met |
+| <LabelPill name="tech-debt" /> | A review finding outside the pull request's scope, saved to be fixed later by [`/gaia-debt`](/maintenance/debt/) |
+| <LabelPill name="severity:critical" /> | Wrong, or will produce broken work; fixed first |
+| <LabelPill name="severity:major" /> | A significant gap or defect; fixed before minor findings |
+| <LabelPill name="severity:minor" /> | Real but small; fixed by default, never skipped |
+| <LabelPill name="severity:investigate" /> | Severity not known yet; needs research before it can be graded |
+| <LabelPill name="difficulty:easy" /> | The issue text and the code it points to make the fix clear |
+| <LabelPill name="difficulty:medium" /> | The fix needs a design decision, and the surrounding code shows which way to go |
+| <LabelPill name="difficulty:hard" /> | The fix needs a design decision the surrounding code does not answer |
+| <LabelPill name="footprint:narrow" /> | One piece of code in one file, with no change to how other code calls it |
+| <LabelPill name="footprint:wide" /> | Touches several files, changes how other code calls it, or changes the structure |
+| <LabelPill name="footprint:spec" /> | Needs a design SPEC first; fixed through `/gaia-spec` |
+| <LabelPill name="debt:spec-pending" /> | Handed to `/gaia-spec`; on hold until the SPEC starts |
+| <LabelPill name="debt:spec-active" /> | A SPEC is in progress for this issue, or is keeping it open until a recorded condition is met |
 
 Every issue carries `tech-debt`, a severity, and a footprint. A difficulty is added only when the filer read the cited code, so an issue without one is normal. At most three `severity:investigate` issues can be open at once: a fourth filing is refused until one is answered and re-graded ([how](/maintenance/debt/#labels)).
-
-The severity labels are shades of red, darkest for critical.
 
 ## Work in progress
 
 | Label | Meaning |
 |---|---|
-| `in-progress` | Someone is working on this issue right now; do not pick it up. Added when the issue is [claimed](/workflow/work-lifecycle/#1-claim) and removed when the pull request that closes it merges. |
-| `needs-human` | An automated process stopped here; a person needs to review it. |
+| <LabelPill name="in-progress" /> | Someone is working on this issue right now; do not pick it up. Added when the issue is [claimed](/workflow/work-lifecycle/#1-claim) and removed when the pull request that closes it merges. |
+| <LabelPill name="needs-human" /> | An automated process stopped here; a person needs to review it. |
 
 ## Issue types
 
 | Label | Meaning |
 |---|---|
-| `bug` | Existing behavior is broken or wrong |
-| `enhancement` | A new feature or request |
-| `documentation` | Improvements or additions to documentation |
-| `security` | A security defect or dependency CVE. Created only when `.github/dependabot.yml` exists. |
-| `wontfix` | Deliberately declined; do not file it again. When a finding matches an issue with this label, it is not filed as tech debt again. |
-| `dependencies`, `github_actions` | [Dependabot](https://docs.github.com/en/code-security/dependabot)'s own labels |
+| <LabelPill name="bug" /> | Existing behavior is broken or wrong |
+| <LabelPill name="enhancement" /> | A new feature or request |
+| <LabelPill name="documentation" /> | Improvements or additions to documentation |
+| <LabelPill name="security" /> | A security defect or dependency CVE. Created only when `.github/dependabot.yml` exists. |
+| <LabelPill name="wontfix" /> | Deliberately declined; do not file it again. When a finding matches an issue with this label, it is not filed as tech debt again. |
+| <LabelPill name="dependencies" /> <LabelPill name="github_actions" /> | [Dependabot](https://docs.github.com/en/code-security/dependabot)'s own labels |
 
 ## Not created
 

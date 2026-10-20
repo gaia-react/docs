@@ -24,7 +24,13 @@ The scripts at the root (`pnpm dev`, `pnpm typecheck`, `pnpm lint`, `pnpm test`,
 
 ### Pinned dependencies
 
-Every dependency in `package.json` is pinned to one exact version, with no `^` or `~` range, and `pnpm add` pins new ones the same way. A version changes only when you or [`/update-deps`](/maintenance/update-deps/) change it, so a new upstream release never reaches your app without a commit that shows it. `/update-deps` tests each update through the [Quality Gate](/reference/gates/#quality-gate) before it keeps it. pnpm also refuses package versions published in the last three days (see [Release-age window](/reference/gates/#release-age-window)), the window in which most compromised packages are caught and pulled.
+Every dependency in `package.json` is pinned to one exact version, with no `^` or `~` range, and `pnpm add` pins new ones the same way. Pinning helps in three ways:
+
+- **Every install is the same.** A fresh clone, a teammate's machine, and CI all run the versions you tested. A range lets a new upstream release slip in on the next install, with no commit that shows it.
+- **A version changes only on purpose.** Updates arrive through [`/update-deps`](/maintenance/update-deps/), as one pull request that passes the [Quality Gate](/workflow/code-audit-team/#quality-gate) first. When something breaks, the commit that moved the version tells you which package to look at, and reverting it rolls the version back.
+- **A bad release has time to be caught.** pnpm also refuses package versions published in the last three days (see [Release-age window](/reference/gates/#release-age-window)). Most compromised packages are found and pulled within that time.
+
+Renovate's [dependency pinning guide](https://docs.renovatebot.com/dependency-pinning/#why-pin-dependencies) recommends pinning every dependency of an app, for the same reasons. pnpm's [supply chain security guide](https://pnpm.io/supply-chain-security#delay-dependency-updates) explains the release-age delay.
 
 ## frontend/
 

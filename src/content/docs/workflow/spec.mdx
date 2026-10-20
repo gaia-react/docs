@@ -97,24 +97,24 @@ Claude first sizes up the draft. A low-stakes SPEC with a narrow scope gets the 
 
 ### The lenses
 
-Each reviewer looks through one lens. Four core lenses run on every SPEC:
+Each reviewer looks through one lens. GAIA names each lens with a short code, such as `COV`, when it starts the audit and in each finding's id. Four core lenses run on every SPEC:
 
 | Lens | What it checks |
 | --- | --- |
-| Factual grounding | Every claim about your code, a dependency, a file path, or an existing convention is true. A new dependency is justified and its version pinned. |
-| UAT testability | Each UAT can fail. The reviewer looks for a way a UAT passes while the feature is still broken, and proposes a tighter one. |
-| Coverage and consistency | Every success criterion has a UAT, every promise in the intent is covered, the scope rules do not contradict the UATs, and the SPEC follows your project's conventions. |
-| Red team and feasibility | The reviewer tries to break the SPEC: a way every UAT passes yet the feature is not delivered, a check that cannot actually run, a file or caller the SPEC missed, an assumption the plan would inherit as fact. |
+| (FG) Factual grounding | Every claim about your code, a dependency, a file path, or an existing convention is true. A new dependency is justified and its version pinned. |
+| (TST) UAT testability | Each UAT can fail. The reviewer looks for a way a UAT passes while the feature is still broken, and proposes a tighter one. |
+| (COV) Coverage and consistency | Every success criterion has a UAT, every promise in the intent is covered, the scope rules do not contradict the UATs, and the SPEC follows your project's conventions. |
+| (RT) Red team and feasibility | The reviewer tries to break the SPEC: a way every UAT passes yet the feature is not delivered, a check that cannot actually run, a file or caller the SPEC missed, an assumption the plan would inherit as fact. |
 
 Specialist lenses join when the draft touches their area:
 
 | Lens | Joins when the SPEC touches |
 | --- | --- |
-| Security | Sign-in, tokens or secrets, redirects, uploads, permissions, personal data, raw user input, headers, cookies |
-| Migration | Data formats or schemas, renamed or removed fields, breaking API changes |
-| Accessibility | Components, routes, pages, anything that renders on screen |
-| Documentation | Wiki or docs deliverables |
-| Performance | Data volume, loops over collections, network calls, caching, rendering |
+| (SEC) Security | Sign-in, tokens or secrets, redirects, uploads, permissions, personal data, raw user input, headers, cookies |
+| (MIG) Migration | Data formats or schemas, renamed or removed fields, breaking API changes |
+| (A11Y) Accessibility | Components, routes, pages, anything that renders on screen |
+| (DOC) Documentation | Wiki or docs deliverables |
+| (PERF) Performance | Data volume, loops over collections, network calls, caching, rendering |
 
 ### Refutation
 
@@ -122,7 +122,7 @@ Every critical or major finding then goes to a separate reviewer whose job is to
 
 On the Deep audit, three reviewers try to disprove each finding, each from a different angle: correctness, security, and whether the problem actually happens as described. A finding stays only if at least two of the three fail to disprove it. A completeness reviewer then looks for anything every lens missed.
 
-When the lenses raise a very large number of findings, one reviewer per lens checks all of that lens's findings instead, and the completeness review is skipped.
+When the lenses raise a very large number of findings (more than 24 critical or major ones on the Standard audit, more than 8 on the Deep audit), one reviewer per lens checks all of that lens's findings instead, and the completeness review is skipped. This caps the number of reviewers, and so the time and tokens the audit spends, however many findings come in. Little is lost: with that many findings, several lenses have usually raised the same problem on their own, which already cross-checks it, and that much volume already covers the gaps a completeness reviewer would hunt for.
 
 ### What happens to a finding that survives
 

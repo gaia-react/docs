@@ -14,7 +14,7 @@ This page covers how that debt is created. Two maintenance commands then work th
 
 ## Where debt comes from
 
-Debt is filed during any work the [Code Audit Team](/workflow/code-audit-team/) reviews, which covers the pull requests GAIA merges: a SPEC's plan, an ad-hoc change, a `/gaia-debt` fix, a dependency update that changes code. It is also filed by some maintenance commands, and on request.
+Debt is found and filed as part of everyday work. The [Code Audit Team](/workflow/code-audit-team/) reviews every pull request GAIA merges, so debt turns up while a SPEC's plan runs, during an ad-hoc change, during a `/gaia-debt` fix, and during a dependency update that changes code. Some maintenance commands file it too, and you can ask for it at any time.
 
 | Source | What it files |
 | --- | --- |
@@ -35,6 +35,16 @@ Not every finding outside the change becomes an issue. Two kinds are recorded in
 - **Waived findings**, under `## Out-of-scope machinery findings (recorded, not filed)`: a non-security finding in GAIA's own audit machinery, or in a file the pull request already changes. Filing these would only re-surface the same finding on the next pull request that touches the file. A finding the change itself caused is never waived, and neither is one the change points to in a comment as "handled elsewhere".
 
 Both are **residue**. Each entry carries a key, so the same finding is not recorded twice. Once a residual is 30 days old, [`/gaia-residue`](/maintenance/residue/) asks you to dismiss it, keep it for later, or promote it to a `tech-debt` issue.
+
+## Why not file everything
+
+A review that files every finding it sees quickly buries the backlog. The next pull request that touches the same file finds the same problem again, and the issue count grows faster than anyone can fix it. Once the backlog is too long to read, nobody reads it, and real problems hide among the noise.
+
+Waiving and recording keep the backlog small enough to work through:
+
+- **The backlog holds only fixable work.** A finding in a file the pull request already changes, or in GAIA's own audit machinery, would come back on the next pull request that touches it. Waiving it breaks that loop instead of filing the same problem over and over.
+- **Each review stays about its change.** Trade-offs inside the change are accepted with a reason instead of filed, so the review does not stall on a judgment call the author already made.
+- **Nothing is lost.** Every waived or accepted finding is written into the pull request with a key. After 30 days, `/gaia-residue` puts each one back in front of you to dismiss, keep, or promote to an issue, so a trade-off that turned out to matter still gets fixed.
 
 ## How an issue is filed
 
