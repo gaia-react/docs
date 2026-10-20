@@ -93,9 +93,9 @@ The grades are guidance only: Claude can change a footprint after reading the co
 
 The `file-tech-debt` skill is the one way a finding becomes a `tech-debt` issue, used by the audit loop, `/gaia-residue`, `/gaia-cleanse`, and by you ("file this as tech-debt"). It:
 
-- adds a key to each issue (`<!-- gaia-debt-key: v1 class=... path=... line=... -->`) so the same finding is never filed twice, and skips a finding that already has an open issue or was declined (closed as not planned, or labelled `wontfix`);
-- checks the labels and key before creating the issue, and refuses a badly formed one instead of leaving it for `/gaia-debt` to trip over later;
-- files **security findings only when the repository is private**, checked twice. Otherwise it writes a redacted local record under `.gaia/local/audit/security/` and reports a count and that path, nothing more.
+- Adds a key to each issue (`<!-- gaia-debt-key: v1 class=... path=... line=... -->`) so the same finding is never filed twice, and skips a finding that already has an open issue or was declined (closed as not planned, or labelled `wontfix`).
+- Checks the labels and key before creating the issue, and refuses a badly formed one instead of leaving it for `/gaia-debt` to trip over later.
+- Files **security findings only when the repository is private**, checked twice. Otherwise it writes a redacted local record under `.gaia/local/audit/security/` and reports a count and that path, nothing more.
 
 <Aside type="note">
 `/gaia-debt` fixes issues; it does not file them. Use `file-tech-debt`, or let the audit file them, to add to the backlog.

@@ -66,11 +66,11 @@ The loop needs **Claude Code 2.1.292 or later**. Run `claude update` if a unit s
 
 ### The branch checkpoint
 
-Each round's fixes need reviewing in the next round, so left alone the loop would never stop. A hook limits it on each branch. It checks in with you when:
+Each round's fixes need reviewing in the next round, so left alone the loop would never stop. A hook limits it on each branch. It checks in with you when any of these happens:
 
-- your session's context reaches its checkpoint line,
-- rounds stop making progress (the number of findings caused by the branch stops going down, or each repair causes new findings on the lines it wrote), or
-- the maximum number of rounds is reached.
+- Your session's context reaches its checkpoint line
+- Rounds stop making progress (the number of findings caused by the branch stops going down, or each repair causes new findings on the lines it wrote)
+- The maximum number of rounds is reached
 
 At a checkpoint Claude shows you where things stand (rounds run, findings per round, its assessment, what remains by severity, and the cost so far) and asks one question with fixed answers:
 

@@ -21,13 +21,13 @@ If your change touches any of these, expect the next release to catch anything o
 
 The command runs on a clean default branch with a `patch`, `minor`, or `major` argument. In outline, it:
 
-- bumps the version in `.gaia/VERSION`, `package.json`, and `frontend/package.json`;
-- graduates the CHANGELOG's `## [Unreleased]` section into a dated `## [X.Y.Z]` entry;
-- resets `wiki/log.md`, so new projects start with a clean log;
-- regenerates `.gaia/manifest.json` and rebuilds the bundled CLIs;
-- commits on a `release/vX.Y.Z` branch and opens a pull request, which passes the same checks and the same [Code Audit Team](/workflow/code-audit-team/) audit as any other;
-- tags the merge commit once it lands, which triggers [release.yml](/contributors/ci/#releaseyml);
-- then brings `create-gaia`, the website, and these docs in line with the release.
+- Bumps the version in `.gaia/VERSION`, `package.json`, and `frontend/package.json`
+- Graduates the CHANGELOG's `## [Unreleased]` section into a dated `## [X.Y.Z]` entry
+- Resets `wiki/log.md`, so new projects start with a clean log
+- Regenerates `.gaia/manifest.json` and rebuilds the bundled CLIs
+- Commits on a `release/vX.Y.Z` branch and opens a pull request, which passes the same checks and the same [Code Audit Team](/workflow/code-audit-team/) audit as any other
+- Tags the merge commit once it lands, which triggers [release.yml](/contributors/ci/#releaseyml)
+- Then brings `create-gaia`, the website, and these docs in line with the release
 
 A 2.x release ships `gaia-bundle-<tag>.tar.gz` with a `.sha256` asset, and any migration notes it needs travel inside the bundle under `.gaia/migrations/` (see [Migration notes](/maintenance/update-gaia/#migration-notes)). While 1.x projects can still reach a 2.x release, the release body opens with a line that sends a 1.6.1 project to the 2.0.0 migration.
 

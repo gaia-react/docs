@@ -11,9 +11,9 @@ A GAIA app is a [React Router 8](https://reactrouter.com/) app with server rende
 
 React Router isn't tied to one hosting platform. You can deploy it to:
 
-- any Node.js server;
-- any platform that runs [Docker](https://www.docker.com/) containers, such as [AWS ECS](https://aws.amazon.com/ecs/), [Google Cloud Run](https://cloud.google.com/run), [Azure Container Apps](https://azure.microsoft.com/products/container-apps), or [Fly.io](https://fly.io/);
-- hosts with their own React Router templates, such as [Vercel](https://vercel.com/), [Netlify](https://www.netlify.com/), and [Cloudflare](https://www.cloudflare.com/).
+- Any Node.js server
+- Any platform that runs [Docker](https://www.docker.com/) containers, such as [AWS ECS](https://aws.amazon.com/ecs/), [Google Cloud Run](https://cloud.google.com/run), [Azure Container Apps](https://azure.microsoft.com/products/container-apps), or [Fly.io](https://fly.io/)
+- Hosts with their own React Router templates, such as [Vercel](https://vercel.com/), [Netlify](https://www.netlify.com/), and [Cloudflare](https://www.cloudflare.com/)
 
 React Router's [deployment guide](https://reactrouter.com/start/framework/deploying) covers each option.
 
@@ -47,9 +47,9 @@ docker run -p 3000:3000 \
 
 The image:
 
-- installs dependencies from the lockfile exactly as committed, then builds the app;
-- copies only the production dependencies and the build output into a fresh Node image;
-- runs the server as the unprivileged `node` user, with `pnpm start`.
+- Installs dependencies from the lockfile exactly as committed, then builds the app
+- Copies only the production dependencies and the build output into a fresh Node image
+- Runs the server as the unprivileged `node` user, with `pnpm start`
 
 No `.env` file ever enters the image: `frontend/Dockerfile.dockerignore` excludes them, along with the root `.claude/` folder, the wiki, and local GAIA state.
 

@@ -30,9 +30,9 @@ Before changing anything, the note checks your project and stops with a clear me
 
 - `.gaia/VERSION` is not exactly `1.6.1`
 - `frontend/` already exists
-- you are in a worktree, not your main copy of the repo
-- there are uncommitted changes (commit or discard them first, including unfinished TDD work)
-- a plan has started running (finish and merge it, or abandon it)
+- You are in a worktree, not your main copy of the repo
+- There are uncommitted changes (commit or discard them first, including unfinished TDD work)
+- A plan has started running (finish and merge it, or abandon it)
 - Claude Code is older than 2.1.292
 - `gh` is not logged in, or `jq`, `tar`, or `shasum` is missing
 
@@ -65,10 +65,10 @@ The note makes every 2.0.0 change to GAIA's own files, and makes or lists the ch
 
 Only after the merge does Claude change anything on GitHub, and it asks you before each change:
 
-- push a `spec/NNN` starting tag so the next SPEC number continues from your highest one
-- remove the old `code-review-audit` required check, keeping `GAIA-Audit` and every other check
-- delete the GAIA CI secrets (`CLAUDE_CODE_OAUTH_TOKEN`, `ANTHROPIC_API_KEY`). Revoke the token where you created it and uninstall the Claude GitHub App yourself. Deleting the secret alone leaves the credential working.
-- sync labels (renaming `severity:important` and `severity:suggestion` in place), close open `gaia-ci` pull requests, and delete `gaia-ci/` branches
+- Push a `spec/NNN` starting tag so the next SPEC number continues from your highest one.
+- Remove the old `code-review-audit` required check, keeping `GAIA-Audit` and every other check.
+- Delete the GAIA CI secrets (`CLAUDE_CODE_OAUTH_TOKEN`, `ANTHROPIC_API_KEY`). Revoke the token where you created it and uninstall the Claude GitHub App yourself. Deleting the secret alone leaves the credential working.
+- Sync labels (renaming `severity:important` and `severity:suggestion` in place), close open `gaia-ci` pull requests, and delete `gaia-ci/` branches.
 
 It then asks before deleting leftover local files, sets up any existing worktrees that already have the 2.0.0 layout, and passes you to `/setup-gaia`, which records the 2.0.0 setup decisions.
 

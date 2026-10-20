@@ -37,9 +37,9 @@ Beyond these pages, the GAIA repo carries maintainer-only tooling that is not do
 
 `/gaia-release` starts with a preflight and stops unless:
 
-- you are on `main` with a clean working tree;
-- the wiki is current (`wiki/.state.json`). If it has drifted, run [`/gaia-wiki`](/maintenance/wiki/) and let its pull request merge first;
-- every check the release expects to be required is required by the default branch's rules (`bash .gaia/scripts/verify-required-checks.sh`).
+- You are on `main` with a clean working tree.
+- The wiki is current (`wiki/.state.json`). If it has drifted, run [`/gaia-wiki`](/maintenance/wiki/) and let its pull request merge first.
+- Every check the release expects to be required is required by the default branch's rules (`bash .gaia/scripts/verify-required-checks.sh`).
 
 See [Releases](/contributors/release/) for what the command does after that.
 

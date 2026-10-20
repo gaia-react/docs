@@ -46,12 +46,12 @@ The mode applies to that one run only. Nothing stores it. When `/gaia-init` fini
 
 Either way, GAIA's guardrails stay on. They are hooks that check every action Claude takes, not permission prompts, so a mode that skips prompts doesn't turn them off. Every new project comes with hooks that block actions like:
 
-- committing or pushing directly to `main`, or force-pushing it
+- Committing or pushing directly to `main`, or force-pushing it
 - `rm -rf` on dangerous targets (`/`, `~`, `.git`, `.claude`, `node_modules`, the repo root)
-- reading `.env` files, keys, and credentials, or writing secrets into the repo
-- committing with `--no-verify`, which would skip the typecheck, lint, and tests the pre-commit hook runs
-- opening a pull request that is not a draft, or whose title is not a Conventional Commit
-- merging a pull request the [Code Audit Team](/workflow/code-audit-team/) has not cleared
+- Reading `.env` files, keys, and credentials, or writing secrets into the repo
+- Committing with `--no-verify`, which would skip the typecheck, lint, and tests the pre-commit hook runs
+- Opening a pull request that is not a draft, or whose title is not a Conventional Commit
+- Merging a pull request the [Code Audit Team](/workflow/code-audit-team/) has not cleared
 
 These hold in every permission mode. See the [hooks reference](/reference/hooks/) for the full set, and the [gate reference](/reference/gates/) for why each one exists.
 

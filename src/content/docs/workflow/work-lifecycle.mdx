@@ -133,11 +133,11 @@ Every worktree links to the main checkout's copy, so nothing written there is lo
 
 Work that spans sessions resumes from a small saved state, rewritten in place. Where it goes depends on the work:
 
-- a `/gaia-plan` run saves to its own progress files, at a committed phase boundary
+- A `/gaia-plan` run saves to its own progress files, at a committed phase boundary
 - `/gaia-spec` saves to its draft cache
-- a research folder saves to its own state file
-- other work on a branch saves to `.gaia/local/runs/<branch>/STATE.md`
-- work on the default branch saves to `.gaia/local/runs/session-<session id>/STATE.md`
+- A research folder saves to its own state file
+- Other work on a branch saves to `.gaia/local/runs/<branch>/STATE.md`
+- Work on the default branch saves to `.gaia/local/runs/session-<session id>/STATE.md`
 
 A resumed session reads that saved state and the run's artifact list and nothing else.
 

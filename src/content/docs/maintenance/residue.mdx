@@ -62,10 +62,10 @@ Going through them is optional tidying. Stopping costs nothing: the run publishe
 
 A promotion that could not file an issue leaves its residual open, so it still counts toward the nudge. That happens when GitHub is unreachable, the filing fails, or the finding is security-sensitive: [security findings are never filed](/maintenance/debt/#how-issues-are-filed) in the public tracker, only kept as a local record.
 
-The run does not retry those in the same pass. It ends by saying how many are stuck, that they keep the nudge up, and what to do:
+The run does not retry those in the same pass. It ends by saying how many are stuck, that they keep the nudge up, and what you can do:
 
-- run `/gaia-residue` again once filing works, or
-- for a security-sensitive one, deal with it privately, then dismiss or keep it on a later run.
+- Run `/gaia-residue` again once filing works.
+- For a security-sensitive one, deal with it privately, then dismiss or keep it on a later run.
 
 If the GitHub reads fail at the start, the run says so plainly ("this is not an all-clear") instead of reporting that nothing is open.
 
