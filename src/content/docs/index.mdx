@@ -38,11 +38,13 @@ The project is a pnpm workspace: the shared Claude setup at the root, and the Re
 
 ### Permissions on the first run
 
-When you scaffold a project, `npx create-gaia` launches Claude Code once with `--dangerously-skip-permissions` and runs `/gaia-init`. That one run rewrites files, registers tools, and sets up the whole project. The flag lets it finish without stopping to ask your permission at every step.
+When you scaffold a project, `npx create-gaia` runs `claude --permission-mode auto /gaia-init`. That one run rewrites files, registers tools, and sets up the whole project. In [auto mode](https://code.claude.com/docs/en/permission-modes), Claude Code skips routine permission prompts. A separate classifier model checks each action before it runs and blocks risky ones, such as a force push, piping a download into a shell (`curl | bash`), or a production deploy. Your own ask rules still prompt you.
 
-That flag applies to the setup run only. Nothing stores it. When `/gaia-init` finishes, it tells you to exit Claude and relaunch, because the new skills and plugins load only in a fresh session. How you relaunch is your call: plain `claude` if you'd rather approve actions as they happen, or `claude --dangerously-skip-permissions` if you don't want to be interrupted.
+If auto mode is not available to you (your organization turned it off, or your model does not support it), the session starts in the normal mode instead. Setup still runs; it just asks your permission more often.
 
-Either way, GAIA's guardrails stay on. They are hooks that check every action Claude takes, not permission prompts, so skipping the prompts doesn't turn them off. Every new project comes with hooks that block actions like:
+The mode applies to that one run only. Nothing stores it. When `/gaia-init` finishes, it tells you to exit Claude and relaunch, because the new skills and plugins load only in a fresh session. Relaunch with plain `claude` to approve actions as they happen, or `claude --permission-mode auto` to skip routine prompts.
+
+Either way, GAIA's guardrails stay on. They are hooks that check every action Claude takes, not permission prompts, so a mode that skips prompts doesn't turn them off. Every new project comes with hooks that block actions like:
 
 - committing or pushing directly to `main`, or force-pushing it
 - `rm -rf` on dangerous targets (`/`, `~`, `.git`, `.claude`, `node_modules`, the repo root)
@@ -51,19 +53,19 @@ Either way, GAIA's guardrails stay on. They are hooks that check every action Cl
 - opening a pull request that is not a draft, or whose title is not a Conventional Commit
 - merging a pull request the [Code Audit Team](/workflow/code-audit-team/) has not cleared
 
-These hold whether or not you pass the flag. See the [hooks reference](/reference/hooks/) for the full set, and the [gate reference](/reference/gates/) for why each one exists.
+These hold in every permission mode. See the [hooks reference](/reference/hooks/) for the full set, and the [gate reference](/reference/gates/) for why each one exists.
 
 ## Cloning an existing GAIA project
 
 For a project that already exists (for example, one a teammate created), clone the repo, then:
 
-1. Run `claude --dangerously-skip-permissions`
+1. Run `claude --permission-mode auto`
 2. Run `/setup-gaia` in Claude Code
 
 Follow along with the `/setup-gaia` [walkthrough](/getting-started/setup-gaia/).
 
 <Aside type="note">
-You can leave out `--dangerously-skip-permissions`. Setup then stops to ask your permission more often, but the choice is yours.
+You can leave out `--permission-mode auto`. Setup then stops to ask your permission more often.
 </Aside>
 
 ## Upgrading a 1.x project

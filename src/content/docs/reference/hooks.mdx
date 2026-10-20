@@ -7,7 +7,7 @@ sidebar:
 
 Hooks are scripts Claude Code runs at set moments: before or after a tool call, when a session starts or stops, and when you send a message. GAIA registers them in `.claude/settings.json`. The app's `frontend/.claude/settings.json` is generated from the root settings plus an overlay file, so the same hooks run in both places. The scripts live in `.claude/hooks/`.
 
-Unlike [rules](/reference/rules/), which Claude reads and follows, hooks are scripts that always behave the same way. A guard hook blocks a tool call no matter what the model decided, and its message tells you the allowed form of the command or the next step. Running Claude Code with `--dangerously-skip-permissions` skips permission prompts, not hooks.
+Unlike [rules](/reference/rules/), which Claude reads and follows, hooks are scripts that always behave the same way. A guard hook blocks a tool call no matter what the model decided, and its message tells you the allowed form of the command or the next step. A permission mode that skips prompts, such as auto mode, does not skip hooks.
 
 Hooks that only advise carry an `if` filter, so a typical Bash call starts only the hooks that apply to it. Guard hooks never have one, so they always run. Every hook path is resolved from the repository root, so a `cd` in a Bash call cannot stop a hook from being found. When `jq` is missing, a blocking hook refuses the call rather than letting it through.
 
