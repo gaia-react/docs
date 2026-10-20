@@ -170,6 +170,7 @@ export default defineConfig({
 						{ label: 'Labels', slug: 'reference/labels' },
 						{ label: 'Cost and usage ledger', slug: 'reference/cost' },
 						{ label: 'Telemetry', slug: 'reference/telemetry' },
+						{ label: '.gaia folder', slug: 'reference/gaia-folder' },
 					],
 				},
 				{
