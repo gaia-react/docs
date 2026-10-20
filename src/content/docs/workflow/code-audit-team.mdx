@@ -90,6 +90,8 @@ A member sent back to review looks only at what changed since its last approval 
 
 A small change since a member's last full review can go to a cheaper Sonnet reviewer. `code-audit-frontend` has this on by default, but its configs, package manifests, test folders, and Claude setup files always get a full review. Whenever GAIA cannot confirm a change qualifies, the full member runs. The settings are in [Agents](/reference/agents/#audit-light-reviewer).
 
+The same reviewer can also take a first review. When a small frontend change is purely presentational (copy edits, swapping one HTML tag for another, static class changes, translation text with the same keys), a script checks the shape of the change and sends it to the quick reviewer instead of the full `code-audit-frontend` review. The quick reviewer answers one question: does anything here need to block the merge? It checks accessibility, translations, and design tokens. When the answer is yes, or it is not sure, the full member reviews the change.
+
 ## Severity
 
 Every finding is graded on one scale:
@@ -188,3 +190,17 @@ Many teams run review, lint, and tests only on CI. GAIA runs them on your machin
 This was true before AI coding tools, and it matters more with them: Claude writes changes faster than a CI round trip can report on them.
 
 CI still runs. The [Tests workflow](/workflow/git-conventions/#github-workflows-that-ship) runs the test suites again on every pull request, and the `GAIA-Audit` required check confirms the local audit ran. CI is the last check on work that should already be good.
+
+## Why not Claude Code's built-in review
+
+Claude Code's own review commands, such as `/code-review` and `/security-review`, are good reviewers. The audit is a merge gate, though, and a gate needs four things a review command does not give you:
+
+- **A reviewer you can hold steady.** Each member's instructions live in your repository. When they change, that member's past clearances no longer count and it reviews the change again. A built-in review's instructions and model change with Claude Code updates, outside your repository, so a clearance it gave last month would still stand after it started checking different things.
+- **Every owner signs off.** Members are assigned files by path in `.gaia/audit-ci.yml`, and a change that touches files owned by two members waits until both clear their part. A built-in review is one reviewer over the whole diff.
+- **It blocks the merge.** `gh pr merge` is refused until every member has cleared, and then the required `GAIA-Audit` check is posted. A local review command only prints findings, and Anthropic's managed review on GitHub does not block a merge.
+- **Every finding is dealt with.** Each finding is fixed and checked again, waived with a reason, or filed as a [tech-debt issue](/workflow/tech-debt/), and security findings are never posted publicly. Kinds of finding that keep coming back feed [`/gaia-codify`](/maintenance/codify/). A built-in review's findings stay in the conversation.
+
+GAIA also has a cheaper tier for small changes: the [light and quick reviews](#light-review). They use GAIA's own reviewer rather than a built-in command, because its instructions are versioned in your repository like the members', and its reply has a fixed format the gate can read.
+
+You can still run any built-in review yourself as a second opinion, before or after the audit. A different reviewer can catch different things. Its findings are advice only: nothing it says clears or blocks a merge.
+{/* TODO: link the "Why not Claude Code's built-in review" section of the Code Audit Team wiki decision page once it ships. */}
