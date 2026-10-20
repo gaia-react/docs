@@ -1,15 +1,17 @@
 ---
 title: Token efficiency
-description: How much of Claude's context GAIA uses at session start, what loads only when it is needed, and how GAIA keeps long work from filling the context.
+description: How much of Claude's context GAIA uses at session start, what a typical task adds, what a skill costs once used, and how the audit keeps long work out of your session.
 sidebar:
   order: 6
 ---
 
 Everything GAIA adds to a session takes up part of Claude's context window, the fixed amount of text Claude can hold at once. GAIA keeps that part small: most of it loads only when a task needs it.
 
+Every figure on this page was measured in a new GAIA 2.0.0 project on Opus 5.5. Percentages are of a 1M-token context window.
+
 ## At session start
 
-GAIA adds about 7.7k tokens to a session before you type anything. That is under 1% of a 1M-token context window, and under 4% of a 200k one.
+GAIA adds 7,672 tokens to a session before you type anything: 0.77% of the window.
 
 | What loads in every session | Tokens |
 | --- | --- |
@@ -18,27 +20,64 @@ GAIA adds about 7.7k tokens to a session before you type anything. That is under
 | The root `CLAUDE.md` | 1,041 |
 | [Skill](/skills/) and command descriptions | 804 |
 | [Agent](/reference/agents/) descriptions | 541 |
-| **Total** | **7,672** |
+| **Total** | **7,672 (0.77%)** |
 
-Measured in a new GAIA 2.0.0 project on Opus 5.5, in a session on a feature branch. On the default branch, the branch workflow text is left out of the session-start text, so the total is lower. The session-start text is added when a session starts, and again after `/clear` or compaction.
+The session-start text was measured in a session on a feature branch. On the default branch, the branch workflow text is left out, so the total is lower. The session-start text is added when a session starts, and again after `/clear` or compaction.
+
+A session started from `frontend/` begins at about 10.4k tokens (1.04%). Claude Code still loads everything above, and adds `frontend/CLAUDE.md` (915) and the descriptions of the 14 frontend skills (1,788). The 14 include React Doctor, which [`/setup-gaia`](/getting-started/setup-gaia/#install-tools) installs on each machine; without it there are 13.
 
 Your own setup adds to this: MCP servers, plugins, and your global `~/.claude/CLAUDE.md` load in every project, with or without GAIA.
 
-## Only when needed
+## A typical task
 
-| What loads on demand | When it loads | Tokens |
-| --- | --- | --- |
-| Root rules for specific paths (9 files) | Claude works on a file a rule covers | Up to 10.1k |
-| Frontend rules (13 files) | Claude works on a file in `frontend/` that a rule covers | Up to 12.4k |
-| A skill's instructions | The skill is used | Varies by skill |
+Most rules apply only to certain paths, and load only when Claude works on a file they cover. A task that edits one component and one route loaded 13 of the 22 path-scoped rules:
 
-The rule figures are the most each set adds if every rule in it loads. A task usually loads only a few.
+| What the task loaded | Tokens |
+| --- | --- |
+| Root rules for specific paths (5 of 9) | 6,077 |
+| Frontend rules (8 of 13) | 5,746 |
+| Frontend skill descriptions (14) | 1,788 |
+| `frontend/CLAUDE.md` | 915 |
+| **Added by the task** | **14,526 (1.45%)** |
+
+With the startup load, the session held 22.2k tokens of GAIA (2.2%). If every path-scoped rule loaded, root rules would add up to 10.1k and frontend rules up to 12.4k.
+
+## Skills
+
+Until a skill is used, it costs only its description. When it is used, Claude reads its `SKILL.md`, and reads its extra files only if the task needs them.
+
+| Skill | Description | `SKILL.md` | Extra files | Most when used |
+| --- | --- | --- | --- | --- |
+| `new-component` | 142 | 1,434 | none | 1,434 (0.14%) |
+| `tdd` | 75 | 4,282 | 416 (3 files) | 4,698 (0.47%) |
+| `react-doctor` | 112 | 1,766 | 1,750 (1 file) | 3,516 (0.35%) |
+| `tdd-react` | 148 | 303 | 7,491 (1 file) | 7,794 (0.78%) |
+| `react-code` | 182 | 5,880 | 9,061 (4 files) | 14,941 (1.5%) |
+
+`react-doctor` is there only once it is installed on your machine.
+
+A description costs about 1% to 3% of the full skill.
+
+## Hooks
 
 [Hooks](/reference/hooks/) run outside the conversation. Most add nothing unless they block something, and then they add only the message they print. Two add text when you reach a point that needs it: the branch workflow text when you move onto a branch or worktree, and the checkpoint instructions when the context gets heavy (see [Context bands](/workflow/work-lifecycle/#context-bands)).
 
-## During long work
+## The audit
 
-- **The audit runs in a sub-agent.** The [audit loop](/workflow/code-audit-team/#the-audit-loop) runs its review rounds outside your main session, which holds only a short report per unit.
-- **Long work resumes from a small saved state.** When a session's context gets heavy, Claude saves its place and offers a continuation prompt, so you can clear and pick up where you left off. See [Resuming long work](/workflow/work-lifecycle/#resuming-long-work).
+The [audit loop](/workflow/code-audit-team/#the-audit-loop) runs its review rounds in sub-agents, outside your main session. Each sub-agent has its own context window, and your session gets back only a short report.
 
-To see what a piece of work cost in tokens, see [Cost and usage ledger](/reference/cost/).
+| Audit | Your session receives | Largest sub-agent context |
+| --- | --- | --- |
+| Light review only | about 450 (0.05%) | 80k |
+| One full round, a fix, and a light re-check | about 690 (0.07%) | 141k |
+| Two full rounds with fixes | about 840 (0.08%) | 167k |
+
+Your session receives about 1/200th of what the largest sub-agent holds.
+
+A [light review](/workflow/code-audit-team/#light-review) also keeps small changes cheap for the reviewers. On two one-line changes to the same file, the light review peaked at 10.2k tokens of context, and the full review at 113k.
+
+What an audit costs in billed tokens is a separate question from how much of your context it takes. See [Cost and usage ledger](/reference/cost/).
+
+## Long work
+
+When a session's context gets heavy, Claude saves its place and offers a continuation prompt, so you can clear and pick up where you left off from a small saved state. See [Resuming long work](/workflow/work-lifecycle/#resuming-long-work).
