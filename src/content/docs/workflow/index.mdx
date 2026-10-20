@@ -13,7 +13,7 @@ This page shows how GAIA's pieces fit together in normal use, so you know what t
 
 Working in GAIA is the same as working with any coding agent: you describe what you want, and it does the work. GAIA's rules, skills, and guardrails are in place from the start of every session, so they apply to every ordinary request. You never call them yourself.
 
-They take up little of Claude's context: about 7.7k tokens at session start, under 1% of a 1M-token window. Most [rules](/reference/rules/) load only when Claude works on the files they cover, and a [skill](/skills/) adds just its description until it is used. See [Token efficiency](/reference/token-efficiency/).
+They take up [little of Claude's context](/reference/token-efficiency/): about 7.7k tokens at session start, under 1% of a 1M-token window. Most [rules](/reference/rules/) load only when Claude works on the files they cover, and a [skill](/skills/) adds just its description until it is used.
 
 Ask for a component, a fix, a refactor:
 
