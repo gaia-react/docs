@@ -9,15 +9,15 @@ The wiki at `wiki/` exists for Claude, not for human reading (though Claude uses
 
 ## Why the wiki exists
 
-The wiki keeps a current, structured project context Claude can read on demand instead of re-inferring the same facts from source code on every request. That re-inference is a token sink the wiki eliminates.
+The wiki keeps an up-to-date, organized description of the project that Claude reads when it needs it, instead of working out the same facts from the source code on every request. Working them out again each time wastes tokens; the wiki saves them.
 
-Without it, every session that needs to reason about a service, a hook contract, or a past architectural decision pays for it twice: once when the source was written, and again when Claude reads the source to answer a question. The wiki captures the load-bearing facts once and stays current as commits land. Claude reads the wiki for orientation and goes to the source only when it needs more detail.
+Without it, every session that needs to reason about a service, a hook contract, or a past architectural decision pays for it twice: once when the source was written, and again when Claude reads the source to answer a question. The wiki records the important facts once and stays current as commits land. Claude reads the wiki for orientation and goes to the source only when it needs more detail.
 
 The wiki is an Obsidian vault, so you can open it in Obsidian if you want to. No plugin is required.
 
 ## When to use it
 
-The wiki does not update on its own. When it trails your code by 20 or more commits that matter to it, the statusline shows:
+The wiki does not update on its own. When it is 20 or more relevant commits behind your code, the statusline shows:
 
 ```
 🧠 /gaia-wiki (N commits)
@@ -41,22 +41,22 @@ It runs like every [maintenance command](/maintenance/#how-maintenance-commands-
 2. **Consolidate** finds redundancy and contradictions across wiki pages and asks you about each one.
 3. **Lint** checks the wiki's health and fixes what it finds.
 4. **One commit** with all three stages' edits, titled `wiki: <date> <time> UTC`.
-5. **One pull request** with that title, stamped out of audit scope and queued to auto-merge.
+5. **One pull request** with that title, marked as outside the code audit's scope and set to merge automatically.
 6. Claude **waits for the merge**, removes the worktree and branch, pulls the default branch, and clears the statusline nudge.
 
 When sync stops partway (a first run, a rewritten history it cannot recover from, an interruption), consolidate and lint are skipped, and whatever sync completed still lands. A cancelled run commits nothing.
 
 ## Sync
 
-Sync walks every commit between the wiki's last evaluated commit and `HEAD`, decides which ones matter to the wiki, and updates the affected pages. Commits that change nothing the wiki describes are skipped, and only commits that changed the wiki are logged. Service and hook changes land on the indexed pages under `wiki/modules/`.
+Sync goes through every commit since the last one the wiki checked, up to `HEAD`, decides which ones matter to the wiki, and updates the affected pages. Commits that change nothing the wiki describes are skipped, and only commits that led to a wiki change are logged. Changes to services and hooks are written to their pages under `wiki/modules/`.
 
-State lives in `wiki/.state.json`. When the wiki trails by more than 30 commits, sync asks first, and you can choose to sync only the most recent 20 and re-anchor. Which commits count can be tuned with `gaia.wikiClassify` in `package.json`.
+State lives in `wiki/.state.json`. When the wiki is more than 30 commits behind, sync asks first. You can choose to sync only the most recent 20 and treat everything older as done. Which commits count can be tuned with `gaia.wikiClassify` in `package.json`.
 
 ## Consolidate
 
-Consolidate runs on every chain. It looks for four kinds of finding, most impactful first:
+Consolidate runs every time. It looks for four kinds of finding, most important first:
 
-- **Supersession**: two pages in the same area cover the same subject, and the newer one should absorb the older.
+- **Supersession**: two pages in the same area cover the same subject, and the newer one should take in the older one.
 - **Reversed decisions**: a decision page whose body reverses an older decision page.
 - **Near-duplicate page names**: names that differ by a character or two, or where one starts the other.
 - **Subject-orphaned pages**: pages nothing links to, that match no concept or module page, and that have not changed in 90 days.
@@ -64,30 +64,30 @@ Consolidate runs on every chain. It looks for four kinds of finding, most impact
 Each finding is one question:
 
 - **Apply** (recommended): merge or retire the page. Links to an archived page are rewritten.
-- **Keep both**: mark it acknowledged on the canonical page, so it is not raised again.
+- **Keep both**: note on the main page that you have seen it, so it is not raised again.
 - **Skip**: leave it for the next run.
 
 The report overwrites one file each run, `wiki/meta/consolidate-report.md`.
 
 ## Lint
 
-Lint recomputes every check from scratch and overwrites one report, `wiki/meta/lint-report.md`:
+Lint runs every check from scratch and overwrites one report, `wiki/meta/lint-report.md`:
 
 | Check | Finds |
 |---|---|
 | #11 Wiki drift | How many commits the wiki trails `HEAD`. |
-| #12 Dead paths | Backticked repo paths in wiki prose that no longer exist. |
+| #12 Dead paths | Repository paths in backticks in wiki text that no longer exist. |
 | #13 Narrative ID drift | SPEC and UAT numbers in prose where they should not appear. |
 | #14 Orphan pages | Pages no other page links to. |
 | #15 Frontmatter gaps | Pages missing `type` or `status`. |
 | #16 Empty sections | Headings with no content before the next heading. |
 | #17 Broken wikilinks | Wikilinks that resolve to no page. |
 
-Lint then fixes what it found. Mechanical fixes (a missing frontmatter field, an index entry for an orphan, a dead path whose file was renamed) apply without asking. Fixes that need judgment ask you. Every finding ends fixed, filed, or explicitly left by you.
+Lint then fixes what it found. Simple fixes (a missing frontmatter field, an index entry for an orphan page, a path to a file that was renamed) apply without asking. Fixes that need judgment ask you. Every finding ends up fixed, filed as a `tech-debt` issue, or left alone because you chose to.
 
 ## The session-start janitor
 
-At every session start, a hook cleans up after earlier wiki runs: it deletes local wiki branches whose work is already upstream and, when it finds one, makes one bounded `git fetch` and fast-forwards your default branch if it is checked out and clean. A run that ended before its merge landed never leaves your default branch stale.
+At every session start, a hook cleans up after earlier wiki runs. It deletes local wiki branches whose work is already merged. When it finds one, it runs one `git fetch` with a time limit and fast-forwards your default branch if it is checked out and has no uncommitted changes. So a run that ended before its merge landed never leaves your default branch out of date.
 
 The fetch times out after `GAIA_WIKI_FETCH_TIMEOUT_SECONDS` (default 5). Set it to `0` to turn the fetch off. `GAIA_WIKI_FETCH_MINIMUM_INTERVAL_MINUTES` (default 60) limits how often it runs.
 

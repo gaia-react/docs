@@ -5,31 +5,31 @@ sidebar:
   order: 2
 ---
 
-`/gaia-release` cuts a new release of GAIA itself. It is invoked by **Steven only**. The command and the `gaia-maintainer` binary it drives are excluded from the release bundle by `.gaia/release-exclude`, so no project scaffolded from GAIA has them.
+`/gaia-release` cuts a new release of GAIA itself. Only **Steven** runs it. The command and the `gaia-maintainer` binary it drives are excluded from the release bundle by `.gaia/release-exclude`, so no project scaffolded from GAIA has them.
 
 ## Why contributors should know it exists
 
-Contributors who change CLI source, hooks, rules, or shipped wiki content land in trees a release will eventually package. The release validates those trees in three ways:
+If you change CLI source, hooks, rules, or shipped wiki content, a release will eventually package your change. The release checks it in three ways:
 
-- **Manifest regeneration.** `.gaia/manifest.json` assigns each file in the bundle a class (`owned`, `shared`, or `wiki-owned`). [`/update-gaia`](/maintenance/update-gaia/) reads it to decide which files to overwrite, three-way merge, or leave alone. A newly shipping file needs an explicit ship-or-withhold decision before the manifest is regenerated.
-- **Bundle-time scrub.** The release workflow stages a tree from `git ls-files`, subtracts `.gaia/release-exclude`, then strips `gaia:maintainer-only` blocks and runs leak checks. Any leak fails the build.
-- **Distribution test gate.** The release workflow runs the distribution harness against the staged tree before anything publishes.
+- **Manifest regeneration.** `.gaia/manifest.json` assigns each file in the bundle a class (`owned`, `shared`, or `wiki-owned`). [`/update-gaia`](/maintenance/update-gaia/) reads it to decide which files to overwrite, three-way merge, or leave alone. A file about to ship for the first time needs an explicit decision, ship or withhold, before the manifest is regenerated.
+- **Bundle-time scrub.** The release workflow builds a tree from `git ls-files`, removes the paths in `.gaia/release-exclude`, then removes `gaia:maintainer-only` blocks and checks for leaks. Any leak fails the build.
+- **Distribution test gate.** The release workflow runs the distribution tests against that tree before anything publishes.
 
-If a change touches surface the release validates, expect the next release to surface any drift.
+If your change touches any of these, expect the next release to catch anything out of step.
 
 ## What /gaia-release does
 
-The command runs on a clean default branch with a `patch`, `minor`, or `major` argument. At a behavioral level it:
+The command runs on a clean default branch with a `patch`, `minor`, or `major` argument. In outline, it:
 
 - bumps the version in `.gaia/VERSION`, `package.json`, and `frontend/package.json`;
 - graduates the CHANGELOG's `## [Unreleased]` section into a dated `## [X.Y.Z]` entry;
-- resets `wiki/log.md` to release-clean content, so projects scaffold from a clean slate;
+- resets `wiki/log.md`, so new projects start with a clean log;
 - regenerates `.gaia/manifest.json` and rebuilds the bundled CLIs;
 - commits on a `release/vX.Y.Z` branch and opens a pull request, which passes the same checks and the same [Code Audit Team](/workflow/code-audit-team/) audit as any other;
 - tags the merge commit once it lands, which triggers [release.yml](/contributors/ci/#releaseyml);
-- then brings `create-gaia`, the website, and these docs into lockstep with the release.
+- then brings `create-gaia`, the website, and these docs in line with the release.
 
-A 2.x release ships `gaia-bundle-<tag>.tar.gz` with a `.sha256` asset, and any migration notes it needs travel inside the bundle under `.gaia/migrations/` (see [Migration notes](/maintenance/update-gaia/#migration-notes)). While 1.x projects can still reach a 2.x release, the release body opens with the routing line that sends a 1.6.1 project to the 2.0.0 migration.
+A 2.x release ships `gaia-bundle-<tag>.tar.gz` with a `.sha256` asset, and any migration notes it needs travel inside the bundle under `.gaia/migrations/` (see [Migration notes](/maintenance/update-gaia/#migration-notes)). While 1.x projects can still reach a 2.x release, the release body opens with a line that sends a 1.6.1 project to the 2.0.0 migration.
 
 ## The two CLI binaries
 

@@ -1,19 +1,19 @@
 ---
 title: /gaia-plan
-description: Plan a feature using task orchestration. Produces a plan folder and a kickoff prompt for a fresh orchestrator session.
+description: Split a feature into phases of tasks that sub-agents build. Produces a plan folder and a kickoff prompt you paste into a fresh session.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-`/gaia-plan` breaks a complex feature into phases of parallel workstreams with frozen interface contracts. It does not implement anything. It writes a plan folder and hands you one prompt to paste into a fresh session, where an orchestrator executes the plan.
+`/gaia-plan` splits a complex feature into phases. Each phase holds tasks that can run at the same time, and the types and interfaces the tasks share (the contracts) are fixed up front so the tasks fit together. It does not write the code. It writes a plan folder and gives you one prompt to paste into a fresh session, where an orchestrator (the session that runs the plan) carries it out.
 
 ## When to use it
 
-Reach for `/gaia-plan` when the work spans several files or modules, has slices that can run in parallel (UI, service layer, tests), or benefits from giving each slice its own fresh sub-agent context.
+Reach for `/gaia-plan` when the work spans several files or modules, has parts that can be built at the same time (UI, service layer, tests), or would benefit from giving each part its own sub-agent with a fresh context.
 
-For one-line fixes or single-file edits, skip the ceremony and prompt Claude directly.
+For one-line fixes or single-file edits, skip the plan and prompt Claude directly.
 
-For a feature whose intent is not settled yet, run [`/gaia-spec`](/workflow/spec/) instead. It plans its SPEC in the same session, so you do not run `/gaia-plan` separately.
+For a feature whose goal is not settled yet, run [`/gaia-spec`](/workflow/spec/) instead. It plans its SPEC in the same session, so you do not run `/gaia-plan` separately.
 
 ## How to invoke
 
@@ -33,7 +33,7 @@ Non-interactive:
 /gaia-plan auto a feature description
 ```
 
-`auto` asks no questions: the planner runs on Opus, and decomposition-audit findings are applied or recorded in the plan's README. A description is required.
+`auto` asks no questions: the planner runs on Opus, and problems the plan audit finds are fixed or written down in the plan's README. A description is required.
 
 With no description at all, `/gaia-plan` asks for one.
 
@@ -48,20 +48,20 @@ Inside it:
 
 | File | Purpose |
 | --- | --- |
-| `README.md` | The task graph: phase order, which tasks run in parallel in each phase and on which model, the frozen interface contracts shared across tasks, and the source SPEC. |
-| `ORCHESTRATOR.md` | The runbook the orchestrator follows: isolation, phase order with quality gates, sub-agent prompt templates, the pre-merge audit, the git flow, and stop conditions. |
+| `README.md` | The overview: phase order, which tasks run at the same time in each phase and on which model, the fixed contracts the tasks share, and the source SPEC. |
+| `ORCHESTRATOR.md` | The step-by-step instructions the orchestrator follows: where the work runs, phase order with quality gates, prompts for each sub-agent, the audit before merge, the git steps, and when to stop. |
 | `KICKOFF.md` | The prompt a fresh session reads to start orchestrating. |
-| `task-<name>.md` | One per workstream, self-contained for a fresh sub-agent: contracts, files to touch, acceptance criteria, dependencies. |
+| `task-<name>.md` | One per task, with everything a fresh sub-agent needs: contracts, files to change, acceptance criteria, dependencies. |
 | `PROGRESS.md` | Written during execution: one entry per completed or halted phase. |
 
 ## The flow
 
-1. **Pre-flight.** The same housekeeping `/gaia-spec` runs, plus the offer to pull when your GAIA version lags.
-2. **Resolve the SPEC**, if one was named. A SPEC reference that resolves to nothing stops with an error rather than silently planning without it.
+1. **Before it starts.** The same housekeeping `/gaia-spec` runs, plus the offer to pull when your GAIA version is behind the remote.
+2. **Find the SPEC**, if you named one. If no SPEC matches, it stops with an error instead of quietly planning without it.
 3. **Pick the planner model.** On Opus or Fable the planner inherits your model. Otherwise Claude asks: Opus (recommended), Fable, or your current model. The planner runs at your session's effort, so a higher `/effort` drafts a deeper plan.
-4. **Plan.** A planner sub-agent writes the folder. A planner that runs heavy on context hands off to a fresh one.
-5. **Verify.** A deterministic check confirms every required file and step, and that every UAT the SPEC defines is routed to a task.
-6. **Decomposition audit.** On any non-trivial plan (parallel tasks, several phases, or a shared contract), parallel lenses audit the task graph and the contracts, plus SPEC coverage for a SPEC's plan, before a cold orchestrator builds against them. A trivial plan skips it.
+4. **Plan.** A planner sub-agent writes the folder. If the planner's context fills up, it hands off to a fresh one.
+5. **Verify.** A script checks that every required file and step is there, and that every UAT (acceptance test) in the SPEC is assigned to a task.
+6. **Plan audit.** On any plan with parallel tasks, several phases, or a shared contract, reviewers check how the work is split and the contracts, and for a SPEC's plan, that the plan covers the whole SPEC. This happens before an orchestrator with no memory of the planning builds from it. A simple plan skips this step.
 7. **Report.** A cost line (or, for a SPEC's plan, a box covering the spec and the plan), then the prompt:
 
    ```text
@@ -74,9 +74,9 @@ Inside it:
 
 The orchestrator runs in the fresh session:
 
-- **Isolation** follows your team's [isolation policy](/workflow/work-lifecycle/#3-isolate), worktrees by default. The branch is named `<type>/spec-<nnn>-<slug>` for a SPEC's plan or `<type>/plan-<nnn>-<slug>` otherwise, where `<type>` is the Conventional Commits type of the change. The PR Conventions check expects the pull request title's type to match.
-- **Each phase** dispatches its tasks to sub-agents, Sonnet by default. Sub-agents only edit files: they never commit, push, or run git that rewrites the shared working tree. The orchestrator commits each phase after the Quality Gate passes.
-- **A task that runs heavy** on context hands off to a fresh agent. When one task yields too often, the plan halts for you.
+- **Where it runs** follows your team's [isolation policy](/workflow/work-lifecycle/#3-isolate): a separate worktree by default. The branch is named `<type>/spec-<nnn>-<slug>` for a SPEC's plan or `<type>/plan-<nnn>-<slug>` otherwise, where `<type>` is the Conventional Commits type of the change. The PR Conventions check expects the pull request title's type to match.
+- **Each phase** hands its tasks to sub-agents, Sonnet by default. Sub-agents only edit files: they never commit, push, or run git commands that change the shared checkout. The orchestrator commits each phase after the Quality Gate passes.
+- **A task whose context fills up** hands off to a fresh agent. When one task has to hand off too often, the plan stops and asks you.
 - **The pull request** opens as a draft and goes through the [Code Audit Team](/workflow/code-audit-team/) before it merges.
 
 ### Resuming a plan
@@ -91,14 +91,14 @@ A plan generated before a GAIA update keeps the steps it was generated with unti
 
 ### UAT specs
 
-For a plan from a SPEC, each browser-flow UAT is rendered into a Playwright spec under `frontend/.playwright/e2e/` **before Phase 1**, committed on its own and marked as expected to fail (`test.fail()`). Each one must pass before the phase that owns it can commit. Executors are told not to rewrite a rendered spec's assertions to make it pass, since the spec is the SPEC's contract.
+For a plan from a SPEC, each browser UAT is turned into a Playwright test under `frontend/.playwright/e2e/` **before Phase 1**. It is committed on its own and marked as expected to fail (`test.fail()`). The phase responsible for a test cannot commit until that test passes. Sub-agents are told not to change a test's assertions to make it pass, because the test is what the SPEC promised.
 
-Before the audit, the orchestrator checks that every rendered spec still asserts its contract (an `uat-fidelity-judge` agent reads each one). When the implementation and a UAT logically diverge, the plan halts so the SPEC can be reopened, instead of quietly changing what was agreed.
+Before the audit, the orchestrator checks that every one of these tests still tests what the SPEC says (an `uat-fidelity-judge` agent reads each one). When the code and a UAT no longer agree, the plan stops so the SPEC can be reopened, instead of quietly changing what was agreed.
 
-The SPEC is closed around the merge of its implementation.
+The SPEC is closed out after its implementation merges.
 
 <Aside type="note">
-A 1.x plan branch named `plan/spec-<nnn>-...` or `spec-<nnn>-...` is legacy. GAIA no longer creates those names. See [Upgrading from 1.x](/getting-started/upgrading/#every-other-machine) to rename an unmerged one.
+A 1.x plan branch named `plan/spec-<nnn>-...` or `spec-<nnn>-...` uses the old naming. GAIA no longer creates those names. See [Upgrading from 1.x](/getting-started/upgrading/#every-other-machine) to rename an unmerged one.
 </Aside>
 
 Source: `.claude/skills/gaia/references/plan.md`.

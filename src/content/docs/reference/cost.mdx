@@ -1,17 +1,17 @@
 ---
 title: Cost and usage ledger
-description: How GAIA records every model call to a local ledger and prints what each pull request, command, and initiative cost.
+description: How GAIA records every model call in a local file and shows what each pull request, command, and piece of work cost.
 sidebar:
   order: 6
 ---
 
-GAIA records every model call to a local usage ledger and prints what work cost, in one shape: tokens, dollars, and elapsed time.
+GAIA records every model call in a local usage ledger (a log file) and shows what your work cost, always in the same form: tokens, dollars, and time taken.
 
-The ledger is `.gaia/local/telemetry/usage.jsonl`, at the main checkout, shared by every worktree. It stays on your machine and is never sent anywhere. Pricing makes no network request.
+The ledger is `.gaia/local/telemetry/usage.jsonl` in the main checkout, and every worktree writes to the same file. It stays on your machine and is never sent anywhere. Working out the price does not use the network either.
 
 ## What you see
 
-One spend prints as one line:
+A single cost prints as one line:
 
 ```text
 Cost: 5.2M tokens, $3.41, 6m39s
@@ -30,21 +30,21 @@ SPEC-NNN Cost
 +---------------------------------------+
 ```
 
-Each row is rounded to the 0.1M tokens and the cent it shows, and the Total adds the rounded rows, so the column always sums.
+Each row is rounded to 0.1M tokens and to the cent, and the Total adds up the rounded rows, so the numbers in the box always add up.
 
 ### Where it prints
 
-- **Every `gh pr merge`** prints a `PR #<N> Cost` box with **Execute**, **Audit**, and **Total** rows: the work on the branch, and what the Code Audit Team spent reviewing it. When only one of the two spent anything, it prints a single Cost line.
-- **`/gaia-spec` and `/gaia-plan`** end with one labelled box: **Spec**, **Plan**, **Execute**, and **Total** rows, or one line when only one row has spend. A plan's orchestrator prints the full-cycle cost when the work merges.
+- **Every `gh pr merge`** prints a `PR #<N> Cost` box with **Execute**, **Audit**, and **Total** rows: the work on the branch, and what the Code Audit Team spent reviewing it. When only one of the two cost anything, it prints a single Cost line.
+- **`/gaia-spec` and `/gaia-plan`** end with one labelled box: **Spec**, **Plan**, **Execute**, and **Total** rows, or one line when only one row has a cost. When a plan's work merges, the plan prints the cost of the whole thing, from SPEC to merge.
 - **Every other workflow** (the maintenance commands, `/gaia-debt`, `/gaia-residue`) ends with a Cost line.
 
 ### Notes under the figures
 
-A `Note:` line under the figures says when a figure needs qualifying:
+A `Note:` line under the figures tells you when a figure is not the full picture:
 
-- usage was still being saved when it was read, so the figures may be low (the note names the command that reads the final numbers);
+- usage was still being saved when it was read, so the figures may be low (the note names the command that shows the final numbers);
 - a model has no price, so the cost is a minimum, and that row reads `at least $X.XX`;
-- a recovered run counts one session only.
+- a run recovered after an interruption counts only one session.
 
 When nothing can be priced, the price reads `cost unavailable`. A figure is never made up.
 
@@ -54,26 +54,26 @@ When nothing can be priced, the price reads `cost unavailable`. A figure is neve
 bash .gaia/scripts/usage.sh initiative <ref>
 ```
 
-Totals an initiative from its first research to its merge, including runs continued after `/clear`. `<ref>` is a SPEC (`SPEC-012`), a plan (`PLAN-004`), an issue (`issue:142`), or a research folder (`research:<date>-<topic>`). Add `--line` for one line or `--box` for the box. `bash .gaia/scripts/usage.sh` lists its other subcommands.
+Adds up the cost of one piece of work (an initiative) from its first research to its merge, including runs continued after `/clear`. `<ref>` is a SPEC (`SPEC-012`), a plan (`PLAN-004`), an issue (`issue:142`), or a research folder (`research:<date>-<topic>`). Add `--line` for one line or `--box` for the box. Run `bash .gaia/scripts/usage.sh` on its own to see its other subcommands.
 
-A branch's spend is tied to its initiative automatically when the branch name carries it (`debt/142-...`, `fix/142-...`, a SPEC's plan branch). Otherwise link it once:
+A branch's cost is counted toward its initiative automatically when the branch name includes it (`debt/142-...`, `fix/142-...`, a SPEC's plan branch). Otherwise link it once:
 
 ```bash
 bash .gaia/scripts/usage.sh link branch:<branch> research:<date>-<topic>
 ```
 
-When a long run is cleared and resumed, the continuation prompt carries a join line that binds the new session to the same run, so its cost record covers every session.
+When you clear and resume a long run, the continuation prompt includes a line that connects the new session to the same run, so the cost covers every session.
 
-Spend from before the ledger's first record is never captured.
+Costs from before the ledger's first entry are not recorded.
 
 ## Prices
 
-Pricing uses the rate table that ships with GAIA, `.gaia/scripts/token-rates.json`, which covers current Claude models and reaches you through `/update-gaia`. Prices are applied when a figure is read, never stored, so a corrected rate moves every past figure on the next read.
+Prices come from the rate table that ships with GAIA, `.gaia/scripts/token-rates.json`, which covers current Claude models. New versions arrive through `/update-gaia`. Prices are applied each time figures are shown, not stored, so a corrected rate changes every past figure the next time you look.
 
-To set your own prices, or price a model the table lacks, write `.gaia/local/telemetry/token-rates.override.json`:
+To set your own prices, or add a model the table does not have, create `.gaia/local/telemetry/token-rates.override.json`:
 
 ```json
 { "models": { "claude-opus-5-5": [ { "input": 4, "output": 20 } ] } }
 ```
 
-Prices are dollars per million input and output tokens. Each model you list replaces that model's shipped rates; models you omit keep theirs. An override that does not parse is ignored, and every readout says so once. GAIA never writes or deletes this file.
+Prices are dollars per million input and output tokens. Each model you list replaces that model's shipped rates; models you leave out keep theirs. If the file is not valid JSON it is ignored, and each cost readout says so once. GAIA never writes or deletes this file.

@@ -1,35 +1,35 @@
 ---
 title: Scaffolders
-description: Skills that scaffold new components, hooks, routes, and services from project templates.
+description: Skills that generate new components, hooks, routes, and services from project templates.
 sidebar:
   order: 2
 ---
 
-These skills generate new files in the React app following the project's conventions. They wrap the bundled `gaia scaffold` CLI, so you do not memorize flags: describe what you want and the skill asks for anything missing. Each one runs the CLI from the repository root (`./.gaia/cli/gaia scaffold ...`) and writes into the `frontend/` package. Paths below are relative to `frontend/`.
+These skills create new files in the React app that follow the project's conventions. They run GAIA's bundled `gaia scaffold` command for you, so you don't need to remember its flags: describe what you want, and the skill asks for anything missing. Each one runs the command from the repository root (`./.gaia/cli/gaia scaffold ...`) and writes into the `frontend/` package. Paths below are relative to `frontend/`.
 
-Files and folders under `app/components`, `app/pages`, and `app/hooks` are kebab-case, and `@gaia-react/lint` enforces it.
+Files and folders under `app/components`, `app/pages`, and `app/hooks` are kebab-case (lowercase words joined by hyphens, like `price-card`), and `@gaia-react/lint` enforces it.
 
 ## New Component
 
-First checks whether the shadcn/ui registry already provides the component (a dialog, tabs, a popover). If it does, it runs `pnpm shadcn add <name>`, which vendors the file flat into `app/components/ui/<name>.tsx`; GAIA never edits those files. Otherwise it scaffolds a component folder: `app/components/<name>/index.tsx` and `tests/index.stories.tsx`, a story with a play function that is the component's test. There is no separate test file.
+It first checks whether shadcn/ui already offers the component (a dialog, tabs, a popover). If it does, it runs `pnpm shadcn add <name>`, which copies the component's source into your project as a single file, `app/components/ui/<name>.tsx`; GAIA never edits those files. Otherwise it creates a component folder: `app/components/<name>/index.tsx` and `tests/index.stories.tsx`, a story whose play function is the component's test. There is no separate test file.
 
-**Confirms:** name (kebab-case or PascalCase; the folder is the kebab form), parent folder (default `app/components/`), and props.
+**Confirms:** name (kebab-case or PascalCase; the folder uses the kebab-case form), parent folder (default `app/components/`), and props.
 
 **Triggers** when you ask to create a component, scaffold a card, make a button, or add a new component.
 
 **Example phrasing:** "create a price-card component", "scaffold a user-avatar with a name and url prop".
 
-Underlying CLI: `gaia scaffold component <name> [--parent <dir>] [--props "a:string,b:number"] [--json]`. `--props` takes comma-separated `name:type` pairs; types with commas inside them (`Record<string, unknown>`, tuples, function types) work. `app/components/ui` is refused as a parent.
+Underlying CLI: `gaia scaffold component <name> [--parent <dir>] [--props "a:string,b:number"] [--json]`. `--props` takes comma-separated `name:type` pairs, and types that contain commas (`Record<string, unknown>`, tuples, function types) work too. `app/components/ui` is refused as a parent.
 
 Source: `frontend/.claude/skills/new-component/SKILL.md`.
 
 ## New Hook
 
-Scaffolds a custom React hook, `app/hooks/use-<name>.ts` (named export `useName`), with a `vitest-browser-react` test at `app/hooks/tests/use-<name>.test.ts`.
+Creates a custom React hook, `app/hooks/use-<name>.ts` (named export `useName`), with a `vitest-browser-react` test at `app/hooks/tests/use-<name>.test.ts`.
 
-**Confirms:** name (`use-kebab` or `useCamel`), params, and return type.
+**Confirms:** name (`use-kebab` or `useCamel`), parameters, and return type.
 
-**Triggers** when you ask to create a hook, make a `useFoo` hook, or describe reusable state or effect logic worth extracting.
+**Triggers** when you ask to create a hook, make a `useFoo` hook, or describe state or effect logic you want to reuse.
 
 **Example phrasing:** "make a useCountdown hook", "extract this into a useFormSubmission hook".
 
@@ -39,17 +39,17 @@ Source: `frontend/.claude/skills/new-hook/SKILL.md`.
 
 ## New Route
 
-Scaffolds a route file, `app/routes/<group>.<name>.tsx` (flat `@react-router/fs-routes` naming), and its page, `app/pages/<name>/page.tsx` with `tests/page.stories.tsx`. The story is the page's test. The route file stays a thin shell (`loader`, `action`, `meta`, one-line default export); the UI lives in the page.
+Creates a route file, `app/routes/<group>.<name>.tsx` (named with the flat file convention of `@react-router/fs-routes`), and its page, `app/pages/<name>/page.tsx`, with `tests/page.stories.tsx`. The story is the page's test. The route file stays small (`loader`, `action`, `meta`, and a one-line default export); the UI lives in the page.
 
-With a service bound, it writes the whole data path for one of three data variants:
+When you connect it to a service, it writes everything from loading the data to showing it on the page, in one of three ways:
 
 | `--data` | What it writes |
 |---|---|
 | `server` | a server `loader` the page reads with `useLoaderData` |
 | `client` | a `clientLoader` and a `HydrateFallback` |
-| `query` | a `clientLoader` that primes the TanStack Query cache, and a page that reads `useSuspenseQuery` (needs Query installed) |
+| `query` | a `clientLoader` that loads the data into the TanStack Query cache, and a page that reads it with `useSuspenseQuery` (needs Query installed) |
 
-`--shape list` writes `<group>.<name>.tsx`; `--shape detail` writes `<group>.<name>_.$id.tsx`. The page story is driven by MSW.
+`--shape list` writes `<group>.<name>.tsx`; `--shape detail` writes `<group>.<name>_.$id.tsx`. The page story gets its data from MSW mocks.
 
 **Confirms:** name (kebab-case), group (`_public` or `_session`), and the data, action, and i18n options.
 
@@ -59,22 +59,22 @@ With a service bound, it writes the whole data path for one of three data varian
 
 Underlying CLI: `gaia scaffold route <name> --group <_public|_session> [--data <server|client|query> --service <name> --shape <list|detail>] [--layer <folder>] [--loader] [--action] [--i18n] [--dry-run] [--json]`.
 
-`--dry-run` prints the files it would write without touching disk. `--loader` (a title and meta loader) cannot be combined with `--data`. With `--action` and `--data`, it writes a create (list) or update (detail) action validated by the service's input schema. With `--i18n`, the locale file is wired into the locale barrel; if the barrel is missing, the command stops with an actionable error.
+`--dry-run` prints the files it would write without writing them. `--loader` (a loader for the page title and meta tags) cannot be combined with `--data`. With `--action` and `--data`, it writes a create action (list) or an update action (detail), validated by the service's input schema. With `--i18n`, it adds the locale file to the locale barrel (the index file that re-exports the locale files); if the barrel is missing, the command stops with an error that says how to fix it.
 
 Source: `frontend/.claude/skills/new-route/SKILL.md`.
 
 ## New Service
 
-Scaffolds an API service in the domain-layer folder under `app/services/`: request functions built on Ky with Zod-validated responses, schemas, URL constants, and types, with optional MSW mock handlers under `test/mocks/<name>/`. When `@tanstack/react-query` is installed and the service has a `get`, it also writes `queries.ts` with query keys and `queryOptions` factories.
+Creates an API service in your API's folder under `app/services/` (shipped as `gaia/`, often renamed to the company or API name). It writes request functions built on Ky that check responses against Zod schemas, plus the schemas, URL constants, and types, and optionally MSW mock handlers under `test/mocks/<name>/`. When `@tanstack/react-query` is installed and the service has a `get`, it also writes `queries.ts` with query keys and `queryOptions` factories.
 
-**Confirms:** name (kebab-case), endpoints (a subset of `get`, `post`, `put`, `delete`), the schema as `name:type` pairs, and whether to include mocks.
+**Confirms:** name (kebab-case), endpoints (any of `get`, `post`, `put`, `delete`), the schema as `name:type` pairs, and whether to include mocks.
 
-**Triggers** when you ask to add a service, create the API for a resource, or wire up CRUD for a resource.
+**Triggers** when you ask to add a service, create the API for a resource, or wire up CRUD (create, read, update, delete) for a resource.
 
 **Example phrasing:** "add a projects service with get and post", "wire up CRUD for tasks with mocks".
 
-Underlying CLI: `gaia scaffold service <name> --endpoints "get,post,put,delete" --schema "id:string,name:string,status:enum(active,archived)" [--layer <folder>] [--mocks] [--json]`. Schema types are `string`, `number`, `boolean`, `datetime`, and `enum(a,b,...)`; append `?` to make a field optional. `--queries-only` adds `queries.ts` to an existing service.
+Underlying CLI: `gaia scaffold service <name> --endpoints "get,post,put,delete" --schema "id:string,name:string,status:enum(active,archived)" [--layer <folder>] [--mocks] [--json]`. Schema types are `string`, `number`, `boolean`, `datetime`, and `enum(a,b,...)`; add `?` to make a field optional. `--queries-only` adds `queries.ts` to an existing service.
 
-The skill stops short of wiring the service into a page or hook, so you decide where it belongs. [New Route](#new-route) with `--data` does that wiring for a route.
+The skill does not connect the service to a page or hook, so you decide where it belongs. [New Route](#new-route) with `--data` does that connection for a route.
 
 Source: `frontend/.claude/skills/new-service/SKILL.md`.

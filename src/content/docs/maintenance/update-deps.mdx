@@ -5,9 +5,9 @@ description: Resolve security advisories and update outdated packages through on
 
 import { Aside } from '@astrojs/starlight/components';
 
-`/update-deps` keeps your dependencies current and your security advisories resolved, in place of Dependabot's version and security pull requests. Advisories come first, each fixed the least invasive way. Then outdated packages, previewed by group so you can snooze what you are not ready for. Everything passes one quality gate, in its own worktree, and lands as one `chore(deps)` pull request that merges once checks are green.
+`/update-deps` keeps your dependencies current and your security advisories resolved, in place of Dependabot's version and security pull requests. Advisories come first, each fixed with the smallest change that works. Then come outdated packages, shown by group so you can snooze (put off) what you are not ready for. Everything passes one quality gate, in its own worktree, and lands as one `chore(deps)` pull request that merges once checks are green.
 
-It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, in a worktree of its own cut from the default branch, whichever branch your checkout holds. Run by [`/gaia-init`](/getting-started/gaia-init/), it asks nothing and leaves its changes for the init commit instead.
+It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, in a worktree of its own cut from the default branch, whichever branch your checkout holds. When [`/gaia-init`](/getting-started/gaia-init/) runs it, it asks no questions and leaves its changes for the init commit instead.
 
 ## When to use it
 
@@ -31,7 +31,7 @@ Only the security advisories, plus the major bumps they need. Every other outdat
 /update-deps --scope react-router
 ```
 
-One companion group, with no preview. The security phase only reports here.
+One companion group (packages that update together, see below), with no preview. Security advisories are only reported in this mode, not fixed.
 
 `--security` and `--scope` cannot be combined.
 
@@ -39,18 +39,18 @@ One companion group, with no preview. The security phase only reports here.
 
 `/update-deps` reads open advisories from `pnpm audit` and from Dependabot alerts when it can read them. Dependabot alerts are read as data only: advisory text is never pasted into a command, file, question, or comment.
 
-Advisories appear first in the preview, ranked, each with its proposed resolution. The resolutions, least invasive first:
+Advisories appear first in the preview, most serious first, each with its proposed fix. The fixes, smallest change first:
 
-1. **In-range refresh**: the fixed version is already inside your allowed range, so a lockfile refresh picks it up.
-2. **Chain-head bump**: the package at the head of the dependency chain moves to a version that pulls in the fix. A major chain-head bump is asked first and runs with its migration.
-3. **Security-floor override**: an `overrides:` entry in `pnpm-workspace.yaml` forces a patched version of the vulnerable sub-dependency.
+1. **In-range refresh**: the fixed version already fits the version range you allow, so refreshing the lockfile picks it up.
+2. **Chain-head bump**: the package you depend on directly, which pulls in the vulnerable one, moves to a version that includes the fix. When that is a major version bump, Claude asks first and applies its migration.
+3. **Security-floor override**: an `overrides:` entry in `pnpm-workspace.yaml` forces a patched version of the vulnerable package deeper in the dependency tree.
 4. **Alert dismissal**: when no fix exists, or you decide to live with it, Claude asks once per advisory whether to dismiss the Dependabot alert, naming every alert, the reason (`tolerable_risk` or `not_used`), and the comment it will post. Nothing is dismissed without your yes.
 
-A resolution that fails the quality gate is reverted, and the advisory is reported still open with the reason.
+If a fix fails the quality gate, it is undone, and the advisory is reported as still open, with the reason.
 
 ## Preview and decision
 
-Updates are grouped into **Security**, **Major**, **Non-semver**, **Minor**, and **Patch**. A companion group shows as one block and updates as one unit. The groups include react-router, react, tailwindcss, shadcn, storybook, vitest, playwright, i18next, msw, vite, zod-conform, stylelint, prettier, and eslint. Packages outside a group update on their own, and `typescript` is deliberately its own group.
+Updates are grouped into **Security**, **Major**, **Non-semver**, **Minor**, and **Patch**. Packages that must move together (a companion group) show as one block and update together. The groups include react-router, react, tailwindcss, shadcn, storybook, vitest, playwright, i18next, msw, vite, zod-conform, stylelint, prettier, and eslint. Packages outside a group update on their own, and `typescript` is deliberately its own group.
 
 You choose:
 
@@ -63,15 +63,15 @@ A snooze is local to your machine (`.gaia/local/declined-updates.json`) and laps
 
 ## What runs
 
-1. **Override audit.** Every `overrides:` entry is tested: it is removed only when removing it causes no peer-dependency error **and** no new advisory, so a security floor is never dropped by accident.
-2. **Minor and patch updates** (Wave A).
-3. **Major updates**, one group at a time (Wave B), each with its migration. If the gate fails after one remediation pass, that group is reverted and reported as skipped.
-4. **Sub-dependencies** refresh to the newest versions their parents allow, skipping releases too new to trust. Reverted as a whole if the gate fails.
-5. **Security resolutions**, then the override audit again.
+1. **Override check.** Each `overrides:` entry is tested by removing it. It stays removed only when that causes no peer-dependency error **and** no new advisory, so an override that blocks a vulnerable version is never dropped by accident.
+2. **Minor and patch updates.**
+3. **Major updates**, one group at a time, each with its migration. If the quality gate still fails after one attempt to fix it, that group is undone and reported as skipped.
+4. **Sub-dependencies** (the packages your packages depend on) refresh to the newest versions their parents allow, skipping releases too new to trust. If the quality gate fails, this whole step is undone.
+5. **Security fixes**, then the override check again.
 6. **Quality gate**: `pnpm typecheck`, `pnpm lint`, `pnpm test --run`, `pnpm pw`, and `pnpm build`.
 7. **Publish**: one commit, `chore(deps): ...` (`chore(deps-dev):` when only devDependencies moved), a draft pull request, merged once checks are green, then local cleanup.
 
-A pull request that changes only dependency manifests clears the audit gate through its `chore(deps)` bypass; one that also carries a migration edit gets the full [Code Audit Team](/workflow/code-audit-team/) audit.
+A `chore(deps)` pull request that changes only dependency files (such as `package.json` and the lockfile) skips the full audit. One that also changes code for a migration gets the full [Code Audit Team](/workflow/code-audit-team/) audit.
 
 It also reports when the global `playwright-cli` binary is behind.
 
@@ -81,7 +81,7 @@ pnpm refuses to install a release younger than 3 days (`minimumReleaseAge` in `p
 
 ## Version holds
 
-To cap a package below its latest release, add a `gaia.updateDepsHold` map to the root `package.json`. It maps a package name to a version-prefix ceiling:
+To keep a package below its latest release, add a `gaia.updateDepsHold` map to the root `package.json`. Each entry maps a package name to the highest version it may move to, written as a version prefix:
 
 ```json
 {
@@ -97,7 +97,7 @@ To cap a package below its latest release, add a `gaia.updateDepsHold` map to th
 - `"8.0.16"` freezes it at exactly that version.
 - `"8"` holds it at the highest `8.x`.
 
-A hold is committed and never lapses until you remove it. A hold caps only the package it names; hold a coupled sibling too when its peer range demands more. Held packages are listed above the preview:
+A hold is committed and stays until you remove it. It limits only the package it names. If a related package needs a newer version of the held one (through its peer dependency range), hold that package too. Held packages are listed above the preview:
 
 ```
 Held by config (not offered): vite (current 8.0.16, ceiling 8.0)
@@ -107,7 +107,7 @@ Held by config (not offered): vite (current 8.0.16, ceiling 8.0)
 
 The project is a pnpm workspace with one lockfile at the root. App dependencies are in `frontend/package.json` (add one with `pnpm -C frontend add <pkg>`); harness dependencies and `gaia.updateDepsHold` are in the root `package.json`. `overrides:` and `minimumReleaseAge` are in the root `pnpm-workspace.yaml`.
 
-After any change to `msw`, `pnpm -C frontend msw:init` regenerates `frontend/public/mockServiceWorker.js`; a test fails when it drifts from the installed msw.
+After any change to `msw`, `pnpm -C frontend msw:init` regenerates `frontend/public/mockServiceWorker.js`; a test fails when that file no longer matches the installed msw.
 
 <Aside type="note">
 [`/setup-gaia`](/getting-started/setup-gaia/) leaves Dependabot alerts on and turns Dependabot's own security pull requests off, so `/update-deps` is the one source of dependency pull requests. If your repository has a Dependabot npm entry or a Renovate config, remove the overlap, or both open duplicate pull requests.

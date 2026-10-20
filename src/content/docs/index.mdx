@@ -5,7 +5,7 @@ description: Scaffold a new GAIA project with npx create-gaia.
 
 import { Aside } from '@astrojs/starlight/components';
 
-One command scaffolds the GAIA React framework and automatically launches Claude Code for the rest of setup.
+One command creates a new GAIA React project, then launches Claude Code to finish setup.
 
 ## Prerequisites
 
@@ -19,13 +19,13 @@ One command scaffolds the GAIA React framework and automatically launches Claude
 
 ## New GAIA project
 
-For greenfield projects, run this command in the terminal:
+To start a new project, run this in the terminal:
 
 ```bash
 npx create-gaia@latest my-app
 ```
 
-`my-app` becomes the project directory. It must be empty or not yet exist; the scaffolder won't write into a non-empty directory.
+`my-app` becomes the project directory. It must be empty or not exist yet. `create-gaia` won't write into a folder that already has files in it.
 
 1. Downloads the latest GAIA release bundle and extracts it
 2. Runs `git init` and creates a single `chore: scaffold from GAIA <version>` commit
@@ -38,16 +38,16 @@ The project is a pnpm workspace: the shared Claude setup at the root, and the Re
 
 ### Permissions on the first run
 
-When you scaffold a project, `npx create-gaia` launches Claude Code once with `--dangerously-skip-permissions` and runs `/gaia-init`. That single run rewrites files, registers tools, and wires the project end to end. The flag lets it finish without stopping to ask permission at every step.
+When you scaffold a project, `npx create-gaia` launches Claude Code once with `--dangerously-skip-permissions` and runs `/gaia-init`. That one run rewrites files, registers tools, and sets up the whole project. The flag lets it finish without stopping to ask your permission at every step.
 
 That flag applies to the setup run only. Nothing stores it. When `/gaia-init` finishes, it tells you to exit Claude and relaunch, because the new skills and plugins load only in a fresh session. How you relaunch is your call: plain `claude` if you'd rather approve actions as they happen, or `claude --dangerously-skip-permissions` if you don't want to be interrupted.
 
-Either way, GAIA's guardrails stay on. They run as hooks on every tool call, not as permission prompts, so skipping the prompts doesn't disable them. Every scaffolded project ships hooks that block actions like:
+Either way, GAIA's guardrails stay on. They are hooks that check every action Claude takes, not permission prompts, so skipping the prompts doesn't turn them off. Every new project comes with hooks that block actions like:
 
 - committing or pushing directly to `main`, or force-pushing it
 - `rm -rf` on dangerous targets (`/`, `~`, `.git`, `.claude`, `node_modules`, the repo root)
 - reading `.env` files, keys, and credentials, or writing secrets into the repo
-- committing with `--no-verify` to skip the native pre-commit hook's typecheck, lint, and test floor
+- committing with `--no-verify`, which would skip the typecheck, lint, and tests the pre-commit hook runs
 - opening a pull request that is not a draft, or whose title is not a Conventional Commit
 - merging a pull request the [Code Audit Team](/workflow/code-audit-team/) has not cleared
 
@@ -55,7 +55,7 @@ These hold whether or not you pass the flag. See the [hooks reference](/referenc
 
 ## Cloning an existing GAIA project
 
-For existing projects (for example, created by a teammate), after you clone the repo:
+For a project that already exists (for example, one a teammate created), clone the repo, then:
 
 1. Run `claude --dangerously-skip-permissions`
 2. Run `/setup-gaia` in Claude Code
@@ -63,7 +63,7 @@ For existing projects (for example, created by a teammate), after you clone the 
 Follow along with the `/setup-gaia` [walkthrough](/getting-started/setup-gaia/).
 
 <Aside type="note">
-You can leave out `--dangerously-skip-permissions`. It adds friction to setup, but the choice is yours.
+You can leave out `--dangerously-skip-permissions`. Setup then stops to ask your permission more often, but the choice is yours.
 </Aside>
 
 ## Upgrading a 1.x project
@@ -72,7 +72,7 @@ A GAIA 1.6.1 project moves to 2.0.0 through a migration Claude runs in your sess
 
 ## Pinning to a specific version
 
-Useful when you want a specific version of GAIA.
+To install a specific version of GAIA instead of the latest:
 
 ```bash
 npx create-gaia@latest my-app --version v2.0.0

@@ -1,73 +1,73 @@
 ---
 title: Agents
-description: Reference for the sub-agents GAIA ships, what dispatches each one, and what it is allowed to do.
+description: Reference for the sub-agents GAIA ships, what starts each one, and what it is allowed to do.
 sidebar:
   order: 3
 ---
 
-GAIA ships seven sub-agents in `.claude/agents/`. None is invoked directly: each is dispatched by a workflow at the point it needs one. Each pins a model and runs at `medium` effort whatever your session's `/effort`, unless `CLAUDE_CODE_EFFORT_LEVEL` is set; the pinned effort needs Claude Code 2.1.292 or later.
+GAIA ships seven sub-agents in `.claude/agents/`. You never start one yourself: a workflow starts each one when it needs it. Each agent uses a fixed model and runs at `medium` effort whatever your session's `/effort` is, unless `CLAUDE_CODE_EFFORT_LEVEL` is set. The fixed effort needs Claude Code 2.1.292 or later.
 
-| Agent | Model | Dispatched by | Edits files? |
+| Agent | Model | Started by | Edits files? |
 |---|---|---|---|
 | [`code-audit-frontend`](#code-audit-frontend) | Opus | the audit loop | No |
 | [`code-audit-github-workflows`](#code-audit-github-workflows) | Opus | the audit loop | No |
 | [`audit-loop-unit`](#audit-loop-unit) | Opus | the merge workflow | Commits fix rounds |
-| [`audit-light-reviewer`](#audit-light-reviewer) | Sonnet | the audit loop, on a light route | No (read-only) |
+| [`audit-light-reviewer`](#audit-light-reviewer) | Sonnet | the audit loop, for a light review | No (read-only) |
 | [`worthiness-evaluator`](#worthiness-evaluator) | Opus | the `tdd` skill | No |
 | [`uat-fidelity-judge`](#uat-fidelity-judge) | Opus | a SPEC plan's orchestrator | Writes its verdict file only |
 | [`fitness-judge`](#fitness-judge) | Sonnet | `/gaia-fitness` | No (read-only) |
 
 ## The Code Audit Team
 
-The pre-merge audit is a team: each member owns the files its globs claim in `.gaia/audit-ci.yml`, and a pull request is reviewed by every member whose files it touches. Members only report; a separate fixer repairs, and a deterministic verifier checks each repair. Every finding is graded Critical, Major, or Minor. See [Code Audit Team](/workflow/code-audit-team/) for the roster, clearances, and the loop.
+The audit before each merge is done by a team. Each member is responsible for the files that match its patterns in `.gaia/audit-ci.yml`, and a pull request is reviewed by every member whose files it changes. Members only report problems. A separate fixer makes the repairs, and a scripted check confirms each repair. Every finding is graded Critical, Major, or Minor. See [Code Audit Team](/workflow/code-audit-team/) for the member list, approvals, and the loop.
 
 ### code-audit-frontend
 
-The default member. Owns the app and its tooling: `frontend/app/**`, tests, Storybook and Playwright trees, manifests, build and lint configs, root tooling such as `.npmrc`, and `frontend/.claude/**`. It reviews what lint and types cannot: security (a critical priority), performance, architectural fit, robustness and edge cases, accessibility, and maintainability. It also flags quadratic lookups split across a component or function boundary.
+The default member. Responsible for the app and its tooling: `frontend/app/**`, tests, Storybook and Playwright trees, manifests, build and lint configs, root tooling such as `.npmrc`, and `frontend/.claude/**`. It reviews what lint and types cannot: security (a top priority), performance, how well the code fits the architecture, robustness and edge cases, accessibility, and maintainability. It also flags slow nested lookups (one loop inside another) that are split across two components or functions, where they are easy to miss.
 
-Three specialist sub-agents review React patterns and accessibility, TypeScript and architecture, and translations. Library-specific rules load from `frontend/.claude/agents/code-audit-frontend/`: `cn`, Conform, the form components, React buckets, react-i18next, and shadcn. React Doctor, Knip, and dependency advisories feed it too, as advisory input.
+Three specialist sub-agents review React patterns and accessibility, TypeScript and architecture, and translations. Library-specific rules load from `frontend/.claude/agents/code-audit-frontend/`: `cn`, Conform, the form components, React buckets, react-i18next, and shadcn. It also reads the output of React Doctor, Knip, and dependency security advisories as hints.
 
-Every Critical or Major finding of its own is handed to a fresh-context refuter before it is reported, so a finding that cannot survive an independent check is dropped or demoted. Each reply ends with a `Files reviewed` count, so an early stop is caught rather than read as clean.
+Before it reports a Critical or Major finding, a separate agent with no shared context tries to disprove it. A finding that does not hold up is dropped or downgraded. Each reply ends with a `Files reviewed` count, so a review that stopped early is caught instead of being read as clean.
 
 ### code-audit-github-workflows
 
-Owns `.github/workflows/*.yml` and `.github/actions/**/*.yml`. Reviews workflow YAML for script injection, unsafe `pull_request_target` use, unpinned third-party actions, over-broad permissions, and secret handling.
+Responsible for `.github/workflows/*.yml` and `.github/actions/**/*.yml`. Reviews workflow YAML for script injection, unsafe `pull_request_target` use, unpinned third-party actions, over-broad permissions, and secret handling.
 
 ### audit-loop-unit
 
-Runs a window of audit rounds off your main session: dispatches the members, the fixer, and the verifier, runs the Quality Gate, commits and pushes each round's fixes, and returns a thin report. Your session holds only that report, so a long audit does not fill its context. It never merges and never posts `GAIA-Audit`; the main session does both. It is the one agent allowed to dispatch agents of its own, which needs Claude Code 2.1.292 or later.
+Runs a batch of audit rounds outside your main session. It starts the members, the fixer, and the checker, runs the Quality Gate, commits and pushes each round's fixes, and returns a short report. Your session keeps only that report, so a long audit does not fill its context. It never merges and never posts `GAIA-Audit`; the main session does both. It is the only agent allowed to start agents of its own, which needs Claude Code 2.1.292 or later.
 
 ### audit-light-reviewer
 
-Reviews a small change since a member's last full review, when the member opted in with `light_review: true`. Read-only. Whenever the light route cannot be established, the full member runs instead.
+Reviews a small change made since a member's last full review, for members that turned this on with `light_review: true`. Read-only. Whenever a light review cannot be used, the full member runs instead.
 
 ## Tests and acceptance
 
 ### worthiness-evaluator
 
-An advisory reviewer for tests on the emergent surface (stories and Playwright), where the failing-first RED gate does not apply. The `tdd` skill dispatches it after tests go green. It reads only the tests the work changed plus their sibling suites, and edits nothing.
+An advisory reviewer for stories and Playwright tests, where the RED gate (see a test fail before it passes) does not apply. The `tdd` skill starts it once the tests pass. It reads only the tests the work changed plus the test files next to them, and edits nothing.
 
 Each test is judged on two axes:
 
-- **Honesty**: can the test fail for a real reason? It must assert through the public interface (roles, accessible names, visible text), not implementation detail, and survive an internal refactor.
-- **Worthiness**: is it worth keeping? It should exercise your own code rather than a dependency, and a composition test should not re-prove what a child's suite already covers.
+- **Honesty**: can the test fail for a real reason? It must check what a user can see and use (roles, accessible names, visible text), not internal details, so it still passes after an internal refactor.
+- **Worthiness**: is it worth keeping? It should test your own code rather than a library's, and a test of a parent component should not repeat what the child component's tests already cover.
 
-One verdict per test: `keep`, `fix`, or `delete`. A `fix` names the defect; a `delete` is always a proposal you confirm, with its evidence. A merge hook checks that every changed test of this kind has a verdict for its current content.
+One verdict per test: `keep`, `fix`, or `delete`. A `fix` names the defect; a `delete` is always a proposal you confirm, with its evidence. A merge hook checks that every changed test of this kind has a verdict for its current version.
 
 ### uat-fidelity-judge
 
-Before a SPEC plan's pull request is audited, reads the SPEC and each rendered Playwright UAT spec and judges whether each test body still asserts its contract. Writes one JSON verdict file. A failure halts the plan.
+Before a SPEC plan's pull request is audited, it reads the SPEC and each generated Playwright acceptance test (UAT), and judges whether each test still checks what the SPEC promised. Writes one JSON verdict file. A failure stops the plan.
 
 ## Integration health
 
 ### fitness-judge
 
-The advisory judgment pass of [`/gaia-fitness`](/maintenance/fitness/): description substance, trigger overlap between skills, rule scope against `paths:` globs, and terminology within a skill. Read-only, and it never moves the grade.
+The part of [`/gaia-fitness`](/maintenance/fitness/) that makes judgment calls instead of fixed checks: whether descriptions say enough, whether two skills would trigger on the same request, whether a rule's `paths:` patterns fit what it covers, and whether a skill uses its terms consistently. Read-only, and it never changes the grade.
 
 ## Agent teams
 
-GAIA no longer sets Claude Code's experimental agent-teams flag, which made named sub-agent dispatches launch as teammates. Opt in through your own user or local settings if you want it.
+GAIA no longer sets Claude Code's experimental agent-teams flag, which made named sub-agents start as teammates. Opt in through your own user or local settings if you want it.
 
 ## Retired
 
-The single `code-review-audit` agent of 1.x is replaced by the Code Audit Team. Its `GAIA-Audit:` commit trailer is retired; the `GAIA-Audit` status check is unchanged and still required.
+The single `code-review-audit` agent of 1.x is replaced by the Code Audit Team. Its `GAIA-Audit:` line at the end of commit messages is retired; the `GAIA-Audit` status check is unchanged and still required.

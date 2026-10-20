@@ -1,13 +1,13 @@
 ---
 title: /gaia-fitness
-description: Lint your project's Claude integration with a fixed rule catalog and get an F-to-A+ grade, plus an advisory judgment pass. Heals only your own files, one file at a time, each on a yes.
+description: Check your project's Claude setup against a fixed list of rules and get an F-to-A+ grade, plus advisory notes. Fixes only your own files, one file at a time, each on a yes.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-`/gaia-fitness` checks your project's Claude integration (skills, commands, agents, rules, hooks, settings, `CLAUDE.md` files, and the wiki) and reports an F-to-A+ grade. A deterministic linter does the checking and the grading. An advisory judgment pass covers what a script cannot judge, and never moves the grade.
+`/gaia-fitness` checks your project's Claude integration (skills, commands, agents, rules, hooks, settings, `CLAUDE.md` files, and the wiki) and reports an F-to-A+ grade. A linter (a script that gives the same result every time) does the checking and the grading. A separate review by Claude covers what a script can't judge. It only gives advice and never changes the grade.
 
-It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, with any fixes on a branch of its own, ending in a pull request. It is a typed command; Claude never starts it on its own.
+It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, with any fixes on a branch of its own, ending in a pull request. Only you start it, by typing it; Claude never runs it on its own.
 
 ## When to use it
 
@@ -15,42 +15,42 @@ Run it after adding or editing skills, rules, commands, or agents, or when Claud
 
 ## What it checks
 
-`gaia fitness check` runs a fixed catalog of rules over the files your project owns, grouped into categories: authoring, `CLAUDE.md`, frontmatter, hooks, memory, prompt, rules, settings, and wiki. List the whole catalog, with what each rule detects:
+`gaia fitness check` runs a fixed list of rules over your project's own files, grouped into categories: authoring, `CLAUDE.md`, frontmatter, hooks, memory, prompt, rules, settings, and wiki. List the whole catalog, with what each rule detects:
 
 ```bash
 .gaia/cli/gaia fitness rules
 ```
 
-Each category is graded from its findings: a structural defect is an F, errors and warnings step the grade down, and a few info findings cost at most an A-. The overall grade is the lowest category grade.
+Each category gets a grade from its findings: a broken structure is an F, errors and warnings lower the grade, and a few informational findings lower it to A- at most. The overall grade is the lowest category grade.
 
-**Only your own files are graded.** A finding in a file GAIA ships is listed separately, under an upstream section, with [`/update-gaia`](/maintenance/update-gaia/) as its fix.
+**Only your own files are graded.** A finding in a file GAIA ships is listed separately, in an upstream section, and is fixed by [`/update-gaia`](/maintenance/update-gaia/).
 
-The run also records Claude Code's own built-in checks (`claude doctor`, `claude plugin validate`) as ran or skipped. For the Claude Code diagnostics and prompt review it does not run, use `/doctor` and `/doctor prompt-audit` interactively.
+The run also reports whether Claude Code's own built-in checks (`claude doctor`, `claude plugin validate`) ran or were skipped. For the Claude Code diagnostics and prompt review it does not run, use `/doctor` and `/doctor prompt-audit` interactively.
 
 ### The judgment pass
 
-When there is something to judge, one read-only Sonnet agent (`fitness-judge`) makes four calls no script can:
+When there is something to judge, one Sonnet agent (`fitness-judge`) answers four questions no script can. It reads files but never changes them.
 
 - **Description substance**: does a skill's or command's description say when to use it?
 - **Trigger overlap**: do two skills claim the same requests?
 - **Rule scope**: does a rule's content fit the files its `paths:` globs load it for?
 - **Terminology**: does one skill use one term for one thing?
 
-Its findings are reported as advisory and ungraded, and they are never healed.
+Its findings are advice only. They are not graded, and nothing is fixed from them.
 
 ## The flow
 
-1. **Pre-flight.** If the repository is mid-rebase, mid-merge, mid-cherry-pick, bisecting, or on a detached HEAD, the run reports and grades but skips healing, and names how to resolve the state.
+1. **Check the repository state.** If the repository is in the middle of a rebase, merge, cherry-pick, or bisect, or on a detached HEAD, the run reports and grades but makes no fixes, and tells you how to get out of that state.
 2. **Check and judge.** The linter, the built-ins, and the judgment pass run.
-3. **Report.** The report card prints as a box, followed by the built-ins, the judgment findings, and each finding's remediation.
-4. **Heal.** For each finding the linter marks fixable, a Sonnet sub-agent proposes the complete new file. You see the diff and answer **Apply** or **Skip**, one file at a time. Fixes are written only to your project's own files: the writer re-checks ownership, refuses a path that escapes the project through a symlink, and refuses a file that changed since you saw the diff. A GAIA-shipped file is never edited. A fix judged too invasive gets a recommended approach instead of a diff.
-5. **Verify.** One re-run of the linter reports what cleared and anything new, with a fresh card. There is no second heal cycle.
-6. **Publish gate**, asked once when at least one fix was applied:
+3. **Report.** The report card prints as a box, followed by the built-in checks, Claude's advisory findings, and how to fix each finding.
+4. **Fix.** For each finding the linter marks as fixable, a separate Sonnet agent proposes the complete new file. You see the diff and answer **Apply** or **Skip**, one file at a time. Fixes are written only to your project's own files. Before writing, GAIA checks again that the file is yours, refuses a path that leads outside the project through a symlink, and refuses a file that changed since you saw the diff. A GAIA-shipped file is never edited. When a fix would change too much, you get a recommended approach instead of a diff.
+5. **Verify.** The linter runs once more and reports what was fixed and anything new, with a fresh report card. There is no second round of fixes.
+6. **Publish**, asked once when at least one fix was applied:
    - **Publish** (recommended): commit, push, open a pull request, and merge it through the audit gate.
    - **Open PR only**: commit, push, and open a draft pull request without merging.
    - **Keep for review**: leave the changes on the run's branch, uncommitted, with the commands to review or discard them.
 
-A clean run prints `No findings. Overall A+. No changes made, no branch created.` A run with nobody to answer (a headless session) reports and stops without healing.
+A clean run prints `No findings. Overall A+. No changes made, no branch created.` A run with nobody to answer (a headless session) reports and stops without fixing anything.
 
 The run ends with a [cost line](/reference/cost/).
 
@@ -74,7 +74,7 @@ When a finding is deliberate, suppress it in `.claude/gaia-fitness.json`, by rul
 A malformed config is itself a finding.
 
 <Aside type="caution">
-In 1.x you could add a custom fitness category to `wiki/decisions/Claude Integration Fitness.md`. 2.0.0 runs only the CLI catalog and its fixed judgment pass, so a custom category no longer runs. Copy it out before `/update-gaia` replaces that page, and keep the check as a rule under `.claude/rules/` or as a skill.
+In 1.x you could add a custom fitness category to `wiki/decisions/Claude Integration Fitness.md`. 2.0.0 runs only the CLI's rule list and its fixed set of advisory questions, so a custom category no longer runs. Copy it out before `/update-gaia` replaces that page, and keep the check as a rule under `.claude/rules/` or as a skill.
 </Aside>
 
 ## Related

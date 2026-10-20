@@ -5,59 +5,59 @@ sidebar:
   order: 2
 ---
 
-Rules are short Markdown files Claude loads into context. A rule's frontmatter `paths:` field is the gate: when Claude reads or edits a file matching one of those globs, the rule loads. A rule with no `paths:` field loads at every session start.
+Rules are short Markdown files Claude loads into its context. A rule's frontmatter `paths:` field decides when it loads: when Claude reads or edits a file matching one of those file patterns, the rule loads. A rule with no `paths:` field loads at the start of every session.
 
-Rules are advice the model reads, not enforcement. What must hold regardless of what the model decides is enforced by [hooks](/reference/hooks/), the commit hooks, and the merge audit.
+Rules are guidance Claude reads; nothing forces Claude to follow them. Anything that must always hold, whatever Claude decides, is enforced by [hooks](/reference/hooks/), the commit hooks, and the merge audit.
 
 GAIA ships rules in two places:
 
-- **`.claude/rules/`** at the root: rules for the whole repository. Their globs are relative to the repository root.
-- **`frontend/.claude/rules/`**: rules for the React app. They load when the work is under `frontend/`, and their globs are relative to `frontend/`.
+- **`.claude/rules/`** at the root: rules for the whole repository. Their file patterns are relative to the repository root.
+- **`frontend/.claude/rules/`**: rules for the React app. They load when the work is under `frontend/`, and their file patterns are relative to `frontend/`.
 
 ## Always loaded (root)
 
 | Rule | What it enforces |
 |---|---|
-| `coding-guidelines` | Kebab-case files and folders; simplicity first (no handling for states that cannot occur, but real failures handled and bounded); surgical changes; goal-driven execution; mandatory TDD and the Quality Gate before a commit. React file layout lives in `coding-guidelines-react`. |
-| `context-discipline` | Keep the main thread lean and fan read-heavy work out to sub-agents; choose models from the Workflow Doctrine table; research lives in `.notebook/research/<date>-<topic>/`; long work resumes from one `STATE.md`; a prompt meant for pasting goes in a fenced code block. |
-| `issue-claim` | Before work that closes a GitHub issue, check for and set the `in-progress` claim; follow the work lifecycle; claim `tech-debt` issues only through `/gaia-debt`. |
-| `pr-merge` | Before any `gh pr merge`, run the audit and post `GAIA-Audit` last; the audit loop runs on its own until the branch checkpoint, which only a human answers. |
+| `coding-guidelines` | Kebab-case files and folders. Keep code simple: no handling for situations that cannot happen, but real failures are handled with limits. Change only what the task needs. Work toward a clear goal. Use TDD, and run the Quality Gate before a commit. React file layout lives in `coding-guidelines-react`. |
+| `context-discipline` | Keep the main session's context small by handing reading-heavy work to sub-agents. Choose models from GAIA's model table. Research goes in `.notebook/research/<date>-<topic>/`. Long work resumes from one `STATE.md` file. A prompt meant for pasting goes in a fenced code block. |
+| `issue-claim` | Before work that closes a GitHub issue, check for the `in-progress` label and add it. Follow the work lifecycle. Claim `tech-debt` issues only through `/gaia-debt`. |
+| `pr-merge` | Before any `gh pr merge`, run the audit and post `GAIA-Audit` as the last step. The audit loop runs on its own until it reaches the branch checkpoint, which only a person can answer. |
 | `quality-gate` | Run the Quality Gate before any commit that touches source, unless nothing in the gate's scope is staged. |
-| `serena-cc-override` | When Serena is registered, prefer its symbol tools over Read and Grep for symbol-level work. Inert without Serena. |
-| `shell-cwd` | No `cd` in Bash calls; use absolute paths, so hooks registered by repo-relative path keep resolving. |
-| `subagent-dispatch` | A dispatched agent writes its result to a JSON file, which a no-op detector classifies, so a missing reply is re-dispatched instead of read as "found nothing". |
+| `serena-cc-override` | When Serena is set up, use its tools for finding functions, classes, and other code symbols, instead of Read and Grep. Does nothing without Serena. |
+| `shell-cwd` | No `cd` in Bash calls; use absolute paths. Hooks are registered by paths relative to the repository root, and a `cd` would break them. |
+| `subagent-dispatch` | A sub-agent writes its result to a JSON file, and a check reads that file to tell an empty result from a missing one. A missing reply is re-run instead of being read as "found nothing". |
 
 ## Path-scoped (root)
 
 | Rule | What it enforces | Loads on |
 |---|---|---|
-| `ambient-context-resolution` | Scripts take the repository root, base, and commit from their input, not from the working directory or `HEAD`. | `.gaia/scripts/**/*.sh`, `.claude/hooks/**/*.sh`, `.github/workflows/**/*.yml`, `.gaia/**/*.ts` |
-| `code-comments` | A comment says something the code does not; the merge auditor applies the same standard. | app, test, Playwright, and Storybook source under `frontend/`, plus `.gaia/**` |
-| `code-search` | Prefer Serena's MCP tools for symbol-level queries; grep stays right for prose, strings, non-code files, and unindexed languages. | code files in any language |
+| `ambient-context-resolution` | Scripts get the repository root, base branch, and commit from their input, not from the current folder or `HEAD`. | `.gaia/scripts/**/*.sh`, `.claude/hooks/**/*.sh`, `.github/workflows/**/*.yml`, `.gaia/**/*.ts` |
+| `code-comments` | A comment says something the code itself does not; the merge audit checks comments by the same standard. | app, test, Playwright, and Storybook source under `frontend/`, plus `.gaia/**` |
+| `code-search` | Use Serena's MCP tools to look up code symbols. Grep is still the right tool for prose, strings, non-code files, and languages Serena does not index. | code files in any language |
 | `file-placement` | Where new hooks and scripts go and how a hook is registered. | `.claude/hooks/**`, `.gaia/scripts/**` |
-| `guards-must-fail` | A guard and its tests must be shown failing before they are trusted. | hooks, scripts, workflows, and Playwright specs |
+| `guards-must-fail` | A guard and its tests must be seen failing before anyone trusts them. | hooks, scripts, workflows, and Playwright specs |
 | `no-abbreviations` | Descriptive names in every language, alongside the `naming-conventions` skill. | code files in any language |
 | `user-questions` | Ask a choice as an `AskUserQuestion` menu with the recommended option first; print any pasteable prompt or command in a fenced code block. | skills, commands, agents |
 | `wiki-style` | Present-tense prose; no historical phrasing or roadmap stated as current; no SPEC, PR, or commit references in body prose. | `wiki/**/*.md`, app source, and harness Markdown |
-| `working-doc-ids` | No SPEC, plan, or audit ids, or your own issue and PR numbers, in code and prose. | app, test, and harness source |
+| `working-doc-ids` | No SPEC, plan, or audit IDs, and none of your own issue or PR numbers, in code or prose. | app, test, and harness source |
 
 ## Frontend (`frontend/.claude/rules/`)
 
 | Rule | What it enforces | Loads on |
 |---|---|---|
 | `accessibility` | Keyboard reachability, alt text, focus management, semantic HTML over ARIA roles, color never the only indicator. | `app/components/**`, `app/pages/**` |
-| `api-service` | Points to the API Service Pattern and the `new-service` skill. | `app/services/**`, `test/mocks/**` |
+| `api-service` | Points Claude to the API Service Pattern and the `new-service` skill. | `app/services/**`, `test/mocks/**` |
 | `coding-guidelines-react` | React file and folder layout and naming: kebab-case folders, `index.tsx`, `use-<name>.ts` hooks, `tests/` folders. | `app/**`, `test/**`, `.playwright/**`, `.storybook/**` |
 | `design-baseline` | GAIA's neutral styling is a placeholder, not a design system; confirm the design direction before extending tokens. | `app/styles/**`, `app/components/**`, `app/pages/**`, `app/routes/**` |
 | `i18n` | Every user-facing string comes from `t()`; namespace and key-file conventions. | `app/routes/**`, `app/pages/**`, `app/components/**`, `app/languages/**` |
 | `playwright` | Spec layout, semantic selectors, web-first assertions, the hydration helper, MSW in dev. | `.playwright/**`, `playwright.config.*` |
 | `ports` | Each checkout owns its dev, Storybook, and Playwright ports; read them from `bash .gaia/scripts/ports.sh`, never hardcode 5173 or 6006. | app, test, and server configs |
-| `react-router-docs` | Read the React Router docs shipped in `node_modules/react-router/docs`, which match the pinned version, and check remix-utils before hand-rolling a primitive. | routes, pages, `app/root.tsx`, middleware |
+| `react-router-docs` | Read the React Router docs in `node_modules/react-router/docs`, which match the installed version, and check remix-utils before writing a basic utility from scratch. | routes, pages, `app/root.tsx`, middleware |
 | `routes` | Thin route files (loader, action, meta, one-line page render); UI in `app/pages/`. | `app/routes/**`, `app/pages/**` |
-| `shadcn-ui` | The vendored `ui` components are not edited; add components with `pnpm shadcn add`. | `app/components/ui/**` |
+| `shadcn-ui` | The `ui` components copied in from shadcn/ui are not edited; add components with `pnpm shadcn add`. | `app/components/ui/**` |
 | `state-pattern` | Context lives in `app/state/`, with Provider, `useX`, and `useMaybeX` naming. | `app/state/**` |
 | `storybook` | Story location and typing, titles, decorator order, layout, and Chromatic light and dark modes. | `app/**/*.stories.tsx`, `.storybook/**` |
-| `tailwind` | Role tokens only, no raw palette classes or arbitrary colors; Tailwind v4 config in CSS. | `app/**/*.tsx`, `app/**/*.css` |
+| `tailwind` | Use the role-based color tokens (named for their purpose, not their color), never raw palette classes or arbitrary colors. Tailwind v4 config lives in CSS. | `app/**/*.tsx`, `app/**/*.css` |
 
 ## Retired in 2.0.0
 
@@ -65,4 +65,4 @@ GAIA ships rules in two places:
 
 ## Adding your own
 
-Add a Markdown file under `.claude/rules/` (or `frontend/.claude/rules/` for an app-only rule), with a `paths:` glob unless it truly needs to load every session: an always-loaded rule costs context in every session. [`/gaia-codify`](/maintenance/codify/) writes path-scoped rules from recurring audit findings, and [`/gaia-cleanse`](/maintenance/cleanse/) and [`/gaia-fitness`](/maintenance/fitness/) keep rules lean.
+Add a Markdown file under `.claude/rules/` (or `frontend/.claude/rules/` for a rule that only applies to the app). Give it a `paths:` pattern unless it truly needs to load in every session, because an always-loaded rule uses up context in every session. [`/gaia-codify`](/maintenance/codify/) writes path-scoped rules from recurring audit findings, and [`/gaia-cleanse`](/maintenance/cleanse/) and [`/gaia-fitness`](/maintenance/fitness/) keep rules lean.

@@ -5,7 +5,9 @@ sidebar:
   order: 5
 ---
 
-These workflows are excluded from the release bundle by `.gaia/release-exclude` and run only on the GAIA repo. Each carries the `GAIA: ` prefix on its workflow `name:`, which a CLI test enforces. The workflows that ship to every project (Tests, Chromatic, PR Conventions) are documented in [Git hooks and conventions](/workflow/git-conventions/#github-workflows-that-ship). None of these workflows runs the pre-merge audit: the audit is local, through the [Code Audit Team](/workflow/code-audit-team/).
+These workflows run only on the GAIA repo; `.gaia/release-exclude` keeps them out of the release bundle. Each workflow's `name:` starts with `GAIA: `, and a CLI test checks that it does. The workflows that ship to every project (Tests, Chromatic, PR Conventions) are documented in [Git hooks and conventions](/workflow/git-conventions/#github-workflows-that-ship).
+
+None of these workflows runs the pre-merge audit. The audit runs locally, through the [Code Audit Team](/workflow/code-audit-team/).
 
 ## release.yml
 
@@ -14,39 +16,39 @@ Triggers on `v*.*.*` tag pushes. Builds and publishes the release bundle.
 1. **Checkout** at the tag with full history, and derive the version.
 2. **Verify `.gaia/VERSION` matches the tag**, so a stray tag cannot publish.
 3. **Extract the CHANGELOG section** for the release; fails when the heading is missing.
-4. **Verify the manifest is fresh** and **the wiki was scrubbed** for release.
-5. **Verify the committed CLI bundles** are what rebuilding from `.gaia/cli/src` produces.
+4. **Verify the manifest is up to date** and **the wiki was scrubbed** for release.
+5. **Verify the committed CLI bundles** match a fresh build from `.gaia/cli/src`.
 6. **Stage the release tree** from `git ls-files`, minus `.gaia/release-exclude`.
-7. **Bundle-time scrub**: strips `gaia:maintainer-only` blocks and runs leak checks.
+7. **Bundle-time scrub**: removes `gaia:maintainer-only` blocks and checks that no contributor-only content leaked into the shipped files.
 8. **Verify runtime dependencies** against the staged tree.
-9. **Distribution test gate**: `bash .gaia/tests/distribution/run-all.sh` (Layers 0 and 1). A failure halts the release before anything publishes.
-10. **Build** `gaia-bundle-<tag>.tar.gz` and its `.sha256`. The `gaia-bundle-` prefix is deliberate: a 1.6.1 `/update-gaia` downloads `gaia-<tag>.tar.gz`, so under the new name it fails at its fetch step instead of misreading the moved layout.
-11. **Compose the release body**, with the 1.6.1 routing line first, then **create the GitHub Release** with both assets.
+9. **Distribution test gate**: `bash .gaia/tests/distribution/run-all.sh` (Layers 0 and 1). A failure stops the release before anything publishes.
+10. **Build** `gaia-bundle-<tag>.tar.gz` and its `.sha256`. The `gaia-bundle-` prefix is deliberate. A 1.6.1 `/update-gaia` looks for `gaia-<tag>.tar.gz`, so the new name makes it fail at the download instead of misreading the new folder layout.
+11. **Compose the release body**, starting with the line that sends 1.6.1 projects to the 2.0.0 migration, then **create the GitHub Release** with both files.
 
 ## cli-tests.yml
 
 Triggers on pushes and pull requests to `main`, and on `workflow_dispatch`. Three jobs:
 
-- **Vitest (`.gaia/cli`)**: typecheck, lint, and the Vitest suite for the CLI, the region-marker conformance bats suite, a check that the committed CLI bundles are rebuilt from source, the fitness lint over GAIA's own harness, and a check that vendored skills are byte-identical to their markers.
-- **Distribution harness** (advisory): the distribution scenarios with no Docker and no token.
-- **Shipped-surface leak check** (advisory): stages the release tree and proves no shipped file leaks a maintainer-only path, and that the marker strip leaves no fragment behind.
+- **Vitest (`.gaia/cli`)**: for the CLI, typecheck, lint, and the Vitest tests. It also runs the bats tests for region markers, checks that the committed CLI bundles match a fresh build from source, runs the fitness lint over GAIA's own harness, and checks that the third-party skills copied into the repo (vendored skills) match the hashes recorded under `.gaia/vendor`.
+- **Distribution harness** (advisory): the distribution tests that need neither Docker nor a token.
+- **Shipped-surface leak check** (advisory): builds the release tree, then checks that no shipped file names a contributor-only path and that removing the maintainer-only blocks leaves no partial marker behind.
 
 ## audit-ci-tests.yml
 
-Triggers on pushes and pull requests to `main`, and on `workflow_dispatch`. Runs GAIA's bats suites for the shipped scripts and hooks (`.gaia/scripts/tests/`, `.github/audit/tests/`, `.gaia/tests/`) as a sharded matrix, plus the commitlint suites and the RED-gate suites that need Node or Chromium. A final `Audit CI Tests` job requires every shard to succeed, so one required check covers the matrix.
+Triggers on pushes and pull requests to `main`, and on `workflow_dispatch`. Runs GAIA's bats tests for the shipped scripts and hooks (`.gaia/scripts/tests/`, `.github/audit/tests/`, `.gaia/tests/`), split across parallel jobs (shards). It also runs the commitlint tests and the tests for the RED gate (the check that a test was seen failing first) that need Node or Chromium. A final `Audit CI Tests` job passes only when every shard passes, so one required check covers them all.
 
-Adopters receive these scripts as GAIA-controlled code they never edit, so the suites guard only maintainer changes.
+Projects get these scripts as code GAIA controls and never edit, so the tests only need to catch changes made on the GAIA repo.
 
 ## shell-lint.yml
 
-Triggers on pull requests to `main`. Advisory. Runs shellcheck over every tracked `*.sh` and `*.bats` file through `.gaia/tests/shell-lint.sh`, and parses every tracked shell script with the stock macOS `/bin/bash` 3.2, since GAIA's shell must run there.
+Triggers on pull requests to `main`. Advisory. Runs shellcheck over every tracked `*.sh` and `*.bats` file through `.gaia/tests/shell-lint.sh`, and checks that every tracked shell script parses under the `/bin/bash` 3.2 that ships with macOS, since GAIA's shell scripts must run there.
 
 ## forensics-triage.yml
 
-Triggers on issues `opened` or `labeled` with `gaia-forensics`, the label [`/gaia-forensics`](/workflow/forensics/) files with. Runs Claude Code triage on the report: an idempotency check (skip when `gaia-triaged` is already set), parse, classify, a scope check, and, for an in-scope fix, a fix branch, the Quality Gate, and a draft pull request. A final step ensures `gaia-triaged` lands whatever the path.
+Triggers on issues `opened` or `labeled` with `gaia-forensics`, the label [`/gaia-forensics`](/workflow/forensics/) files with. Runs Claude Code to triage the report. It skips an issue already labeled `gaia-triaged`, then parses the report, classifies it, and checks whether the fix is in scope. For an in-scope fix it creates a fix branch, runs the Quality Gate, and opens a draft pull request. A final step always adds the `gaia-triaged` label, however the run went.
 
-Its helpers live in `.github/forensics/`, all contributor-only. The scope check rejects any edit under `.github/workflows/`: self-modifying triage is a security boundary.
+Its helpers live in `.github/forensics/`, all contributor-only. The scope check rejects any edit under `.github/workflows/`, so triage can never change its own workflow; that is a security boundary.
 
 ## Removed in 2.0.0
 
-`distribution.yml` is gone; the distribution harness runs inside `release.yml` and `cli-tests.yml`. The on-demand GAIA CI workflows (`gaia-ci-*.yml`, `code-review-audit.yml`) and their templates are removed: Claude no longer runs on GitHub Actions in any project or in the GAIA repo.
+`distribution.yml` is gone; the distribution tests now run inside `release.yml` and `cli-tests.yml`. The on-demand GAIA CI workflows (`gaia-ci-*.yml`, `code-review-audit.yml`) and their templates are removed: Claude no longer runs on GitHub Actions in any project or in the GAIA repo.

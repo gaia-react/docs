@@ -1,13 +1,13 @@
 ---
 title: Contributors
-description: Reference for people working on the GAIA repo itself. Covers surface that is not included in the `create-gaia` bundle.
+description: Reference for people working on the GAIA repo itself. Covers the parts of GAIA that the `create-gaia` bundle leaves out.
 sidebar:
   order: 1
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-This section covers GAIA surface that exists in the GAIA repo but is not included in the `npx create-gaia` bundle.
+This section covers the parts of GAIA that exist in the GAIA repo but are left out of the bundle `npx create-gaia` installs.
 
 Audience: the GAIA maintainer and any outside contributors working on GAIA itself.
 
@@ -17,12 +17,12 @@ If you ran `npx create-gaia my-app` for a scaffolded project, this section is no
 
 ## Project / contributor split
 
-GAIA routes its surface to two audiences. Two mechanisms strip contributor-only material from the release bundle:
+GAIA has two audiences: people building a project with it, and people working on GAIA itself. Two mechanisms keep contributor-only material out of the release bundle:
 
 1. **Path-level exclusion.** Files and directories listed in `.gaia/release-exclude` never enter the bundle the release workflow builds. Examples: `.claude/commands/gaia-release.md`, `.claude/commands/distribution-vet.md`, `.claude/skills/release-notes`, the two `code-audit-maintainer-*` agents, `.claude/rules/maintainers/`, `.gaia/cli/src/`, `.gaia/tests/`, `.gaia/scripts/tests/`, `.githooks/pre-push`, `wiki/entities/`, and `wiki/meta/`.
 2. **Block-level exclusion.** Content between `<!-- gaia:maintainer-only:start -->` and `<!-- gaia:maintainer-only:end -->` markers inside files that do ship. The shipped file is a subset of the source.
 
-Both pass through the bundle-time scrub during release. `.gaia/release-exclude` is the authoritative manifest of path-level rules, and each of its categories carries the reason its paths are withheld.
+The release removes both kinds in one step, the bundle-time scrub. `.gaia/release-exclude` is the authoritative list of excluded paths, and each of its categories says why its paths are withheld.
 
 ## What's in this section
 
@@ -31,7 +31,7 @@ Both pass through the bundle-time scrub during release. `.gaia/release-exclude` 
 - [`/gaia-release`](/contributors/release/): audience, scope, and what releases produce. The detailed runbook is internal to the maintainer.
 - [Contributor wiki content](/contributors/wiki/): `wiki/entities/`, `wiki/meta/`, and the `gaia:maintainer-only` block convention.
 
-Beyond these pages, the GAIA repo carries maintainer-only tooling that is not documented here: the `/distribution-vet` ship-or-withhold vet, the `release-notes` skill, the two maintainer members of the Code Audit Team, and the verification runner under `.gaia/tests/`. Their source and headers are the reference.
+Beyond these pages, the GAIA repo carries maintainer-only tooling that is not documented here: `/distribution-vet` (which decides whether a new file ships or is withheld), the `release-notes` skill, the two maintainer members of the Code Audit Team, and the verification runner under `.gaia/tests/`. Their source and headers are the reference.
 
 ## Before a release
 

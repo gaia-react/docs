@@ -1,19 +1,19 @@
 ---
 title: /gaia-spec
-description: Run a Socratic discovery loop, save an immutable SPEC, and plan it in the same session, ending at the plan's kickoff prompt.
+description: Settle what to build through a guided conversation, save a locked SPEC, and plan it in the same session, ending at the plan's kickoff prompt.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-`/gaia-spec` turns a feature idea into an immutable SPEC through a guided conversation, then plans it in the same session with [`/gaia-plan`](/workflow/plan/). It ends at the plan's KICKOFF prompt. It never implements anything: execution starts in a fresh session.
+`/gaia-spec` turns a feature idea into a SPEC through a guided conversation. A SPEC is a written description of what to build and how to test it, locked once saved. The command then plans the SPEC in the same session with [`/gaia-plan`](/workflow/plan/) and ends at the plan's KICKOFF prompt. It never writes the code itself: the building starts in a fresh session.
 
 The SPEC is saved at `.notebook/specs/SPEC-NNN/SPEC.md`, in the gitignored notebook at your main checkout. Its plan lives inside the same folder.
 
 ## When to use it
 
-Run `/gaia-spec` for a feature whose boundaries are not clear yet: the description has more questions than answers, or two readings of it produce different intents. It is also the way to present an idea and refine it before any code is written.
+Run `/gaia-spec` for a feature whose scope is not clear yet: the description raises more questions than it answers, or two people could read it and picture different features. It is also the way to present an idea and refine it before any code is written.
 
-For changes whose intent is already obvious (a bug fix, a refactor against a known interface, a copy edit), just prompt Claude, or go straight to [`/gaia-plan`](/workflow/plan/).
+For changes whose goal is already obvious (a bug fix, a refactor of known code, a copy edit), just prompt Claude, or go straight to [`/gaia-plan`](/workflow/plan/).
 
 ## How to invoke
 
@@ -23,7 +23,7 @@ For changes whose intent is already obvious (a bug fix, a refactor against a kno
 /gaia-spec your feature description
 ```
 
-Claude asks you a series of questions to settle the intent. Every closed-set question is a menu with the recommended option first, plus **Discuss this** to talk it through.
+Claude asks you a series of questions to settle what you want. Any question with a fixed set of answers is a menu, with the recommended option first and a **Discuss this** option to talk it through.
 
 ### Auto mode
 
@@ -31,46 +31,46 @@ Claude asks you a series of questions to settle the intent. Every closed-set que
 /gaia-spec auto your feature description
 ```
 
-Claude answers its own questions, picking the recommended option each time, and proceeds without stopping. Use it when the description is already well-formed, or when you keep picking the recommended option anyway. A description is required: without one, auto mode aborts at once. Anything it could not settle is recorded as a deferred clarification for you to review.
+Claude answers its own questions, picking the recommended option each time, and proceeds without stopping. Use it when the description is already complete, or when you keep picking the recommended option anyway. A description is required: without one, auto mode stops at once. Anything it could not settle is written down as an open question for you to review.
 
 ## Before it starts
 
-- **Model check.** SPEC synthesis runs on your session model. On a model other than Opus or Fable, Claude offers to stop so you can switch with `/model` first.
-- **Housekeeping.** Merged and abandoned SPEC folders older than `GAIA_SPEC_RETENTION_DAYS` days (default 30) are deleted, and closed research older than its retention window is offered for removal.
-- **Pull check.** When your checkout's GAIA version lags the remote, Claude offers to pull first.
-- **Resume.** When an unfinished draft exists, you choose to resume it or start new. A draft another live session is still authoring is detected, so two sessions never resume the same draft.
+- **Model check.** The SPEC is written by your session's model. On a model other than Opus or Fable, Claude offers to stop so you can switch with `/model` first.
+- **Housekeeping.** Merged and abandoned SPEC folders older than `GAIA_SPEC_RETENTION_DAYS` days (default 30) are deleted. Closed research that has passed its keep-until date is offered for removal.
+- **Pull check.** When your checkout has an older GAIA version than the remote, Claude offers to pull first.
+- **Resume.** When an unfinished draft exists, you choose to resume it or start new. Claude can tell when another open session is still writing a draft, so two sessions never resume the same one.
 
 ## SPEC numbers
 
-SPEC numbers are allocated from immutable `spec/NNN` git tags on the remote, so teammates never collide on a number, and nothing in the working tree changes to reserve one. A plan with no SPEC gets a `PLAN-NNN` number instead.
+Each SPEC number is reserved by pushing a `spec/NNN` git tag to the remote. Teammates can never get the same number, and reserving one changes no files in your checkout. A plan with no SPEC gets a `PLAN-NNN` number instead.
 
 A SPEC moves through four statuses: `draft`, `ready`, `merged`, and `abandoned`.
 
 ## The flow
 
-1. **Allocate** the SPEC number and write the first draft.
-2. **Gate 1: shape.** Before any question, Claude shows the proposed intent and the proposed UATs (automated acceptance tests, in Given/When/Then form) in plain English. You confirm or revise. The confirmed shape is snapshotted so later steps can catch drift from it.
-3. **Socratic loop.** One question at a time, each shaped by the last answer. A coverage scan stops the loop when every topic is settled; the ceiling is 10 substantive questions interactive and 5 in auto mode. When Claude needs facts, it runs the research itself and brings you the findings.
-4. **Self-review.** A sub-agent checks the draft against the gate-1 snapshot and its own consistency. Critical and major findings come to you.
-5. **Adversarial SPEC audit.** Automatically, before the final gate, independent lenses verify the draft's claims against your repository. Each finding is folded into the draft or recorded as a directive for the plan in `AUDIT.md` beside the SPEC. Because the draft is unsaved, a fix lands with no reopen ceremony.
+1. **Reserve** the SPEC number and write the first draft.
+2. **Gate 1: shape.** Before asking anything, Claude shows in plain English what it thinks you want and the proposed UATs (automated acceptance tests, written as Given/When/Then). You confirm or revise. Claude saves a copy of what you confirmed so later steps can catch the SPEC drifting away from it.
+3. **Questions.** One question at a time, each based on your last answer. The questions stop once every topic is settled, or at most after 10 real questions (5 in auto mode). When Claude needs facts, it runs the research itself and brings you the findings.
+4. **Self-review.** A sub-agent checks that the draft still matches what you confirmed at gate 1 and does not contradict itself. Critical and major problems come to you.
+5. **SPEC audit.** Before the final gate, independent reviewers check the draft's claims against your actual code. Each problem is either fixed in the draft or written into `AUDIT.md`, beside the SPEC, as an instruction for the plan. The draft is not saved yet, so fixing it needs no formal reopening.
 6. **Gate 2: the artifact.** The full rendered SPEC, shown once more. Revise until it is right.
-7. **Save** to `.notebook/specs/SPEC-NNN/SPEC.md`, then an immutability lint.
+7. **Save** to `.notebook/specs/SPEC-NNN/SPEC.md`, then run a lint that enforces the lock.
 8. **Plan it here.** `/gaia-spec` invokes `/gaia-plan` with the SPEC in the same session. The run ends at the plan's report: a cost box and the KICKOFF prompt to paste into a fresh session.
 
 <Aside type="caution">
-Confirming gate 2 saves the SPEC and locks it. Changing a saved SPEC takes a reopen ceremony with a written rationale and a UAT diff, which the lint enforces. Settle the shape before you confirm.
+Confirming gate 2 saves the SPEC and locks it. To change a saved SPEC you must formally reopen it, with a written reason and a record of how the UATs change, and the lint enforces this. Get it right before you confirm.
 </Aside>
 
 ## While a spec session runs
 
 - **It writes only to the notebook and GAIA's local cache**: `.notebook/specs/`, `.gaia/local/cache/`, and the usage ledger. It never edits `frontend/app/**` or any other source.
 - **Project decisions go into the SPEC, the wiki, or `.claude/rules/`**, never into machine-local memory.
-- **Your progress is saved as you go**, after every answer and every gate, to a draft cache. Choose **Save partial and resume later** to stop, and the next `/gaia-spec` offers to resume.
-- **Long sessions** reach the context checkpoint like any other: save, then continue here or clear and resume. See [Work lifecycle](/workflow/work-lifecycle/#resuming-long-work).
+- **Your progress is saved as you go**, after every answer and every gate. Choose **Save partial and resume later** to stop, and the next `/gaia-spec` offers to resume.
+- **Long sessions** pause when the context fills up, like any other: Claude saves, then you continue here or clear and resume. See [Work lifecycle](/workflow/work-lifecycle/#resuming-long-work).
 
 ## After the plan runs
 
-The plan's orchestrator renders each browser-flow UAT into a failing Playwright spec before it writes code, and closes the SPEC around the merge of its implementation. See [`/gaia-plan`](/workflow/plan/#uat-specs).
+Before it writes any code, the plan's orchestrator turns each browser UAT into a Playwright test that fails at first. It closes out the SPEC after the implementation merges. See [`/gaia-plan`](/workflow/plan/#uat-specs).
 
 `/gaia-spec` no longer mirrors SPECs to GitHub issues, and no longer runs on spec-kit.
 

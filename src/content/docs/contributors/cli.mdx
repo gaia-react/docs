@@ -1,22 +1,22 @@
 ---
 title: CLI surface
-description: Reference for the gaia binary subcommands invoked by skills, hooks, and slash commands. Source layout for contributors working on the CLI.
+description: Reference for the gaia binary's subcommands, which skills, hooks, and slash commands run, and where their source lives.
 sidebar:
   order: 4
 ---
 
-The `gaia` binary is the bundled CLI at `.gaia/cli/gaia`, shipped in every project. Projects rarely invoke it directly: skills, hooks, and slash commands invoke it for them. Every subcommand prints a help block on `--help`, and `gaia --help` lists them all.
+The `gaia` binary is the bundled CLI at `.gaia/cli/gaia`, shipped in every project. Projects rarely run it directly; skills, hooks, and slash commands run it for them. Every subcommand prints a help block on `--help`, and `gaia --help` lists them all.
 
-Contributors working on the CLI need the surface map. Source lives under `.gaia/cli/src/`, excluded from the release bundle.
+If you work on the CLI, this page maps its subcommands. The source lives under `.gaia/cli/src/`, which the release bundle leaves out.
 
 ## Build layout
 
-`.gaia/cli` is a member of the root pnpm workspace. The release scrub removes it from the shipped `pnpm-workspace.yaml` and `pnpm-lock.yaml`, and every file that makes up the CLI source is release-excluded. `pnpm -C .gaia/cli bundle` builds two binaries:
+`.gaia/cli` is a package in the root pnpm workspace. At release, the scrub removes it from the shipped `pnpm-workspace.yaml` and `pnpm-lock.yaml`, and every CLI source file is left out of the bundle. `pnpm -C .gaia/cli bundle` builds two binaries:
 
 - `.gaia/cli/gaia`: the shipped binary. Entry point `src/index.ts`.
 - `.gaia/cli/gaia-maintainer`: the maintainer binary, carrying `labels docs` and the release namespace. Entry point `src/index.maintainer.ts`. Excluded from the bundle.
 
-`src/index.ts` imports no maintainer-only handler, so esbuild keeps that surface out of the shipped binary. The committed bundles must match what rebuilding from source produces: any change under `.gaia/cli/src` rebuilds and commits them (the pre-commit hook does this on the GAIA repo), and CI verifies it.
+`src/index.ts` imports no maintainer-only code, so esbuild (the bundler) leaves that code out of the shipped binary. The committed binaries must match a fresh build from source. Any change under `.gaia/cli/src` means rebuilding and committing them (the pre-commit hook does this on the GAIA repo), and CI checks it.
 
 ## Top-level subcommands
 
@@ -46,7 +46,7 @@ The engine behind the [scaffolder skills](/skills/scaffolders/): `component`, `h
 
 ### `gaia setup`
 
-Primitives for [`/setup-gaia`](/getting-started/setup-gaia/). `gaia setup-ci` from 1.x is merged in here.
+The steps behind [`/setup-gaia`](/getting-started/setup-gaia/). `gaia setup-ci` from 1.x is merged in here.
 
 ```
 gaia setup status|mark-step|finalize [--force]|bootstrap-env
@@ -62,11 +62,11 @@ gaia setup drift [--features <path>]
 
 ### `gaia sandbox`
 
-`detect`, `apply`, `record`, and `status` for the OS-level Bash sandbox decision. Exits 2 on invalid arguments.
+`detect`, `apply`, `record`, and `status` for the decision on whether Bash runs inside the operating system's sandbox. Exits 2 on invalid arguments.
 
 ### `gaia labels`
 
-`gaia labels sync` reconciles a repository against `.gaia/labels.json`. See [Labels](/reference/labels/).
+`gaia labels sync` brings a repository's labels in line with `.gaia/labels.json`. See [Labels](/reference/labels/).
 
 ### `gaia packages`
 
@@ -74,31 +74,31 @@ gaia setup drift [--features <path>]
 
 ### `gaia update`
 
-Merge primitives for [`/update-gaia`](/maintenance/update-gaia/): `merge-package`, `merge-workspace`, and `merge-audit-ci` (field-aware verdicts), `merge-region` and `regen-regions` (generated regions), and `lockfile-command`.
+The merge steps behind [`/update-gaia`](/maintenance/update-gaia/): `merge-package`, `merge-workspace`, and `merge-audit-ci` (each merges its file field by field and reports what it applied and what conflicted), `merge-region` and `regen-regions` (for generated regions of a file), and `lockfile-command`.
 
 ### `gaia update-deps`
 
-Primitives for [`/update-deps`](/maintenance/update-deps/): `run` (discovery and wave classification), `decline` (snoozes), `global-tools`, `advisories`, `advisory-landed`, `dismiss-alert`, `write-security-cache`, and `check-security-override`.
+The steps behind [`/update-deps`](/maintenance/update-deps/): `run` (finds what is outdated and sorts it into update waves), `decline` (snoozes an update), `global-tools`, `advisories`, `advisory-landed`, `dismiss-alert`, `write-security-cache`, and `check-security-override`.
 
 ### `gaia fitness`
 
-The [`/gaia-fitness`](/maintenance/fitness/) linter: `check` (the rule catalog and grade), `rules`, `inventory` (also used by `/gaia-cleanse`), `builtins`, `apply` (the one writer for a heal, with ownership and staleness checks), and `render-card`.
+The [`/gaia-fitness`](/maintenance/fitness/) linter: `check` (the rule catalog and grade), `rules`, `inventory` (also used by `/gaia-cleanse`), `builtins`, `apply` (the only subcommand that writes a fix, and only to a file you own that has not changed since the check), and `render-card`.
 
 ### `gaia codify-tally`, `gaia codify-ledger`
 
-The recurrence tally and decline ledger for [`/gaia-codify`](/maintenance/codify/). They replace 1.x `harden-tally` and `harden-ledger`; the ledger's `is-suppressed` subcommand is removed.
+For [`/gaia-codify`](/maintenance/codify/): `codify-tally` counts how often each finding recurs, and `codify-ledger` records the ones you declined. They replace 1.x `harden-tally` and `harden-ledger`; the ledger's `is-suppressed` subcommand is removed.
 
 ### `gaia residue-tally`, `gaia residue-cursor`, `gaia residue-record`
 
-The candidate tally, resumable cursor, and dismissal-store writer for [`/gaia-residue`](/maintenance/residue/). `residue-tally` drops 1.x's `--attribute-only`, `--cap`, `--no-cap`, and `--json`; `GAIA_RESIDUE_CAP` sets one batch's size.
+For [`/gaia-residue`](/maintenance/residue/): `residue-tally` counts the residuals to triage, `residue-cursor` remembers where a run stopped so the next one resumes there, and `residue-record` records dismissals. `residue-tally` drops 1.x's `--attribute-only`, `--cap`, `--no-cap`, and `--json`; `GAIA_RESIDUE_CAP` sets one batch's size.
 
 ### `gaia react-perf`
 
-`gaia react-perf reduce <raw.json> [--frame-budget-ms <n>]` reduces a render dump for [`/gaia-react-perf`](/skills/react-performance/).
+`gaia react-perf reduce <raw.json> [--frame-budget-ms <n>]` condenses a raw render recording into a summary for [`/gaia-react-perf`](/skills/react-performance/).
 
 ### `gaia wiki`
 
-Primitives for [`/gaia-wiki`](/maintenance/wiki/): `state`, `commit-classify`, `state-init`, `state-bump`, `log-prepend`, `page-index`, `orphans`, `near-collisions`, `dead-paths`, `frontmatter`, `empty-sections`, `broken-links`, and `chain <begin|commit|finish|refresh-nudge>`, the one-branch, one-PR orchestration. `chain begin` refuses `main` and `master`; `begin` and `finish` no longer accept `--branch-aware`. `sync land` is removed.
+The steps behind [`/gaia-wiki`](/maintenance/wiki/): `state`, `commit-classify`, `state-init`, `state-bump`, `log-prepend`, `page-index`, `orphans`, `near-collisions`, `dead-paths`, `frontmatter`, `empty-sections`, `broken-links`, and `chain <begin|commit|finish|refresh-nudge>`, which runs the whole `/gaia-wiki` chain on one branch with one pull request. `chain begin` refuses `main` and `master`; `begin` and `finish` no longer accept `--branch-aware`. `sync land` is removed.
 
 ### `gaia ping`
 

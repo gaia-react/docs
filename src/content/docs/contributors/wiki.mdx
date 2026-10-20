@@ -21,9 +21,9 @@ Pages here describe named entities the GAIA team tracks. Current entries:
 - `GAIA.md`: the project itself, including history, naming convention, and supporting links.
 - `Steven Sacks.md`: author and maintainer.
 
-Entity pages use the `entity` type frontmatter with an `entity_type` discriminator (`project`, `person`, etc.).
+Entity pages use the `entity` type in their frontmatter, with an `entity_type` field saying what kind of entity it is (`project`, `person`, etc.).
 
-When to add: a new entity becomes worth tracking on its own page when it gets cross-linked from concept or decision pages and when its identity is useful to disambiguate from other names. Generic concepts go under `wiki/concepts/`, not here.
+When to add: give an entity its own page once concept or decision pages link to it and a page of its own helps tell it apart from similar names. Generic concepts go under `wiki/concepts/`, not here.
 
 ## wiki/meta/
 
@@ -38,7 +38,7 @@ When to add: a new meta page is appropriate when it documents how the wiki itsel
 
 ## wiki/.state.json
 
-`wiki/sync` and `wiki/consolidate` share a single state file at `wiki/.state.json`. All fields are written atomically by CLI primitives; do not edit by hand while a workflow is running.
+`wiki/sync` and `wiki/consolidate` share a single state file at `wiki/.state.json`. Only CLI subcommands write it, and each write replaces the file in one step. Do not edit it by hand while a workflow is running.
 
 | Field | Written by | Value |
 |---|---|---|
@@ -48,34 +48,34 @@ When to add: a new meta page is appropriate when it documents how the wiki itsel
 | `last_consolidated_sha` | sync (bootstrap) / consolidate | Full 40-char SHA at consolidate completion; bootstrapped by sync on first run. |
 | `last_consolidated_at` | consolidate | ISO-8601 timestamp at consolidate completion. |
 
-`gaia wiki state-init <sha>` creates the file on a fresh project (refuses if it already exists). `gaia wiki state-bump <field> <value>` updates a single field and preserves all others. `gaia wiki state --json` reads the file and returns drift severity, head SHA, and per-domain page counts.
+`gaia wiki state-init <sha>` creates the file on a fresh project (refuses if it already exists). `gaia wiki state-bump <field> <value>` updates a single field and preserves all others. `gaia wiki state --json` reads the file and reports how far the wiki has fallen behind the code (drift severity), the head SHA, and page counts per domain.
 
 ## gaia wiki CLI primitives
 
-The `gaia wiki` namespace exposes these subcommands. The `/gaia-wiki` router and its subagents call them; they are rarely invoked manually outside of debugging.
+`gaia wiki` has these subcommands. `/gaia-wiki` and its subagents call them; you rarely run them by hand except to debug.
 
 | Subcommand | Description |
 |---|---|
-| `state [--json]` | Drift report: commits ahead of `last_evaluated_sha`, severity, per-domain page counts. |
-| `commit-classify --since <sha> [--json]` | Classify commits WORTHY/SKIP since `<sha>`. |
+| `state [--json]` | Drift report: commits since `last_evaluated_sha`, severity, page counts per domain. |
+| `commit-classify --since <sha> [--json]` | Mark each commit since `<sha>` as `WORTHY` (worth a wiki update) or `SKIP`. |
 | `state-init <sha>` | Create `wiki/.state.json` (refuses if the file already exists). |
-| `state-bump <field> <value>` | Atomic field update in `wiki/.state.json`; preserves all other fields. |
+| `state-bump <field> <value>` | Update one field in `wiki/.state.json`, keeping all the others. |
 | `log-prepend --sha <h> --decision <D> --reason "..."` | Prepend a decision line to `wiki/log.md`. |
-| `page-index [--json]` | Walk all wiki pages; return frontmatter and wikilinks per page. |
-| `orphans [--json]` | Pages with zero inbound wikilinks. |
-| `near-collisions [--max-distance N]` | Per-domain Levenshtein check over page slugs. |
-| `dead-paths [--json]` | Backtick repo paths cited in wiki prose that no longer exist on disk. |
+| `page-index [--json]` | List every wiki page with its frontmatter and wikilinks. |
+| `orphans [--json]` | Pages no other page links to. |
+| `near-collisions [--max-distance N]` | Page names in the same domain that differ by only a few characters (Levenshtein distance). |
+| `dead-paths [--json]` | Repo paths written in backticks in wiki text that no longer exist. |
 | `frontmatter [--json]` | Pages missing required frontmatter (`type`, `status`). Excludes `wiki/meta/`. |
-| `empty-sections [--json]` | Leaf headings with no body content; parent headings are never flagged. |
+| `empty-sections [--json]` | Headings with no content and no subheadings; a heading with subheadings is never flagged. |
 | `broken-links [--json]` | Wikilinks whose target page does not exist. |
-| `chain <begin\|commit\|finish\|refresh-nudge>` | One-branch, one-PR orchestration of the full `/gaia-wiki` chain. |
+| `chain <begin\|commit\|finish\|refresh-nudge>` | Runs the full `/gaia-wiki` chain on one branch with one pull request. |
 
 `chain` subcommands:
 
-- `begin` runs on the branch `/gaia-wiki` already isolated (a `wiki/<YYYY-MM-DD-HHMM>` branch, in a worktree by default) and refuses `main` and `master`.
+- `begin` runs on the branch `/gaia-wiki` already created (a `wiki/<YYYY-MM-DD-HHMM>` branch, in a worktree by default) and refuses `main` and `master`.
 - `commit` commits every stage's `wiki/` edits as one commit titled `wiki: <date> <time> UTC`; a no-op when nothing changed; refuses when non-wiki changes are present.
-- `finish` pushes the branch, opens one pull request, posts the out-of-scope `GAIA-Audit` stamp, and queues auto-merge; it drops an empty branch.
-- `refresh-nudge` writes the main checkout's new drift into the statusline cache after the merge.
+- `finish` pushes the branch, opens one pull request, posts a `GAIA-Audit` status marking the change as outside the audit's scope, and queues auto-merge. It deletes the branch if nothing changed.
+- `refresh-nudge` updates the statusline's wiki nudge after the merge, from the main checkout's new drift.
 
 `--branch-aware` and `sync land` are removed in 2.0.0.
 
@@ -90,11 +90,11 @@ tarball by the bundle-time scrub during release.
 <!-- gaia:maintainer-only:end -->
 ```
 
-The shipped file is a subset of the source: the markers and everything between them get removed by the scrub before the tarball builds. The literal phrase is `maintainer-only`; this is the on-disk identifier and matches the comment text in `.gaia/release-exclude` and the step name in `release.yml`. Public-facing references in the docs site use "Contributors."
+The shipped file is a subset of the source: the scrub removes the markers and everything between them before the tarball is built. The literal phrase is `maintainer-only`; this is the on-disk identifier and matches the comment text in `.gaia/release-exclude` and the step name in `release.yml`. Public-facing references in the docs site use "Contributors."
 
 When to use the block convention rather than path-level exclusion: use blocks when most of a page is relevant to every project but a section needs to stay internal. Use path-level exclusion (an entry in `.gaia/release-exclude`) when the entire file is contributor-only.
 
 ## Cross-references
 
 - The wiki workflow every project runs: [`/gaia-wiki`](/maintenance/wiki/).
-- The `.gaia/release-exclude` manifest is the authoritative path-level exclusion list. Anything matched there is also skipped by the maintainer's release tooling, so the shipped manifest never references a file a project cannot have.
+- The `.gaia/release-exclude` manifest is the authoritative path-level exclusion list. The maintainer's release tooling also skips anything listed there, so the shipped manifest never lists a file a project cannot have.

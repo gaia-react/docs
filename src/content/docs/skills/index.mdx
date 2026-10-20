@@ -5,7 +5,7 @@ sidebar:
   order: 0
 ---
 
-A skill is a directory with a `SKILL.md` and sometimes supporting `references/` files that load on demand. GAIA ships skills in two places:
+A skill is a folder of instructions that Claude loads when your request matches it. Each skill has a `SKILL.md`, and some have extra files in `references/` that Claude reads only when it needs them. GAIA ships skills in two places:
 
 - **`.claude/skills/`** at the project root: skills that apply anywhere in the repository.
 - **`frontend/.claude/skills/`**: the React app's skills, which load in sessions working on the app.
@@ -16,14 +16,14 @@ A skill is a directory with a `SKILL.md` and sometimes supporting `references/` 
 |---|---|---|
 | [`react-code`](/skills/code/#react-code) | `frontend/` | React components, hooks, forms, data loading, React 19 idioms |
 | [`typescript`](/skills/code/#typescript) | `frontend/` | TypeScript and Zod patterns |
-| [`tailwind`](/skills/code/#tailwind) | `frontend/` | Role tokens, `cn`, variants |
+| [`tailwind`](/skills/code/#tailwind) | `frontend/` | Theme color tokens, the `cn` class helper, variants |
 | [`skeleton-loaders`](/skills/code/#skeleton-loaders) | `frontend/` | Loading states |
 | [`tdd-react`](/skills/code/#test-driven-development) | `frontend/` | The frontend testing reference: stories, hook tests, MSW, Playwright |
 | [`playwright-cli`](/skills/code/#playwright-cli) | `frontend/` | Browser automation |
 | [`eslint-fixes`](/skills/code/#eslint-fixes) | `frontend/` | Lint failures and autofix conflicts |
-| [`a11y-fixes`](/skills/code/#accessibility-fixes) | `frontend/` | axe-core violations |
-| [`gaia-react-perf`](/skills/react-performance/) | `frontend/` | Render performance diagnosis, also `/gaia-react-perf` |
-| [`new-component`, `new-hook`, `new-route`, `new-service`](/skills/scaffolders/) | `frontend/` | Scaffolders |
+| [`a11y-fixes`](/skills/code/#accessibility-fixes) | `frontend/` | Accessibility errors reported by axe-core |
+| [`gaia-react-perf`](/skills/react-performance/) | `frontend/` | Finding why a component re-renders, also `/gaia-react-perf` |
+| [`new-component`, `new-hook`, `new-route`, `new-service`](/skills/scaffolders/) | `frontend/` | Generate new files from templates |
 | [`tdd`](/skills/code/#test-driven-development) | root | The red-green-refactor loop |
 | [`naming-conventions`](/skills/code/#naming-conventions) | root | Descriptive names in any language |
 | [`file-tech-debt`](/maintenance/debt/#how-issues-are-filed) | root | Files an out-of-scope finding as a `tech-debt` issue |
@@ -31,20 +31,20 @@ A skill is a directory with a `SKILL.md` and sometimes supporting `references/` 
 | [`update-deps`](/maintenance/update-deps/) | root | Dependency and security updates, also `/update-deps` |
 | [`update-gaia`](/maintenance/update-gaia/) | root | GAIA release updates, also `/update-gaia` |
 
-React Doctor installs per machine as `frontend/.claude/skills/react-doctor`, gitignored. GAIA's workflow commands (`/gaia-spec`, `/gaia-plan`, and the rest) read their instructions from `.claude/skills/gaia/references/`, which has no slash entry of its own.
+React Doctor is installed on each machine separately, at `frontend/.claude/skills/react-doctor`, and is gitignored. GAIA's workflow commands (`/gaia-spec`, `/gaia-plan`, and the rest) read their instructions from `.claude/skills/gaia/references/`. That folder is not a skill you can call with a slash command.
 
 ## How triggering works
 
-Each `SKILL.md` has a `description:` field listing the phrasings and situations that load it. A skill activates when the description matches what you said, not on every prompt. Saying "scaffold a card called price-card" loads `new-component`; saying "this useEffect fires twice" loads `react-code`.
+Each `SKILL.md` has a `description:` field listing the phrasings and situations that load it. A skill loads when that description matches what you said, not on every prompt. Saying "scaffold a card called price-card" loads `new-component`; saying "this useEffect fires twice" loads `react-code`.
 
-`/gaia-wiki`, `/update-deps`, and `/update-gaia` are skills, so plain-English asks trigger them too. They also surface on the statusline (`🧠`, `📦`, `🚀`) when there is pending work.
+`/gaia-wiki`, `/update-deps`, and `/update-gaia` are skills, so asking in plain English triggers them too. They also appear in the statusline (`🧠`, `📦`, `🚀`) when they have work to do.
 
-User-only commands (`/gaia-init`, `/setup-gaia`, `/gaia-fitness`, `/gaia-forensics`, `/gaia-codify`, `/gaia-residue`, `/gaia-serena-sync`) set `disable-model-invocation`, so Claude never starts them on its own and they do not appear in its skill listing. Type them as slash commands.
+Some commands are user-only: `/gaia-init`, `/setup-gaia`, `/gaia-fitness`, `/gaia-forensics`, `/gaia-codify`, `/gaia-residue`, and `/gaia-serena-sync`. They set `disable-model-invocation`, so Claude never starts them on its own and they do not appear in its list of skills. Type them yourself as slash commands.
 
 ## Questions are menus
 
-Every GAIA skill and command asks a choice as a menu (`AskUserQuestion`) with the recommended option first, and prints any prompt or command meant for pasting in a fenced code block. The shipped `user-questions` rule applies the same standard to skills you write.
+When a GAIA skill or command needs you to choose, it shows a menu (`AskUserQuestion`) with the recommended option first. Any prompt or command meant for you to paste is printed in a fenced code block. The shipped `user-questions` rule holds the skills you write to the same standard.
 
 ## Adding your own
 
-Add a directory under `.claude/skills/<name>/` (or `frontend/.claude/skills/<name>/` for an app-only skill) with a `SKILL.md` whose frontmatter sets `name` and `description`, and optionally `model:` to pin a model tier. Claude picks it up in the next session. [`/gaia-fitness`](/maintenance/fitness/) lints it.
+Add a folder under `.claude/skills/<name>/` (or `frontend/.claude/skills/<name>/` for a skill only the app needs) with a `SKILL.md`. Its frontmatter sets `name` and `description`, and optionally `model:` to always run the skill on a particular model. Claude picks it up in the next session. [`/gaia-fitness`](/maintenance/fitness/) lints it.

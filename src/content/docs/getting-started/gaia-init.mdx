@@ -7,19 +7,19 @@ sidebar:
 
 import { Aside } from '@astrojs/starlight/components';
 
-`/gaia-init` runs automatically during `npx create-gaia`. It renames the project to your title, configures language support and the data layer, strips the scaffold's GAIA branding, sets up CODEOWNERS and your environment file, registers Claude tools and plugins, verifies the build, and commits the result. You get a project that compiles, lints, and tests cleanly.
+`/gaia-init` runs automatically during `npx create-gaia`. It renames the project to your title, sets up language support and how routes load data, removes GAIA's own branding, sets up CODEOWNERS and your environment file, registers Claude tools and plugins, verifies the build, and commits the result. You get a project that compiles, lints, and tests cleanly.
 
-`/gaia-init` refuses to run anywhere but the root of a project scaffolded by `npx create-gaia`. It is a typed command: Claude never starts it on its own.
+`/gaia-init` runs only at the root of a project created by `npx create-gaia`, and refuses anywhere else. You start it by typing it; Claude never starts it on its own.
 
 ## The flow
 
 ### 1. Dependencies
 
-1. Ensures pnpm is available and new enough. GAIA requires pnpm 12 or later (the version pinned in `package.json` `packageManager`). If pnpm is missing, init enables it with `corepack enable pnpm`, or installs it globally with npm when Corepack isn't available. If an older major is on your `PATH` (for example 11.x), init asks you to confirm the upgrade before continuing, and stops if an older pnpm binary still takes precedence on your `PATH` afterward.
-2. Runs `pnpm install` against the freshly extracted scaffold.
-3. Runs [`/update-deps`](/maintenance/update-deps/) to bring every package to its latest compatible version and resolve every security advisory it can. In this mode it asks no questions, reverts a resolution that fails the quality gate, and commits nothing; init's own commit at the end carries the changes. Anything held back is surfaced with a reason.
+1. Ensures pnpm is available and new enough. GAIA requires pnpm 12 or later (the version pinned in `package.json` `packageManager`). If pnpm is missing, init enables it with `corepack enable pnpm`, or installs it globally with npm when Corepack isn't available. If an older major version is on your `PATH` (for example 11.x), init asks you to confirm the upgrade first. It stops if an older pnpm still comes first on your `PATH` after the upgrade.
+2. Runs `pnpm install` in the new project.
+3. Runs [`/update-deps`](/maintenance/update-deps/) to bring every package to its latest compatible version and resolve every security advisory it can. In this mode it asks no questions, undoes any fix that fails the quality gate, and commits nothing; init's own commit at the end includes the changes. Anything it holds back is listed with a reason.
 
-If install fails, the run halts with the underlying error. Fix the cause and resume (see [Resuming after a failure](#resuming-after-a-failure)).
+If install fails, the run stops and shows the error. Fix the cause and resume (see [Resuming after a failure](#resuming-after-a-failure)).
 
 ### 2. Questions about your project
 
@@ -31,53 +31,61 @@ Before it asks about your project, `/gaia-init` asks how you want to answer the 
 Every question is a menu with the recommended option first. In interactive mode it asks:
 
 - **Primary language.** The main language for your app's UI. The first option is the language you have been typing in. The second is always a different real language: English when you type in another language, otherwise your system locale's language, or Spanish. Type any other language, by name or code, through the menu's Other answer.
-- **Additional languages.** Keep only the primary with the i18n scaffolding wired (recommended, so you can localize later with no rework), add more languages now, or remove i18n entirely. Stripping is hard to reverse, so pick it only if you are sure the app stays single-language.
-- **GitHub username for CODEOWNERS.** GAIA detects your handle from your authenticated GitHub CLI (`gh api user`) and offers it first. Choose **Set it later** to write a placeholder you edit before pushing, or type a different handle. If detection fails, GAIA asks you to type your handle rather than guessing.
-- **Project title.** Your folder name in title case (for example `my-cool-app` becomes `My Cool App`), or the folder name as it is. Type your own title through Other. The kebab-case slug is derived from the title, so it is never asked on its own. To set both, type `Title / slug`.
-- **Backend field casing.** How your backend names JSON fields. `camelCase` (recommended) passes keys through unchanged. `snake_case` has the services layer convert between `snake_case` on the wire and camelCase in code (`create({isSnakeCaseEnabled: true})`). **Not sure** is treated as camelCase.
-- **TanStack Query.** Off by default: route loaders own the data and nothing extra is installed. **Yes** pins TanStack Query and wires its provider and Storybook decorator.
+- **Additional languages.** Keep only the primary language with translation support (i18n) still set up (recommended, so you can add languages later with no rework), add more languages now, or remove i18n entirely. Removing it is hard to undo, so pick it only if you are sure the app will only ever use one language.
+- **GitHub username for CODEOWNERS.** GAIA reads your handle from the GitHub CLI you are logged in to (`gh api user`) and offers it first. Choose **Set it later** to write a placeholder you edit before pushing, or type a different handle. If detection fails, GAIA asks you to type your handle rather than guessing.
+- **Project title.** Your folder name in title case (for example `my-cool-app` becomes `My Cool App`), or the folder name as it is. Type your own title through Other. The slug (the kebab-case name used in package names and paths) comes from the title, so it is never asked separately. To set both, type `Title / slug`.
+- **Backend field casing.** How your backend names JSON fields. `camelCase` (recommended) passes keys through unchanged. `snake_case` makes the services convert keys: `snake_case` in requests and responses, camelCase in your code (`create({isSnakeCaseEnabled: true})`). **Not sure** is treated as camelCase.
+- **TanStack Query.** Off by default: route loaders handle data and nothing extra is installed. **Yes** installs a pinned TanStack Query and sets up its provider and Storybook decorator.
 
-Both data-layer answers can change later with `./.gaia/cli/gaia init configure-data-layer --casing snake` or `--query true`.
+Both data answers (casing and TanStack Query) can change later with `./.gaia/cli/gaia init configure-data-layer --casing snake` or `--query true`.
 
-The language, title, and identity questions are re-asked until you answer; GAIA never guesses them. The two data-layer questions are re-asked once, then fall back to their stated default.
+The language, title, and identity questions are re-asked until you answer; GAIA never guesses them. The two data questions are asked again once, then fall back to their default.
 
 <Aside type="caution">
-Stripping i18n is hard to reverse. Choose it only if you are certain the app stays single-language. Keeping the scaffolding lets you add locales later with no rework.
+Removing i18n is hard to undo. Choose it only if you are certain the app will only ever use one language. Keeping it set up lets you add languages later with no rework.
 </Aside>
 
 ### 3. Branding, naming, data layer, and i18n
 
-With your answers, `/gaia-init` strips the scaffold's GAIA branding (it writes a fresh `README.md` for your project and rebrands the Storybook sidebar to your title), configures i18n for your chosen locales, configures the route data layer for your casing and Query answers, renames the project to your title and slug, and wires the statusline into the project's `.claude/settings.json`. If you added locales, it scaffolds each non-English one. If you stripped i18n, it removes the framework cleanly.
+With your answers, `/gaia-init`:
+
+- removes GAIA's branding: it writes a new `README.md` for your project and puts your title on the Storybook sidebar
+- sets up i18n for the languages you chose, and creates starter files for each non-English one
+- sets up route data loading for your casing and TanStack Query answers
+- renames the project to your title and slug
+- adds the statusline to the project's `.claude/settings.json`
+
+If you removed i18n, it removes all of it cleanly.
 
 ### 4. Project files and build check
 
-- Creates `.github/CODEOWNERS` with your GitHub handle as the repo-wide owner. When no real handle was obtained, it writes the placeholder `REPLACE-WITH-YOUR-GITHUB-HANDLE` and flags a required follow-up to edit before you push. GitHub flags the unknown owner, so the gap stays visible.
+- Creates `.github/CODEOWNERS` with your GitHub handle as the repo-wide owner. When it has no real handle, it writes the placeholder `REPLACE-WITH-YOUR-GITHUB-HANDLE` and tells you to edit it before you push. GitHub also warns about the unknown owner, so you won't miss it.
 - Copies `frontend/.env.example` to `frontend/.env` if you do not already have one. The app's environment file lives in the `frontend/` package; Playwright reads the same file.
-- Runs the full quality gate from the repository root, `pnpm typecheck && pnpm lint && pnpm test:ci && pnpm build` (the root scripts run the `frontend` package), and stops if anything fails. This is the step that backs the "compiles, lints, and tests cleanly" promise, and the main reason init takes a few minutes.
+- Runs the full quality gate from the repository root, `pnpm typecheck && pnpm lint && pnpm test:ci && pnpm build` (the root scripts run the `frontend` package), and stops if anything fails. This step is what makes sure the project compiles, lints, and tests cleanly, and it is the main reason init takes a few minutes.
 
 ### 5. Claude tooling
 
-`/gaia-init` configures the external tools and plugins GAIA relies on. GAIA's skills and rules already ship with the project. You don't run any of this by hand; it is listed for reference. [`/setup-gaia`](/getting-started/setup-gaia/) runs the same steps on every other machine.
+`/gaia-init` sets up the outside tools and plugins GAIA uses. GAIA's skills and rules already ship with the project. You don't run any of this by hand; it is listed for reference. [`/setup-gaia`](/getting-started/setup-gaia/) runs the same steps on every other machine.
 
-**Tools.** Per-machine, not tracked in the repo:
+**Tools.** Installed on each machine, not tracked in the repo:
 
 - [React Doctor](https://github.com/millionco/react-doctor): `bash .gaia/scripts/install-react-doctor.sh` installs the `react-doctor` skill under `frontend/.claude/skills/`, so it only loads in sessions that work on the app.
-- [Playwright CLI](https://github.com/microsoft/playwright-cli) binary: `npm install -g @playwright/cli@latest`. The bundled `playwright-cli` skill runs through it, and [`/update-deps`](/maintenance/update-deps/) reports when it falls behind.
+- [Playwright CLI](https://github.com/microsoft/playwright-cli) binary: `npm install -g @playwright/cli@latest`. The `playwright-cli` skill that ships with GAIA uses it, and [`/update-deps`](/maintenance/update-deps/) reports when it falls behind.
 - [Serena](https://github.com/oraios/serena) MCP server, registered globally for your Claude Code:
 
   ```bash
   claude mcp add serena -s user -- uvx --from git+https://github.com/oraios/serena@v1.7.0 serena start-mcp-server --context claude-code --project-from-cwd --open-web-dashboard false
   ```
 
-  Serena needs `uv` (Astral's Python toolchain runner). If `uv` is missing, `/gaia-init` installs it first with `curl -LsSf https://astral.sh/uv/install.sh | sh`.
+  Serena needs `uv`, Astral's tool for running Python programs. If `uv` is missing, `/gaia-init` installs it first with `curl -LsSf https://astral.sh/uv/install.sh | sh`.
 
-  Serena's tools win over Claude's built-in Read, Grep, and Edit only when Claude Code loads Serena's system-prompt override. The recommended way to start a session is:
+  Claude prefers Serena's code tools over its built-in Read, Grep, and Edit only when Claude Code starts with Serena's extra system prompt. The recommended way to start a session is:
 
   ```bash
   claude --append-system-prompt="$(serena prompts print-cc-system-prompt-override)"
   ```
 
-  A plain `claude` still works; the shipped `serena-cc-override` rule is the fallback.
+  A plain `claude` still works; in that case the `serena-cc-override` rule that ships with GAIA tells Claude to prefer Serena.
 
 **Plugins.**
 
@@ -85,14 +93,14 @@ With your answers, `/gaia-init` strips the scaffold's GAIA branding (it writes a
 claude plugin install typescript-lsp@claude-plugins-official
 ```
 
-After installing, `/gaia-init` probes each component and reports `[ok]` or `[FAIL]` per item. A failure halts the run so you can retry before continuing.
+After installing, `/gaia-init` checks each one and reports `[ok]` or `[FAIL]` for each. A failure stops the run so you can retry before continuing.
 
 ### 6. Team settings
 
 `/gaia-init` writes GAIA's two team defaults to `.gaia/project.json` without asking:
 
 - **Git isolation policy**: always use worktrees. Every `/gaia-plan`, `/gaia-debt`, and ad-hoc task works in its own git worktree, so tasks run in parallel without touching each other. See [Work lifecycle](/workflow/work-lifecycle/).
-- **Sandbox recommendation**: not recommended. Claude Code's OS-level Bash sandbox breaks `gh`, git over HTTPS, and `docker` until they are allowlisted, and GAIA's lifecycle runs on `gh`.
+- **Sandbox recommendation**: not recommended. Claude Code's operating-system sandbox for shell commands breaks `gh`, git over HTTPS, and `docker` until you allow each one, and GAIA's whole workflow depends on `gh`.
 
 The file is committed and shared with your team, and `/update-gaia` never overwrites it. A repo admin changes either setting later with `/setup-gaia --reconfigure`.
 
@@ -102,11 +110,11 @@ GAIA ships with a built-in [wiki](/maintenance/wiki/) that Claude maintains as i
 
 ### 8. Commit
 
-`/gaia-init` commits its own changes as one commit on your default branch, `chore: initialize project with /gaia-init`. [`/setup-gaia`](/getting-started/setup-gaia/) pushes only what is committed, and every branch or worktree cut later starts from the last commit, so nothing init wrote is left behind. If the commit fails, init says so and tells you to review `git status` and commit before running `/setup-gaia`.
+`/gaia-init` commits its own changes as one commit on your default branch, `chore: initialize project with /gaia-init`. [`/setup-gaia`](/getting-started/setup-gaia/) pushes only what is committed, and every later branch or worktree starts from the last commit. Committing makes sure nothing init wrote is left behind. If the commit fails, init says so and tells you to review `git status` and commit before running `/setup-gaia`.
 
 ## Usage ping
 
-`/gaia-init`, `/setup-gaia`, `/update-gaia`, and the 2.0.0 migration each send one fire-and-forget request to `telemetry.gaiareact.com`. It carries a few categorical fields for that event (for `/gaia-init`, the run mode and the number of languages), a pseudonymous per-install `projectId`, the GAIA version, and a coarse platform (`macos`, `linux`, `windows`, or `other`). It never carries paths or free text, it never blocks or fails the command, and a network failure is ignored.
+`/gaia-init`, `/setup-gaia`, `/update-gaia`, and the 2.0.0 migration each send one request to `telemetry.gaiareact.com` and don't wait for a reply. It carries a few fields with fixed choices for that event (for `/gaia-init`, the run mode and the number of languages), a pseudonymous ID for this install (`projectId`), the GAIA version, and a broad platform (`macos`, `linux`, `windows`, or `other`). It never carries paths or free text. It never blocks or fails the command, and a network failure is ignored.
 
 To turn it off, set the variable in your shell profile:
 
@@ -116,7 +124,7 @@ export GAIA_TELEMETRY_PING_DISABLE=1
 
 ## After gaia-init completes
 
-Init marks the per-machine setup complete and cleans up its own one-time setup files. Then it prints:
+Init marks this machine's setup as done and deletes its own one-time setup files. Then it prints:
 
 ```
 <Project Title> is ready for development. Exit Claude, then from your terminal:
@@ -128,20 +136,20 @@ Then start Claude again, and run /setup-gaia. After your first push, /setup-gaia
 
 If `.github/CODEOWNERS` still holds the placeholder owner, a required follow-up to edit it comes first.
 
-Exit Claude and relaunch from inside the project folder. The new plugin and skill state only loads in a fresh session.
+Exit Claude and relaunch from inside the project folder. New plugins and skills only load in a new session.
 
 <Aside type="caution">
 When you exit Claude, your shell returns to the directory you launched from, not the project folder. Run `cd <project-folder-name>` before relaunching, or the new plugins and skills will not load.
 </Aside>
 
-From there you are ready to build. Run `pnpm dev` to start the app locally, or ask Claude to run it. When you are ready for GitHub, run [`/setup-gaia`](/getting-started/setup-gaia/); it provisions the repo for you (or adopts one you already created). [What you meet, and when](/getting-started/what-you-meet/) shows what GAIA does as your first commits and pull requests land.
+From there you are ready to build. Run `pnpm dev` to start the app locally, or ask Claude to run it. When you are ready for GitHub, run [`/setup-gaia`](/getting-started/setup-gaia/); it creates the GitHub repo for you (or uses one you already created). [What you meet, and when](/getting-started/what-you-meet/) shows what GAIA does as your first commits and pull requests land.
 
 ## Resuming after a failure
 
-`/gaia-init` records its progress in `.gaia/init-state.json`. If something breaks mid-run, the failing step prints a structured error. Fix the cause and run:
+`/gaia-init` records its progress in `.gaia/init-state.json`. If something breaks partway through, the failing step prints an error saying what went wrong. Fix the cause and run:
 
 ```bash
 .gaia/cli/gaia init resume
 ```
 
-Already-completed steps are skipped, and the remaining ones replay with the arguments you already gave.
+Steps that already finished are skipped, and the rest run again with the answers you already gave.

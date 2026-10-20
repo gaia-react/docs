@@ -1,26 +1,26 @@
 ---
 title: /gaia-codify
-description: Turn a finding the Code Audit Team keeps making into a guard (a deterministic check, a skill, or a path-scoped rule), at the lowest context weight, with your approval.
+description: Turn a problem the Code Audit Team keeps finding into a guard (an automated check, a skill, or a rule for matching files), picking the option that adds least to Claude's context, with your approval.
 ---
 
-`/gaia-codify` looks at what the [Code Audit Team](/workflow/code-audit-team/) keeps finding across merged pull requests and proposes a guard so the pattern stops recurring. For each recurring finding it recommends the lightest form that would work, explains it in plain language, and asks you once to accept the plan. Nothing is authored or switched on without your answer.
+`/gaia-codify` looks at what the [Code Audit Team](/workflow/code-audit-team/) keeps finding across merged pull requests and proposes a guard so the problem stops coming back. For each repeat problem it recommends the lightest fix that would work (the one that adds least to what Claude reads on every task), explains it in plain language, and asks you once to accept the plan. Nothing is authored or switched on without your answer.
 
-It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, on a branch of its own, ending in a pull request. It is a typed command; Claude never starts it on its own. In 1.x it was `/gaia-harden`. There is no alias.
+It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, on a branch of its own, ending in a pull request. Only you start it, by typing it; Claude never runs it on its own. In 1.x it was `/gaia-harden`. There is no alias.
 
 ## When to use it
 
 The statusline nudges you with `🔨 /gaia-codify (<reason>)`:
 
 - Before your first completed review, it counts recurring patterns: `/gaia-codify (3 recurring patterns)`.
-- After a completed review, it stays quiet until something changes, then names it: a new recurring pattern, a pattern rising materially, or a change in how findings are counted.
+- After a completed review, it stays quiet until something changes, then names it: a new recurring pattern, a pattern that has grown noticeably, or a change in how findings are counted.
 
-A hook posts each pull request's machine-readable findings on every `gh pr merge`, which is what the tally reads.
+On every `gh pr merge`, a hook posts the pull request's findings in a machine-readable form. Those posts are what the count reads.
 
 ## What counts as recurring
 
-A finding class becomes a candidate once it appears on **3 or more distinct merged pull requests within the last 90 days**, at any severity, and no rule promoted earlier covers it. Findings the audit could not place in a class are counted too, and surface as their own signal when they recur.
+A kind of finding (its finding class) becomes a candidate once it appears on **3 or more different merged pull requests within the last 90 days**, at any severity, and no rule from an earlier run already covers it. Findings the audit could not place in a class are counted too, and surface as their own signal when they recur.
 
-The tally reads your merged pull requests through `gh`. When it cannot, the run says so ("this is not an all-clear") instead of reporting nothing.
+The count reads your merged pull requests through `gh`. When it cannot, the run says so ("this is not an all-clear") instead of reporting nothing.
 
 ## How it judges the form
 
@@ -28,12 +28,12 @@ For each candidate, it first checks whether an existing rule, skill, hook, or Qu
 
 | Pattern | Recommended form | What `/gaia-codify` does |
 |---|---|---|
-| A deterministic tool already catches it | Make that check blocking, or add it to the Quality Gate | Edits the existing wiring |
-| It can be caught by a lint rule, hook, or test | A deterministic check | Writes a sketch of the hook and script for you to finish. Nothing is switched on. |
+| An existing tool already catches it | Make that check stop the change instead of only warning, or add it to the Quality Gate | Edits the existing setup |
+| It can be caught by a lint rule, hook, or test | An automated check | Writes a sketch of the hook and script for you to finish. Nothing is switched on. |
 | The lesson is a procedure ("do these steps in this order") | A skill | Writes a `SKILL.md` outline for you to finish. Nothing is switched on. |
-| A judgment call no tool can catch | A path-scoped prose rule | Writes the rule file under `.claude/rules/`, scoped by `paths:` to where the finding recurs |
+| A judgment call no tool can catch | A written rule that loads only for matching paths | Writes the rule file under `.claude/rules/`, scoped by `paths:` to where the finding recurs |
 
-Prose is the weakest form: it advises rather than enforces and costs context on every matching task. So before recommending a rule, it asks what cheap evidence would show the rule changes behavior. When it cannot name any, it recommends defer or decline instead.
+A written rule is the weakest option: it advises instead of enforcing, and Claude has to read it on every matching task. So before recommending one, it asks what quick evidence would show the rule actually changes behavior. If it can't name any, it recommends defer or decline instead.
 
 ## The flow
 
@@ -43,23 +43,23 @@ Prose is the weakest form: it advises rather than enforces and costs context on 
    - **Accept all recommendations** (recommended)
    - **Change some**: pick rows, then choose **approve**, **decline**, **defer**, or **redirect** (a different form) for each
    - **Stop without changes**: nothing is authored or recorded
-4. **Apply** each disposition. Approved rule edits land in the working tree on the run's own branch.
+4. **Apply** your choice for each candidate. Approved rule edits land in the working tree on the run's own branch.
 5. **Publish** approved changes as one pull request at the end, merged only on your answer.
 
 ### Decline and defer
 
-- **Decline** records, on this machine only, that you are not acting on the pattern. It comes back once the pattern rises materially (at least 3 more pull requests). The ledger lives in `.gaia/local/codify/` and is never shared, so a teammate still sees the nudge.
-- **Defer** records nothing of its own. The candidate still appears in the next review; the nudge stays quiet until the pattern rises or the counting changes.
+- **Decline** records, on this machine only, that you are not acting on the pattern. It comes back once the pattern grows by at least 3 more pull requests. The record lives in `.gaia/local/codify/` and is never shared, so a teammate still sees the nudge.
+- **Defer** records nothing of its own. The candidate still appears in the next review; the nudge stays quiet until the pattern grows or the counting changes.
 
 ## Promoted rules
 
-A rule `/gaia-codify` writes carries a one-line provenance marker after its frontmatter:
+A rule `/gaia-codify` writes carries a one-line comment after its frontmatter saying where it came from:
 
 ```markdown
 <!-- gaia-harden: promoted from recurring finding_class <class>; pruned by /gaia-cleanse on obsolescence/redundancy/supersession/duplication only, never for non-recurrence -->
 ```
 
-The marker is what drops the class from future tallies. [`/gaia-cleanse`](/maintenance/cleanse/) treats a marked rule like any other, except it never prunes one because its pattern stopped recurring: a quiet pattern is the rule working.
+That comment is what stops the pattern from being counted again. [`/gaia-cleanse`](/maintenance/cleanse/) treats a marked rule like any other, except it never removes one because its pattern stopped showing up: a pattern that stops showing up means the rule is working.
 
 The run ends with a [cost line](/reference/cost/).
 

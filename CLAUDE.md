@@ -93,6 +93,7 @@ Studio's `VOICE.md` covers marketing, docs, and in-app strings together. For doc
 
 - **Reference register, not pitch register.** Procedural and declarative. "Run `/gaia-cleanse` to review memory and auto-loaded files." Not "Unleash the power of `/gaia-cleanse`."
 - **Voice rules still apply.** No em dashes anywhere. No AI tells (delve, tapestry, leveraging, seamless, robust, powerful). No borrowed-field jargon (substrate, paradigm, ecosystem, fabric). Grep for `—` before publishing.
+- **Plain language.** Readers are engineers, but their experience varies widely. Explain in everyday words, keep jargon and internal vocabulary to a minimum, define an unavoidable term the first time a page uses it, and split long sentences. Plainer is often shorter; it never drops a fact.
 - **Concrete over vague.** Real command names, real flags, real file paths, real numbers. Not "various options."
 - **Code blocks are honest.** Examples should run. If a snippet won't work as written, it doesn't belong.
 - **No "we" / "our team."** Either declarative ("GAIA installs…") or second-person instructional ("Run `pnpm install`…"). "Built by Steven Sacks" stays in marketing surfaces, not docs.
