@@ -14,7 +14,11 @@ A gate is not a judgment of you or of Claude. Each one exists because the proble
 ### Commits on the default branch
 
 - **Stops:** `git commit` on `main` or `master`, a plain `git push` from them, a push that targets `main`, `master`, or `HEAD`, and force-pushes that name them (`--force`, `--force-with-lease`, or `-f`).
-- **Why:** a commit made straight on the default branch skips the pull request and the audit that every other change goes through. A force-push rewrites history your teammates have already pulled.
+- **Why:**
+  - **Commit:** work reaches the default branch only through a pull request, where the audit reviews it before it merges.
+  - **Plain push:** it would land your local commits on the shared branch without the pull request and audit every change goes through.
+  - **Force-push:** the branch's history is shared, so rewriting it pulls commits out from under every clone and branch built on it.
+  - **A push that targets `main`, `master`, or `HEAD`:** refused from any branch; the refusal asks you to name the branch you are pushing and open a pull request, and gives no further reason.
 - **When:** before the `git` command runs (`block-main-destructive-git`).
 - **Clear it:** create a feature branch, push it by name, and open a pull request. Claude does this for you as part of the [work lifecycle](/workflow/work-lifecycle/).
 
@@ -144,14 +148,14 @@ A gate is not a judgment of you or of Claude. Each one exists because the proble
 ### Writing secrets
 
 - **Stops:** writes that contain an AWS key, a GitHub token, a private key, or a variable with a secret-sounding name set to a real-looking value. It also stops any write to a `.env` file except `.env.example`.
-- **Why:** a secret written into a tracked file is one commit away from the repository's history.
+- **Why:** a secret written into a tracked file is one commit away from the repository's history. `.env` files hold local secrets Claude is kept from reading, so a write there would overwrite values it cannot see.
 - **When:** before Edit, Write, or MultiEdit runs (`block-secrets-write`).
 - **Clear it:** put the value in your gitignored `frontend/.env` yourself and refer to it by name. `.env.example` takes placeholder values.
 
 ### GAIA's manifest
 
 - **Stops:** writes to `.gaia/manifest.json`.
-- **Why:** the manifest lists only the files GAIA ships, and `/update-gaia` overwrites the files it lists as GAIA's. A file of yours added there would be treated as GAIA's.
+- **Why:** the manifest lists only the files GAIA ships. `/gaia-fitness` reads it to tell GAIA's files from yours, so an entry you add could mark your own file as GAIA's and put it out of reach of fitness fixes. `/update-gaia` also replaces the whole file from the release, so the edit would be lost anyway.
 - **When:** before Edit, Write, or a Bash command that writes files runs (`block-manifest-write`).
 - **Clear it:** nothing to do; your files never belong there. `/update-gaia` writes it through a specific exemption.
 
@@ -179,9 +183,15 @@ A gate is not a judgment of you or of Claude. Each one exists because the proble
 ### Destructive deletes
 
 - **Stops:** `rm -rf` of `/`, an absolute path outside the allowed scratch folders, `$HOME`, `.`, `*`, dotfile or brace globs, `.git`, `.claude` and anything in it, and `node_modules`, plus `--no-preserve-root`.
-- **Why:** each of these deletes the repository, its history, its Claude setup, or your home directory in one command, with no undo.
+- **Why:** each one can delete far more than you meant, in one command, with no undo:
+  - **An absolute path** can reach anywhere on your machine, outside the repository. One containing `..` resolves somewhere its spelling does not name.
+  - **`$HOME` or `~`** holds far more than this repository, and git cannot restore what lives outside it.
+  - **`.`** wipes the whole working folder, `.git` and `.claude` included. **`*`** removes every file and folder in it that is not hidden. Dotfile and brace globs remove `.git` and `.claude`.
+  - **`.git`** holds the repository's history, and a commit you have not pushed exists nowhere else.
+  - **`.claude`** holds the hooks, skills, agents, and settings.
+  - **`--no-preserve-root`** switches off rm's own refusal to delete the filesystem root.
 - **When:** before the Bash command runs (`block-rm-rf`).
-- **Clear it:** delete by an explicit relative path. Remove one file under `.claude/` with a plain `rm <file>` (no flags). Run `pnpm install` instead of deleting `node_modules`.
+- **Clear it:** delete by an explicit relative path. Remove one file under `.claude/` with a plain `rm <file>` (no flags). For `node_modules`, use `pnpm store prune`, or remove it yourself.
 
 ## Worktrees and parallel work
 

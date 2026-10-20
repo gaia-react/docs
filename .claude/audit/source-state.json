@@ -1,7 +1,7 @@
 {
   "version": 1,
   "captured_at": "2026-10-20",
-  "gaia_commit": "b27d86a9491f973fdefd1f827e265f8674c10f44",
+  "gaia_commit": "d540ccf2b67a06cac2b1222a48c542fd595566a7",
   "items": [
     {
       "kind": "command",
@@ -1019,7 +1019,7 @@
       "name": "block-manifest-write.sh",
       "description": "PreToolUse Edit/Write/MultiEdit + Bash hook: deny writes to .gaia/manifest.json.",
       "audience": "adopter",
-      "content_hash": "4f3021c718285038862b14857071fca8a1aac518d581851d555757a241682e45",
+      "content_hash": "ba473748590a7aafa719a40490ac462a3047525476f4df4bb4797bc6e68ac82f",
       "excluded_from_docs": false
     },
     {
@@ -2197,7 +2197,7 @@
       "name": "wiki/concepts/Git Workflow.md",
       "description": "Git Workflow",
       "audience": "adopter",
-      "content_hash": "f8f3339659e90349cc47cb29b42a3799d6b79f7aef3658502b86caa1e1e2fe7d",
+      "content_hash": "d1ffd86c0d421ef210fb00d6203e029d3093e493e6f62caf133656f52cd3a223",
       "excluded_from_docs": false
     },
     {
