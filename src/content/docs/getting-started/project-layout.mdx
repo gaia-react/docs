@@ -39,7 +39,7 @@ Files and folders under `app/components`, `app/pages`, and `app/hooks` are kebab
 
 Each copy of the repo, your main one and each worktree, gets its [own dev, Storybook, and Playwright ports](/workflow/work-lifecycle/#ports-per-worktree), so they never collide. The main copy uses 5173 and 6006. To see a copy's ports, run `bash .gaia/scripts/ports.sh` in it.
 
-To add another package beside `frontend/`, such as a backend, see [Why no backend?](#why-no-backend).
+To add a backend or another package beside `frontend/`, see [Adding a backend](#adding-a-backend).
 
 ## The frontend stack
 
@@ -59,11 +59,7 @@ A new project starts plain and unbranded: neutral gray-scale shadcn color tokens
 
 For the reasoning behind each choice, ask Claude: the decisions live in the project wiki.
 
-## Why no backend?
-
-GAIA ships one frontend framework and no backend. This is an intentional choice.
-
-### The frontend is chosen for you
+## Why React Router
 
 [React Router 8](https://reactrouter.com/) can be used to build nearly any web app you need. It is widely used and well established, and it can render pages on the server or run entirely in the browser as a single-page app. GAIA ships with server rendering on.
 
@@ -73,9 +69,9 @@ Other frameworks differ in ways that rarely decide whether you *can* build your 
 
 If React Router truly cannot do something your project needs, you can ask Claude to replace it. Expect a large change: GAIA's frontend rules, skills, scaffolders, and Code Audit Team extensions are written for React Router and would have to change with it.
 
-### The backend is left to you
+## Adding a backend
 
-Backends differ in ways that matter: language, hosting, database, and what your team already knows. Often the choice isn't yours at all, because your company already runs one. Your backend might be a hosted service such as Supabase, a service you write in TypeScript, Python, or Ruby, or an existing company API. GAIA works with any of them.
+GAIA ships no backend. This is an intentional choice. Backends differ in ways that matter: language, hosting, database, and what your team already knows. Often the choice isn't yours at all, because your company already runs one. Your backend might be a hosted service such as Supabase, a service you write in TypeScript, Python, or Ruby, or an existing company API. GAIA works with any of them.
 
 GAIA's repo is built for this. It is a pnpm workspace, so each backend you add becomes another package beside `frontend/`, with its own `CLAUDE.md`, rules, and skills. To add one, ask Claude: it follows the steps GAIA ships. Those steps include two things the backend needs before its code is checked as well as the frontend's:
 
