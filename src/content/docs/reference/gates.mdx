@@ -22,6 +22,13 @@ A gate is not a judgment of you or of Claude. Each one exists because the proble
 - **When:** before the `git` command runs (`block-main-destructive-git`). The hook checks the branch names `main` and `master` themselves, so a default branch with any other name is not covered.
 - **Clear it:** create a feature branch, push it by name, and open a pull request. Claude does this for you as part of the [work lifecycle](/workflow/work-lifecycle/).
 
+### Hard reset that drops commits
+
+- **Stops:** `git reset --hard HEAD~<n>` (any command that starts with `git reset --hard HEAD~`).
+- **Why:** the permission rule states no reason.
+- **When:** before the Bash command runs (a permission deny in `.claude/settings.json`).
+- **Clear it:** Claude cannot run it. If you mean to drop commits, run the command yourself in a terminal.
+
 ### Moving another session's checkout
 
 - **Stops:** a `git checkout` or `git switch` that would move the main checkout off a branch that another Claude session is using there, with an open pull request.
