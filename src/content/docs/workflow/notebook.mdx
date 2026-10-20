@@ -5,17 +5,17 @@ description: Where GAIA keeps specs, plans, and research while the work is in pr
 
 import { Aside } from '@astrojs/starlight/components';
 
-The `.notebook/` folder at the root of your main checkout is where GAIA keeps working material for SPECs, plans, and research. It is gitignored, so nothing in it is ever committed.
+The `.notebook/` folder at the root of your main checkout is where GAIA keeps working material for SPECs, plans, and research. It is gitignored.
 
 ## An engineer's notebook
 
-Conceptually, the notebook works the way an engineer's paper notebook does. You keep it at your own desk and write in it while the work is happening. It holds drafts, plans you are working through, notes on what you tried. It is not where the finished result lives.
+Conceptually, the notebook works the way an engineer's paper notebook does. You keep it at your own desk and write in it while the work is happening. It holds drafts, the plans you are working through, and notes on what you tried. It is not where the finished result lives.
 
 The finished result is the code, the pull request, and the commit history. When a plan's pull request is ready to merge, Claude writes a short summary of what shipped. It can promote that summary into the [project wiki](/maintenance/wiki/) as a commit on the pull request's branch, so the lasting part travels with the code. The notebook entry has done its job after that, and GAIA clears it out.
 
 Nothing in the notebook is committed, so drafts, dead ends, and research notes never show up in your repository's history or in a pull request's diff.
 
-The notebook sits at the root of your project, so its files are easy to find when you want to read a SPEC, check a plan's progress, or look back at research.
+Because it sits at the top level of your project, its files are easy to find when you want to read a SPEC, check a plan's progress, or look back at research.
 
 ## What it holds
 
