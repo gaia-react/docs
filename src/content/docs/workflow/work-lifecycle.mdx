@@ -72,7 +72,7 @@ Uncommitted edits already in your checkout come along. On a feature branch they 
 GAIA uses Claude Code's built-in worktrees under `.claude/worktrees/`. When a session enters one, GAIA renames its branch to the generated name and sets the worktree up:
 
 - **Shared state is linked, not copied.** GAIA's machine-local state (`.gaia/local`), the [notebook](#where-specs-plans-and-research-live), and the main checkout's `frontend/.env` are linked into the worktree. Nothing written there disappears when the worktree is removed, and your secrets stay in one file instead of being duplicated into every worktree. Separately, Claude cannot read `.env` files in any checkout. See the [gate reference](/reference/gates/#reading-secrets).
-- **Dependencies install and typed routes are generated in the background.** A new worktree has no `node_modules`, so GAIA runs `pnpm install --frozen-lockfile` in it. It then runs React Router's `typegen`, which writes TypeScript types for each route's URL params and loader data, so route code type-checks against the worktree's own routes. See React Router's [type safety guide](https://reactrouter.com/explanation/type-safety). Both steps run as a background job so the session does not wait for them, and Claude is told where the job's log is while it runs.
+- **Dependencies install and typed routes are generated in the background.** A new worktree has no `node_modules`, so GAIA runs `pnpm install --frozen-lockfile` in it. It then runs React Router's `typegen`, which writes [TypeScript](https://www.typescriptlang.org/) types for each route's URL params and loader data, so route code type-checks against the worktree's own routes. See React Router's [type safety guide](https://reactrouter.com/explanation/type-safety). Both steps run as a background job so the session does not wait for them, and Claude is told where the job's log is while it runs.
 - **Each checkout has its own ports.** See [Ports per worktree](#ports-per-worktree).
 - **A guard keeps edits in the right copy.** An edit to a file in a different checkout from the session's worktree is denied. When a session moves into a worktree, Claude may still hold absolute paths it used in the main checkout. Those paths still point to real files, just in the wrong copy, so an edit through one would change the main checkout without any warning. See the [gate reference](/reference/gates/#worktree-path-mismatch).
 
@@ -80,7 +80,7 @@ If a worktree's links break, repair them with `bash .gaia/scripts/link-worktree.
 
 ### Ports per worktree
 
-Every checkout gets its own dev, Storybook, and Playwright ports, so you can run the app in several worktrees at the same time without one server taking another's port.
+Every checkout gets its own dev, [Storybook](https://storybook.js.org/), and [Playwright](https://playwright.dev/) ports, so you can run the app in several worktrees at the same time without one server taking another's port.
 
 - **The main checkout keeps the default ports:** 5173 (dev) and 6006 (Storybook).
 - **Each worktree gets a numbered slot**, the lowest one free, and its ports are the defaults plus that number. Slot 1 is 5174 and 6007, slot 2 is 5175 and 6008. A worktree keeps its slot every time a session returns to it. Slots cover the `frontend/` package only.

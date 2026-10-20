@@ -30,7 +30,7 @@ The command works out which situation your clone is in (a new project with no Gi
 Three checks run every time:
 
 - **Worktree links.** `bash .gaia/scripts/link-worktree.sh` checks the links a git worktree needs to the main copy's shared folders. In your main copy it does nothing. If it prints a `failed:` line (for example, Windows refused to create a symlink), setup stops and shows that line. Fix the cause and run `/setup-gaia` again.
-- **pnpm and node_modules.** If `corepack` is available, pnpm is enabled at the pinned version; otherwise it is installed globally with npm. `pnpm install` runs when `node_modules/` is missing.
+- **[pnpm](https://pnpm.io/) and node_modules.** If `corepack` is available, pnpm is enabled at the pinned version; otherwise it is installed globally with npm. `pnpm install` runs when `node_modules/` is missing.
 - **GitHub CLI check (warning only).** If `gh` is missing or not logged in, you get a warning and setup continues. The pull request merge workflow, `/gaia-plan`, and `/gaia-forensics` rely on `gh`, so install it from [cli.github.com](https://cli.github.com/) and run `gh auth login` when you can.
 
 ## Phase: per-machine setup
@@ -41,9 +41,9 @@ Skipped if this clone already finished its machine setup (a new project finishes
 
 Three outside tools, the same as step 5 of [`/gaia-init`](/getting-started/gaia-init/#5-claude-tooling):
 
-- **React Doctor** skill, installed under `frontend/.claude/skills/` by `bash .gaia/scripts/install-react-doctor.sh`.
+- **[React Doctor](https://github.com/millionco/react-doctor)** skill, installed under `frontend/.claude/skills/` by `bash .gaia/scripts/install-react-doctor.sh`.
 - **Playwright CLI** binary, installed globally.
-- **Serena** MCP server at v1.7.0, with `uv` installed first if missing. If Serena is already registered, the "name already exists" error counts as success.
+- **[Serena](https://github.com/oraios/serena)** MCP server at v1.7.0, with `uv` installed first if missing. If Serena is already registered, the "name already exists" error counts as success.
 
 ### Install Plugins
 
@@ -87,7 +87,7 @@ Applied after you create or pick a repo, and only when you are a repo admin and 
 - **Default-branch protection.** Added only when the branch has no protection rule; an existing rule is left as it is. On purpose, approvals are not required and admins are not bound by the rule, so a solo developer can still merge their own pull requests.
 - **`GAIA-Audit` as the required check.** When the [pre-merge audit](/workflow/code-audit-team/) passes, GAIA's merge workflow (which runs on your machine) posts the `GAIA-Audit` status. Making it required means a pull request merged with the button on github.com can't skip the audit. Setup adds `GAIA-Audit` to your required checks and keeps the others (`Tests`, `Chromatic`, your own). It also removes the 1.x `code-review-audit` check. Nothing posts that check any more, so leaving it required would block every pull request.
 - **`delete_branch_on_merge`**, so GitHub deletes each pull request's branch when it merges, however it was merged. Applied without asking on a repo this run created; on an existing repo, setup asks.
-- **Dependabot settings**: security alerts on, Dependabot's own security-fix pull requests off. [`/update-deps`](/maintenance/update-deps/) reads the alerts and fixes vulnerable packages itself, then tests the fix through the quality gate. If you already have a Dependabot npm entry or a Renovate config, setup first warns that you may get duplicate pull requests; it never edits either file.
+- **[Dependabot](https://docs.github.com/en/code-security/dependabot) settings**: security alerts on, Dependabot's own security-fix pull requests off. [`/update-deps`](/maintenance/update-deps/) reads the alerts and fixes vulnerable packages itself, then tests the fix through the quality gate. If you already have a Dependabot npm entry or a Renovate config, setup first warns that you may get duplicate pull requests; it never edits either file.
 
 If one of these settings fails (403 if you are not an admin, 404 if there is no protection rule), setup tells you what someone with admin access needs to run or change, and continues. For `GAIA-Audit` it prints the `gh api` command; for the Dependabot settings it prints the commands to run.
 

@@ -35,7 +35,7 @@ Its jobs run on pull requests to `main` and on `workflow_dispatch`. The workflow
 
 ## audit-ci-tests.yml
 
-Like `cli-tests.yml`, its jobs run on pull requests to `main` and on `workflow_dispatch`, and skip on a push to `main`. Runs GAIA's bats tests for the shipped scripts and hooks (`.gaia/scripts/tests/`, `.github/audit/tests/`, `.gaia/tests/`), split across parallel jobs (shards). It also runs the commitlint tests and the tests for the RED gate (the check that a test was seen failing first) that need Node or Chromium. A final `Audit CI Tests` job passes only when every shard passes, so one required check covers them all.
+Like `cli-tests.yml`, its jobs run on pull requests to `main` and on `workflow_dispatch`, and skip on a push to `main`. Runs GAIA's bats tests for the shipped scripts and hooks (`.gaia/scripts/tests/`, `.github/audit/tests/`, `.gaia/tests/`), split across parallel jobs (shards). It also runs the [commitlint](https://commitlint.js.org/) tests and the tests for the RED gate (the check that a test was seen failing first) that need Node or Chromium. A final `Audit CI Tests` job passes only when every shard passes, so one required check covers them all.
 
 Projects get these scripts as code GAIA controls and never edit, so the tests only need to catch changes made on the GAIA repo.
 

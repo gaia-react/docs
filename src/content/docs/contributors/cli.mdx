@@ -11,7 +11,7 @@ If you work on the CLI, this page maps its subcommands. The source lives under `
 
 ## Build layout
 
-`.gaia/cli` is a package in the root pnpm workspace. At release, the scrub removes it from the shipped `pnpm-workspace.yaml` and `pnpm-lock.yaml`, and every CLI source file is left out of the bundle. `pnpm -C .gaia/cli bundle` builds two binaries:
+`.gaia/cli` is a package in the root [pnpm](https://pnpm.io/) workspace. At release, the scrub removes it from the shipped `pnpm-workspace.yaml` and `pnpm-lock.yaml`, and every CLI source file is left out of the bundle. `pnpm -C .gaia/cli bundle` builds two binaries:
 
 - `.gaia/cli/gaia`: the shipped binary. Entry point `src/index.ts`.
 - `.gaia/cli/gaia-maintainer`: the maintainer binary, carrying `labels docs` and the release namespace. Entry point `src/index.maintainer.ts`. Excluded from the bundle.
@@ -38,7 +38,7 @@ gaia init finalize
 gaia init resume [--from-step <N>]
 ```
 
-`configure-data-layer` prints one JSON line naming the files it changed and the commands to run next, and can be re-run after init (for example `--query true` to add TanStack Query later). `init` refuses to run outside a scaffolded project root, and in the GAIA source itself.
+`configure-data-layer` prints one JSON line naming the files it changed and the commands to run next, and can be re-run after init (for example `--query true` to add [TanStack Query](https://tanstack.com/query/latest) later). `init` refuses to run outside a scaffolded project root, and in the GAIA source itself.
 
 ### `gaia scaffold`
 
@@ -106,7 +106,7 @@ The fire-and-forget usage ping sent by `/gaia-init`, `/setup-gaia`, and `/update
 
 ## Where to find tests
 
-Test files sit beside their source under `.gaia/cli/src/`, run by Vitest:
+Test files sit beside their source under `.gaia/cli/src/`, run by [Vitest](https://vitest.dev/):
 
 ```bash
 pnpm -C .gaia/cli typecheck

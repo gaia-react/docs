@@ -32,7 +32,7 @@ With an argument, your description is used word for word. Without one, forensics
 
 Forensics runs in nine read-only steps:
 
-1. **Capture.** Records a fixed set of facts: GAIA version, Node, pnpm, Claude Code version, branch, and whether there are uncommitted changes. It also reads state files that depend on the kind of failure. It never copies the contents of files under `frontend/app/` or `wiki/`, though file names can appear in summaries. `.env*` and `node_modules/` are skipped. Long files are cut short.
+1. **Capture.** Records a fixed set of facts: GAIA version, Node, [pnpm](https://pnpm.io/), Claude Code version, branch, and whether there are uncommitted changes. It also reads state files that depend on the kind of failure. It never copies the contents of files under `frontend/app/` or `wiki/`, though file names can appear in summaries. `.env*` and `node_modules/` are skipped. Long files are cut short.
 2. **Classify.** Sorts the failure into one of eight kinds (`init`, `update`, `wiki-sync`, `quality-gate`, `hook`, `scaffold`, `dev-server`, `other`) by matching key phrases in your description. It quotes the phrase it matched and names the state file it relied on.
 3. **Diagnose.** Decides whether the failure comes from your setup (wrong Node version, a missing env var, uncommitted changes blocking a command) or is probably a bug. When the evidence points both ways, it picks your setup, since that is the more likely cause.
 4. **Redact.** Strips secrets, identity details, and machine-specific paths out of the report, then double-checks the result. If anything that still looks like a credential gets through, forensics stops instead of writing a report that could leak it.

@@ -5,7 +5,7 @@ description: Resolve security advisories and update outdated packages through on
 
 import { Aside } from '@astrojs/starlight/components';
 
-`/update-deps` keeps your dependencies current and your security advisories resolved, in place of Dependabot's version and security pull requests. Advisories come first, each fixed with the smallest change that works. Then come outdated packages, shown by group so you can snooze (put off) what you are not ready for. Everything passes one quality gate, in its own worktree, and lands as one `chore(deps)` pull request that merges once checks are green.
+`/update-deps` keeps your dependencies current and your security advisories resolved, in place of [Dependabot](https://docs.github.com/en/code-security/dependabot)'s version and security pull requests. Advisories come first, each fixed with the smallest change that works. Then come outdated packages, shown by group so you can snooze (put off) what you are not ready for. Everything passes one quality gate, in its own worktree, and lands as one `chore(deps)` pull request that merges once checks are green.
 
 It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, in a worktree of its own cut from the default branch, whichever branch your checkout holds. When [`/gaia-init`](/getting-started/gaia-init/) runs it, it asks no questions and leaves its changes for the init commit instead.
 
@@ -77,7 +77,7 @@ It also reports when the global `playwright-cli` binary is behind.
 
 ## Release-age window
 
-pnpm refuses to install a release younger than 3 days (`minimumReleaseAge` in `pnpm-workspace.yaml`), and the setting is strict. **Why:** a compromised package version is usually caught and pulled within days, so waiting keeps a poisoned release out of your lockfile. See the [gate reference](/reference/gates/#release-age-window).
+[pnpm](https://pnpm.io/) refuses to install a release younger than 3 days (`minimumReleaseAge` in `pnpm-workspace.yaml`), and the setting is strict. **Why:** a compromised package version is usually caught and pulled within days, so waiting keeps a poisoned release out of your lockfile. See the [gate reference](/reference/gates/#release-age-window).
 
 ## Version holds
 

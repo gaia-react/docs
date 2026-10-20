@@ -21,7 +21,7 @@ Ask for a component, a fix, a refactor:
 > Add a date-range filter to the saved-search panel.
 ```
 
-The code skills (TypeScript, React, Tailwind, tests) and the scaffolders (which generate new components, hooks, routes, and services) start on their own, based on what you ask for. Most sessions never touch a slash command.
+The code skills ([TypeScript](https://www.typescriptlang.org/), React, [Tailwind](https://tailwindcss.com/), tests) and the scaffolders (which generate new components, hooks, routes, and services) start on their own, based on what you ask for. Most sessions never touch a slash command.
 
 Notice the prompt did not ask for a test. GAIA works test-first: for a feature or a bug fix, Claude writes a test that fails, then writes the code that makes it pass. A Claude Code hook on `git commit` enforces this. It refuses to commit a new test that was never seen failing first. Some tests are exempt, such as stories and type-only tests; see the [RED gate](/reference/gates/#test-seen-failing-first-red-gate).
 
@@ -37,7 +37,7 @@ When Claude commits work, with or without a command, it follows the same steps:
 6. **Merges** only when you ask.
 7. **Cleans up** back to a pulled default branch.
 
-Before a commit that touches source, the Quality Gate runs a simplify pass, a check for untranslated text, typecheck, lint, tests, Playwright, a quick check that the dev server starts, and the build. Meanwhile, hooks block risky actions in the background. See [Work lifecycle](/workflow/work-lifecycle/) for the details, and [Git hooks and conventions](/workflow/git-conventions/) for the commit and title rules.
+Before a commit that touches source, the Quality Gate runs a simplify pass, a check for untranslated text, typecheck, lint, tests, [Playwright](https://playwright.dev/), a quick check that the dev server starts, and the build. Meanwhile, hooks block risky actions in the background. See [Work lifecycle](/workflow/work-lifecycle/) for the details, and [Git hooks and conventions](/workflow/git-conventions/) for the commit and title rules.
 
 ## When to reach for a command
 
@@ -79,7 +79,7 @@ You rarely reach for these yourself, and you do not have to memorize them. Most 
 | Tech-debt issues have piled up | [`/gaia-debt`](/maintenance/debt/) | Fixes the backlog, highest severity first, through the audit gate. |
 | The audit keeps flagging the same thing | [`/gaia-codify`](/maintenance/codify/) | Turns the recurring finding into a check, a skill, or a rule. |
 | Accepted trade-offs have piled up | [`/gaia-residue`](/maintenance/residue/) | Goes through the known issues reviewers accepted at merge and dismisses, keeps, or turns each into a tech-debt issue. |
-| Serena is missing a language | [`/gaia-serena-sync`](/maintenance/serena-sync/) | Adds it to Serena's index on your yes. |
+| [Serena](https://github.com/oraios/serena) is missing a language | [`/gaia-serena-sync`](/maintenance/serena-sync/) | Adds it to Serena's index on your yes. |
 | The wiki has fallen behind the code | [`/gaia-wiki`](/maintenance/wiki/) | Updates the project wiki Claude reads from, merges overlapping pages, and fixes broken links and formatting. |
 | Dependencies are stale or vulnerable | [`/update-deps`](/maintenance/update-deps/) | Resolves security advisories, then updates packages by group. |
 | A new GAIA release is out | [`/update-gaia`](/maintenance/update-gaia/) | Merges the release into your project without overwriting your changes. |

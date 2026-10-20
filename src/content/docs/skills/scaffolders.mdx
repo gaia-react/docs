@@ -11,7 +11,7 @@ Files and folders under `app/components`, `app/pages`, and `app/hooks` are kebab
 
 ## New Component
 
-It first checks whether shadcn/ui already offers the component (a dialog, tabs, a popover). If it does, it runs `pnpm shadcn add <name>`, which copies the component's source into your project as a single file, `app/components/ui/<name>.tsx`; GAIA never edits those files. Otherwise it creates a component folder: `app/components/<name>/index.tsx` and `tests/index.stories.tsx`, a story whose play function is the component's test. There is no separate test file.
+It first checks whether [shadcn/ui](https://ui.shadcn.com/) already offers the component (a dialog, tabs, a popover). If it does, it runs `pnpm shadcn add <name>`, which copies the component's source into your project as a single file, `app/components/ui/<name>.tsx`; GAIA never edits those files. Otherwise it creates a component folder: `app/components/<name>/index.tsx` and `tests/index.stories.tsx`, a story whose play function is the component's test. There is no separate test file.
 
 **Confirms:** name (kebab-case or PascalCase; the folder uses the kebab-case form), parent folder (default `app/components/`), and props.
 
@@ -47,9 +47,9 @@ When you connect it to a service, it writes everything from loading the data to 
 |---|---|
 | `server` | a server `loader` the page reads with `useLoaderData` |
 | `client` | a `clientLoader` and a `HydrateFallback` |
-| `query` | a `clientLoader` that loads the data into the TanStack Query cache, and a page that reads it with `useSuspenseQuery` (needs Query installed) |
+| `query` | a `clientLoader` that loads the data into the [TanStack Query](https://tanstack.com/query/latest) cache, and a page that reads it with `useSuspenseQuery` (needs Query installed) |
 
-`--shape list` writes `<group>.<name>.tsx`; `--shape detail` writes `<group>.<name>_.$id.tsx`. The page story gets its data from MSW mocks.
+`--shape list` writes `<group>.<name>.tsx`; `--shape detail` writes `<group>.<name>_.$id.tsx`. The page story gets its data from [MSW](https://mswjs.io/) mocks.
 
 **Confirms:** name (kebab-case), group (`_public` or `_session`), and the data, action, and i18n options.
 
@@ -65,7 +65,7 @@ Source: `frontend/.claude/skills/new-route/SKILL.md`.
 
 ## New Service
 
-Creates an API service in your API's folder under `app/services/` (shipped as `gaia/`, often renamed to the company or API name). It writes request functions built on Ky that check responses against Zod schemas, plus the schemas, URL constants, and types, and optionally MSW mock handlers under `test/mocks/<name>/`. When `@tanstack/react-query` is installed and the service has a `get`, it also writes `queries.ts` with query keys and `queryOptions` factories.
+Creates an API service in your API's folder under `app/services/` (shipped as `gaia/`, often renamed to the company or API name). It writes request functions built on [Ky](https://github.com/sindresorhus/ky) that check responses against [Zod](https://zod.dev/) schemas, plus the schemas, URL constants, and types, and optionally MSW mock handlers under `test/mocks/<name>/`. When `@tanstack/react-query` is installed and the service has a `get`, it also writes `queries.ts` with query keys and `queryOptions` factories.
 
 **Confirms:** name (kebab-case), endpoints (any of `get`, `post`, `put`, `delete`), the schema as `name:type` pairs, and whether to include mocks.
 

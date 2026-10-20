@@ -15,13 +15,13 @@ A skill is a folder of instructions that Claude loads when your request matches 
 | Skill | Where | What it covers |
 |---|---|---|
 | [`react-code`](/skills/code/#react-code) | `frontend/` | React components, hooks, forms, data loading, React 19 idioms |
-| [`typescript`](/skills/code/#typescript) | `frontend/` | TypeScript and Zod patterns |
+| [`typescript`](/skills/code/#typescript) | `frontend/` | [TypeScript](https://www.typescriptlang.org/) and [Zod](https://zod.dev/) patterns |
 | [`tailwind`](/skills/code/#tailwind) | `frontend/` | Theme color tokens, the `cn` class helper, variants |
 | [`skeleton-loaders`](/skills/code/#skeleton-loaders) | `frontend/` | Loading states |
-| [`tdd-react`](/skills/code/#test-driven-development) | `frontend/` | The frontend testing reference: stories, hook tests, MSW, Playwright |
+| [`tdd-react`](/skills/code/#test-driven-development) | `frontend/` | The frontend testing reference: stories, hook tests, [MSW](https://mswjs.io/), [Playwright](https://playwright.dev/) |
 | [`playwright-cli`](/skills/code/#playwright-cli) | `frontend/` | Browser automation |
 | [`eslint-fixes`](/skills/code/#eslint-fixes) | `frontend/` | Lint failures and autofix conflicts |
-| [`a11y-fixes`](/skills/code/#accessibility-fixes) | `frontend/` | Accessibility errors reported by axe-core |
+| [`a11y-fixes`](/skills/code/#accessibility-fixes) | `frontend/` | Accessibility errors reported by [axe-core](https://github.com/dequelabs/axe-core) |
 | [`gaia-react-perf`](/skills/react-performance/) | `frontend/` | Finding why a component re-renders, also `/gaia-react-perf` |
 | [`new-component`, `new-hook`, `new-route`, `new-service`](/skills/scaffolders/) | `frontend/` | Generate new files from templates |
 | [`tdd`](/skills/code/#test-driven-development) | root | The red-green-refactor loop |
@@ -31,7 +31,7 @@ A skill is a folder of instructions that Claude loads when your request matches 
 | [`update-deps`](/maintenance/update-deps/) | root | Dependency and security updates, also `/update-deps` |
 | [`update-gaia`](/maintenance/update-gaia/) | root | GAIA release updates, also `/update-gaia` |
 
-React Doctor is installed on each machine separately, at `frontend/.claude/skills/react-doctor`, and is gitignored. GAIA's workflow commands (`/gaia-spec`, `/gaia-plan`, and the rest) read their instructions from `.claude/skills/gaia/references/`. That folder is not a skill you can call with a slash command.
+[React Doctor](https://github.com/millionco/react-doctor) is installed on each machine separately, at `frontend/.claude/skills/react-doctor`, and is gitignored. GAIA's workflow commands (`/gaia-spec`, `/gaia-plan`, and the rest) read their instructions from `.claude/skills/gaia/references/`. That folder is not a skill you can call with a slash command.
 
 ## How triggering works
 

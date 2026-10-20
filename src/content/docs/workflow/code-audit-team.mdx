@@ -7,7 +7,7 @@ sidebar:
 
 import { Aside } from '@astrojs/starlight/components';
 
-Every pull request in a GAIA project is audited before it merges. The audit is not one reviewer but a team. Each member is responsible for a set of files, and a pull request is reviewed by every member whose files it changes. The audit runs locally in your Claude Code session. Nothing runs Claude on GitHub Actions.
+Every pull request in a GAIA project is audited before it merges. The audit is not one reviewer but a team. Each member is responsible for a set of files, and a pull request is reviewed by every member whose files it changes. The audit runs locally in your Claude Code session. Nothing runs Claude on [GitHub Actions](https://docs.github.com/en/actions).
 
 A hook enforces it: `gh pr merge` is denied until every member whose files changed has approved the change. The `GAIA-Audit` required check stops anyone from skipping the audit by merging with the button on github.com.
 
@@ -17,7 +17,7 @@ The list of members (the roster) lives in `.gaia/audit-ci.yml` under `auditors:`
 
 | Member | Owns | Reviews for |
 |---|---|---|
-| `code-audit-frontend` (the default member) | The app and its tooling: `frontend/app/**`, `frontend/test/**`, `frontend/.storybook/**`, `frontend/.playwright/**`, the package manifests and lockfile, build and lint configs, `frontend/.claude/**`, `frontend/CLAUDE.md`, and root tooling such as `.npmrc` and `.nvmrc` | Security, performance, fit with the existing architecture, edge cases, accessibility, and maintainability: problems that take understanding what the code is meant to do and how data moves through it, beyond what lint and types catch. Library-specific rules for shadcn/ui, `cn`, Conform, the form components, React patterns, and react-i18next load from `frontend/.claude/agents/code-audit-frontend/`. |
+| `code-audit-frontend` (the default member) | The app and its tooling: `frontend/app/**`, `frontend/test/**`, `frontend/.storybook/**`, `frontend/.playwright/**`, the package manifests and lockfile, build and lint configs, `frontend/.claude/**`, `frontend/CLAUDE.md`, and root tooling such as `.npmrc` and `.nvmrc` | Security, performance, fit with the existing architecture, edge cases, accessibility, and maintainability: problems that take understanding what the code is meant to do and how data moves through it, beyond what lint and types catch. Library-specific rules for [shadcn/ui](https://ui.shadcn.com/), `cn`, [Conform](https://conform.guide/), the form components, React patterns, and react-i18next load from `frontend/.claude/agents/code-audit-frontend/`. |
 | `code-audit-github-workflows` | `.github/workflows/*.yml` and `.github/actions/**/*.yml` | Workflow YAML problems: unsafe third-party actions, script injection, too-broad permissions, and mishandled secrets. |
 
 Each file goes to the first member whose pattern matches it, and the default member's patterns are checked last, so a workflow file belongs to `code-audit-github-workflows`. A file no member is responsible for belongs under `unowned:` in the same file. The audit itself does not check this. After you change the roster, run `bash .gaia/scripts/verify-audit-roster.sh` by hand: it fails when a file has no member and is not listed under `unowned:`, or when a pattern matches no file at all.
@@ -101,7 +101,7 @@ A refusal posts a `GAIA-Audit` failure straight away. That cancels any earlier s
 Pull requests the audit does not need to review (no changed file is assigned to any member, or a `chore(deps)` update from `/update-deps` that only changes package manifests) get the check posted by the merge hook itself, as `skipped: out of scope` or `skipped: chore(deps) manifest-only`.
 
 <Aside type="note">
-A pull request merged from the GitHub UI without going through Claude (a raw Dependabot pull request, for example) never gets the check posted, so it waits on `GAIA-Audit` forever. Ask Claude to merge it once: the hook works out which case it is, posts the check, and allows the merge.
+A pull request merged from the GitHub UI without going through Claude (a raw [Dependabot](https://docs.github.com/en/code-security/dependabot) pull request, for example) never gets the check posted, so it waits on `GAIA-Audit` forever. Ask Claude to merge it once: the hook works out which case it is, posts the check, and allows the merge.
 </Aside>
 
 ## What lands in the pull request

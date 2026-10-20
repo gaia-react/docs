@@ -15,7 +15,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 ### 1. Dependencies
 
-1. Ensures pnpm is available and new enough. GAIA requires pnpm 12 or later (the version pinned in `package.json` `packageManager`). If pnpm is missing, init enables it with `corepack enable pnpm`, or installs it globally with npm when Corepack isn't available. If an older major version is on your `PATH` (for example 11.x), init asks you to confirm the upgrade first. It stops if an older pnpm still comes first on your `PATH` after the upgrade.
+1. Ensures [pnpm](https://pnpm.io/) is available and new enough. GAIA requires pnpm 12 or later (the version pinned in `package.json` `packageManager`). If pnpm is missing, init enables it with `corepack enable pnpm`, or installs it globally with npm when Corepack isn't available. If an older major version is on your `PATH` (for example 11.x), init asks you to confirm the upgrade first. It stops if an older pnpm still comes first on your `PATH` after the upgrade.
 2. Runs `pnpm install` in the new project.
 3. Runs [`/update-deps`](/maintenance/update-deps/) to bring every package to its latest compatible version and resolve every security advisory it can. In this mode it asks no questions, undoes any fix that fails the quality gate, and commits nothing; init's own commit at the end includes the changes. Anything it holds back is listed with a reason.
 
@@ -32,10 +32,10 @@ Every question is a menu with the recommended option first. In interactive mode 
 
 - **Primary language.** The main language for your app's UI. The first option is the language you have been typing in. The second is always a different real language: English when you type in another language, otherwise your system locale's language, or Spanish. Type any other language, by name or code, through the menu's Other answer.
 - **Additional languages.** Keep only the primary language with translation support (i18n) still set up (recommended, so you can add languages later with no rework), add more languages now, or remove i18n entirely. Removing it is hard to undo, so pick it only if you are sure the app will only ever use one language.
-- **GitHub username for CODEOWNERS.** GAIA reads your handle from the GitHub CLI you are logged in to (`gh api user`) and offers it first. Choose **Set it later** to write a placeholder you edit before pushing, or type a different handle. If detection fails, GAIA asks you to type your handle rather than guessing.
+- **GitHub username for CODEOWNERS.** GAIA reads your handle from the [GitHub CLI](https://cli.github.com/) you are logged in to (`gh api user`) and offers it first. Choose **Set it later** to write a placeholder you edit before pushing, or type a different handle. If detection fails, GAIA asks you to type your handle rather than guessing.
 - **Project title.** Your folder name in title case (for example `my-cool-app` becomes `My Cool App`), or the folder name as it is. Type your own title through Other. The slug (the kebab-case name used in package names and paths) comes from the title, so it is never asked separately. To set both, type `Title / slug`.
 - **Backend field casing.** How your backend names JSON fields. `camelCase` (recommended) passes keys through unchanged. `snake_case` makes the services convert keys: `snake_case` in requests and responses, camelCase in your code (`create({isSnakeCaseEnabled: true})`). **Not sure** is treated as camelCase.
-- **TanStack Query.** Off by default: route loaders handle data and nothing extra is installed. **Yes** installs a pinned TanStack Query and sets up its provider and Storybook decorator.
+- **[TanStack Query](https://tanstack.com/query/latest).** Off by default: route loaders handle data and nothing extra is installed. **Yes** installs a pinned TanStack Query and sets up its provider and [Storybook](https://storybook.js.org/) decorator.
 
 Both data answers (casing and TanStack Query) can change later with `./.gaia/cli/gaia init configure-data-layer --casing snake` or `--query true`.
 
@@ -60,7 +60,7 @@ If you removed i18n, it removes all of it cleanly.
 ### 4. Project files and build check
 
 - Creates `.github/CODEOWNERS` with your GitHub handle as the repo-wide owner. When it has no real handle, it writes the placeholder `REPLACE-WITH-YOUR-GITHUB-HANDLE` and tells you to edit it before you push. GitHub also warns about the unknown owner, so you won't miss it.
-- Copies `frontend/.env.example` to `frontend/.env` if you do not already have one. The app's environment file lives in the `frontend/` package; Playwright reads the same file.
+- Copies `frontend/.env.example` to `frontend/.env` if you do not already have one. The app's environment file lives in the `frontend/` package; [Playwright](https://playwright.dev/) reads the same file.
 - Runs the full quality gate from the repository root, `pnpm typecheck && pnpm lint && pnpm test:ci && pnpm build` (the root scripts run the `frontend` package), and stops if anything fails. This step is what makes sure the project compiles, lints, and tests cleanly, and it is the main reason init takes a few minutes.
 
 ### 5. Claude tooling

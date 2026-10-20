@@ -49,7 +49,7 @@ tokens. It never enters the conversation; Claude reads only the summary.
 
 ### 1. Capture
 
-The skill writes a short, temporary Playwright test file (a spec) that performs
+The skill writes a short, temporary [Playwright](https://playwright.dev/) test file (a spec) that performs
 your target interaction, using the committed capture helper at
 `frontend/.playwright/react-perf/capture.ts`. The helper records every render your
 interaction causes and writes the raw data to
@@ -181,7 +181,7 @@ problem and points at the matching fix. The reduce emits
 `jsx-no-new-object-as-prop` when most of the instability comes from props,
 `jsx-no-constructed-context-values` when most of it comes from context, or `null`
 when only state is unstable. These labels help you read the diagnosis. They are
-not ESLint rules that run, and the diagnostic never compares them with lint
+not [ESLint](https://eslint.org/) rules that run, and the diagnostic never compares them with lint
 output.
 
 ## When to stop

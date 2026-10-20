@@ -12,8 +12,8 @@ A GAIA app is a [React Router 8](https://reactrouter.com/) app with server rende
 React Router isn't tied to one hosting platform. You can deploy it to:
 
 - any Node.js server;
-- any platform that runs Docker containers, such as AWS ECS, Google Cloud Run, Azure Container Apps, or Fly.io;
-- hosts with their own React Router templates, such as Vercel, Netlify, and Cloudflare.
+- any platform that runs [Docker](https://www.docker.com/) containers, such as [AWS ECS](https://aws.amazon.com/ecs/), [Google Cloud Run](https://cloud.google.com/run), [Azure Container Apps](https://azure.microsoft.com/products/container-apps), or [Fly.io](https://fly.io/);
+- hosts with their own React Router templates, such as [Vercel](https://vercel.com/), [Netlify](https://www.netlify.com/), and [Cloudflare](https://www.cloudflare.com/).
 
 React Router's [deployment guide](https://reactrouter.com/start/framework/deploying) covers each option.
 
@@ -34,7 +34,7 @@ pnpm start
 
 GAIA ships `frontend/Dockerfile` as a starting point. Your host may need changes to it, and Claude can make them.
 
-Build it from the repository root, so the root lockfile and pnpm's supply-chain settings apply:
+Build it from the repository root, so the root lockfile and [pnpm](https://pnpm.io/)'s supply-chain settings apply:
 
 ```bash
 docker build -t my-app -f frontend/Dockerfile .

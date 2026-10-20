@@ -45,21 +45,21 @@ A gate is not a judgment of you or of Claude. Each one exists because the proble
 
 ### Pre-commit floor
 
-- **Stops:** a commit whose staged files fail typecheck, lint-staged, or their tests. It also stops a commit when the package registry cannot be read, or when GAIA's generated settings no longer match what they should be.
+- **Stops:** a commit whose staged files fail typecheck, [lint-staged](https://github.com/lint-staged/lint-staged), or their tests. It also stops a commit when the package registry cannot be read, or when GAIA's generated settings no longer match what they should be.
 - **Why:** it is the fixed, scripted check that keeps code failing typecheck, lint, or its own tests out of history, no matter what the Claude session decided.
 - **When:** at `git commit`, through the native git hook `.githooks/pre-commit`.
 - **Clear it:** fix the failures it prints. If no hook runs at all, check that `git config --get core.hooksPath` prints `.githooks`; if it does not, run `pnpm install`.
 
 ### Commit message format
 
-- **Stops:** a commit message that is not a Conventional Commit (`<type>(<scope>): <subject>`), and any commit when commitlint cannot run.
+- **Stops:** a commit message that is not a Conventional Commit (`<type>(<scope>): <subject>`), and any commit when [commitlint](https://commitlint.js.org/) cannot run.
 - **Why:** commit messages, branch names, and pull request titles all use the same list of Conventional Commits types. With a squash merge, the pull request title becomes the commit message on the default branch. A type GAIA does not know cannot be checked later on.
 - **When:** at `git commit`, through `.githooks/commit-msg`.
 - **Clear it:** use one of the types in `.gaia/conventional-commits.json`. When commitlint is missing, run `pnpm install`.
 
 ### Quality Gate
 
-- **Stops:** Claude committing source changes before the gate's steps pass with zero warnings: a simplify pass, a check for hardcoded user-facing strings, typecheck, lint, tests, Playwright, the dev-server smoke test, and the build.
+- **Stops:** Claude committing source changes before the gate's steps pass with zero warnings: a simplify pass, a check for hardcoded user-facing strings, typecheck, lint, tests, [Playwright](https://playwright.dev/), the dev-server smoke test, and the build.
 - **Why:** the commit hook checks only the files you staged. The full gate catches what breaks elsewhere, including warnings that would otherwise ship.
 - **When:** before any commit that touches source code or config that affects these checks. Commits that change only docs or only the wiki skip it. This is a rule Claude follows (`.claude/rules/quality-gate.md`), not a hook; the [pre-commit floor](#pre-commit-floor) is the part that runs no matter what.
 - **Clear it:** fix what it reports. Claude then stops and asks before committing, except inside a workflow that commits on its own (the audit fix round, `/gaia-debt`, a plan's phase commits).
@@ -249,7 +249,7 @@ A gate is not a judgment of you or of Claude. Each one exists because the proble
 ### Lockfile edits
 
 - **Stops:** Claude editing `pnpm-lock.yaml` by hand.
-- **Why:** hand edits often leave the lockfile broken or out of step with itself. pnpm rewrites it correctly.
+- **Why:** hand edits often leave the lockfile broken or out of step with itself. [pnpm](https://pnpm.io/) rewrites it correctly.
 - **When:** before the edit runs (a permission deny in `.claude/settings.json`).
 - **Clear it:** change `package.json` or `pnpm-workspace.yaml`, then run `pnpm install`, `pnpm add`, or `pnpm remove` and let pnpm rewrite the lockfile.
 
@@ -318,5 +318,5 @@ It reports, among other things, a file no member covers and that `unowned:` does
 
 - **Stops:** a story that skips its accessibility check, unless its id and a reason are recorded in `frontend/test/story-a11y-opt-out.test.tsx`. A story skips the check when it sets `parameters.a11y.test` to `'todo'` or `'off'`, sets `parameters.a11y.disable`, turns on the `a11y.manual` global, has a `!test` tag, or uses `a11y` context, config, or options that differ from `.storybook/a11y.ts`.
 - **Why:** this check is the only light-theme accessibility scan a story gets; the Playwright scan covers dark. A story that quietly opted out would have no light-theme check at all.
-- **When:** in the Storybook test run, so at `git commit` for staged stories and in the Quality Gate.
+- **When:** in the [Storybook](https://storybook.js.org/) test run, so at `git commit` for staged stories and in the Quality Gate.
 - **Clear it:** fix the markup so the story passes. If the opt-out is truly needed, add the story id and its reason to the test's opt-out list.

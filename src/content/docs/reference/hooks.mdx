@@ -29,7 +29,7 @@ Why each guard exists, and how to clear it, is in the [gate reference](/referenc
 | `block-fork-pr-checkout` | `gh pr checkout` or a `git fetch` of `pull/<n>/head` for a pull request from a fork, or one that `gh` cannot identify as fork or not. |
 | `block-handrolled-pr-poll` | A shell loop that checks `gh pr view` or `gh pr checks` over and over without reading `mergeable`; use `bash .gaia/scripts/pr-wait-merge.sh --pr <N>`. |
 | `pr-merge-audit-check` | `gh pr merge` until every Code Audit Team member responsible for the changed files has approved it. For a pull request outside the audit's scope, or a `chore(deps)` pull request that only changes dependency manifests, it posts the `skipped:` status itself. |
-| `worthiness-presence-check` | `gh pr merge` when a changed test has no worthiness record for its current content. In scope: stories, Playwright tests, and component or page tests whose result the classifier finds is not predictable. It checks only that the record exists, not its verdict. |
+| `worthiness-presence-check` | `gh pr merge` when a changed test has no worthiness record for its current content. In scope: stories, [Playwright](https://playwright.dev/) tests, and component or page tests whose result the classifier finds is not predictable. It checks only that the record exists, not its verdict. |
 | `red-verify-commit-check` | `git commit` of a new, passing test for code with predictable output (utilities, parsers, hooks) that was never seen failing. Exemptions are listed under [the RED gate](/reference/gates/#test-seen-failing-first-red-gate). |
 | `block-audit-loop-write` | Writes to the audit loop's protected state and context readings, and running by hand the scripts that record a person's grant. |
 
@@ -76,7 +76,7 @@ These hooks never block anything. They record what happened (test failures, gran
 
 ## Not hooks, but enforced
 
-- **Native git hooks** in `.githooks/`: `pre-commit` (typecheck, lint-staged, tests) and `commit-msg` (commitlint). See [Git hooks and conventions](/workflow/git-conventions/).
+- **Native git hooks** in `.githooks/`: `pre-commit` (typecheck, [lint-staged](https://github.com/lint-staged/lint-staged), tests) and `commit-msg` ([commitlint](https://commitlint.js.org/)). See [Git hooks and conventions](/workflow/git-conventions/).
 - **Permission rules** in `.claude/settings.json`: for example, Claude cannot edit `pnpm-lock.yaml` directly; `pnpm install` regenerates it.
 - **The `GAIA-Audit` required check** on GitHub, registered by [`/setup-gaia`](/getting-started/setup-gaia/).
 
