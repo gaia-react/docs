@@ -6,7 +6,7 @@ description: What GAIA's statusline shows. The left side tracks your session (pr
 export const S = ({ c, children }) => <span style={{ color: c, fontWeight: 700 }}>{children}</span>;
 
 export const Row = ({ children }) => (
-	<pre style={{ padding: '0.75rem 1rem', overflowX: 'auto', border: '1px solid var(--sl-color-gray-5)', background: 'var(--sl-color-gray-6)' }}>
+	<pre style={{ padding: '0.75rem 1rem', overflowX: 'auto', border: '1px solid var(--sl-color-gray-5)', background: '#1a1b26' }}>
 		<code>{children}</code>
 	</pre>
 );
@@ -35,11 +35,11 @@ Claude cannot see how full its own context is, so the bar shows it for you. A mo
 
 | Band | Bar |
 | --- | --- |
-| Green | <code><S c="#4ade80">▓░░░░░░░░░</S> 9%</code> |
-| Yellow | <code><S c="#facc15">▓▓▓░░░░░░░</S> 26%</code> |
-| Red | <code><S c="#f87171">▓▓▓░░░░░░░</S> 31%</code> |
-| 🔥 | <code><S c="#f87171">▓▓▓▓░░░░░░</S> 38% 🔥</code> |
-| 💀 | <code><S c="#f87171">▓▓▓▓▓░░░░░</S> 46% 💀</code> |
+| Green | <code style={{ background: '#1a1b26' }}><S c="#4ade80">▓░░░░░░░░░</S> 9%</code> |
+| Yellow | <code style={{ background: '#1a1b26' }}><S c="#facc15">▓▓▓░░░░░░░</S> 26%</code> |
+| Red | <code style={{ background: '#1a1b26' }}><S c="#f87171">▓▓▓░░░░░░░</S> 31%</code> |
+| 🔥 | <code style={{ background: '#1a1b26' }}><S c="#f87171">▓▓▓▓░░░░░░</S> 38% 🔥</code> |
+| 💀 | <code style={{ background: '#1a1b26' }}><S c="#f87171">▓▓▓▓▓░░░░░</S> 46% 💀</code> |
 
 The examples use a 1M-token window. Where each band starts, and what Claude does when the context reaches it, is on [Work lifecycle](/workflow/work-lifecycle/#context-bands).
 
@@ -63,23 +63,23 @@ Nudges always appear in this order, which is also their priority when space runs
 
 | Nudge | Shows when |
 | --- | --- |
-| <code><S c="#f0abfc">⚙️ /setup-gaia (2 choices pending)</S></code> | A setup choice is waiting for this machine, usually after a GAIA update adds one. See [`/setup-gaia`](/getting-started/setup-gaia/). |
-| <code><S c="#22d3ee">🚀 /update-gaia (2.1.0)</S></code> | A newer GAIA release is out. See [`/update-gaia`](/maintenance/update-gaia/). |
-| <code><S c="#f87171">🔭 /gaia-serena-sync (missing: python)</S></code> | Your project has a language [Serena](https://github.com/oraios/serena) is not indexing. See [`/gaia-serena-sync`](/maintenance/serena-sync/). |
-| <code><S c="#facc15">📦 /update-deps (4 outdated, 1 security)</S></code> | Packages are outdated or have open security advisories. See [`/update-deps`](/maintenance/update-deps/). |
-| <code><S c="#4ade80">🔎 /gaia-cleanse (12 new memories)</S></code> | Claude's memory or startup files need a review. See [`/gaia-cleanse`](/maintenance/cleanse/). |
-| <code><S c="#e879f9">🔨 /gaia-codify (2 recurring patterns)</S></code> | The audit keeps finding the same kind of problem. See [`/gaia-codify`](/maintenance/codify/). |
-| <code><S c="#60a5fa">🐛 /gaia-debt (3 issues)</S></code> | Open `tech-debt` issues are waiting. See [`/gaia-debt`](/maintenance/debt/). |
-| <code><S c="#e5e7eb">🧹 /gaia-residue (6 residuals)</S></code> | Trade-offs accepted at merge have piled up. See [`/gaia-residue`](/maintenance/residue/). |
-| <code><S c="#67e8f9">🧠 /gaia-wiki (24 commits)</S></code> | The wiki has fallen behind the code. See [`/gaia-wiki`](/maintenance/wiki/). |
+| <code style={{ background: '#1a1b26' }}><S c="#f0abfc">⚙️ /setup-gaia (2 choices pending)</S></code> | A setup choice is waiting for this machine, usually after a GAIA update adds one. See [`/setup-gaia`](/getting-started/setup-gaia/). |
+| <code style={{ background: '#1a1b26' }}><S c="#22d3ee">🚀 /update-gaia (2.1.0)</S></code> | A newer GAIA release is out. See [`/update-gaia`](/maintenance/update-gaia/). |
+| <code style={{ background: '#1a1b26' }}><S c="#f87171">🔭 /gaia-serena-sync (missing: python)</S></code> | Your project has a language [Serena](https://github.com/oraios/serena) is not indexing. See [`/gaia-serena-sync`](/maintenance/serena-sync/). |
+| <code style={{ background: '#1a1b26' }}><S c="#facc15">📦 /update-deps (4 outdated, 1 security)</S></code> | Packages are outdated or have open security advisories. See [`/update-deps`](/maintenance/update-deps/). |
+| <code style={{ background: '#1a1b26' }}><S c="#4ade80">🔎 /gaia-cleanse (12 new memories)</S></code> | Claude's memory or startup files need a review. See [`/gaia-cleanse`](/maintenance/cleanse/). |
+| <code style={{ background: '#1a1b26' }}><S c="#e879f9">🔨 /gaia-codify (2 recurring patterns)</S></code> | The audit keeps finding the same kind of problem. See [`/gaia-codify`](/maintenance/codify/). |
+| <code style={{ background: '#1a1b26' }}><S c="#60a5fa">🐛 /gaia-debt (3 issues)</S></code> | Open `tech-debt` issues are waiting. See [`/gaia-debt`](/maintenance/debt/). |
+| <code style={{ background: '#1a1b26' }}><S c="#e5e7eb">🧹 /gaia-residue (6 residuals)</S></code> | Trade-offs accepted at merge have piled up. See [`/gaia-residue`](/maintenance/residue/). |
+| <code style={{ background: '#1a1b26' }}><S c="#67e8f9">🧠 /gaia-wiki (24 commits)</S></code> | The wiki has fallen behind the code. See [`/gaia-wiki`](/maintenance/wiki/). |
 
 Each command's page explains what triggers its nudge and what the reason text means.
 
 The `/update-gaia` nudge has three more forms:
 
-- <code><S c="#22d3ee">🚀 /update-gaia (pull 2.1.0)</S></code>: your teammates already updated GAIA on the default branch. Pull it instead of running a new update.
-- <code><S c="#22d3ee">🚀 /update-gaia (resume 2.1.0)</S></code>: you have an unfinished update of your own. Running the command picks it up.
-- <code><S c="#fde047">⌛️ GAIA 2.1.0 in progress (@teammate)</S></code>: a teammate is updating GAIA right now. There is nothing for you to run, so this form names no command.
+- <code style={{ background: '#1a1b26' }}><S c="#22d3ee">🚀 /update-gaia (pull 2.1.0)</S></code>: your teammates already updated GAIA on the default branch. Pull it instead of running a new update.
+- <code style={{ background: '#1a1b26' }}><S c="#22d3ee">🚀 /update-gaia (resume 2.1.0)</S></code>: you have an unfinished update of your own. Running the command picks it up.
+- <code style={{ background: '#1a1b26' }}><S c="#fde047">⌛️ GAIA 2.1.0 in progress (@teammate)</S></code>: a teammate is updating GAIA right now. There is nothing for you to run, so this form names no command.
 
 ### Before setup is done
 
@@ -91,15 +91,15 @@ While [`/gaia-init`](/getting-started/gaia-init/) is still setting up a new proj
 
 ### In a linked worktree
 
-Maintenance commands run from the main checkout, so a linked worktree shows no nudges. The one exception is <code><S c="#e879f9">⚙️ /setup-gaia (Required)</S></code>, which shows everywhere until setup is done.
+Maintenance commands run from the main checkout, so a linked worktree shows no nudges. The one exception is <code style={{ background: '#1a1b26' }}><S c="#e879f9">⚙️ /setup-gaia (Required)</S></code>, which shows everywhere until setup is done.
 
 ### On a narrow terminal
 
 When the nudges do not fit, they shrink one step at a time, starting with the lowest-priority one:
 
-1. The full form: <code><S c="#facc15">📦 /update-deps (4 outdated, 1 security)</S></code>
-2. A shorter reason, when the nudge has one: <code><S c="#facc15">📦 /update-deps (5)</S></code>
-3. The command alone: <code><S c="#facc15">📦 /update-deps</S></code>
+1. The full form: <code style={{ background: '#1a1b26' }}><S c="#facc15">📦 /update-deps (4 outdated, 1 security)</S></code>
+2. A shorter reason, when the nudge has one: <code style={{ background: '#1a1b26' }}><S c="#facc15">📦 /update-deps (5)</S></code>
+3. The command alone: <code style={{ background: '#1a1b26' }}><S c="#facc15">📦 /update-deps</S></code>
 4. The emoji, with its count when there is one, in the default text color: `📦 5`
 5. Hidden, and counted in a `+N` at the end of the row
 
@@ -107,7 +107,7 @@ A narrow row might look like this:
 
 <Row>🚀 │ 📦 5 │ 🐛 3 +1</Row>
 
-A teammate's GAIA update in progress never shrinks past <code><S c="#fde047">⌛️ GAIA 2.1.0 (@teammate)</S></code>, so you always see who is on it.
+A teammate's GAIA update in progress never shrinks past <code style={{ background: '#1a1b26' }}><S c="#fde047">⌛️ GAIA 2.1.0 (@teammate)</S></code>, so you always see who is on it.
 
 ## When it updates
 
