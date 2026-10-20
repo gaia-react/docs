@@ -133,6 +133,7 @@ If a claim can't be grounded in the source, don't write it. Open a question inst
 - Content lives in `src/content/docs/`. Each `.md` / `.mdx` file becomes a route at the same path.
 - Sidebar registered in `astro.config.mjs`. Adding a new page means adding a sidebar entry; don't rely on autogenerate unless you've configured it.
 - Frontmatter follows Starlight's `docsSchema()` (`src/content.config.ts`). At minimum: `title`, `description`. Use `sidebar.order` for explicit ordering when needed.
+- Asides: `tip` (green, shield icon) is reserved for safety and privacy callouts. Use `note` for ordinary tips and `caution` for warnings.
 - Images go in `src/assets/` and are imported. Static files (favicon, `CNAME`) go in `public/`.
 - Site config: `astro.config.mjs`. `site` is `https://docs.gaiareact.com`; don't change without coordination.
 
