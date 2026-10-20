@@ -55,9 +55,13 @@ Your team's isolation policy lives in `.gaia/project.json` as `isolation_policy`
 |---|---|
 | `always-worktree` (default) | Every task runs in its own git worktree (a separate working copy of the repository), so tasks can run at the same time without touching each other or your checkout. Claude does not ask. |
 | `prefer-worktree` | Claude suggests a worktree and you can choose a branch instead. |
-| `prefer-branch` | Claude suggests a feature branch in your current checkout and you can choose a worktree instead. A second task started while you are on a feature branch still gets a worktree. |
+| `prefer-branch` | Claude suggests a feature branch in your current checkout and you can choose a worktree instead. |
 
 A repo admin changes the policy with `/setup-gaia --reconfigure`. Saying "in a worktree" or "on a branch" in your request answers the question up front. Under `always-worktree`, though, a request for a branch still gets a worktree, and Claude tells you so.
+
+<Aside type="caution" title="Off the default branch, every policy uses a worktree">
+The choice is only offered when your checkout is on `main` or `master`. If it is on any other branch, new work always gets its own worktree, under every policy, and Claude does not ask. The branch you are on already holds work, and a second task's changes must not get mixed into it.
+</Aside>
 
 <Aside type="note">
 Uncommitted edits already in your checkout come along. On a feature branch they stay where they are. A worktree starts clean from the default branch, so Claude copies the edits into it as a patch and leaves your original copies untouched.
@@ -67,14 +71,23 @@ Uncommitted edits already in your checkout come along. On a feature branch they 
 
 GAIA uses Claude Code's built-in worktrees under `.claude/worktrees/`. When a session enters one, GAIA renames its branch to the generated name and sets the worktree up:
 
-- **Shared state is linked, not copied.** GAIA's machine-local state (`.gaia/local`), the [notebook](#where-specs-plans-and-research-live), and the main checkout's `frontend/.env` are linked into the worktree, so nothing written there disappears when the worktree is removed, and secrets are never copied.
-- **Dependencies and typed routes install in the background.**
-- **Each checkout has its own ports.** The main checkout keeps 5173 (dev) and 6006 (Storybook). Each worktree gets its own fixed set of ports for dev, Storybook, and Playwright. A server refuses to start on a port that is already taken instead of quietly picking another one. Read a tree's ports with `bash .gaia/scripts/ports.sh`.
-- **A guard keeps edits in the right copy.** An edit to a file in a different checkout from the session's worktree is denied. Without this, an old absolute path from before the switch would silently change the wrong copy. See the [gate reference](/reference/gates/#worktree-path-mismatch).
+- **Shared state is linked, not copied.** GAIA's machine-local state (`.gaia/local`), the [notebook](#where-specs-plans-and-research-live), and the main checkout's `frontend/.env` are linked into the worktree. Nothing written there disappears when the worktree is removed, and your secrets stay in one file instead of being duplicated into every worktree. Separately, Claude cannot read `.env` files in any checkout. See the [gate reference](/reference/gates/#reading-secrets).
+- **Dependencies install and typed routes are generated in the background.** A new worktree has no `node_modules`, so GAIA runs `pnpm install --frozen-lockfile` in it. It then runs React Router's `typegen`, which writes TypeScript types for each route's URL params and loader data, so route code type-checks against the worktree's own routes. See React Router's [type safety guide](https://reactrouter.com/explanation/type-safety). Both steps run as a background job so the session does not wait for them, and Claude is told where the job's log is while it runs.
+- **Each checkout has its own ports.** See [Ports per worktree](#ports-per-worktree).
+- **A guard keeps edits in the right copy.** An edit to a file in a different checkout from the session's worktree is denied. When a session moves into a worktree, Claude may still hold absolute paths it used in the main checkout. Those paths still point to real files, just in the wrong copy, so an edit through one would change the main checkout without any warning. See the [gate reference](/reference/gates/#worktree-path-mismatch).
 
-If a worktree's links break, repair them with `bash .gaia/scripts/link-worktree.sh`. A worktree with no port file refuses `pnpm dev`, `pnpm storybook`, and `pnpm pw`. Fix it with `bash .claude/hooks/provision-worktree.sh <worktree path>`.
+If a worktree's links break, repair them with `bash .gaia/scripts/link-worktree.sh`.
 
-At every session start, GAIA lists merged worktrees that no live session is using, with the commands to remove them.
+### Ports per worktree
+
+Every checkout gets its own dev, Storybook, and Playwright ports, so you can run the app in several worktrees at the same time without one server taking another's port.
+
+- **The main checkout keeps the default ports:** 5173 (dev) and 6006 (Storybook).
+- **Each worktree gets a numbered slot**, the lowest one free, and its ports are the defaults plus that number. Slot 1 is 5174 and 6007, slot 2 is 5175 and 6008. A worktree keeps its slot every time a session returns to it. Slots cover the `frontend/` package only.
+- **`pnpm dev`, `pnpm storybook`, and `pnpm pw` use the worktree's ports automatically.** They read them from `frontend/.gaia-ports`, which GAIA rewrites each time a session enters the worktree, so don't edit it. To see a tree's ports, run `bash .gaia/scripts/ports.sh` (`--field dev`, `storybook`, `site-url`, or `slot` prints one value).
+- **A taken port is refused, never swapped.** A server refuses to start on a port that is already in use instead of quietly picking another one. Playwright reuses a running server only when it belongs to its own worktree. A direct `storybook dev` skips this check and can move to another port, so start Storybook with `pnpm storybook`.
+- **A worktree with no port file refuses `pnpm dev`, `pnpm storybook`, and `pnpm pw`** rather than borrow the main checkout's ports. Fix it with `bash .claude/hooks/provision-worktree.sh <worktree path>`.
+- **Leftover servers are stopped for you, carefully.** At a later session start, GAIA stops servers that a Claude session started once that session has ended, and servers left running by a removed worktree. A server you started yourself is never stopped automatically, and Claude asks before stopping anything on a port another worktree owns.
 
 ## 4. Commit and open the draft pull request
 
@@ -103,6 +116,8 @@ The script ends with one result (`MERGED`, `CONFLICTING`, `CHECK_FAILED`, `TIMEO
 After `MERGED`, Claude removes the worktree (or switches off the feature branch), deletes the local branch, fetches, and pulls the default branch. It runs `pnpm install --frozen-lockfile` only when the pull changed `pnpm-lock.yaml`.
 
 Cleanup never forces a pull and never stashes. Before removing a worktree it checks for uncommitted files and unpushed commits. If it finds either, it keeps the worktree and the branch, and tells you what is left and how to remove them. When the main checkout is on a branch another session holds, Claude skips the pull and says so.
+
+A worktree that cleanup kept, or one whose remote branch was deleted without the worktree being removed, is listed at every session start, with the commands to remove it. The list shows only worktrees whose work is merged and that no live Claude session is using. GAIA never removes them itself: Claude removes a listed worktree only when you name it.
 
 ## Where specs, plans, and research live
 
