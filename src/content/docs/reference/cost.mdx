@@ -8,7 +8,7 @@ sidebar:
 GAIA records every model call in a local usage ledger (a log file) and shows what your work cost, always in the same form: tokens, dollars, and time taken.
 
 :::tip[Your data stays on your machine]
-The ledger stays on your machine and is never sent anywhere. Working out the price does not use the network either. It is yours to read and use however you like. GAIA's separate, opt-out usage ping is described on [Telemetry](/reference/telemetry/); it never reads or sends the ledger.
+The ledger stays on your machine and is never sent anywhere. Working out the price does not use the network either. It is yours to read and use however you like.
 :::
 
 The ledger is `.gaia/local/telemetry/usage.jsonl` in the main checkout, and every worktree writes to the same file. GAIA's cleanup of spent local state never removes it.
