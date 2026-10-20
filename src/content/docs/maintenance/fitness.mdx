@@ -17,6 +17,20 @@ Claude picks a skill by its description and reads every always-loaded file befor
 
 Run it after adding or editing skills, rules, commands, or agents, or when Claude starts ignoring guidance you know is there.
 
+## The statusline nudge
+
+The [statusline](/workflow/statusline/#nudges) suggests `/gaia-fitness` for the first of these reasons that holds. Harness files are the files this command checks, except wiki pages and third-party files such as an installed skill.
+
+| Nudge | Shows when |
+| --- | --- |
+| `💪 /gaia-fitness (grade B+)` | The check finds something in a file your project owns. The reason is the overall grade. |
+| `💪 /gaia-fitness (3 blended files)` | An [`/update-gaia`](/maintenance/update-gaia/) run combined your team's edits with GAIA's changes in harness files, and no `/gaia-fitness` run has reviewed them since the update reached your main checkout. |
+| `💪 /gaia-fitness (15 harness commits)` | Your team has made at least 15 commits that change harness files since the last `/gaia-fitness` run. GAIA's own scaffold and update commits do not count, and neither do commits not yet pulled into your main checkout. Before your first run, every commit counts. In a shallow clone, this reason never shows. |
+
+To change the commit count, set `fitness_commit_threshold` in [`.gaia/project.json`](/reference/gaia-folder/#projectjson) to a positive whole number. No command writes it. Without a valid value, the count is 15.
+
+A run clears the blended-files and harness-commits reasons and refreshes the nudge right away. It does not clear the grade reason: that one clears only when you fix the finding or [suppress it](#suppressing-a-finding) with a reason. An oversized `CLAUDE.md` belongs to [`/gaia-cleanse`](/maintenance/cleanse/) and never shows this nudge.
+
 ## What it checks
 
 `/gaia-fitness` runs a fixed list of 57 rules over your project's own files. Each rule belongs to one category, and every category except `memory` gets its own grade.

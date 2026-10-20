@@ -7,18 +7,18 @@ GAIA ships commands for doing work and commands for keeping the project in shape
 
 ## Commands
 
-The commands are listed in the order their nudges appear on the [statusline](/workflow/statusline/#nudges), except `/gaia-serena-sync`, which comes last because it is the one you will need least often. `/gaia-fitness` has no nudge.
+The commands are listed in the order their nudges appear on the [statusline](/workflow/statusline/#nudges), except `/gaia-serena-sync`, which comes last because it is the one you will need least often.
 
 | Command | Nudge | What it does |
 | --- | --- | --- |
 | [`/update-gaia`](/maintenance/update-gaia/) | 🚀 | Pulls the latest GAIA release into your project with a three-way merge, verifying the release bundle first. |
 | [`/update-deps`](/maintenance/update-deps/) | 📦 | Resolves security advisories, then updates outdated packages by group, through one quality gate. |
 | [`/gaia-cleanse`](/maintenance/cleanse/) | 🔎 | Cleans up Claude's memory and the files it loads at startup: what repeats or disagrees with the wiki, what is out of date, and what makes the startup context too large. Asks before changing anything. |
+| [`/gaia-fitness`](/maintenance/fitness/) | 💪 | Checks your Claude setup (skills, commands, agents, rules, hooks, settings, `CLAUDE.md` files, wiki) against a fixed list of rules, grades it F to A+, and fixes your own files one at a time on a yes. |
 | [`/gaia-codify`](/maintenance/codify/) | 🔨 | Turns a problem the Code Audit Team keeps finding into a guard: an automated check, a skill, or a rule for matching files, with your approval. |
 | [`/gaia-debt`](/maintenance/debt/) | 🐛 | Fixes the `tech-debt` backlog, highest severity then oldest first, one issue or a related batch per run, through the audit gate. Closes the issues on merge. |
 | [`/gaia-residue`](/maintenance/residue/) | 🧹 | Goes through the trade-offs reviewers accepted at merge: dismiss each one, keep it for later, or turn it into a tech-debt issue. Never fixes code. |
 | [`/gaia-wiki`](/maintenance/wiki/) | 🧠 | Runs wiki sync, consolidate, and lint with fixes, as one commit and one pull request. Takes no arguments. |
-| [`/gaia-fitness`](/maintenance/fitness/) | none | Checks your Claude setup (skills, commands, agents, rules, hooks, settings, `CLAUDE.md` files, wiki) against a fixed list of rules, grades it F to A+, and fixes your own files one at a time on a yes. |
 | [`/gaia-serena-sync`](/maintenance/serena-sync/) | 🔭 | Adds languages your project has grown to [Serena](https://github.com/oraios/serena)'s index, on your yes. |
 
 ## The statusline
@@ -30,11 +30,11 @@ The right side of the [statusline](/workflow/statusline/) names each command abo
 Pick by symptom:
 
 - Claude's starting context feels heavy, or the memory on your machine has grown large: [`/gaia-cleanse`](/maintenance/cleanse/).
+- The integration feels off, a skill is not triggering, a rule is not loading: [`/gaia-fitness`](/maintenance/fitness/).
 - The audit keeps flagging the same kind of problem: [`/gaia-codify`](/maintenance/codify/).
 - The `tech-debt` backlog has grown: [`/gaia-debt`](/maintenance/debt/).
 - Trade-offs accepted at merge have piled up in merged pull requests: [`/gaia-residue`](/maintenance/residue/).
 - The wiki trails the code, or wiki pages overlap: [`/gaia-wiki`](/maintenance/wiki/).
-- The integration feels off, a skill is not triggering, a rule is not loading: [`/gaia-fitness`](/maintenance/fitness/).
 - The project grew a language Serena is not indexing: [`/gaia-serena-sync`](/maintenance/serena-sync/).
 
 The boundary between `/gaia-cleanse` and `/gaia-wiki` is deliberate. `/gaia-cleanse` reconciles memory and auto-loaded files against the wiki. Redundancy and broken links inside the wiki belong to `/gaia-wiki`. Conflicts between two instruction files belong to Claude Code's own `/doctor prompt-audit`.

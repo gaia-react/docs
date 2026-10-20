@@ -106,6 +106,7 @@ The packages in your workspace that GAIA's harness covers, as a list of `{name, 
 Team settings and project setup decisions, shared by everyone on the repository:
 
 - `sandbox_recommended` and `isolation_policy`, the two team settings. See [Team settings](/getting-started/setup-gaia/#phase-team-settings).
+- `fitness_commit_threshold`, optional: how many of your team's harness commits since the last `/gaia-fitness` run show its statusline nudge. Without it the count is 15. No command writes it; edit the file. See [The statusline nudge](/maintenance/fitness/#the-statusline-nudge).
 - `setup_decisions`, the decision recorded for each project-level step in `setup-features.json`.
 
 `/gaia-init` creates the file with GAIA's defaults. `/setup-gaia` adds decisions, and only a repo admin running `/setup-gaia --reconfigure` changes the team settings. `/update-gaia` adds decisions for setup steps a new release brings, and commits them with the update. Its merge never overwrites the file.
@@ -139,6 +140,7 @@ A linked worktree's `.gaia/local` is a link to the main checkout's copy, so ever
 | `red-ledger/`, `worthiness-ledger/` | Records of tests seen failing first and of worthiness verdicts, one set per worktree. See [Test-driven development](/workflow/tdd/). |
 | `forensics/` | [`/gaia-forensics`](/workflow/forensics/) reports. |
 | `codify/`, `cleanse/`, `debt/` | State for [`/gaia-codify`](/maintenance/codify/), [`/gaia-cleanse`](/maintenance/cleanse/), and [`/gaia-debt`](/maintenance/debt/). |
+| `fitness/` | The harness files an `/update-gaia` run blended. A `/gaia-fitness` run stops them counting toward its nudge. See [The statusline nudge](/maintenance/fitness/#the-statusline-nudge). |
 | `declined-updates.json` | Updates you snoozed in [`/update-deps`](/maintenance/update-deps/#snoozing). |
 | `ports/` | Which ports each worktree's dev servers use. See [Ports per worktree](/workflow/work-lifecycle/#ports-per-worktree). |
 | `cache/` | Caches that can be rebuilt, including the verified release bundles `/update-gaia` downloads (`cache/shared/update-gaia/`) and the statusline's update check. |
