@@ -47,7 +47,6 @@ Spec work that is not finished carries over: a finalized SPEC, a plan written bu
 - For every file that comes from GAIA, Claude compares three versions: the 1.6.1 original, yours, and the 2.0.0 one. Your changes stay, GAIA's changes come in, and you are asked about any real conflict.
 - It never deletes an uncommitted or untracked file of yours without asking where to keep it, never opens a `.env` file (env files are moved, not read), and never copies GAIA's lockfile (`pnpm install` regenerates it).
 - It ends by opening one pull request, which merges through the 2.0.0 [Code Audit Team](/workflow/code-audit-team/).
-- It sends the `init` and `update` [telemetry](/reference/telemetry/) events once each, with no extra fields on `init`. `GAIA_TELEMETRY_PING_DISABLE=1` turns them off.
 
 ### What moves
 

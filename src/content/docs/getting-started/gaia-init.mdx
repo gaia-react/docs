@@ -104,8 +104,6 @@ The file is committed and shared with your team, and `/update-gaia` never overwr
 
 `/gaia-init` commits its own changes as one commit on the current branch, `chore: initialize project with /gaia-init`. [`/setup-gaia`](/getting-started/setup-gaia/) pushes only what is committed, and every later branch or worktree starts from the last commit. Committing makes sure nothing init wrote is left behind. If the commit fails, init says so and tells you to review `git status` and commit before running `/setup-gaia`.
 
-When it finishes, init sends one usage ping (see [Telemetry](/reference/telemetry/)).
-
 ## After gaia-init completes
 
 Init marks this machine's setup as done and deletes its own one-time setup files. Then it prints:

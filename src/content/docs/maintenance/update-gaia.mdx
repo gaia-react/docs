@@ -30,8 +30,6 @@ Click the `🚀 /update-gaia` statusline indicator, or ask in plain language:
 11. **Asks once to commit**, then pushes. The push updates the claim pull request, whose description is replaced with the summary; without a claim, it opens a draft pull request, `chore(gaia): update to <tag>`. Either way the pull request merges through the [Code Audit Team](/workflow/code-audit-team/).
 12. **Prints the residue sweep**, a cleanup command to run from the main checkout once the pull request merges: `bash .gaia/scripts/state-registry-lib.sh residue-sweep --apply`. It deletes files under `.gaia/local` that retired features left behind.
 
-`/update-gaia` sends one usage ping per update. See [Telemetry](/reference/telemetry/).
-
 **Why the checksum:** a tampered or corrupted bundle would be merged straight into your Claude setup and hooks. See the [gate reference](/reference/gates/#update-gaia-checksum).
 
 ## The three-way merge
