@@ -56,7 +56,7 @@ exclusions:
     added: 2026-05-08
 
   - name: gaia telemetry*
-    reason: deferred. The 1.x `gaia telemetry` emit surface is gone from the 2.0.0 adopter binary. The 2.0.0 adoption ping (`gaia ping`) IS documented, as opt-out only, on getting-started/gaia-init.mdx (Usage ping) - one fire-and-forget POST to telemetry.gaiareact.com with a few categorical fields, a pseudonymous per-install projectId, the GAIA version and a coarse platform, never paths or free text, disabled by GAIA_TELEMETRY_PING_DISABLE=1. Do not document the server side, the payload beyond that, or how projectId is derived. The local usage ledger (.gaia/local/telemetry/usage.jsonl) is documented separately on reference/cost.mdx and is not covered by this entry.
+    reason: deferred. The 1.x `gaia telemetry` emit surface is gone from the 2.0.0 adopter binary. The 2.0.0 adoption ping (`gaia ping`) IS documented, as opt-out only, on reference/telemetry.mdx (the three events and the categorical fields each adds) - one fire-and-forget POST to telemetry.gaiareact.com with a few categorical fields, a pseudonymous per-install projectId, the GAIA version and a coarse platform, never paths or free text, disabled by GAIA_TELEMETRY_PING_DISABLE=1. Do not document the server side, the payload beyond that, or how projectId is derived. The local usage ledger (.gaia/local/telemetry/usage.jsonl) is documented separately on reference/cost.mdx and is not covered by this entry.
     added: 2026-05-08
     updated: 2026-10-20
 

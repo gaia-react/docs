@@ -1,0 +1,54 @@
+---
+title: Telemetry
+description: The small usage ping GAIA sends when /gaia-init, /setup-gaia, and /update-gaia finish, exactly what it contains, and how to turn it off.
+sidebar:
+  order: 7
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+GAIA sends one small usage ping when `/gaia-init`, `/setup-gaia`, or `/update-gaia` finishes. This ping is GAIA's only telemetry. It tells GAIA's maintainer how many projects use GAIA, which setup options they choose, and which platforms they run on, so future work goes where it helps the most people.
+
+<Aside type="note" title="What the ping never contains">
+No code, file names, paths, repository names, GitHub usernames, prompts, or anything you typed. Every field is a fixed choice from a short list, a count, a version number, or the install ID described below. Turning the ping off changes nothing else about GAIA.
+</Aside>
+
+## The three events
+
+Each command sends its event once, when it finishes:
+
+| Command | Event | Fields it adds |
+|---|---|---|
+| `/gaia-init` | `init` | Whether you answered the setup questions yourself or let GAIA pick the defaults (`interactive` or `automatic`), and how many languages the app has (`0` if you removed i18n) |
+| `/setup-gaia` | `setup` | The kind of setup (`init` for a new project, `clone`, or `reconfigure`), how you connected GitHub (`create`, `adopt` for an existing repo, or `manual`), and whether the sandbox is on (`on` or `off`) |
+| `/update-gaia` | `update` | The GAIA version you updated from and the version you updated to |
+
+A field is sent only when the run has a value for it. A `/setup-gaia` re-run that settles no new setup choice sends no ping. An `/update-gaia` run that is interrupted and then run again can send its event twice.
+
+## What every ping carries
+
+Besides its event and fields, each ping carries:
+
+- **The GAIA version** of your project
+- **A broad platform:** `macos`, `linux`, `windows`, or `other`
+- **An install ID** (`projectId`)
+
+The install ID is pseudonymous: it is the same for every ping from one install, so the three events from one project can be counted together, but it contains nothing readable about you or your project. It identifies an install, not a person.
+
+## How it is sent
+
+The ping is a single request to `telemetry.gaiareact.com`. GAIA waits at most two seconds for a reply, ignores any network error, and never fails the command that sent it.
+
+## Turning it off
+
+Set this variable in your shell profile:
+
+```bash
+export GAIA_TELEMETRY_PING_DISABLE=1
+```
+
+With it set to `1`, no command sends the ping.
+
+## Not the usage ledger
+
+The [cost and usage ledger](/reference/cost/) is a different thing. It records model calls, tokens, and cost in a file on your machine, and it is never sent anywhere. The ping carries none of it.

@@ -17,7 +17,9 @@ The wiki is an Obsidian vault, so you can open it in [Obsidian](https://obsidian
 
 ## When to use it
 
-The wiki does not update on its own. When it is 20 or more relevant commits behind your code, the statusline shows:
+Some work updates the wiki as it goes. When a [plan's pull request](/workflow/plan/) is ready to merge, Claude can promote a summary of what shipped into the wiki on the same branch, and Claude may update a page during other work when it learns something lasting. Nothing makes every change do so, though, so the wiki can fall behind your code. `/gaia-wiki` is the backstop: it catches up whatever the rest of your work missed. Often sync finds little or nothing to add, and consolidate and lint still check the wiki's health.
+
+When the wiki is 20 or more relevant commits behind your code, the statusline shows:
 
 ```
 🧠 /gaia-wiki (N commits)
@@ -31,7 +33,7 @@ Run `/gaia-wiki` then. It is a skill, so plain-language asks like "sync the wiki
 /gaia-wiki
 ```
 
-It takes no arguments and always runs all three stages. Anything you pass prints a one-line notice and is ignored.
+It takes no arguments and runs the three [stages](#the-three-stages). Anything you pass prints a one-line notice and is ignored.
 
 It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, in a worktree of its own cut from the default branch.
 
@@ -46,15 +48,17 @@ It runs like every [maintenance command](/maintenance/#how-maintenance-commands-
 
 When sync stops partway (a first run, a rewritten history it cannot recover from, an interruption), consolidate and lint are skipped, and whatever sync completed still lands. A cancelled run commits nothing.
 
-## Sync
+## The three stages
+
+### Sync
 
 Sync goes through every commit since the last one the wiki checked, up to `HEAD`, decides which ones matter to the wiki, and updates the affected pages. Commits that change nothing the wiki describes are skipped, and only commits that led to a wiki change are logged. Changes to services and hooks are written to their pages under `wiki/modules/`.
 
 State lives in `wiki/.state.json`. When the wiki is more than 30 commits behind, sync asks first. You can choose to sync only the most recent 20 and treat everything older as done. Which commits count can be tuned with `gaia.wikiClassify` in `package.json`.
 
-## Consolidate
+### Consolidate
 
-Consolidate runs every time. It looks for four kinds of finding, most important first:
+Consolidate looks for four kinds of finding, most important first:
 
 - **Supersession**: two pages in the same area cover the same subject, and the newer one should take in the older one.
 - **Reversed decisions**: a decision page whose body reverses an older decision page.
@@ -69,7 +73,7 @@ Each finding is one question:
 
 The report overwrites one file each run, `wiki/meta/consolidate-report.md`.
 
-## Lint
+### Lint
 
 Lint runs every check from scratch and overwrites one report, `wiki/meta/lint-report.md`:
 

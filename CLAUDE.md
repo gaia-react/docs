@@ -40,7 +40,7 @@ GAIA has two audiences and the docs must keep them strictly separate:
 
 **The inverse rule (softer):** a contributor docs page should not duplicate what's already in the adopter docs. Cross-link instead.
 
-## GAIA's actual surface (verified against gaia `d540ccf2`, 2026-10-20, GAIA 2.0.0; volatile, re-check before publishing)
+## GAIA's actual surface (verified against gaia `54ffa7de`, 2026-10-21, GAIA 2.0.0; volatile, re-check before publishing)
 
 GAIA 2.0.0 is a pnpm workspace: the shared harness at the root (`.claude/`, `.gaia/`, `.githooks/`, `.github/`, `wiki/`, root `CLAUDE.md`) and the React app plus its frontend-only harness in `frontend/` (`frontend/app/`, `frontend/.claude/{rules,skills,agents}`, `frontend/CLAUDE.md`). Every 1.x `app/...` path is now `frontend/app/...`. Releases ship as `gaia-bundle-<tag>.tar.gz` with a `.sha256`.
 
@@ -106,7 +106,7 @@ Some adopter-facing commands and wiki pages internally reference mechanisms that
 
 **Current adjacent surfaces and how to handle them:**
 
-- **The usage ping** (`gaia ping`, sent by `/gaia-init`, `/setup-gaia`, `/update-gaia` and the 2.0.0 migration). Documented as opt-out on the `/gaia-init` page (Usage ping section): one fire-and-forget POST to telemetry.gaiareact.com with a few categorical fields, a pseudonymous per-install `projectId`, the GAIA version and a coarse platform, never paths or free text, turned off with `GAIA_TELEMETRY_PING_DISABLE=1`. Describe it in those terms only; do not document the server side, the payload schema beyond that, or how `projectId` is derived.
+- **The usage ping** (`gaia ping`, sent by `/gaia-init`, `/setup-gaia`, `/update-gaia` and the 2.0.0 migration). Documented as opt-out on the Telemetry page (`reference/telemetry.mdx`), which lists the three events and the categorical fields each adds: one fire-and-forget POST to telemetry.gaiareact.com with a few categorical fields, a pseudonymous per-install `projectId`, the GAIA version and a coarse platform, never paths or free text, turned off with `GAIA_TELEMETRY_PING_DISABLE=1`. Describe it in those terms only; do not document the server side, the payload schema beyond that, or how `projectId` is derived.
 - **The local usage ledger** (`.gaia/local/telemetry/usage.jsonl`) is documented on `reference/cost.mdx`. It is local-only and is not the ping.
 - The 1.x mentorship layer (and its `gaia mentorship` verbs, display rule and opt-in step) is removed in 2.0.0. Do not describe it; mention its removal only where the CHANGELOG makes it adopter-actionable.
 

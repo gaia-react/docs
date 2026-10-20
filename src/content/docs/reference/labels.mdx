@@ -33,6 +33,8 @@ Add `--dry-run` to see what it would change, or `--adopt` to replace your colors
 | `debt:spec-pending` | Handed to `/gaia-spec`; on hold until the SPEC starts |
 | `debt:spec-active` | A SPEC is in progress for this issue, or is keeping it open until a recorded condition is met |
 
+Every issue carries `tech-debt`, a severity, and a footprint. A difficulty is added only when the filer read the cited code, so an issue without one is normal. At most three `severity:investigate` issues can be open at once: a fourth filing is refused until one is answered and re-graded ([how](/maintenance/debt/#labels)).
+
 The severity labels are shades of red, darkest for critical.
 
 ## Work in progress

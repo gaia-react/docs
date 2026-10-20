@@ -1,57 +1,52 @@
 ---
 title: Maintenance
-description: 'The GAIA commands that keep a project in shape as it grows: the Claude setup, what Claude loads at startup, the tech-debt backlog, problems reviews keep finding, trade-offs accepted at merge, Serena, the wiki, dependencies, and GAIA itself.'
+description: 'The GAIA commands that keep a project in shape as it grows: GAIA itself, Serena, dependencies, what Claude loads at startup, problems reviews keep finding, the tech-debt backlog, trade-offs accepted at merge, the wiki, and the Claude setup.'
 ---
 
 GAIA ships commands for doing work and commands for keeping the project in shape. This page covers the second kind. You rarely need to remember them: each one surfaces as a statusline nudge when it is due.
 
-## Maintenance commands
+## Commands
 
-| Command | Statusline nudge | What it does |
+The commands are listed in the order their nudges appear on the [statusline](/workflow/statusline/#nudges). `/gaia-fitness` has no nudge, so it comes last.
+
+| Command | Nudge | What it does |
 | --- | --- | --- |
-| [`/gaia-fitness`](/maintenance/fitness/) | none | Checks your Claude setup (skills, commands, agents, rules, hooks, settings, `CLAUDE.md` files, wiki) against a fixed list of rules, grades it F to A+, and fixes your own files one at a time on a yes. |
-| [`/gaia-cleanse`](/maintenance/cleanse/) | 🔎 | Cleans up Claude's memory and the files it loads at startup: what repeats or disagrees with the wiki, what is out of date, and what makes the startup context too large. Asks before changing anything. |
-| [`/gaia-debt`](/maintenance/debt/) | 🐛 | Fixes the `tech-debt` backlog, highest severity then oldest first, one issue or a related batch per run, through the audit gate. Closes the issues on merge. |
-| [`/gaia-codify`](/maintenance/codify/) | 🔨 | Turns a problem the Code Audit Team keeps finding into a guard: an automated check, a skill, or a rule for matching files, with your approval. |
-| [`/gaia-residue`](/maintenance/residue/) | 🧹 | Goes through the trade-offs reviewers accepted at merge: dismiss each one, keep it for later, or turn it into a tech-debt issue. Never fixes code. |
-| [`/gaia-serena-sync`](/maintenance/serena-sync/) | 🔭 | Adds languages your project has grown to [Serena](https://github.com/oraios/serena)'s index, on your yes. |
-| [`/gaia-wiki`](/maintenance/wiki/) | 🧠 | Runs wiki sync, consolidate, and lint with fixes, as one commit and one pull request. Takes no arguments. |
-
-## Update commands
-
-| Command | Statusline nudge | What it does |
-| --- | --- | --- |
-| [`/update-deps`](/maintenance/update-deps/) | 📦 | Resolves security advisories, then updates outdated packages by group, through one quality gate. |
 | [`/update-gaia`](/maintenance/update-gaia/) | 🚀 | Pulls the latest GAIA release into your project with a three-way merge, verifying the release bundle first. |
+| [`/gaia-serena-sync`](/maintenance/serena-sync/) | 🔭 | Adds languages your project has grown to [Serena](https://github.com/oraios/serena)'s index, on your yes. |
+| [`/update-deps`](/maintenance/update-deps/) | 📦 | Resolves security advisories, then updates outdated packages by group, through one quality gate. |
+| [`/gaia-cleanse`](/maintenance/cleanse/) | 🔎 | Cleans up Claude's memory and the files it loads at startup: what repeats or disagrees with the wiki, what is out of date, and what makes the startup context too large. Asks before changing anything. |
+| [`/gaia-codify`](/maintenance/codify/) | 🔨 | Turns a problem the Code Audit Team keeps finding into a guard: an automated check, a skill, or a rule for matching files, with your approval. |
+| [`/gaia-debt`](/maintenance/debt/) | 🐛 | Fixes the `tech-debt` backlog, highest severity then oldest first, one issue or a related batch per run, through the audit gate. Closes the issues on merge. |
+| [`/gaia-residue`](/maintenance/residue/) | 🧹 | Goes through the trade-offs reviewers accepted at merge: dismiss each one, keep it for later, or turn it into a tech-debt issue. Never fixes code. |
+| [`/gaia-wiki`](/maintenance/wiki/) | 🧠 | Runs wiki sync, consolidate, and lint with fixes, as one commit and one pull request. Takes no arguments. |
+| [`/gaia-fitness`](/maintenance/fitness/) | none | Checks your Claude setup (skills, commands, agents, rules, hooks, settings, `CLAUDE.md` files, wiki) against a fixed list of rules, grades it F to A+, and fixes your own files one at a time on a yes. |
 
 ## The statusline
 
-GAIA's statusline draws its nudges on the right, each led by its emoji icon: `⚙️ /setup-gaia`, `🚀 /update-gaia`, `🔭 /gaia-serena-sync`, `📦 /update-deps`, `🔎 /gaia-cleanse`, `🔨 /gaia-codify`, `🐛 /gaia-debt`, `🧹 /gaia-residue`, and `🧠 /gaia-wiki`. It also shows when a teammate's GAIA update is in progress. The nudges fit the terminal width: on a narrow terminal they shrink to icons, with a `+N` for those hidden, and adjust within 15 seconds when you resize the terminal. The debt and residue counts refresh as soon as those commands finish.
-
-Inside a linked worktree the statusline shows only a blocking setup prompt, since the maintenance commands run from the main checkout. The left side shows GAIA's own bar (project, branch, model and effort, and a context bar), or your global statusline if you chose to keep it in [`/setup-gaia`](/getting-started/setup-gaia/#phase-statusline-left-side).
+The right side of the [statusline](/workflow/statusline/) names each command above when it has work to do, with a short reason, for example `🐛 /gaia-debt (3 issues)`. A nudge clears once the command has done its work. Nudges show only in the main checkout, where these commands run.
 
 ## Which one to run
 
 Pick by symptom:
 
-- The integration feels off, a skill is not triggering, a rule is not loading: [`/gaia-fitness`](/maintenance/fitness/).
-- Claude's starting context feels heavy, or the memory on your machine has grown large: [`/gaia-cleanse`](/maintenance/cleanse/).
-- The `tech-debt` backlog has grown: [`/gaia-debt`](/maintenance/debt/).
-- The audit keeps flagging the same kind of problem: [`/gaia-codify`](/maintenance/codify/).
-- Trade-offs accepted at merge have piled up in merged pull requests: [`/gaia-residue`](/maintenance/residue/).
 - The project grew a language Serena is not indexing: [`/gaia-serena-sync`](/maintenance/serena-sync/).
+- Claude's starting context feels heavy, or the memory on your machine has grown large: [`/gaia-cleanse`](/maintenance/cleanse/).
+- The audit keeps flagging the same kind of problem: [`/gaia-codify`](/maintenance/codify/).
+- The `tech-debt` backlog has grown: [`/gaia-debt`](/maintenance/debt/).
+- Trade-offs accepted at merge have piled up in merged pull requests: [`/gaia-residue`](/maintenance/residue/).
 - The wiki trails the code, or wiki pages overlap: [`/gaia-wiki`](/maintenance/wiki/).
+- The integration feels off, a skill is not triggering, a rule is not loading: [`/gaia-fitness`](/maintenance/fitness/).
 
 The boundary between `/gaia-cleanse` and `/gaia-wiki` is deliberate. `/gaia-cleanse` reconciles memory and auto-loaded files against the wiki. Redundancy and broken links inside the wiki belong to `/gaia-wiki`. Conflicts between two instruction files belong to Claude Code's own `/doctor prompt-audit`.
 
 ## How maintenance commands run
 
-Every maintenance command (`/gaia-wiki`, `/gaia-residue`, `/gaia-codify`, `/gaia-fitness`, `/gaia-cleanse`, `/update-deps`, `/update-gaia`) follows the same pattern:
+Every maintenance command (`/update-gaia`, `/update-deps`, `/gaia-cleanse`, `/gaia-codify`, `/gaia-residue`, `/gaia-wiki`, `/gaia-fitness`) follows the same pattern:
 
 1. **It starts from the main checkout.** Inside a linked worktree it refuses and names the main checkout to run it from. The exceptions are `/update-deps` and `/update-gaia`, which also accept their own `deps/` or `update/` worktree, so a re-run continues there.
 2. **It offers to pull first** when your checkout's GAIA version is behind the remote's.
 3. **It does its work on a branch of its own**, created just before it first changes a file: a worktree cut from the default branch by default, following your team's [isolation policy](/workflow/work-lifecycle/#3-isolate). It never writes onto the branch your checkout holds. The branch is named for the command and a timestamp, for example `deps/2026-10-20-1432`.
-4. **It commits, opens a draft pull request, and merges it** through the [Code Audit Team](/workflow/code-audit-team/), waiting up to ten minutes for a queued merge (fifteen for `/gaia-wiki`). Some ask before merging: `/gaia-residue` asks once, and `/gaia-fitness` and `/gaia-codify` publish only on your answer.
+4. **It commits and opens a draft pull request**, reviewed by the [Code Audit Team](/workflow/code-audit-team/). Whether it then merges on its own, asks you first, or leaves the pull request for you depends on the command: see [who merges what](/workflow/work-lifecycle/#6-merge).
 5. **It cleans up** the worktree and branch and pulls the default branch. A worktree holding unresolved work is kept, with the commands to remove it.
 
 A run that ends with nothing to publish removes its empty branch and worktree.

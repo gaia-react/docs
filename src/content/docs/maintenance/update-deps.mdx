@@ -5,9 +5,22 @@ description: Resolve security advisories and update outdated packages through on
 
 import { Aside } from '@astrojs/starlight/components';
 
-`/update-deps` keeps your dependencies current and your security advisories resolved, in place of [Dependabot](https://docs.github.com/en/code-security/dependabot)'s version and security pull requests. Advisories come first, each fixed with the smallest change that works. Then come outdated packages, shown by group so you can snooze (put off) what you are not ready for. Everything passes one quality gate, in its own worktree, and lands as one `chore(deps)` pull request that merges once checks are green.
+`/update-deps` keeps your dependencies current and your security advisories resolved, in place of [Dependabot](https://docs.github.com/en/code-security/dependabot)'s version and security pull requests (see [Why not Dependabot pull requests](#why-not-dependabot-pull-requests)).
 
-It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, in a worktree of its own cut from the default branch, whichever branch your checkout holds. When [`/gaia-init`](/getting-started/gaia-init/) runs it, it asks no questions and leaves its changes for the init commit instead.
+Advisories come first, each fixed with the smallest change that works. Then come outdated packages, shown by group so you can [snooze](#snoozing) what you are not ready for. Everything passes one quality gate, in its own worktree, and lands as one `chore(deps)` pull request that merges once checks are green.
+
+It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, in a worktree of its own cut from the default branch, whichever branch your checkout holds.
+
+## Why not Dependabot pull requests
+
+Dependabot still finds advisories: its alerts stay on, and `/update-deps` reads them. What GAIA turns off is Dependabot opening pull requests, so that one tool decides what moves and when.
+
+- **Packages that must move together do.** `/update-deps` updates [companion groups](#preview-and-decision) as one unit, respects your [version holds](#version-holds) and snoozes, and skips releases too new to trust. Dependabot reads none of GAIA's groups, holds, or snoozes, so its pull requests would duplicate or fight the ones `/update-deps` opens.
+- **A major version comes with its migration.** `/update-deps` changes your code to fit the new version in the same pull request. A Dependabot pull request bumps the version and leaves the migration to you.
+- **Every change passes the quality gate first.** Type checks, lint, tests, end-to-end tests, and the build all run locally before anything merges. That gate is what makes a dependency-only pull request safe to merge without a full code audit.
+- **Security fixes need a decision.** An advisory can need a lockfile refresh, a bump of the package that pulls in the vulnerable one (with its migration), or an override deep in the dependency tree. A security-update pull request cannot choose between them, and accepting a risk instead of fixing it is recorded as a visible alert dismissal, not hidden.
+
+The trade-off: nothing fixes an advisory until someone runs `/update-deps`. The statusline security count stays up every session until it does, and a snooze never hides it.
 
 ## When to use it
 
@@ -50,7 +63,7 @@ If a fix fails the quality gate, it is undone, and the advisory is reported as s
 
 ## Preview and decision
 
-Updates are grouped into **Security**, **Major**, **Non-semver**, **Minor**, and **Patch**. Packages that must move together (a companion group) show as one block and update together. The groups include react-router, react, tailwindcss, shadcn, storybook, vitest, playwright, i18next, msw, vite, zod-conform, fontawesome, stylelint, prettier, and eslint. Packages outside a group update on their own; `typescript` and `@types/node` are deliberately left out of every group.
+Updates are grouped into **Security**, **Major**, **Non-semver**, **Minor**, and **Patch**. Packages that must move together (a companion group) show as one block and update together. The groups include react-router, react, tailwindcss, [shadcn](https://ui.shadcn.com/), storybook, vitest, playwright, [i18next](https://www.i18next.com/), msw, vite, zod-conform, fontawesome, stylelint, prettier, and eslint. Packages outside a group update on their own; `typescript` and `@types/node` are deliberately left out of every group.
 
 You choose:
 
@@ -59,7 +72,17 @@ You choose:
 - **Update everything incl. snoozed**, when snoozes exist
 - **Cancel**: no branch, no changes
 
-A snooze is local to your machine (`.gaia/local/declined-updates.json`) and lapses when a newer version ships or after 14 days.
+### Snoozing
+
+Snoozing puts off an update you are not ready for, without saying no to it for good. Name the group or package under **Choose what to skip**, and it is recorded on your machine only, in `.gaia/local/declined-updates.json`. A teammate still sees it.
+
+While a snooze lasts:
+
+- The group is left out of the statusline count.
+- The group still appears in the preview, marked `[snoozed until <date>]`, and is skipped unless you choose otherwise. **Update the rest** keeps it skipped; **Update everything incl. snoozed** applies it and clears every snooze.
+- A security fix that needs the snoozed group is still offered. A snooze never blocks a security fix and never hides the security count.
+
+A snooze ends after 14 days, or sooner when a newer version of the group ships. Either way, the group comes back to the preview and the statusline count.
 
 ## What runs
 
@@ -73,7 +96,7 @@ A snooze is local to your machine (`.gaia/local/declined-updates.json`) and laps
 
 A `chore(deps)` pull request that changes only dependency files (such as `package.json` and the lockfile) skips the `code-audit-frontend` review. Any other audit member the change calls for still reviews it. One that also changes code for a migration gets the full [Code Audit Team](/workflow/code-audit-team/) audit.
 
-It also reports when the global `playwright-cli` binary is behind.
+It also reports when the global `playwright-cli` binary is behind, and offers to upgrade it.
 
 ## Release-age window
 
@@ -102,6 +125,17 @@ A hold is committed and stays until you remove it. It limits only the package it
 ```
 Held by config (not offered): vite (current 8.0.16, ceiling 8.0)
 ```
+
+## What GAIA holds back
+
+GAIA keeps two packages below their latest major version on purpose:
+
+| Package | Held at | Why |
+| --- | --- | --- |
+| `typescript` | The 6.0 line (`"typescript": "6.0"` in `gaia.updateDepsHold`) | The type-aware lint rules, and GAIA tooling that reads your source, depend on [TypeScript](https://www.typescriptlang.org/)'s programmatic API. [TypeScript 7](https://github.com/microsoft/typescript-go) stabilizes that API in 7.1, not 7.0. TypeScript 6.1 is out too, because typescript-eslint's supported range stops below it. Patches on the 6.0 line still land. |
+| `eslint`, `@eslint/js` | The newest 9.x release | GAIA's lint config, [`@gaia-react/lint`](https://github.com/gaia-react/lint), supports [ESLint](https://eslint.org/) 9 (`^9.30.0`). ESLint 9 updates still land. |
+
+GAIA's `tsconfig.json` already follows the TypeScript 7 strict settings, so once 7.1 ships, the upgrade is a dependency swap rather than a config migration. To lift the TypeScript hold, raise or remove its entry in the root `package.json`. The ESLint cap is built into `/update-deps`, so it is not in `gaia.updateDepsHold`, and an ESLint 10 release is never offered or listed.
 
 ## Where dependencies live
 

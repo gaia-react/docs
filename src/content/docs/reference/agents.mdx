@@ -25,7 +25,7 @@ The audit before each merge is done by a team. Each member is responsible for th
 
 The default member. Responsible for the app and its tooling: `frontend/app/**`, tests, [Storybook](https://storybook.js.org/) and [Playwright](https://playwright.dev/) trees, manifests, build and lint configs, root tooling such as `.npmrc`, and `frontend/.claude/**`. It reviews what lint and types cannot: security (a top priority), performance, how well the code fits the architecture, robustness and edge cases, accessibility, and maintainability. It also flags slow nested lookups (one loop inside another) that are split across two components or functions, where they are easy to miss.
 
-Three specialist sub-agents review React patterns and accessibility, [TypeScript](https://www.typescriptlang.org/) and architecture, and translations. Library-specific rules load from `frontend/.claude/agents/code-audit-frontend/`: `cn`, [Conform](https://conform.guide/), the form components, React buckets, react-i18next, and [shadcn](https://ui.shadcn.com/). It also reads the output of [React Doctor](https://github.com/millionco/react-doctor), [Knip](https://knip.dev/), and dependency security advisories as hints.
+Three specialist sub-agents review React patterns and accessibility, [TypeScript](https://www.typescriptlang.org/) and architecture, and translations. Library-specific rules load from `frontend/.claude/agents/code-audit-frontend/`: `cn`, [Conform](https://conform.guide/), the form components, React buckets, react-i18next, and [shadcn](https://ui.shadcn.com/). It also runs [React Doctor](https://github.com/millionco/react-doctor), [Knip](https://knip.dev/), and a dependency security advisory check, and merges their output into its report in a Tooling table. Those findings are advisory: they never block its approval.
 
 Before it reports a Critical or Major finding, a separate agent with no shared context tries to disprove it. A finding that does not hold up is dropped or downgraded. Each specialist's reply ends with a `Files reviewed` count, so a specialist that stopped early is caught and run again instead of being read as clean.
 
@@ -39,24 +39,21 @@ Runs a batch of audit rounds outside your main session. It starts the members, t
 
 ### audit-light-reviewer
 
-Reviews a small change made since a member's last full review, for members that turned this on with `light_review: true`. Read-only. Whenever a light review cannot be used, the full member runs instead.
+Reviews a small change made since a member's last full review, for members that turn this on with `light_review: true` in `.gaia/audit-ci.yml`. `light_line_cap` sets the largest change that qualifies (at most 50 lines), and `light_hard_full` lists patterns that always get a full review. Read-only. Whenever GAIA cannot confirm a change qualifies, the full member runs instead.
 
 ## Tests and acceptance
 
+How these two fit into building with tests is described in [Test-driven development](/workflow/tdd/).
+
 ### worthiness-evaluator
 
-An advisory reviewer for stories and Playwright tests, where the RED gate (see a test fail before it passes) does not apply. The `tdd` skill starts it once the tests pass. It reads only the tests the work changed plus the test files next to them, and edits nothing.
+The advisory reviewer for tests the RED gate does not cover: stories, component interaction tests, and Playwright tests. The `tdd` skill starts it in a fresh context once the tests pass, since the test's author would share its own blind spots. It reads only the tests the work changed plus the test files next to them, and reads source code only to judge whether a test goes through the public interface. It edits nothing.
 
-Each test is judged on two axes:
-
-- **Honesty**: can the test fail for a real reason? It must check what a user can see and use (roles, accessible names, visible text), not internal details, so it still passes after an internal refactor.
-- **Worthiness**: is it worth keeping? It should test your own code rather than a library's, and a test of a parent component should not repeat what the child component's tests already cover.
-
-One verdict per test: `keep`, `fix`, or `delete`. A `fix` names the defect; a `delete` is always a proposal you confirm, with its evidence. A merge hook checks that every changed test of this kind has a verdict for its current version.
+It judges each test on honesty and worthiness (see [the worthiness review](/workflow/tdd/#everything-else-the-worthiness-review)) and returns one verdict per test: `keep`, `fix`, or `delete`. Every `fix` or `delete` carries evidence: the defect for a fix, and for a delete the redundant assertion and the test that already covers it. A delete whose cited assertion it cannot find in the sibling file is downgraded, never proposed. The `tdd` skill records each verdict, keyed to the test's current content, and the [worthiness verdict](/reference/gates/#worthiness-verdict) gate checks that record at merge.
 
 ### uat-fidelity-judge
 
-Before a SPEC plan's pull request is audited, it reads the SPEC and each generated Playwright acceptance test (UAT), and judges whether each test still checks what the SPEC promised. Writes one JSON verdict file. A failure stops the plan.
+Before a SPEC plan's pull request is audited, it reads the SPEC and each generated Playwright acceptance test (UAT), and judges whether each test body still checks what the SPEC promised. Differences in wording, selectors, or layout do not count; a weaker assertion or a changed user flow does, and an unclear case is judged as diverging. It writes one JSON verdict file and nothing else. A failure stops the plan. See [UAT specs](/workflow/plan/#uat-specs).
 
 ## Integration health
 

@@ -13,7 +13,7 @@ A GAIA project is a [pnpm](https://pnpm.io/) workspace: one repo holding more th
 |---|---|
 | `CLAUDE.md` | Project instructions Claude reads at every session start |
 | `.claude/` | Shared commands, skills, agents, hooks, rules, and settings |
-| `.gaia/` | GAIA's CLI (`.gaia/cli/gaia`), scripts, statusline, the Code Audit Team roster (`audit-ci.yml`), team settings (`project.json`), the label registry, and state kept only on your machine under `.gaia/local/` (gitignored) |
+| `.gaia/` | GAIA's CLI (`.gaia/cli/gaia`), scripts, statusline, the [Code Audit Team](/workflow/code-audit-team/) roster (`audit-ci.yml`), team settings (`project.json`), the label registry, and state kept only on your machine under `.gaia/local/` (gitignored) |
 | `.githooks/` | Git's own hooks: `pre-commit` and `commit-msg` |
 | `.github/` | The Tests, Chromatic, and PR Conventions workflows, and your `CODEOWNERS` |
 | `wiki/` | The project wiki Claude maintains, an Obsidian vault |
@@ -22,13 +22,17 @@ A GAIA project is a [pnpm](https://pnpm.io/) workspace: one repo holding more th
 
 The scripts at the root (`pnpm dev`, `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm pw`, `pnpm build`) run in the `frontend` package, so `pnpm lint` and `pnpm -C frontend lint` do the same thing.
 
+### Pinned dependencies
+
+Every dependency in `package.json` is pinned to one exact version, with no `^` or `~` range, and `pnpm add` pins new ones the same way. A version changes only when you or [`/update-deps`](/maintenance/update-deps/) change it, so a new upstream release never reaches your app without a commit that shows it. `/update-deps` tests each update through the [Quality Gate](/reference/gates/#quality-gate) before it keeps it. pnpm also refuses package versions published in the last three days (see [Release-age window](/reference/gates/#release-age-window)), the window in which most compromised packages are caught and pulled.
+
 ## frontend/
 
 | Path | What it holds |
 |---|---|
 | `frontend/CLAUDE.md` | Instructions for sessions working on the app |
 | `frontend/.claude/` | The app's skills, rules, and Code Audit Team extensions. Its `settings.json` is generated from the root settings plus `settings.overlay.json`. |
-| `frontend/app/` | The React Router app: `routes/`, `pages/`, `components/` (with [shadcn/ui](https://ui.shadcn.com/) in `components/ui/`), `hooks/`, `services/`, `state/`, `languages/`, `styles/` |
+| `frontend/app/` | The [React Router](https://reactrouter.com/) app: `routes/`, `pages/`, `components/` (with [shadcn/ui](https://ui.shadcn.com/) in `components/ui/`), `hooks/`, `services/`, `state/`, `languages/`, `styles/` |
 | `frontend/test/` | Test setup, mocks, and utilities |
 | `frontend/.storybook/` | [Storybook](https://storybook.js.org/) config, including the accessibility settings in `a11y.ts` |
 | `frontend/.playwright/` | [Playwright](https://playwright.dev/) specs and helpers |
@@ -37,9 +41,7 @@ The scripts at the root (`pnpm dev`, `pnpm typecheck`, `pnpm lint`, `pnpm test`,
 
 Files and folders under `app/components`, `app/pages`, and `app/hooks` are kebab-case: a component is `components/<name>/index.tsx`, a page is `pages/<route path>/page.tsx`, and a hook is `use-<name>.ts`. Each folder keeps its tests and stories in a `tests/` folder beside the code.
 
-Each copy of the repo, your main one and each worktree, gets its [own dev, Storybook, and Playwright ports](/workflow/work-lifecycle/#ports-per-worktree), so they never collide. The main copy uses 5173 and 6006. To see a copy's ports, run `bash .gaia/scripts/ports.sh` in it.
-
-To add a backend or another package beside `frontend/`, see [The backend is left to you](#the-backend-is-left-to-you).
+Each copy of the repo, your main one and each worktree, gets its own dev, Storybook, and Playwright [ports](/workflow/work-lifecycle/#ports-per-worktree), so they never collide. The main copy uses 5173 and 6006.
 
 ## The frontend stack
 
@@ -65,7 +67,7 @@ GAIA ships one frontend framework and no backend. This is an intentional choice.
 
 ### The frontend is chosen for you
 
-[React Router 8](https://reactrouter.com/) can be used to build nearly any web app you need. It is widely used and well established, and it can render pages on the server or run entirely in the browser as a single-page app. GAIA ships with server rendering on.
+React Router 8 can be used to build nearly any web app you need. It is widely used and well established, and it can render pages on the server or run entirely in the browser as a single-page app. GAIA ships with server rendering on.
 
 It also isn't tied to one hosting platform, so you can deploy it almost anywhere. See [Deployment](/getting-started/deployment/).
 
@@ -75,11 +77,11 @@ If React Router truly cannot do something your project needs, you can ask Claude
 
 ### The backend is left to you
 
-Backends differ in ways that matter: language, hosting, database, and what your team already knows. Often the choice isn't yours at all, because your company already runs one. Your backend might be a hosted service such as Supabase, a service you write in TypeScript, Python, or Ruby, or an existing company API. GAIA works with any of them.
+Backends differ in ways that matter: language, hosting, database, and what your team already knows. Often the choice isn't yours at all, because your company already runs one. Your backend might be a hosted service such as Supabase, a service you write in [TypeScript](https://www.typescriptlang.org/), Python, or Ruby, or an existing company API. GAIA works with any of them.
 
 GAIA's repo is built for this. It is a pnpm workspace, so each backend you add becomes another package beside `frontend/`, with its own `CLAUDE.md`, rules, and skills. To add one, ask Claude: it follows the steps GAIA ships. Those steps include two things the backend needs before its code is checked as well as the frontend's:
 
-- **A Code Audit Team member that covers it.** Code no member covers is not merged unreviewed. Until a member's file patterns cover the backend, the merge waits for `code-audit-frontend`, the default member, to review its files, and that member reviews with a React focus. The steps have Claude register a member for your backend's stack, or give its file patterns to a member whose focus fits. See [Code Audit Team](/workflow/code-audit-team/).
-- **A quality gate for its stack.** The shipped [Quality Gate](/reference/gates/#quality-gate) checks only `frontend/`, so the steps have Claude add a gate that names the backend's own checks.
+- **A Code Audit Team member that covers it.** Code no member covers is not merged unreviewed. Until a member's file patterns cover the backend, the merge waits for `code-audit-frontend`, the default member, to review its files, and that member reviews with a React focus. The steps have Claude register a member for your backend's stack, or give its file patterns to a member whose focus fits. See [Covering new code](/workflow/code-audit-team/#covering-new-code).
+- **A quality gate for its stack.** The shipped [Quality Gate](/workflow/code-audit-team/#quality-gate) checks only `frontend/`, so the steps have Claude add a gate that names the backend's own checks.
 
 Worktrees get their [own ports](/workflow/work-lifecycle/#ports-per-worktree) for `frontend/` only. By default, the frontend's tests mock the API with MSW, so they don't need a backend running. Before Claude runs backend work in a worktree, it asks whether worktrees should share one backend or each run their own.

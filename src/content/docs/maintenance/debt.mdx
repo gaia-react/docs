@@ -5,7 +5,7 @@ description: Fix the tech-debt backlog, most severe and then oldest first, one i
 
 import { Aside } from '@astrojs/starlight/components';
 
-`/gaia-debt` fixes the `tech-debt` backlog: the GitHub issues the [Code Audit Team](/workflow/code-audit-team/), [`/gaia-residue`](/maintenance/residue/), and [`/gaia-cleanse`](/maintenance/cleanse/) file for problems they found outside the change they were reviewing. Each run fixes **one unit** of work: a single issue, or a batch of related issues. It works on its own branch, passes the same audit every feature pull request passes, and merges. The pull request carries one `Closes #N` per issue, so the merge closes them.
+`/gaia-debt` fixes the `tech-debt` backlog: the GitHub issues GAIA files for real problems it finds outside the change at hand, during any work. [Tech debt](/workflow/tech-debt/) covers how those issues are created. Each run fixes **one unit** of work: a single issue, or a batch of related issues. It works on its own branch, passes the same audit every feature pull request passes, and merges. The pull request carries one `Closes #N` per issue, so the merge closes them.
 
 ## When to use it
 
@@ -70,35 +70,12 @@ The run ends with a [cost line](/reference/cost/).
 
 ## Labels
 
-Every tech-debt issue carries a severity. Issues GAIA files also carry a footprint (how much code the fix touches). A difficulty is added only when the cited code was read at filing time, so an issue without one is normal:
+What each label means is in [Labels](/reference/labels/#tech-debt).
 
-| Label | Meaning |
-|---|---|
-| `severity:critical` | Wrong, or will produce broken work. Drained first. |
-| `severity:major` | A significant gap or defect. Drained before minor findings. |
-| `severity:minor` | Real but small. Fixed by default, never ignorable. |
-| `severity:investigate` | Severity cannot be judged yet. The issue must name the open question and what would settle it. At most three may be open at once, and they are never drained until re-graded. |
-| `footprint:narrow` | One self-contained change in one file, with no change to a contract (how other code uses it). |
-| `footprint:wide` | Spans files, changes a contract, or changes the code's structure. |
-| `footprint:spec` | Must start with a design SPEC. Drains through `/gaia-spec`. |
-| `difficulty:easy` | The issue and the cited code already make the fix clear. |
-| `difficulty:medium` | The fix needs a design decision, and the surrounding code shows the answer. |
-| `difficulty:hard` | The fix needs a design decision the surrounding code does not answer. |
-| `in-progress` | Someone is working the issue right now. |
-| `debt:spec-pending`, `debt:spec-active` | Parked on a SPEC handoff, or a SPEC underway. |
-
-The grades are guidance only: Claude can change a footprint after reading the code. To return an `investigate` issue to the backlog, answer its question and re-grade it in one edit: `gh issue edit <n> --remove-label severity:investigate --add-label severity:<tier> --body-file <path>`, with the answer in the body. See [Labels](/reference/labels/) for the full registry.
-
-## How issues are filed
-
-The `file-tech-debt` skill is the one way a finding becomes a `tech-debt` issue, used by the audit loop, `/gaia-residue`, `/gaia-cleanse`, and by you ("file this as tech-debt"). It:
-
-- Adds a key to each issue (`<!-- gaia-debt-key: v1 class=... path=... line=... -->`) so the same finding is never filed twice, and skips a finding that already has an open issue or was declined (closed as not planned, or labelled `wontfix`).
-- Checks the labels and key before creating the issue, and refuses a badly formed one instead of leaving it for `/gaia-debt` to trip over later.
-- Files **security findings only when the repository is private**, checked twice. Otherwise it writes a redacted local record under `.gaia/local/audit/security/` and reports a count and that path, nothing more.
+The grades are guidance only: Claude can change a footprint after reading the code. To return a `severity:investigate` issue to the backlog, answer its question and re-grade it in one edit: `gh issue edit <n> --remove-label severity:investigate --add-label severity:<tier> --body-file <path>`, with the answer in the body.
 
 <Aside type="note">
-`/gaia-debt` fixes issues; it does not file them. Use `file-tech-debt`, or let the audit file them, to add to the backlog.
+`/gaia-debt` fixes issues; it does not file them. See [How an issue is filed](/workflow/tech-debt/#how-an-issue-is-filed).
 </Aside>
 
-Source: `.claude/skills/gaia/references/debt.md`, `.claude/skills/file-tech-debt/SKILL.md`.
+Source: `.claude/skills/gaia/references/debt.md`.

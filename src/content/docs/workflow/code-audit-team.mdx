@@ -7,9 +7,36 @@ sidebar:
 
 import { Aside } from '@astrojs/starlight/components';
 
-Every pull request in a GAIA project is audited before it merges. The audit is not one reviewer but a team. Each member is responsible for a set of files, and a pull request is reviewed by every member whose files it changes. The audit runs locally in your Claude Code session. Nothing runs Claude on [GitHub Actions](https://docs.github.com/en/actions).
+Every change in a GAIA project is checked twice before it merges. The [Quality Gate](#quality-gate) runs before each commit, and the Code Audit Team reviews the pull request before it merges.
+
+The audit is not one reviewer but a team. Each member is responsible for a set of files, and a pull request is reviewed by every member whose files it changes. The audit runs locally in your Claude Code session. Nothing runs Claude on [GitHub Actions](https://docs.github.com/en/actions) ([why](#why-the-audit-runs-locally)).
 
 A hook enforces it: `gh pr merge` is denied until every member whose files changed has approved the change. The `GAIA-Audit` required check stops anyone from skipping the audit by merging with the button on github.com.
+
+## Quality Gate
+
+The Quality Gate is the full set of checks Claude runs before it commits a change to source code. The [pre-commit hook](/workflow/git-conventions/#native-git-hooks) checks only the files you staged. The gate checks the whole `frontend/` package, so it also catches what a change breaks somewhere else.
+
+### When it runs
+
+Before any commit that stages source code (`.ts`, `.tsx`, `.js`, `.jsx`, `.mjs`, `.cjs`, or `.css`) or a config that changes what the checks do: `package.json`, the lockfile, the [TypeScript](https://www.typescriptlang.org/), [Vite](https://vite.dev/), [Vitest](https://vitest.dev/), [Playwright](https://playwright.dev/), and [ESLint](https://eslint.org/) configs, and GAIA's package registry. A commit of only Markdown, `.claude/` files, wiki pages, or images skips the gate.
+
+### What it checks
+
+| Step | Passes when |
+|---|---|
+| Simplify | Claude has run the `simplify` skill on the change and applied the changes it recommends. |
+| Localization | No user-facing text is hardcoded, and no translation key is missing its value. |
+| Typecheck (`pnpm typecheck`) | There are zero errors. |
+| Lint (`pnpm lint`) | There are zero errors and zero warnings. Lint also fixes formatting, because [Prettier](https://prettier.io/) runs as an ESLint rule. |
+| Unit tests (`pnpm test --run`) | Every test passes with zero console warnings. Stories and hook tests run in headless Chromium. |
+| End-to-end tests (`pnpm pw`) | Every Playwright test passes. |
+| Dev server (`bash .gaia/scripts/dev-smoke.sh`) | This checkout's own dev server starts and its home page loads. The script stops only the server it started, so it never stops a server another session is using. |
+| Build (`pnpm build`) | The production build succeeds. |
+
+Claude fixes every warning, not only errors, before it reports. It then shows you a table of the results and asks whether to commit or hold the change for your review. Inside a workflow that commits on its own (the audit's fix round, [`/gaia-debt`](/maintenance/debt/), and a plan's phase commits), a clean gate commits without asking, because that workflow has its own point where you review.
+
+The gate is a rule Claude follows, not a hook. The pre-commit hook is the part that runs no matter what ([gate reference](/reference/gates/#pre-commit-floor)). The shipped gate checks only `frontend/`. A package you add beside it, such as a backend, needs a gate of its own ([The backend is left to you](/getting-started/project-layout/#the-backend-is-left-to-you)).
 
 ## Members
 
@@ -20,27 +47,48 @@ The list of members (the roster) lives in `.gaia/audit-ci.yml` under `auditors:`
 | `code-audit-frontend` (the default member) | The app and its tooling: `frontend/app/**`, `frontend/test/**`, `frontend/.storybook/**`, `frontend/.playwright/**`, the package manifests and lockfile, build and lint configs, `frontend/.claude/**`, `frontend/CLAUDE.md`, and root tooling such as `.npmrc` and `.nvmrc` | Security, performance, fit with the existing architecture, edge cases, accessibility, and maintainability: problems that take understanding what the code is meant to do and how data moves through it, beyond what lint and types catch. Library-specific rules for [shadcn/ui](https://ui.shadcn.com/), `cn`, [Conform](https://conform.guide/), the form components, React patterns, and react-i18next load from `frontend/.claude/agents/code-audit-frontend/`. |
 | `code-audit-github-workflows` | `.github/workflows/*.yml` and `.github/actions/**/*.yml` | Workflow YAML problems: unsafe third-party actions, script injection, too-broad permissions, and mishandled secrets. |
 
-Each file goes to the first member whose pattern matches it, and the default member's patterns are checked last, so a workflow file belongs to `code-audit-github-workflows`. A file no member is responsible for belongs under `unowned:` in the same file. The audit itself does not check this. After you change the roster, run `bash .gaia/scripts/verify-audit-roster.sh` by hand: it fails when a file has no member and is not listed under `unowned:`, or when a pattern matches no file at all.
+Each file goes to the first member whose pattern matches it, and the default member's patterns are checked last, so a workflow file belongs to `code-audit-github-workflows`.
+
+`code-audit-frontend` also runs three tools on every review and lists what they find in its report, as advice that never blocks approval: [React Doctor](https://github.com/millionco/react-doctor) for React problems, [Knip](https://knip.dev/) for unused files, exports, and dependencies, and a check for known security advisories in your dependencies.
 
 Members only report problems. They never edit a file. A separate fixer makes the repairs, and a script checks each repair before it is kept.
 
-### Editing the roster
+### Covering new code
 
-`.gaia/audit-ci.yml` ships with GAIA, and you edit its values to adjust the audit: add patterns for code you add beside `frontend/`, list paths that deliberately have no owner under `unowned:` (this only quiets the roster check; it does not skip review), or set the light-review keys below. If the file has no `auditors:` block, the audit refuses to run rather than falling back to a built-in list.
+`.gaia/audit-ci.yml` ships with GAIA, and you edit it to fit your project. When you add code beside `frontend/`, such as a backend, decide who reviews it:
+
+- **Give it its own member.** A member is an agent file in `.claude/agents/` that says what to review for, plus an entry under `auditors:` that gives the member's name and file patterns. This is the better choice for code in another language or stack.
+- **Add its patterns to an existing member** whose review fits the code.
+
+Until you do one of these, the new files are not skipped. A file no member covers goes to `code-audit-frontend`, the default member, so the merge still waits for a review, but one written for a React app. Only a pull request whose every file is outside the audit's scope (wiki pages, `.claude/` files, GAIA's own `.gaia/` files, docs, and Markdown files at the root) merges with no member's review.
+
+Claude follows the steps on the shipped wiki page `wiki/concepts/Registering a Code Audit Team Member.md`. To add a member, give Claude a prompt like this one, with your own folder and stack:
+
+```text
+Add a Code Audit Team member for the Python API in backend/. Follow the wiki page "Registering a Code Audit Team Member": write the agent file with review guidance for Python and FastAPI, add its roster entry in .gaia/audit-ci.yml with patterns that cover backend/**, then run the roster check and show me the result.
+```
+
+After any change to the roster, run the roster check. Nothing runs it for you:
+
+```bash
+bash .gaia/scripts/verify-audit-roster.sh
+```
+
+It reports a file that no member covers and that is not listed under `unowned:`, and a pattern that matches no file. Listing a path under `unowned:` only quiets that report. It does not skip the review. If `.gaia/audit-ci.yml` has no `auditors:` block, the audit refuses to run rather than falling back to a built-in list.
 
 ## Per-member clearance
 
 Each member's approval (its clearance) covers exactly what the branch changed in that member's files, plus GAIA's own audit scripts. You will notice three effects:
 
 - **Members run in parallel**, in any order.
-- **A commit outside a member's files never sends it back to review.** A CHANGELOG line or a wiki page triggers no new review.
+- **A commit outside a member's files never sends it back to review.** A docs change or a wiki page triggers no new review.
 - **Merging the base branch into yours does not trigger a new review**, unless the merge commit contains its own edit, or a change from the base branch lands within three lines of your branch's changes.
 
 A member sent back to review looks only at what changed since its last approval or refusal, plus any of its findings still open.
 
 ### Light review
 
-A small change since a member's last full review can go to a cheaper Sonnet reviewer, if the member turns this on with `light_review: true` in `.gaia/audit-ci.yml`. `light_line_cap` sets the largest change that qualifies (at most 50 lines), and `light_hard_full` lists patterns that always get a full review. `code-audit-frontend` has light review on by default, but its configs, package manifests, test folders, and Claude setup files always get a full review. Whenever GAIA cannot confirm a change qualifies for light review, the full member runs.
+A small change since a member's last full review can go to a cheaper Sonnet reviewer. `code-audit-frontend` has this on by default, but its configs, package manifests, test folders, and Claude setup files always get a full review. Whenever GAIA cannot confirm a change qualifies, the full member runs. The settings are in [Agents](/reference/agents/#audit-light-reviewer).
 
 ## Severity
 
@@ -52,11 +100,11 @@ Every finding is graded on one scale:
 | **Major** | Must be fixed, or acknowledged with a stated reason. |
 | **Minor** | Never blocks approval. Fixed by default. |
 
-A fourth grade, `severity:investigate`, marks a tech-debt issue whose severity cannot be judged yet. See [`/gaia-debt`](/maintenance/debt/#labels).
+A fourth grade, `severity:investigate`, marks a tech-debt issue whose severity cannot be judged yet. See [Investigate issues](/workflow/tech-debt/#investigate-issues).
 
 Every finding, Minor included, gets an outcome. By default it is fixed. Otherwise it is accepted as a known trade-off (a residual), waived, or filed as an issue, each with a reason. Findings about architecture come to you to decide.
 
-**Out-of-scope findings** (problems the audit notices outside the pull request's own change) are filed as `tech-debt` issues through the [`file-tech-debt`](/maintenance/debt/#how-issues-are-filed) skill. A non-security finding in a file the pull request already changes can instead be recorded as waived in the pull request body, but only when it passes two checks (for example, that this change did not introduce it). **Security findings are never filed publicly.** They become issues only when the repository is private. Otherwise they stay in a local record, with secrets removed, under `.gaia/local/audit/security/`, and you are told only how many there were and where the records are.
+**Out-of-scope findings** (problems the audit notices outside the pull request's own change) are filed as `tech-debt` issues through the [`file-tech-debt`](/workflow/tech-debt/#how-an-issue-is-filed) skill. A non-security finding in a file the pull request already changes can instead be recorded as waived in the pull request body, but only when it passes two checks (for example, that this change did not introduce it). **Security findings are never filed publicly.** They become issues only when the repository is private. Otherwise they stay in a local record, with secrets removed, under `.gaia/local/audit/security/`, and you are told only how many there were and where the records are.
 
 ## The audit loop
 
@@ -126,6 +174,17 @@ The merge hook denies `gh pr merge` with one reason and one next step. The commo
 
 After changing a pull request's base branch on GitHub, reset the recorded base with `git config --unset branch.<branch>.gaia-audit-base`.
 
-Claude waits for a queued merge with `bash .gaia/scripts/pr-wait-merge.sh --pr <N>`, which stops as soon as the pull request has a conflict or a required check fails.
-
 Every gate the audit can raise has a row in the [gate reference](/reference/gates/).
+
+## Why the audit runs locally
+
+Many teams run review, lint, and tests only on CI. GAIA runs them on your machine first, before the pull request merges, and keeps CI as the backstop.
+
+- **The sooner you hear about a problem, the cheaper it is to fix.** A problem the Quality Gate or the audit finds is fixed while the change is still fresh, in the same session. A problem CI finds arrives after you have moved on to something else. You wait for the run, look up what failed, switch back, fix it, push, and wait again.
+- **You can see and steer it.** The audit runs in your Claude Code session, so you watch each round, answer its questions, and stop it or change course. Claude running on CI is a black box: you see the result, not the work, and you cannot adjust it while it runs.
+- **It costs less.** Each member reviews only what changed since it last approved, and the fixes happen in the same loop. Claude on CI would run its own sessions on top of the one you already have open.
+- **Fixing stays simple.** On CI, getting Claude to fix what it found and push the fix back takes extra machinery, and that fix needs another review. Locally, the fixer repairs findings inside the audit loop and the next round reviews the repairs.
+
+This was true before AI coding tools, and it matters more with them: Claude writes changes faster than a CI round trip can report on them.
+
+CI still runs. The [Tests workflow](/workflow/git-conventions/#github-workflows-that-ship) runs the test suites again on every pull request, and the `GAIA-Audit` required check confirms the local audit ran. CI is the last check on work that should already be good.

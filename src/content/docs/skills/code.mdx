@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-These skills shape how Claude writes and reviews code. Each one loads automatically when what you say matches its trigger. You don't call them by name.
+These skills shape how Claude writes and reviews code. Each one loads automatically when the task matches its trigger, whether the task comes from your request or from work Claude or a sub-agent is already doing. You don't call them by name.
 
 The React app's skills live in `frontend/.claude/skills/` and load in sessions that work on the app. `tdd` and `naming-conventions` live in the root `.claude/skills/` and apply anywhere in the repository.
 
@@ -13,15 +13,15 @@ The React app's skills live in `frontend/.claude/skills/` and load in sessions t
 
 Patterns and conventions for [TypeScript](https://www.typescriptlang.org/):
 
-- `type` rather than `interface`.
-- Explicit return types on exported functions.
-- No enums: use `as const` objects with types derived from them.
-- No `switch`.
-- At most three positional parameters.
+- `type` rather than `interface` ([why](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#differences-between-type-aliases-and-interfaces)).
+- Explicit return types on exported functions ([why](https://typescript-eslint.io/rules/explicit-module-boundary-types/)).
+- No enums: use `as const` objects with types derived from them ([why](https://www.typescriptlang.org/docs/handbook/enums.html#objects-vs-enums)).
+- No `switch`: use an object map or `if`/`else`.
+- At most three positional parameters, with an options object beyond that ([why](https://eslint.org/docs/latest/rules/max-params)).
 - `undefined` rather than `null` for a missing value your own code sets.
-- [Zod](https://zod.dev/) 4's `z.literal([...])` rather than `z.enum()`.
+- [Zod](https://zod.dev/) 4's [`z.literal([...])`](https://zod.dev/api#literals) rather than `z.enum()`, with values sorted alphabetically.
 
-**One source of truth.** Before Claude defines a constant list, union type, schema, or lookup map, it searches for an existing one and imports it. Every other form of the same set (a type, a schema) is derived from that one source. A map keyed by a union uses `satisfies Record<Union, ...>`, so when you add a member to the union, TypeScript reports an error everywhere the new member is not handled yet.
+**One source of truth.** Before Claude defines a constant list, union type, schema, or lookup map, it searches for an existing one and imports it. Every other form of the same set (a type, a schema) is derived from that one source. A map keyed by a union uses `satisfies Record<Union, ...>`, so when you add a member to the union, TypeScript reports an error everywhere the new member is not handled yet ([why](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-9.html#the-satisfies-operator)).
 
 **Triggers** when writing or reviewing TypeScript: typing exports, choosing between `type` and `interface`, defining Zod schemas, defining a shared constant list or union, structuring function parameters, or avoiding switch statements and enums.
 
@@ -92,15 +92,11 @@ Fixed text in a skeleton that gets translated uses `t()` or `<Trans>`, the same 
 
 Source: `frontend/.claude/skills/skeleton-loaders/SKILL.md`.
 
-## Test Driven Development
+## Test-driven development
 
-Based on Matt Pocock's [TDD Skill](https://www.aihero.dev/skill-test-driven-development-claude-code), adapted for GAIA. It works one small behavior at a time in a red-green-refactor loop: write one failing test (red), write the code that makes it pass (green), tidy up (refactor), then move to the next test. Tests check behavior through public interfaces, not internal details. `tdd` runs the loop; its React companion, `tdd-react`, holds the frontend testing reference.
+`tdd` runs the red-green-refactor loop Claude uses to build features and fix bugs, and its React companion, `tdd-react`, holds the frontend testing reference: stories as component tests, hook tests, [MSW](https://mswjs.io/), and [Playwright](https://playwright.dev/). See [Test-driven development](/workflow/tdd/) for how the loop works and how GAIA checks that each test can catch a bug.
 
-**Stories are the component tests.** A component's test is its [Storybook](https://storybook.js.org/) story with a play function (a script that clicks and types like a user), run in a real Chromium browser. Hook tests use `vitest-browser-react`. Network requests are mocked with [MSW](https://mswjs.io/) (Mock Service Worker). `addon-a11y` checks every story for accessibility, and a story that weakens its accessibility check fails the tests unless the opt-out is recorded with a reason.
-
-**The RED gate.** For code that gives the same result on every run (pure utilities, service parsers, hooks), a Claude Code hook on `git commit` refuses a new test that was never seen failing first. Tests whose subject does not behave the same on every run are exempt: stories, component interaction tests, async tests, and [Playwright](https://playwright.dev/) tests. They have no stable failing-then-passing run to observe. For those, the `worthiness-evaluator` agent reviews each changed test: can it fail for a real reason, and is it worth keeping? It answers keep, fix, or delete. Claude rewrites a test that fails the honesty check in place, as a normal edit you review, and every delete needs your confirmation. A hook at merge time checks that every changed test of that kind has a review entry.
-
-**Triggers** when building features or fixing bugs with TDD, mentioning "red-green-refactor", asking for integration tests, or asking for test-first development.
+**Triggers** when building features or fixing bugs, mentioning "red-green-refactor", asking for integration tests, or asking for test-first development.
 
 **Example phrasing:** "let's TDD this", "write a red test for the login flow".
 
@@ -116,7 +112,7 @@ Source: `frontend/.claude/skills/playwright-cli/SKILL.md`.
 
 ## ESLint Fixes
 
-Claude usually handles [ESLint](https://eslint.org/) errors well. This skill covers specific errors Claude has fixed badly in the past, and autofix conflicts where one rule undoes another. If you see Claude fixing an error the wrong way (for example, turning the rule off instead of fixing the cause), ask it to improve the `eslint-fixes` skill for that error. Lint requires every `eslint-disable` comment to give a reason after `--` (`@eslint-community/eslint-comments/require-description`).
+Claude usually handles [ESLint](https://eslint.org/) errors well. This skill covers specific errors where this project expects a particular fix, and autofix conflicts where one rule undoes another. If you see Claude fixing an error the wrong way (for example, turning the rule off instead of fixing the cause), ask it to improve the `eslint-fixes` skill for that error. Lint requires every `eslint-disable` comment to give a reason after `--` (`@eslint-community/eslint-comments/require-description`).
 
 Source: `frontend/.claude/skills/eslint-fixes/SKILL.md`.
 

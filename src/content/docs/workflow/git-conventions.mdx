@@ -11,7 +11,7 @@ GAIA enforces its commit and pull request rules in three places: git hooks that 
 
 ## Native git hooks
 
-The hooks live in `.githooks/`. Git finds them through its `core.hooksPath` setting, which `pnpm install` sets for you (through the root `prepare` script). Husky is not used.
+The hooks live in `.githooks/`. Git finds them through its `core.hooksPath` setting, which `pnpm install` sets for you (through the root `prepare` script). GAIA does not use Husky: git's own `core.hooksPath` setting does the same job without another dependency.
 
 | Hook | What it runs |
 |---|---|
@@ -42,17 +42,27 @@ A squash merge uses the pull request title as the commit's first line on the def
 
 Before `gh pr create` or `gh pr edit` runs with a title, a Claude Code hook checks the title with the same commitlint setup CI uses, and blocks a title that would fail. It also blocks `gh pr create --fill` (and `-f`) with no `--title`, because the title GitHub would fill in cannot be checked in advance. Pass `--title`.
 
-[`/setup-gaia`](/getting-started/setup-gaia/#phase-squash-only-merges) offers to allow only squash merges, with the PR title as the commit's first line, so the title check covers exactly what lands on the default branch.
+By default, [`/setup-gaia`](/getting-started/setup-gaia/#phase-squash-only-merges) sets your repository to allow only squash merges, with the PR title as the commit's first line. So the title check covers exactly what lands on the default branch.
 
 ## Draft pull requests
 
 Every pull request Claude opens for this repository opens as a draft. A hook blocks `gh pr create` without `--draft`. When the audit passes and posts `GAIA-Audit`, the pull request is marked ready for review, and a refusal turns it back into a draft.
 
-**Why:** reviewers are notified when a pull request is ready, and in a GAIA project that is when the audit passes. A pull request opened as ready notifies them before any audit has run. Pull requests to another repository, and private repositories on GitHub plans that do not allow drafts, are allowed without `--draft`.
+**Why:** reviewers are notified when a pull request is ready, and in a GAIA project that is when the audit passes. A pull request opened as ready notifies them before any audit has run. Pull requests to another repository are allowed without `--draft`.
 
-## Branches
+<Aside type="note" title="Private repositories on GitHub Free">
+On GitHub Free, draft pull requests are available only in public repositories ([compare plans](https://github.com/pricing#compare-features)). So in a private repository, GAIA allows a pull request without `--draft`, and it opens ready for review.
+</Aside>
 
-Every branch GAIA creates is named by one shared script, in the form `<kind>/<rest>`. See [Work lifecycle](/workflow/work-lifecycle/#2-name). Commits and pushes to `main` or `master` are denied, as are force-pushes naming them; work on a branch and open a pull request.
+## Branches and worktrees
+
+A **branch** is a named line of commits. In a single checkout (the folder you cloned), only one branch is checked out at a time, and switching branches swaps the files in that folder.
+
+A **worktree** is an extra folder linked to the same repository, with its own branch checked out. Each worktree has its own copy of the files, so two tasks can run at the same time without touching each other or your main checkout.
+
+GAIA runs most work in a worktree, each on its own new branch. Your team's isolation policy decides when Claude uses a worktree and when it uses a branch in your current checkout. See [Isolate](/workflow/work-lifecycle/#3-isolate).
+
+Every branch GAIA creates, in a worktree or not, is named by one shared script, in the form `<kind>/<rest>`. See [Name](/workflow/work-lifecycle/#2-name). Commits and pushes to `main` or `master` are denied, as are force-pushes naming them. Work on a branch and open a pull request.
 
 ## GitHub workflows that ship
 

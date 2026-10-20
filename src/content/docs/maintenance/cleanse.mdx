@@ -11,7 +11,7 @@ It runs like every [maintenance command](/maintenance/#how-maintenance-commands-
 
 ## When to use it
 
-Run it after a stretch of work, or when Claude's starting context (everything it loads before you type anything) feels heavy. The statusline nudges you with `🔎 /gaia-cleanse (<reason>)`, showing the highest-priority reason only:
+Run it after a stretch of work, or when Claude's starting context (everything it loads before you type anything) feels heavy. The statusline nudges you with `🔎 /gaia-cleanse (<reason>)`, showing the highest-priority reason:
 
 - `resume draft`: a report is waiting to be applied.
 - `<N> new memories`: machine-local memory has grown by 10 or more entries since the last applied cleanse.
@@ -65,7 +65,7 @@ Counts, size budgets, and references to missing paths are measured by GAIA's own
 - **Conflicts between instruction files.** When two `CLAUDE.md` files, rules, skills, commands, or agents disagree with each other, this command does not decide between them. Run `/doctor prompt-audit` for those. An instruction file that contradicts the wiki is reported and filed as a `tech-debt` issue, never edited.
 - **Files you do not own.** It edits only your project's own files and memory, and asks you per file. A problem in a file GAIA ships is reported for [`/update-gaia`](/maintenance/update-gaia/) to fix. A problem in a third-party file is reported for its vendor. Agent memory shared across the whole machine is yours to edit by hand.
 - **The wiki's own redundancy and broken links.** Those belong to [`/gaia-wiki`](/maintenance/wiki/).
-- **Rules from `/gaia-codify`.** A rule `/gaia-codify` wrote carries a `gaia-harden:` comment saying where it came from. It is treated like any other rule, except it is never removed just because the problem it targets stopped showing up. A problem that stops showing up means the rule is working.
+- **Rules from [`/gaia-codify`](/maintenance/codify/).** A rule `/gaia-codify` wrote carries a `gaia-harden:` comment saying where it came from. It is treated like any other rule, except it is never removed just because the problem it targets stopped showing up. A problem that stops showing up means the rule is working.
 
 ## The flow
 

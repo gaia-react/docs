@@ -5,7 +5,7 @@ description: Where a GAIA app can run, how to build and start it, the Dockerfile
 
 import { Aside } from '@astrojs/starlight/components';
 
-A GAIA app is a [React Router 8](https://reactrouter.com/) app with server rendering on, so it deploys wherever React Router does. GAIA does not ship a deployment workflow or pick a host for you. Ask Claude to set up deployment for the host you choose.
+GAIA builds a [React Router 8](https://reactrouter.com/) app with server rendering on, so it deploys wherever React Router does. GAIA does not ship a deployment workflow or pick a host for you. Ask Claude to set up deployment for the host you choose.
 
 ## Where it can run
 
@@ -17,7 +17,7 @@ React Router isn't tied to one hosting platform. You can deploy it to:
 
 React Router's [deployment guide](https://reactrouter.com/start/framework/deploying) covers each option.
 
-GAIA's app is built for server rendering: on every request, its root loader reads cookies and sets response headers. React Router can also build a single-page app that a static host serves, but switching a GAIA app to that mode is a larger change than flipping `ssr` in `frontend/react-router.config.ts`. Ask Claude before you try it.
+GAIA's app is built for server rendering: on every request, its root loader reads cookies and sets response headers. React Router can also build a single-page app that a static host serves. Switching takes more than turning off `ssr` in `frontend/react-router.config.ts`, so to use that mode, ask Claude to switch the app for you.
 
 ## Build and start
 
@@ -63,12 +63,11 @@ No `.env` file ever enters the image: `frontend/Dockerfile.dockerignore` exclude
 | `SESSION_SECRET` | Yes | Signs the app's cookies, such as the language and toast cookies. Use a long random value, never the `local` placeholder from `.env.example`. |
 | `SITE_URL` | Yes | Your site's public URL, including the scheme (`https://example.com`). Pages tell search engines not to index them unless the request's `Host` header matches this URL's host and port, so a preview deployment stays out of search results. If a proxy in front of the server changes the `Host` header, every page is marked this way. |
 | `PORT`, `HOST` | No | Where the server listens. |
-| `COMMIT_SHA` | No | Set when building to add the first six characters of the commit to the app's version string. The shipped Dockerfile doesn't pass it to the build; add an `ARG COMMIT_SHA` to use it there. |
-
-`MSW_ENABLED` only matters in development. A production build never starts the mock API.
+| `COMMIT_SHA` | No | Set when building to add the first six characters of the commit to the app's version string, so you can tell which commit a running build came from (for example, when debugging). The shipped Dockerfile doesn't pass it to the build; add an `ARG COMMIT_SHA` to use it there. |
+| `MSW_ENABLED` | No | Development only: starts the mock API. A production build never starts it, so leave it unset on your host. |
 
 <Aside type="caution">
-`API_URL` and `COMMIT_SHA` are written into every page's HTML so the browser can use them. Never put a secret in a variable the browser receives. A new variable stays server-only until it is added to the browser allowlist in `frontend/app/env.server.ts`.
+`API_URL`, `COMMIT_SHA`, and `MSW_ENABLED` are written into every page's HTML so the browser can use them. Never put a secret in a variable the browser receives. A new variable stays server-only until it is added to the browser allowlist in `frontend/app/env.server.ts`.
 </Aside>
 
 ## Calling an API on another domain

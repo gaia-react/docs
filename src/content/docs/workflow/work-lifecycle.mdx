@@ -9,19 +9,21 @@ import { Aside } from '@astrojs/starlight/components';
 
 Every change Claude commits follows one lifecycle, whether a command drives it (`/gaia-plan`, `/gaia-debt`, a maintenance command) or you just asked for a fix in plain language:
 
-1. **Claim** the issue, if the work closes one.
-2. **Name** the branch.
-3. **Isolate** the work in a worktree or a feature branch, per your team's policy.
-4. **Commit** through the Quality Gate and open a **draft** pull request.
+1. **Claim** the GitHub issue with an `in-progress` label, so nobody else starts it. This step runs only when the work closes an existing issue.
+2. **Name** the branch with GAIA's shared naming script.
+3. **Isolate** the work in its own git worktree (a second working copy of the repository) or a feature branch, per your team's policy, so tasks running at the same time never touch each other.
+4. **Commit** through the Quality Gate and the commit hooks, with a Conventional Commits message, and open a **draft** pull request.
 5. **Audit** the pull request with the [Code Audit Team](/workflow/code-audit-team/).
-6. **Merge**, only when you ask.
+6. **Merge.** Ad-hoc work waits until you ask. Some commands merge their own pull request as part of the run.
 7. **Clean up** back to a pulled default branch.
 
 Every committed task gets a draft pull request, even when you did not ask for one. If you say you will review or commit an edit yourself, Claude leaves it uncommitted on your current branch and none of these steps apply.
 
 ## 1. Claim
 
-When the work closes a GitHub issue, Claude reads the issue's labels first. An issue already labeled `in-progress` belongs to someone else, so Claude tells you and picks different work instead of competing for it. Otherwise it claims the issue:
+Claiming applies only when the work closes an existing GitHub issue. Work with no issue behind it, such as a quick fix you asked for in a prompt, skips this step.
+
+When there is an issue, Claude reads its labels first. An issue already labeled `in-progress` belongs to someone else, so Claude tells you and picks different work instead of competing for it. Otherwise it claims the issue:
 
 ```bash
 gh issue edit <n> --add-label in-progress
@@ -71,7 +73,7 @@ Uncommitted edits already in your checkout come along. On a feature branch they 
 
 GAIA uses Claude Code's built-in worktrees under `.claude/worktrees/`. When a session enters one, GAIA renames its branch to the generated name and sets the worktree up:
 
-- **Shared state is linked, not copied.** GAIA's machine-local state (`.gaia/local`), the [notebook](#where-specs-plans-and-research-live), and the main checkout's `frontend/.env` are linked into the worktree. Nothing written there disappears when the worktree is removed, and your secrets stay in one file instead of being duplicated into every worktree. Separately, Claude cannot read `.env` files in any checkout. See the [gate reference](/reference/gates/#reading-secrets).
+- **Shared state is linked, not copied.** GAIA's machine-local state (`.gaia/local`), [The Notebook](/workflow/notebook/), and the main checkout's `frontend/.env` are linked into the worktree. Nothing written there disappears when the worktree is removed, and your secrets stay in one file instead of being duplicated into every worktree. Separately, Claude cannot read `.env` files in any checkout. See the [gate reference](/reference/gates/#reading-secrets).
 - **Dependencies install and typed routes are generated in the background.** A new worktree has no `node_modules`, so GAIA runs `pnpm install --frozen-lockfile` in it. It then runs React Router's `typegen`, which writes [TypeScript](https://www.typescriptlang.org/) types for each route's URL params and loader data, so route code type-checks against the worktree's own routes. See React Router's [type safety guide](https://reactrouter.com/explanation/type-safety). Both steps run as a background job so the session does not wait for them, and Claude is told where the job's log is while it runs.
 - **Each checkout has its own ports.** See [Ports per worktree](#ports-per-worktree).
 - **A guard keeps edits in the right copy.** An edit to a file in a different checkout from the session's worktree is denied. When a session moves into a worktree, Claude may still hold absolute paths it used in the main checkout. Those paths still point to real files, just in the wrong copy, so an edit through one would change the main checkout without any warning. See the [gate reference](/reference/gates/#worktree-path-mismatch).
@@ -91,7 +93,7 @@ Every checkout gets its own dev, [Storybook](https://storybook.js.org/), and [Pl
 
 ## 4. Commit and open the draft pull request
 
-Every commit passes the commit hooks. A commit that touches source or build configuration also passes the Quality Gate: a simplify pass, a check for untranslated user-facing text, typecheck, lint, tests, Playwright, a quick dev-server check, and the build. A commit of only Markdown, `.claude/` files, or wiki pages skips the gate. The dev-server check runs `bash .gaia/scripts/dev-smoke.sh`, which starts this checkout's own dev server, checks that a page loads, and stops only the server it started. That way it never kills a server another session is using. The branch is pushed and the pull request opens as a draft with a Conventional Commits title. When the work closes an issue, `Closes #<n>` goes in the pull request body, never in a commit message. A squash merge copies commit messages into the final commit, and GitHub would close the issue from there no matter what the body says.
+Every commit passes the commit hooks. A commit that touches source or build configuration also passes the [Quality Gate](/workflow/code-audit-team/#quality-gate), the full set of checks on the `frontend/` package. The branch is pushed and the pull request opens as a draft with a Conventional Commits title. When the work closes an issue, `Closes #<n>` goes in the pull request body, never in a commit message. A squash merge copies commit messages into the final commit, and GitHub would close the issue from there no matter what the body says.
 
 **Why draft:** reviewers should be notified when a pull request is ready, and in a GAIA project that is when the audit passes and posts its `GAIA-Audit` check. A pull request opened as ready notifies reviewers before any audit has run. When the audit passes, it marks the pull request ready. See the [gate reference](/reference/gates/#draft-pull-requests).
 
@@ -99,11 +101,21 @@ Every commit passes the commit hooks. A commit that touches source or build conf
 
 Claude runs the full audit on every pull request before merge, including small one-off changes. There is no shortcut. See [Code Audit Team](/workflow/code-audit-team/).
 
-When you did not ask Claude to merge, it stops here and reports the pull request as ready to merge, leaving the branch, worktree, and pull request in place.
+For ad-hoc work you did not ask Claude to merge, it stops here and reports the pull request as ready to merge, leaving the branch, worktree, and pull request in place.
 
 ## 6. Merge
 
-Claude squash-merges when you ask, then waits for the merge to land:
+Who decides when to merge depends on what started the work:
+
+| Work | When it merges |
+|---|---|
+| Ad-hoc work (a plain request) | Only when you ask. A later message asking to merge counts. |
+| A plan run from its kickoff prompt | At the end of the run, Claude prints a summary and asks one question: merge it, or hold the merge. |
+| [`/gaia-debt`](/maintenance/debt/), [`/gaia-wiki`](/maintenance/wiki/), [`/update-deps`](/maintenance/update-deps/), [`/gaia-cleanse`](/maintenance/cleanse/) | As part of the run, once the audit passes (`/gaia-wiki` posts its own) and the required checks are green. You do not need to ask. |
+| [`/gaia-residue`](/maintenance/residue/), [`/gaia-codify`](/maintenance/codify/), [`/gaia-fitness`](/maintenance/fitness/) | The command asks before it merges, and you can leave the pull request open instead. |
+| [`/update-gaia`](/maintenance/update-gaia/) | It opens a draft pull request and stops. You merge it when you are ready. |
+
+Claude squash-merges, then waits for the merge to land:
 
 ```bash
 bash .gaia/scripts/pr-wait-merge.sh --pr <N>
@@ -119,16 +131,6 @@ Cleanup never forces a pull and never stashes. Before removing a worktree it che
 
 A worktree that cleanup kept, or one whose remote branch was deleted without the worktree being removed, is listed at every session start, with the commands to remove it. The list shows only worktrees whose work is merged and that no live Claude session is using. GAIA never removes them itself: Claude removes a listed worktree only when you name it.
 
-## Where specs, plans, and research live
-
-Specs, plans, and research live in one gitignored `.notebook/` folder at the main checkout:
-
-- `.notebook/specs/SPEC-NNN/` (a SPEC's plan nests inside it)
-- `.notebook/plans/PLAN-NNN/` for plans with no SPEC
-- `.notebook/research/<date>-<topic>/`
-
-Every worktree links to the main checkout's copy, so nothing written there is lost when a worktree is removed. Abandoned SPEC folders are kept for `GAIA_SPEC_RETENTION_DAYS` days (default 30), then deleted. Merged ones are deleted after the same period only once their layers are consolidated and their cost is in the usage ledger. Closed research that nothing refers to is deleted only after you confirm. [The Notebook](/workflow/notebook/) covers what it holds, how entries are cleared, and why it stays on your machine.
-
 ## Resuming long work
 
 Work that spans sessions resumes from a small saved state, rewritten in place. Where it goes depends on the work:
@@ -139,29 +141,43 @@ Work that spans sessions resumes from a small saved state, rewritten in place. W
 - Other work on a branch saves to `.gaia/local/runs/<branch>/STATE.md`
 - Work on the default branch saves to `.gaia/local/runs/session-<session id>/STATE.md`
 
-A resumed session reads that saved state and the run's artifact list and nothing else.
+A resumed session reads that saved state and the run's artifact list and nothing else. A saved place does not last forever. Once its branch no longer exists, GAIA deletes a branch's run folder after 7 days. A save made on the default branch is deleted after 30 days.
 
-Claude cannot see how full its own context is, so the statusline tracks it in four bands. GAIA asks you to clear long before Claude Code's own automatic compaction, which only starts when the context window is nearly full:
+### Context bands
+
+Claude cannot see how full its own context is, so the [statusline](/workflow/statusline/#the-context-bar) tracks it in four bands. GAIA asks you to clear long before Claude Code's own automatic compaction, which only starts when the context window is nearly full:
 
 | Band | On a 1M-token window | On a 200K-token window | What happens |
 |---|---|---|---|
-| Yellow | 250K tokens (25%) | 60K tokens (30%) | The statusline turns yellow. No question. |
-| Red | 300K tokens (30%) | 100K tokens (50%) | Claude saves its place and asks. |
-| Fire | 375K tokens | 125K tokens | Claude asks again and recommends clearing. |
-| Skull | 450K tokens | 150K tokens | Claude asks again and recommends clearing. |
+| Yellow | 250K tokens (25%) | 60K tokens (30%) | The statusline turns yellow. |
+| Red | 300K tokens (30%) | 100K tokens (50%) | The statusline turns red. Claude saves its place and asks. |
+| 🔥 | 375K tokens (37.5%) | 125K tokens (62.5%) | The statusline shows 🔥. Claude asks again and recommends clearing. |
+| 💀 | 450K tokens (45%) | 150K tokens (75%) | The statusline shows 💀. Claude asks again and recommends clearing. |
 
-The red band sits at 300,000 tokens or half the window, whichever is smaller. Fire is 1.25 times red and skull is 1.5 times red. To ask even earlier, a person can lower the red band in `.gaia/local/protected/checkpoint-override.json`, for example `{"version":1,"context_checkpoint":{"ask_tokens":100000}}`. The file can only lower it, never raise it, and Claude cannot edit it.
-
-**Why so early:** models get less reliable as their context grows long, long before the window is full. They recall and use information less accurately, especially information in the middle of a long context. Researchers call this context rot. See Chroma's [Context Rot](https://www.trychroma.com/research/context-rot) study, [Lost in the Middle](https://arxiv.org/abs/2307.03172) (Liu et al.), and Anthropic's [Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents). A long session also costs more: every turn sends the whole conversation again, so each step in a full session is billed for everything before it, even at the [cached rate](https://platform.claude.com/docs/en/build-with-claude/prompt-caching). A fresh session that resumes from a short saved state is both sharper and cheaper. GAIA's band values are tuned estimates, not measured limits.
+The red band sits at 300,000 tokens or half the window, whichever is smaller. 🔥 is 1.25 times red and 💀 is 1.5 times red. To ask even earlier, a person can lower the red band in `.gaia/local/protected/checkpoint-override.json`, for example `{"version":1,"context_checkpoint":{"ask_tokens":100000}}`. The file can only lower it, never raise it, and **Claude cannot edit it**.
 
 When the context reaches the red band, Claude finishes the current step, saves its place, and asks one question:
 
 - **Continue here**: keep working until the next band.
 - **Clear and resume**: Claude prints a continuation prompt in a fenced code block. Run `/clear` and paste it.
 
-At the fire and skull bands, the two fullest, Claude always recommends clearing. Sessions running with nobody watching never ask: they save and continue, and at the last band they save, print the continuation prompt, and stop.
+At 🔥 and 💀, the two fullest bands, Claude always recommends clearing. Sessions running with nobody watching never ask: they save and continue, and at 💀 they save, print the continuation prompt, and stop.
 
 You can also ask Claude for a continuation prompt at any time. It always arrives in a fenced code block, ready to paste.
+
+### Why so early?
+
+Models get less reliable as their context grows long, long before the window is full. They recall and use information less accurately, especially information in the middle of a long context. Researchers call this context rot. Chroma's [Context Rot](https://www.trychroma.com/research/context-rot) study tested 18 models and found that performance drops as input grows, even on simple tasks. See also [Lost in the Middle](https://arxiv.org/abs/2307.03172) (Liu et al.) and Anthropic's [Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents).
+
+A long session also costs more. Claude Code sends the whole conversation with every request, so each step in a full session is billed for everything before it, even at the [cached rate](https://code.claude.com/docs/en/costs#why-usage-climbs-in-a-long-session). A fresh session that resumes from a short saved state is both sharper and cheaper. GAIA's band values are tuned estimates, not measured limits.
+
+### Why not wait for auto-compaction?
+
+Claude Code compacts a session on its own when the context fills: it replaces the conversation with a summary and carries on. By default that happens at the model's context limit, or at about 967K tokens on a 1M-token window. See [Default auto-compact thresholds](https://code.claude.com/docs/en/model-config#default-auto-compact-thresholds). Clearing at the red band beats waiting for it in three ways:
+
+- **The summary is written late.** By the time compaction runs, the session is far past the point where context rot sets in. The model writes the summary from that long context, so it can miss or blur details that mattered.
+- **What carries over is chosen.** At the red band, Claude saves a short state of at most 4 KB: the goal, open decisions, what is done, and the one next step. A compaction summary is the model's condensed version of the whole conversation.
+- **It costs less.** Every turn before compaction is billed for the full history, and compaction itself is a [request over that whole history](https://code.claude.com/docs/en/prompt-caching#compacting-the-conversation). Claude Code's own docs note that when you want a fresh start, `/clear` costs nothing.
 
 ## Commands that run only in the main checkout
 

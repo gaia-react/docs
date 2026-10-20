@@ -7,18 +7,20 @@ sidebar:
 
 import { Aside } from '@astrojs/starlight/components';
 
-`/gaia-forensics` turns a GAIA problem (a failed `/gaia-*` command, a stuck `/update-gaia`, a quality-gate refusal, a hook that blocked something unexpectedly) into a bug report with a fixed structure and with secrets removed. It only reads: it looks at your project's state and never changes, installs, or fixes anything.
+`/gaia-forensics` turns a problem with GAIA itself into a bug report with a fixed structure and with secrets removed. It only reads: it looks at your project's state and never changes, installs, or fixes anything.
 
 ## When to use it
 
 Run it when something GAIA-related goes wrong, and you want to file a useful issue without manually scrubbing paths and tokens out of your logs. Good fit for:
 
-- GAIA commands that stopped partway through.
+- GAIA commands that stopped partway through, such as a stuck `/update-gaia`.
 - Hooks that blocked a commit or tool call you expected to pass.
 - Wiki sync, scaffold, or quality-gate failures.
 - Dev server problems traced to GAIA configuration.
 
-If the failure is in your own application code, **this is the wrong tool**. Forensics covers only GAIA's own commands, hooks, and configuration.
+<Aside type="caution" title="Not for your own code">
+If the failure is in your own application code, this is the wrong tool. Forensics covers only GAIA's own commands, hooks, and configuration.
+</Aside>
 
 ## Invocation
 
@@ -112,4 +114,4 @@ If you say no, the report stays local and you can attach it to a manual issue la
 
 ## Storage
 
-`.gaia/local/forensics/` is project-local and gitignored. Reports stay on your machine unless you explicitly file them. Nothing deletes old reports automatically, so they collect under `.gaia/local/forensics/` until you remove them.
+`.gaia/local/forensics/` is project-local and gitignored. Reports stay on your machine unless you explicitly file them. Reports written in a [worktree](/workflow/work-lifecycle/#3-isolate) are deleted after that worktree is removed. Reports written in your main checkout collect under `.gaia/local/forensics/` until you remove them.

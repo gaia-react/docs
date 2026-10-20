@@ -27,17 +27,7 @@ Notice the prompt did not ask for a test. GAIA works test-first: for a feature o
 
 ## Every committed change follows one lifecycle
 
-When Claude commits work, with or without a command, it follows the same steps:
-
-1. **Claims** the GitHub issue the work closes with an `in-progress` label, so nobody else starts it.
-2. **Names** the branch with a shared naming script, `<type>/[<issue>-]<slug>` for ad-hoc work.
-3. **Isolates** the work in a separate git worktree by default (a second working copy of the repository), so tasks running at the same time never touch each other.
-4. **Commits** through the Quality Gate and the commit hooks, with a Conventional Commits message, and opens a **draft** pull request.
-5. **Audits** it with the [Code Audit Team](/workflow/code-audit-team/).
-6. **Merges** only when you ask.
-7. **Cleans up** back to a pulled default branch.
-
-Before a commit that touches source, the Quality Gate runs a simplify pass, a check for untranslated text, typecheck, lint, tests, [Playwright](https://playwright.dev/), a quick check that the dev server starts, and the build. Meanwhile, hooks block risky actions in the background. See [Work lifecycle](/workflow/work-lifecycle/) for the details, and [Git hooks and conventions](/workflow/git-conventions/) for the commit and title rules.
+When Claude commits work, with or without a command, it follows the same steps. It claims the issue if there is one, names the branch, and isolates the work so tasks running at the same time never touch each other. It commits through the [Quality Gate](/workflow/code-audit-team/#quality-gate), opens a draft pull request, and has the [Code Audit Team](/workflow/code-audit-team/) audit it. Then it merges and cleans up. Hooks block risky actions along the way. See [Work lifecycle](/workflow/work-lifecycle/) for each step, and [Git hooks and conventions](/workflow/git-conventions/) for the commit and title rules.
 
 ## When to reach for a command
 
@@ -53,13 +43,13 @@ The `/gaia-*` commands are for specific moments, not everyday driving:
 
 ## Resuming work
 
-Long work resumes from a small saved state, such as `STATE.md` in the run's folder under `.gaia/local/runs/<branch>/`. When a session's context reaches GAIA's red band (300,000 tokens or half the window, whichever is smaller; 30% of a 1M-token window), well before Claude Code would compact it, Claude saves its place and asks whether to continue in this session or clear and resume. If you choose to clear, it prints a continuation prompt in a code block. Run `/clear`, then paste it. You can ask Claude for a continuation prompt at any time. See [Work lifecycle](/workflow/work-lifecycle/#resuming-long-work).
+Long work resumes from a small saved state. When a session's context gets heavy, well before Claude Code would compact it, Claude saves its place and asks whether to continue or clear and resume. If you clear, it prints a continuation prompt: run `/clear`, then paste it. You can ask Claude for a continuation prompt at any time. See [Resuming long work](/workflow/work-lifecycle/#resuming-long-work).
 
 ## A feature, start to finish
 
 1. **Settle what to build.** Run `/gaia-spec add saved-search filters`. It asks a few questions, confirms the intent and the acceptance tests in plain language, and saves a SPEC. Then it plans the SPEC in the same session and ends with a kickoff prompt.
-2. **Build it.** Run `/clear` and paste the kickoff prompt. The orchestrator (the session that runs the plan) works in its own worktree. It turns the SPEC's browser acceptance tests into Playwright tests that fail at first, builds each phase with sub-agents, commits each phase once it passes the Quality Gate, and opens a draft pull request.
-3. **Audit and merge.** The [Code Audit Team](/workflow/code-audit-team/) reviews the pull request, a fixer repairs what the reviewers find, and Claude posts the `GAIA-Audit` check once the review passes. Ask Claude to merge.
+2. **Build it.** Run `/clear` and paste the kickoff prompt. The orchestrator (the session that runs the plan) works in its own worktree. It turns the SPEC's browser acceptance tests into [Playwright](https://playwright.dev/) tests that fail at first, builds each phase with sub-agents, commits each phase once it passes the Quality Gate, and opens a draft pull request.
+3. **Audit and merge.** The [Code Audit Team](/workflow/code-audit-team/) reviews the pull request, a fixer repairs what the reviewers find, and Claude posts the `GAIA-Audit` check once the review passes. Claude then asks whether to merge.
 4. **Handle the small stuff directly.** "Fix the date formatting in the invoice header" is a single prompt. Claude still claims the issue, isolates the change, and audits the pull request.
 
 You will not run every step for every task. Use as much of this process as the work needs, and just prompt Claude for the rest.
@@ -69,7 +59,7 @@ You will not run every step for every task. Use as much of this process as the w
 ## Maintenance commands
 
 <Aside type="tip">
-You rarely reach for these yourself, and you do not have to memorize them. Most of them surface on the statusline when they are due; `/gaia-fitness` does not.
+You rarely reach for these yourself, and you do not have to memorize them. Most of them surface on the [statusline](/workflow/statusline/#nudges) when they are due; `/gaia-fitness` does not.
 </Aside>
 
 | When... | Reach for | Why |

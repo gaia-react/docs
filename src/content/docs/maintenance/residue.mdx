@@ -9,7 +9,7 @@ It runs like every [maintenance command](/maintenance/#how-maintenance-commands-
 
 ## What a residual is
 
-When the [Code Audit Team](/workflow/code-audit-team/) clears a pull request, some findings are not fixed. A reviewer can accept one as a known trade-off, or let one pass because it is outside the change, in a file the pull request already touches. These are not lost: each one is written into the merged pull request's description, under `## Accepted residuals (recorded, not fixed)` or `## Out-of-scope machinery findings (recorded, not filed)`, with a key that keeps it from being counted twice. Each entry is a **residual**.
+When the [Code Audit Team](/workflow/code-audit-team/) clears a pull request, some findings are not fixed. A reviewer can accept one as a known trade-off, or let one pass because it is outside the change, in a file the pull request already touches. These are not lost: as [Tech debt](/workflow/tech-debt/#what-gets-recorded-instead-of-filed) explains, each one is written into the merged pull request's description, under `## Accepted residuals (recorded, not fixed)` or `## Out-of-scope machinery findings (recorded, not filed)`, with a key that keeps it from being counted twice. Each entry is a **residual**.
 
 `/gaia-residue` reads those entries back and asks you to decide each one:
 
@@ -60,7 +60,7 @@ Going through them is optional tidying. Stopping costs nothing: the run publishe
 
 ## When the nudge can stay up after a run
 
-A promotion that could not file an issue leaves its residual open, so it still counts toward the nudge. That happens when GitHub is unreachable, the filing fails, or the finding is security-sensitive: [security findings are never filed](/maintenance/debt/#how-issues-are-filed) in the public tracker, only kept as a local record.
+A promotion that could not file an issue leaves its residual open, so it still counts toward the nudge. That happens when GitHub is unreachable, the filing fails, or the finding is security-sensitive: [security findings are never filed](/workflow/tech-debt/#security-findings) in the public tracker, only kept as a local record.
 
 The run does not retry those in the same pass. It ends by saying how many are stuck, that they keep the nudge up, and what you can do:
 
@@ -71,7 +71,7 @@ If the GitHub reads fail at the start, the run says so plainly ("this is not an 
 
 ## Long runs
 
-A run with many residuals can take a while. When the session's context reaches the [red band](/workflow/work-lifecycle/#resuming-long-work) between batches, the run offers to keep going or to clear and resume. Nothing is lost either way: every decision is saved as it is made, and the whole run still lands as one pull request at the end. If you clear and never paste the continuation prompt, the next `/gaia-residue` offers to finish or publish that run first.
+A run with many residuals can take a while. When the session's context reaches the [red band](/workflow/work-lifecycle/#context-bands) between batches, the run offers to keep going or to clear and resume. Nothing is lost either way: every decision is saved as it is made, and the whole run still lands as one pull request at the end. If you clear and never paste the continuation prompt, the next `/gaia-residue` offers to finish or publish that run first.
 
 ## Guardrails
 

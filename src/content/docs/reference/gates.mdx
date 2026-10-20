@@ -5,9 +5,21 @@ sidebar:
   order: 0
 ---
 
-GAIA follows the same process a well-run engineering team does, and a newcomer meets all of it at once. This page lists every gate: any check that can stop a command, a commit, a pull request, or a merge. For each one you get what it stops, the problem it prevents, when it runs, and how to get past it.
+A gate is any check that can stop a command, a commit, a pull request, or a merge. Together, GAIA's gates hold every change to the process a well-run engineering team follows: work happens on its own branch, code is checked before it is committed, every change is reviewed before it merges, and secrets and other sessions' work stay safe. The gates are all on from your first session, so you meet them as you work instead of setting them up.
 
 A gate is not a judgment of you or of Claude. Each one exists because the problem it prevents happens quietly and costs more to find later than to stop now. Every refusal tells you the allowed form of the command or the next step to take.
+
+| Group | What its gates do |
+|---|---|
+| [Commits and branches](#commits-and-branches) | Keep work off the default branch, stop Claude skipping the git hooks or dropping commits, and check each commit's code, tests, and message before it lands. |
+| [Pull requests and merge](#pull-requests-and-merge) | Claim the issue, open every pull request as a draft with a checked title, refuse pull requests from forks, and allow a merge only after the Code Audit Team approves the change. |
+| [Secrets and protected files](#secrets-and-protected-files) | Keep secrets out of what Claude reads and writes, protect the files GAIA generates and the records of audit approvals, and block destructive deletes. |
+| [Worktrees and parallel work](#worktrees-and-parallel-work) | Keep each session in its own checkout and on its own ports, keep maintenance commands in the main checkout, and pause new work while your GAIA version is behind. |
+| [Dependencies](#dependencies) | Refuse package versions that are too new or less trusted than earlier ones, and keep the lockfile machine-written. |
+| [Updates and setup](#updates-and-setup) | Check each GAIA update against its checksum, keep two updates from running at once, and run setup only where it belongs. |
+| [Tests and lint](#tests-and-lint) | Require the audit's list of members, a reason on every lint rule that is turned off, and an accessibility check on every story. |
+
+The rest of this page lists every gate. For each one you get what it stops, the problem it prevents, when it runs, and how to get past it.
 
 ## Commits and branches
 
@@ -57,19 +69,26 @@ A gate is not a judgment of you or of Claude. Each one exists because the proble
 - **When:** at `git commit`, through `.githooks/commit-msg`.
 - **Clear it:** use one of the types in `.gaia/conventional-commits.json`. When commitlint is missing, run `pnpm install`.
 
+### Machine-local references
+
+- **Stops:** a commit, pull request, or issue whose text cites something only one machine has: a SPEC, UAT, or plan number, or a concrete path under `.notebook/` or `.gaia/local/`. It reads commit messages, the lines a commit adds (prose in full, and code comments that take a whole line), and the title and body of a `gh pr create`, `gh pr edit`, `gh issue create`, or `gh issue edit`.
+- **Why:** nobody else can open a document that exists on one machine, and another machine's SPEC with the same number is a different document. A merged commit or pull request keeps the reference for good.
+- **When:** at `git commit`, through `.githooks/commit-msg` and `.githooks/pre-commit`, and before the `gh` command runs (`block-machine-local-ref-gh-text`).
+- **Clear it:** write out what the reference stood for: the behavior, decision, or evidence. A placeholder such as `SPEC-NNN` passes. See [The Notebook](/workflow/notebook/).
+
 ### Quality Gate
 
-- **Stops:** Claude committing source changes before the gate's steps pass with zero warnings: a simplify pass, a check for hardcoded user-facing strings, typecheck, lint, tests, [Playwright](https://playwright.dev/), the dev-server smoke test, and the build.
+- **Stops:** Claude committing source changes before every step of the gate passes with zero warnings.
 - **Why:** the commit hook checks only the files you staged. The full gate catches what breaks elsewhere, including warnings that would otherwise ship.
-- **When:** before any commit that touches source code or config that affects these checks. Commits that change only docs or only the wiki skip it. This is a rule Claude follows (`.claude/rules/quality-gate.md`), not a hook; the [pre-commit floor](#pre-commit-floor) is the part that runs no matter what.
-- **Clear it:** fix what it reports. Claude then stops and asks before committing, except inside a workflow that commits on its own (the audit fix round, `/gaia-debt`, a plan's phase commits).
+- **When:** before any commit that touches source code or config that affects these checks. This is a rule Claude follows (`.claude/rules/quality-gate.md`), not a hook. The [pre-commit floor](#pre-commit-floor) is the part that runs no matter what.
+- **Clear it:** fix what it reports. See [Quality Gate](/workflow/code-audit-team/#quality-gate) for its steps and when it runs.
 
 ### Test seen failing first (RED gate)
 
 - **Stops:** `git commit` of a new test for code with predictable output (utilities, parsers, hooks) when that test has never been seen failing in its current form.
-- **Why:** a test that passed from the start may not test anything. Watching it fail first proves it can catch the bug it is named for.
-- **When:** before `git commit` (`red-verify-commit-check`). Only tests that are new in the commit need a recorded failure; editing or renaming a test that already exists never does. Exempt: stories and Playwright tests, type-only tests, tests whose title is computed (a template literal or a `test.each` row), tests the classifier finds have no predictable result (component interaction, async work, layout), and test files that arrive unchanged from a GAIA release. A component or page test the classifier exempts goes through the [worthiness check](#worthiness-verdict) instead.
-- **Clear it:** run the test on its own file so the failure is recorded (`pnpm test --run <test-file>`): make it fail first, then make it pass.
+- **Why:** a test that passed from the start may not test anything. See [Proving a test can fail](/workflow/tdd/#proving-a-test-can-fail).
+- **When:** before `git commit` (`red-verify-commit-check`). Only tests that are new in the commit need a recorded failure; editing or renaming a test that already exists never does. Exempt: stories and [Playwright](https://playwright.dev/) tests, type-only tests, tests whose title is computed (a template literal or a `test.each` row), tests the classifier finds have no predictable result (component interaction, async work, layout), and test files that arrive unchanged from a GAIA release. A component or page test the classifier exempts goes through the [worthiness check](#worthiness-verdict) instead.
+- **Clear it:** Claude runs the test on its own file (`pnpm test --run <test-file>`) with the test failing, so the failure is recorded, then makes it pass. A failure is recorded only when Claude runs the test.
 
 ## Pull requests and merge
 
@@ -132,7 +151,7 @@ A gate is not a judgment of you or of Claude. Each one exists because the proble
 ### Worthiness verdict
 
 - **Stops:** `gh pr merge` when a test the pull request changed has no worthiness record for its current content. This covers stories, Playwright tests, and component and page tests the classifier finds have no predictable result. An exact rename is skipped.
-- **Why:** these tests cannot be reliably watched failing first to prove they catch a bug, so a worthiness review of each one takes the place of the RED gate. The hook checks only that a record exists for the test's current content; it does not read the verdict or prove how the review was done.
+- **Why:** these tests cannot be reliably watched failing first, so a [worthiness review](/workflow/tdd/#everything-else-the-worthiness-review) of each one takes the place of the RED gate. The hook checks only that a record exists for the test's current content; it does not read the verdict or prove how the review was done.
 - **When:** before `gh pr merge` runs (`worthiness-presence-check`).
 - **Clear it:** let Claude run the worthiness review on the changed tests.
 
@@ -299,13 +318,7 @@ A gate is not a judgment of you or of Claude. Each one exists because the proble
 - **When:** when the audit works out which members to run.
 - **Clear it:** restore the `auditors:` block from the GAIA template.
 
-Gaps in coverage do not stop the audit. A file no member covers still has to be reviewed, even when it is listed under `unowned:`: the merge waits for `code-audit-frontend`, the default member, unless every file the pull request changes is outside the audit's scope (wiki pages, `.claude/` files, GAIA metadata, and docs). After you change the roster, run the roster check by hand to find these gaps:
-
-```bash
-bash .gaia/scripts/verify-audit-roster.sh
-```
-
-It reports, among other things, a file no member covers and that `unowned:` does not list, and a pattern that matches no file. `bash .gaia/scripts/write-audit-remits.sh` repairs the members' copies of their own patterns.
+Gaps in coverage do not stop the audit: a file no member covers goes to `code-audit-frontend`, the default member. See [Covering new code](/workflow/code-audit-team/#covering-new-code). After you change the roster, the roster check finds gaps, and `bash .gaia/scripts/write-audit-remits.sh` repairs the members' copies of their own patterns.
 
 ### eslint-disable reason
 

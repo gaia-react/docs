@@ -1,0 +1,85 @@
+---
+title: Test-driven development
+description: How Claude builds features and fixes bugs test-first in a GAIA project, where each kind of test goes, and how GAIA checks that a test can actually catch a bug.
+---
+
+Claude builds features and fixes bugs test-first. An always-loaded rule tells it to follow the `tdd` skill for this work, so you don't need to ask. Say "let's TDD this" when you want to be explicit.
+
+The skill runs a red-green-refactor loop: write one failing test (red), write just enough code to make it pass (green), tidy up (refactor), then move to the next behavior.
+
+## The loop
+
+1. **Plan.** Claude picks the layer the test belongs in (see [Where tests go](#where-tests-go)) and lists the behaviors to test, not the steps to build them. It asks you to approve that plan or revise it. It focuses on the critical paths and the complex logic, not every edge case.
+2. **One tracer test.** One test that checks one thing from start to finish, to prove the test setup works before real coverage is added.
+3. **One behavior at a time.** For each remaining behavior: one failing test, then only enough code to pass it. Claude never writes all the tests first and all the code after. Tests written in bulk describe how Claude imagines the code will behave, not how it does.
+4. **Refactor on green.** Once every test passes, Claude removes duplication and simplifies, running the tests after each step.
+
+If a test still won't pass after a few focused attempts, Claude stops and tells you what is blocking it instead of reworking the code until something passes. The test, the interface, or an assumption may be wrong.
+
+## What a good test looks like
+
+A good test checks behavior through the code's public interface, the way a caller or a user would use it. It reads like a specification ("the user submits a valid form and sees a success message") and still passes after an internal refactor that keeps the behavior the same.
+
+Tests mock only at the edges of the system: network requests, time, and randomness. Your own components, hooks, and services run for real.
+
+## Where tests go
+
+In the React app, each behavior is tested at the lowest layer that can check it. A button's disabled state is a story test, a route's redirect is an end-to-end test, and a loader's parsing is a service test.
+
+| Layer | Tool | What it checks |
+|---|---|---|
+| Component or page | A [Storybook](https://storybook.js.org/) story with a play function | What renders, user interactions, props, accessibility |
+| Hook | `renderHook` from `vitest-browser-react` | Return values, state changes, callbacks |
+| Utility or service | [Vitest](https://vitest.dev/) with [MSW](https://mswjs.io/) mocking the network | Parsed responses, request payloads, error cases |
+| End-to-end | [Playwright](https://playwright.dev/) against the dev server | A full user flow across routes |
+
+**Stories are the component tests.** A play function is a script that clicks and types like a user, run in a real Chromium browser. Claude does not write a separate test file that renders the component again. Every story is also checked for accessibility, and a story that opts out of that check fails the tests unless the opt-out is recorded with a reason in `frontend/test/story-a11y-opt-out.test.tsx`.
+
+Stories and hook tests need Chromium. [`/gaia-init`](/getting-started/gaia-init/) and [`/setup-gaia`](/getting-started/setup-gaia/) install it; outside them, run `pnpm install:browsers` once in `frontend/`.
+
+## Proving a test can fail
+
+A test that passed from the start may not test anything. GAIA checks this in one of two ways, depending on the code under test.
+
+### Code with predictable output: seen failing first
+
+For code that gives the same result every run (utilities, service parsers, most hooks), a test must be seen failing before it passes. When Claude runs the tests, GAIA records every test that fails. A commit by Claude that adds a new test with no recorded failure for its current content is refused. Editing or renaming an existing test never needs a new failure.
+
+Claude writes the test against a function that does not exist yet, or a stub that returns the wrong value, so the test fails because the code is missing. Then it writes the code. It never breaks working code to force a failure.
+
+When the gate stops a commit, Claude runs the test file on its own (`pnpm test --run <test-file>`) while it fails, so the failure is recorded, then makes it pass. See [the RED gate](/reference/gates/#test-seen-failing-first-red-gate) for the exemptions.
+
+### Everything else: the worthiness review
+
+Stories, component interaction tests, async tests, and Playwright tests have no reliable failing-then-passing run to observe. For these, a separate reviewer with no shared context reads each changed test, plus the test files next to it, once the tests pass. The author shares their own blind spots, so Claude cannot review its own tests here.
+
+Each test is judged on two questions:
+
+- **Can it fail for a real reason?** It must check what a user can see and do (roles, accessible names, visible text), not internal details.
+- **Is it worth keeping?** It should test your code, not a library's. A parent component's test should cover how its children work together, not repeat what each child's tests already check. A test of formatted output checks your logic (the conversion, the locale chosen), not the exact characters `Intl` produces.
+
+For an interactive component, the reviewer also expects the stories to drive it from the keyboard and check where focus lands. An accessibility scan of a rendered component tests neither.
+
+Each test gets one verdict: keep, fix, or delete. The reviewer edits nothing itself.
+
+## What you see at the end
+
+When the work is done, Claude's summary shows:
+
+- **Each source file it touched, with how it was classified**: predictable (owes a failing-first run) or not (goes to the worthiness review). Every file is listed, so a wrong call is visible.
+- **Honesty fixes**, already made. A test that could not fail for a real reason is rewritten in place, and you review it like any other edit.
+- **Proposed deletes**, each with its evidence shown inline: the redundant assertion and the test that already covers it. Claude asks you about each one (confirm the delete or keep the test) and never deletes on its own.
+
+The list shows the most severe findings first, with a count when there are more. Before merging, a hook checks that every changed test of this kind has a review on record for its current content. See [the worthiness verdict gate](/reference/gates/#worthiness-verdict).
+
+## Acceptance tests from a SPEC
+
+When you build from a [SPEC](/workflow/spec/), its acceptance tests become Playwright tests that are expected to fail before any code is written. Each one stops failing when the phase that builds its behavior is done. See [UAT specs](/workflow/plan/#uat-specs).
+
+## Testing another stack
+
+The loop works for any language. The React specifics live in a separate skill, `tdd-react`, that the `tdd` skill reads before the first test. When you add a backend or another package, give Claude the equivalent reference for it:
+
+```text
+Add a TDD stack reference for <stack> in <folder>, following the pattern of the tdd-react skill: test layers, where each kind of test lives, what to mock, and good and bad examples. Then point the tdd skill's stack list at it.
+```

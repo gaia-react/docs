@@ -15,13 +15,28 @@ Run it after adding or editing skills, rules, commands, or agents, or when Claud
 
 ## What it checks
 
-`gaia fitness check` runs a fixed list of rules over your project's own files, grouped into categories: authoring, `CLAUDE.md`, frontmatter, hooks, memory, prompt, rules, settings, and wiki. List the whole catalog, with what each rule detects:
+`/gaia-fitness` runs a fixed list of 57 rules over your project's own files. Each rule belongs to one category, and every category except `memory` gets its own grade.
 
-```bash
-.gaia/cli/gaia fitness rules
-```
+| Category | What its rules check |
+| --- | --- |
+| `authoring` | How skills, commands, and agents are written: a description that says what the file does and when to use it, in the third person; files under 500 lines; a table of contents on long files; links that resolve; reference files that something links to; no Windows-style paths. |
+| `claudemd` | Your `CLAUDE.md` files: a root `CLAUDE.md` exists, each file stays within its size budget, `@` imports and paths resolve, and no path names a folder on one person's machine (such as `/Users/<name>/`). |
+| `frontmatter` | The block at the top of each skill, command, and agent: it parses, has a valid `name` and a non-empty `description` within the length limits, and no two share a name. |
+| `hooks` | Hooks registered in your settings: each uses an event Claude Code knows, and each names a script that exists and can run, by a path that works from any folder. |
+| `memory` | Memory files that name a path in the project that no longer exists. Counted in the inventory, but not graded and not shown on the card. |
+| `prompt` | Wording that tends to make Claude work worse, such as all-caps `MUST` or `NEVER` in a description, "think step by step", "keep updates brief", or unbalanced XML tags. |
+| `rules` | Rule files: valid `paths:` globs, paths that exist, and no rule importing a skill. |
+| `settings` | Settings files: valid JSON, no secrets in `env`, `settings.local.json` kept out of git, no duplicate permissions, and a valid suppression file (see [Suppressing a finding](#suppressing-a-finding)). |
+| `wiki` | Wiki pages that cite a path that no longer exists, or that no other page links to. |
 
-Each category gets a grade from its findings: a broken structure is an F, errors and warnings lower the grade, and a few informational findings lower it to A- at most. The overall grade is the lowest category grade.
+Each finding has a severity, and the category's grade follows from its findings:
+
+- A structural problem (such as a file that cannot be parsed) is an F.
+- Errors give a C+ for one, down to D- for six or more.
+- Warnings give a B+ for one, B for two, and B- for three or more.
+- Informational findings give an A for one or two, and A- for three or more. They never lower a grade further than A-.
+
+The overall grade is the lowest category grade. A category with nothing to check shows `n/a`.
 
 **Only your own files are graded.** A finding in a file GAIA ships is listed separately, in an upstream section, and is fixed by [`/update-gaia`](/maintenance/update-gaia/).
 
@@ -37,6 +52,45 @@ When there is something to judge, one Sonnet agent (`fitness-judge`) answers fou
 - **Terminology**: does one skill use one term for one thing?
 
 Its findings are advice only. They are not graded, and nothing is fixed from them.
+
+## Reading the report
+
+The report starts with a report card: one row per category, with the count of findings and the grade, and the overall grade at the top. Under it, each finding names its severity, the file and line, the rule, and how to fix it. For a skill whose description reads `I write release notes.`:
+
+```text
++------------------------------------------------------------------------------+
+| GAIA FITNESS                                                   OVERALL   B+  |
++------------------------------------------------------------------------------+
+| authoring                                            1 warning, 2 info   B+  |
+| claudemd                                                                 A+  |
+| frontmatter                                                              A+  |
+| hooks                                                                    n/a |
+| prompt                                                                   A+  |
+| rules                                                                    n/a |
+| settings                                                                 n/a |
+| wiki                                                                     n/a |
++------------------------------------------------------------------------------+
+| FINDINGS                                                                     |
+|                                                                              |
+| authoring: B+                                                                |
+|   [warning] .claude/skills/release-notes-helper/SKILL.md:3                   |
+|             authoring.skill.description.first-person                         |
+|             Write the description in the third person, as what the file does |
+|             and when to use it.                                              |
+|   [info]    .claude/skills/release-notes-helper/SKILL.md:3                   |
+|             authoring.skill.description.no-when                              |
+|             Add a trigger to the description, for example "Use when the user |
+|             asks for ...".                                                   |
+|   [info]    .claude/skills/release-notes-helper/SKILL.md:3                   |
+|             authoring.skill.description.too-short                            |
+|             Describe what it does and when to use it in a full sentence or   |
+|             two.                                                             |
++------------------------------------------------------------------------------+
+```
+
+Here one warning sets the `authoring` grade to B+, and because it is the lowest category grade, the overall grade is B+ too. The two informational findings alone would have given an A. `hooks`, `rules`, `settings`, and `wiki` show `n/a` because this project has nothing in them to check.
+
+After the card come the built-in checks, Claude's advisory findings from the judgment pass, and how to fix each finding.
 
 ## The flow
 
@@ -56,7 +110,15 @@ The run ends with a [cost line](/reference/cost/).
 
 ## Suppressing a finding
 
-When a finding is deliberate, suppress it in `.claude/gaia-fitness.json`, by rule id and path, each with a reason:
+When a finding is deliberate, ask Claude to suppress it. Give the rule, the file, and your reason:
+
+```text
+Suppress the authoring.playbook.max-lines fitness finding for
+.claude/skills/my-skill/references/big.md. Reason: it is a generated reference, and
+splitting it would break the generator.
+```
+
+Claude adds an entry to `.claude/gaia-fitness.json`, by rule id and path, with your reason:
 
 ```json
 {
@@ -64,14 +126,14 @@ When a finding is deliberate, suppress it in `.claude/gaia-fitness.json`, by rul
   "ignore": [
     {
       "rule_id": "authoring.playbook.max-lines",
-      "path": ".claude/skills/my-skill/SKILL.md",
+      "path": ".claude/skills/my-skill/references/big.md",
       "reason": "Generated reference; splitting it would break the generator."
     }
   ]
 }
 ```
 
-A malformed config is itself a finding.
+An entry without a reason is not applied. A malformed file, or an entry that names a rule or path that no longer exists, is itself a finding.
 
 ## Related
 

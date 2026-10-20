@@ -7,7 +7,11 @@ sidebar:
 
 GAIA records every model call in a local usage ledger (a log file) and shows what your work cost, always in the same form: tokens, dollars, and time taken.
 
-The ledger is `.gaia/local/telemetry/usage.jsonl` in the main checkout, and every worktree writes to the same file. It stays on your machine and is never sent anywhere. Working out the price does not use the network either.
+:::note[Your data stays on your machine]
+The ledger stays on your machine and is never sent anywhere. Working out the price does not use the network either. It is yours to read and use however you like. GAIA's separate, opt-out usage ping is described on [Telemetry](/reference/telemetry/); it never reads or sends the ledger.
+:::
+
+The ledger is `.gaia/local/telemetry/usage.jsonl` in the main checkout, and every worktree writes to the same file. GAIA's cleanup of spent local state never removes it.
 
 ## What you see
 
@@ -70,10 +74,16 @@ Costs from before the ledger's first entry are not recorded.
 
 Prices come from the rate table that ships with GAIA, `.gaia/scripts/token-rates.json`, which covers current Claude models. New versions arrive through `/update-gaia`. Prices are applied each time figures are shown, not stored, so a corrected rate changes every past figure the next time you look.
 
-To set your own prices, or add a model the table does not have, create `.gaia/local/telemetry/token-rates.override.json`:
+To set your own prices, or add a model the table does not have, ask Claude to write a price override for you:
+
+```text
+Create .gaia/local/telemetry/token-rates.override.json in the main checkout with my own token prices: <model id> at $<input> per million input tokens and $<output> per million output tokens. Use the same format as .gaia/scripts/token-rates.json.
+```
+
+The file looks like this:
 
 ```json
 { "models": { "claude-opus-5-5": [ { "input": 4, "output": 20 } ] } }
 ```
 
-Prices are dollars per million input and output tokens. Each model you list replaces that model's shipped rates; models you leave out keep theirs. If the file is not a JSON object with a `models` object inside it (including when it is not valid JSON at all), it is ignored, and each cost readout says so once. GAIA never writes or deletes this file.
+Prices are dollars per million input and output tokens. Each model you list replaces that model's shipped rates; models you leave out keep theirs. If the file is not a JSON object with a `models` object inside it (including when it is not valid JSON at all), it is ignored, and each cost readout says so once. GAIA's own scripts never write or delete this file, and its cleanup of local state never removes it.

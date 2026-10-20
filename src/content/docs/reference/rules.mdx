@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-Rules are short Markdown files Claude loads into its context. A rule's frontmatter `paths:` field decides when it loads: when Claude reads or edits a file matching one of those file patterns, the rule loads. A rule with no `paths:` field loads at the start of every session.
+[Rules](https://code.claude.com/docs/en/memory#organize-rules-with-claude/rules/) are short Markdown files Claude loads into its context. A rule's frontmatter `paths:` field decides when it loads: when Claude reads or edits a file matching one of those file patterns, the rule loads. A rule with no `paths:` field loads at the start of every session.
 
 Rules are guidance Claude reads; nothing forces Claude to follow them. Anything that must always hold, whatever Claude decides, is enforced by [hooks](/reference/hooks/), the commit hooks, and the merge audit.
 
@@ -37,9 +37,9 @@ GAIA ships rules in two places:
 | `file-placement` | New hooks go at the root of `.claude/hooks/`, and how to register one so it keeps working. Project scripts go outside `.gaia/`, never in `.gaia/scripts/`. | `.claude/hooks/**`, `.gaia/scripts/**` |
 | `guards-must-fail` | A guard and its tests must be seen failing before anyone trusts them. | hooks, scripts, workflows, and Playwright specs |
 | `no-abbreviations` | Descriptive names in every language, alongside the `naming-conventions` skill. | code files in any language |
-| `user-questions` | Ask a choice as an `AskUserQuestion` menu: recommended option first, at most four options, one question per decision. | skills, commands, and agents (root and `frontend/`), plus a few wiki pages about the merge workflow and the Quality Gate |
+| `user-questions` | Ask a choice as an `AskUserQuestion` menu: recommended option first, at most four options, one question per decision. A list of review findings, each with its own recommendation, is one decision: every finding prints as text, then one question asks **Accept all as recommended** or **Revise**. | skills, commands, and agents (root and `frontend/`), plus a few wiki pages about the merge workflow and the Quality Gate |
 | `wiki-style` | Present-tense prose; no historical phrasing or roadmap stated as current; no SPEC, PR, or commit references in body prose. | `wiki/**/*.md`, app source, and harness Markdown |
-| `working-doc-ids` | No SPEC, plan, or audit IDs, and none of your own issue or PR numbers, in code or prose. | app, test, and harness source |
+| `working-doc-ids` | No SPEC, plan, or audit IDs, no paths to one machine's [notebook](/workflow/notebook/) or `.gaia/local/` entries, and none of your own issue or PR numbers, in code or prose. Hooks also enforce most of this ([gate](/reference/gates/#machine-local-references)). | app, test, and harness source |
 
 ## Frontend (`frontend/.claude/rules/`)
 
@@ -61,4 +61,12 @@ GAIA ships rules in two places:
 
 ## Adding your own
 
-Add a Markdown file under `.claude/rules/` (or `frontend/.claude/rules/` for a rule that only applies to the app). Give it a `paths:` pattern unless it truly needs to load in every session, because an always-loaded rule uses up context in every session. [`/gaia-codify`](/maintenance/codify/) writes path-scoped rules from recurring audit findings, and [`/gaia-cleanse`](/maintenance/cleanse/) and [`/gaia-fitness`](/maintenance/fitness/) keep rules lean.
+Ask Claude to write the rule for you. Say what the rule should make Claude do, and which files it applies to, so Claude can scope it with a `paths:` pattern:
+
+```text
+Add a Claude Code rule that <what Claude should always do>. It applies when working on <which files, for example frontend/app/services/**>. Scope it with a paths: pattern, and keep it short.
+```
+
+A rule for the whole repository goes under `.claude/rules/`. A rule that only applies to the app goes under `frontend/.claude/rules/`, with patterns relative to `frontend/`. Leave out `paths:` only when the rule truly needs to load in every session, because an always-loaded rule uses up context in every session.
+
+[`/gaia-codify`](/maintenance/codify/) writes path-scoped rules from recurring audit findings, and [`/gaia-cleanse`](/maintenance/cleanse/) and [`/gaia-fitness`](/maintenance/fitness/) keep rules lean.
