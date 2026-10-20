@@ -48,7 +48,3 @@ Triggers on pull requests to `main`. Advisory. Runs shellcheck over every tracke
 Triggers on issues `opened` or `labeled` with `gaia-forensics`, the label [`/gaia-forensics`](/workflow/forensics/) files with. Runs Claude Code to triage the report. It skips an issue already labeled `gaia-triaged`, then parses the report, classifies it, and checks whether the fix is in scope. For an in-scope fix it creates a fix branch, runs the Quality Gate, and opens a draft pull request. A final step always adds the `gaia-triaged` label, however the run went.
 
 Its helpers live in `.github/forensics/`, all contributor-only. The scope check rejects any edit under `.github/workflows/`, so triage can never change its own workflow; that is a security boundary.
-
-## Removed in 2.0.0
-
-`distribution.yml` is gone; the distribution tests now run inside `release.yml` and `cli-tests.yml`. The on-demand GAIA CI workflows (`gaia-ci-*.yml`, `code-review-audit.yml`) and their templates are removed: Claude no longer runs on GitHub Actions in any project or in the GAIA repo.

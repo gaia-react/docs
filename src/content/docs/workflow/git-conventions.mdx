@@ -34,7 +34,7 @@ It must print `.githooks`. If it does not, run `pnpm install` or `git config cor
 
 ## Conventional Commits
 
-Commit messages and pull request titles follow [Conventional Commits](https://www.conventionalcommits.org/): `<type>(<optional scope>): <subject>`. The types are `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style`, `test`, and `wiki`, listed in `.gaia/conventional-commits.json`. The 1.x `debt` type is retired; a debt fix uses the type of the change it makes.
+Commit messages and pull request titles follow [Conventional Commits](https://www.conventionalcommits.org/): `<type>(<optional scope>): <subject>`. The types are `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style`, `test`, and `wiki`, listed in `.gaia/conventional-commits.json`.
 
 ## Pull request titles
 
@@ -64,8 +64,4 @@ Three workflows ship in `.github/workflows/`. None of them runs Claude.
 | **Chromatic** (`chromatic.yml`) | `main`, and pull requests that are ready for review. Drafts are skipped. | Takes a screenshot of every story, once in light mode and once in dark mode, so each story costs two snapshots per build. A branch pushed several times as a draft pays for only one build, when it is marked ready. Runs with no `GITHUB_TOKEN` permissions. |
 | **PR Conventions** (`pr-conventions.yml`) | Pull requests (opened, edited, pushed) | Advisory only: it reports but does not block. Checks the branch name, checks the title as the future squash-merge commit line, and checks that a plan branch's type (`<type>/spec-<nnn>`) matches the title's type. Safe on pull requests from forks: it uses no secrets and a read-only token. |
 
-The Tests and Chromatic workflows pin third-party actions to exact commit SHAs and set a time limit on each job. GAIA no longer ships its own pull request template, issue templates, or `FUNDING.yml`; copies already in your repository stay yours, and deleting `.github/ISSUE_TEMPLATE/` restores GitHub's defaults. The audit itself runs locally; see [Code Audit Team](/workflow/code-audit-team/).
-
-<Aside type="note">
-GAIA 1.x could run Claude on GitHub Actions (GAIA CI). 2.0.0 removes it: no scheduler, no Claude PR-audit workflow, no bot token. If an older project still has those workflows, see [Upgrading from 1.x](/getting-started/upgrading/).
-</Aside>
+The Tests and Chromatic workflows pin third-party actions to exact commit SHAs and set a time limit on each job. The audit itself runs locally; see [Code Audit Team](/workflow/code-audit-team/).

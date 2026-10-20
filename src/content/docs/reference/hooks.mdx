@@ -87,7 +87,3 @@ If you register hooks of your own, check that their paths resolve from the repos
 ```bash
 bash .gaia/scripts/check-hook-command-rooting.sh .
 ```
-
-## Retired in 2.0.0
-
-The wiki drift, commit-nudge, session-stop, and auto-commit squash hooks are gone, along with the lockfile, bare-test, vitest-globals, i18n-strings, story-exists, and trailer-stamp hooks. Each one repeated a permission rule, a rule, or a skill, or guarded against something that cannot happen. `block-env-write` is merged into `block-secrets-write`, and the two guards against reading secrets into `block-sensitive-read`. The 2.0.0 migration removes the old files and registrations.

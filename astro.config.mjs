@@ -25,7 +25,7 @@ export default defineConfig({
 		'/getting-started/setup-cloned-gaia-project': '/getting-started/setup-gaia/',
 		'/maintenance/audit': '/maintenance/cleanse/',
 		'/maintenance/harden': '/maintenance/codify/',
-		'/maintenance/gaia-ci': '/maintenance/#gaia-ci-is-gone',
+		'/maintenance/gaia-ci': '/getting-started/upgrading/',
 		'/workflow/handoff': '/workflow/work-lifecycle/#resuming-long-work',
 		'/workflow/pickup': '/workflow/work-lifecycle/#resuming-long-work',
 		'/contributors/health-audit': '/contributors/#before-a-release',

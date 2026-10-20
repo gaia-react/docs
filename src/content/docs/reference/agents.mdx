@@ -63,11 +63,3 @@ Before a SPEC plan's pull request is audited, it reads the SPEC and each generat
 ### fitness-judge
 
 The part of [`/gaia-fitness`](/maintenance/fitness/) that makes judgment calls instead of fixed checks: whether descriptions say enough, whether two skills would trigger on the same request, whether a rule's `paths:` patterns fit what it covers, and whether a skill uses its terms consistently. Read-only, and it never changes the grade.
-
-## Agent teams
-
-GAIA no longer sets Claude Code's experimental agent-teams flag, which made named sub-agents start as teammates. Opt in through your own user or local settings if you want it.
-
-## Retired
-
-The single `code-review-audit` agent of 1.x is replaced by the Code Audit Team. Its `GAIA-Audit:` line at the end of commit messages is retired; the `GAIA-Audit` status check is unchanged and still required.

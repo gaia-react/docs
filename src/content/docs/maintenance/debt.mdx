@@ -39,7 +39,7 @@ Several numbers make your own batch, fixed together on one branch and one pull r
 
 Add `worktree` or `branch` (optionally after `use`) at the end to choose where the fix happens, for example `/gaia-debt 142 use branch`. Your team's [isolation policy](/workflow/work-lifecycle/#3-isolate) can still override it.
 
-Any other argument stops and shows the accepted form. An issue number that can't be fixed this way (closed, not labelled `tech-debt`, already claimed, or parked) stops with the reason. The 1.x `fix`, `list`, and `why` subcommands are gone.
+Any other argument stops and shows the accepted form. An issue number that can't be fixed this way (closed, not labelled `tech-debt`, already claimed, or parked) stops with the reason.
 
 ## How the backlog is ordered
 
@@ -59,7 +59,7 @@ Each offer also notes when an issue's cited file no longer exists (`[stale: path
 3. **Checks for security issues.** On a public or internal repository, a security-sensitive issue is never fixed in a public pull request. It is set aside and its claim released, and you are told only how many there were.
 4. **Checks the size.** An issue big enough to need a design SPEC goes to [`/gaia-spec`](/workflow/spec/) instead. Claude prints what to run next and parks the issue under `debt:spec-pending` (handed off) or `debt:spec-active` (a SPEC is underway).
 5. **Creates a branch** for the fix, `debt/<n>-<slug>` (or `debt/<a>-<b>-batch`), in a worktree by default.
-6. **Fixes** every issue in the unit, runs the Quality Gate once, commits, and opens a draft pull request with one `Closes #N` per issue. The commit type is the type of the change (`fix`, `refactor`, `test`); the 1.x `debt` type is refused.
+6. **Fixes** every issue in the unit, runs the Quality Gate once, commits, and opens a draft pull request with one `Closes #N` per issue. The commit type is the type of the change (`fix`, `refactor`, `test`), never `debt`.
 7. **Audits and merges** without asking you again, then checks that the merge closed exactly the intended issues, and cleans up.
 
 The claim stays in place when the audit stops at its branch checkpoint, when a merge is still queued, or when a check fails, since the work is not finished. Closing the pull request without merging releases it.

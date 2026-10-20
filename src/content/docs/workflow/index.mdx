@@ -51,9 +51,7 @@ The `/gaia-*` commands are for specific moments, not everyday driving:
 
 ## Resuming work
 
-Long work resumes from one small file, `STATE.md`, saved in the run's folder under `.gaia/local/runs/<branch>/`. When a session's context fills up, Claude saves its place and asks whether to continue in this session or clear and resume. If you choose to clear, it prints a continuation prompt in a code block. Run `/clear`, then paste it. You can ask Claude for a continuation prompt at any time. See [Work lifecycle](/workflow/work-lifecycle/#resuming-long-work).
-
-The 1.x `/gaia-handoff` and `/gaia-pickup` commands are gone.
+Long work resumes from one small file, `STATE.md`, saved in the run's folder under `.gaia/local/runs/<branch>/`. When a session's context reaches GAIA's red band (300,000 tokens or half the window, whichever is smaller; 30% of a 1M-token window), well before Claude Code would compact it, Claude saves its place and asks whether to continue in this session or clear and resume. If you choose to clear, it prints a continuation prompt in a code block. Run `/clear`, then paste it. You can ask Claude for a continuation prompt at any time. See [Work lifecycle](/workflow/work-lifecycle/#resuming-long-work).
 
 ## A feature, start to finish
 

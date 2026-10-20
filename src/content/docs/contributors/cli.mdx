@@ -46,7 +46,7 @@ The engine behind the [scaffolder skills](/skills/scaffolders/): `component`, `h
 
 ### `gaia setup`
 
-The steps behind [`/setup-gaia`](/getting-started/setup-gaia/). `gaia setup-ci` from 1.x is merged in here.
+The steps behind [`/setup-gaia`](/getting-started/setup-gaia/).
 
 ```
 gaia setup status|mark-step|finalize [--force]|bootstrap-env
@@ -86,11 +86,11 @@ The [`/gaia-fitness`](/maintenance/fitness/) linter: `check` (the rule catalog a
 
 ### `gaia codify-tally`, `gaia codify-ledger`
 
-For [`/gaia-codify`](/maintenance/codify/): `codify-tally` counts how often each finding recurs, and `codify-ledger` records the ones you declined. They replace 1.x `harden-tally` and `harden-ledger`; the ledger's `is-suppressed` subcommand is removed.
+For [`/gaia-codify`](/maintenance/codify/): `codify-tally` counts how often each finding recurs, and `codify-ledger` records the ones you declined.
 
 ### `gaia residue-tally`, `gaia residue-cursor`, `gaia residue-record`
 
-For [`/gaia-residue`](/maintenance/residue/): `residue-tally` counts the residuals to triage, `residue-cursor` remembers where a run stopped so the next one resumes there, and `residue-record` records dismissals. `residue-tally` drops 1.x's `--attribute-only`, `--cap`, `--no-cap`, and `--json`; `GAIA_RESIDUE_CAP` sets one batch's size.
+For [`/gaia-residue`](/maintenance/residue/): `residue-tally` counts the residuals to triage, `residue-cursor` remembers where a run stopped so the next one resumes there, and `residue-record` records dismissals. `GAIA_RESIDUE_CAP` sets one batch's size.
 
 ### `gaia react-perf`
 
@@ -103,10 +103,6 @@ The steps behind [`/gaia-wiki`](/maintenance/wiki/): `state`, `commit-classify`,
 ### `gaia ping`
 
 The fire-and-forget usage ping sent by `/gaia-init`, `/setup-gaia`, and `/update-gaia`. `GAIA_TELEMETRY_PING_DISABLE=1` suppresses it.
-
-## Removed in 2.0.0
-
-`setup-ci` (merged into `setup`), `automation`, `ci-revert`, `ci-stale-check`, `harden-tally`, `harden-ledger`, `wiki sync land`, and `init configure-automation`.
 
 ## Where to find tests
 

@@ -174,7 +174,12 @@ The note changes GAIA's files and lists what your own code needs. The release no
 - **msw 3.** Migrate your handlers with `npx codemod@latest run @mswjs/v3`.
 - **Data layer.** Services are Ky and Zod modules, and `create()` defaults to camelCase. A snake_case backend passes `{isSnakeCaseEnabled: true}`.
 - **`FormError`'s `hide` prop** is now `isHidden`.
-- **Label renames.** `priority:high`, `priority:critical`, and `needs-human-review` in your own workflows or templates become `severity:major`, `severity:critical`, and `needs-human`.
+- **Label renames.** `priority:high`, `priority:critical`, and `needs-human-review` in your own workflows or templates become `severity:major`, `severity:critical`, and `needs-human`. Find them with `git grep -n -E 'priority:(high|critical)|needs-human-review'`. `gaia labels sync --prune-deprecated` removes the old `gaia-ci` label.
+- **Custom fitness categories.** A category you added to `wiki/decisions/Claude Integration Fitness.md` no longer runs. Copy it out before the update replaces that page, and keep the check as a rule under `.claude/rules/` or as a skill.
+- **Your own React performance drive spec.** Rename `{keep: true}` to `{isRunDirectoryKept: true}`; the old name is ignored.
+- **Codify declines.** Candidates you declined in `/gaia-harden` come back once in [`/gaia-codify`](/maintenance/codify/).
+- **Templates.** GAIA no longer ships a pull request template, issue templates, or `FUNDING.yml`. Your copies stay yours; deleting `.github/ISSUE_TEMPLATE/` restores GitHub's defaults.
+- **Agent teams.** GAIA no longer turns on Claude Code's experimental agent-teams flag. Set it in your own user or local settings if you want it.
 - **React Compiler** is on by default. Run `pnpm lint` and all your tests; to turn it off, set `isReactCompilerEnabled = false` in `frontend/react-compiler.config.ts`.
 - **Vitest 5** turns on `clearMocks` by default and fails an un-awaited `.resolves` or `.rejects`, so a few of your own tests may need small fixes.
 - **Client environment allowlist.** The browser gets only the environment variables on an allowlist, so server variables stay on the server. If a story of yours reads `window.process.env`, pass the value in as a story arg instead; if a test depends on a value from your `.env`, set it in your shell or give it a default in `frontend/test/setup.ts`.

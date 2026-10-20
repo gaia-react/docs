@@ -66,13 +66,11 @@ Confirming gate 2 saves the SPEC and locks it. To change a saved SPEC you must f
 - **It writes only to the notebook and GAIA's local cache**: `.notebook/specs/`, `.gaia/local/cache/`, and the usage ledger. It never edits `frontend/app/**` or any other source.
 - **Project decisions go into the SPEC, the wiki, or `.claude/rules/`**, never into machine-local memory.
 - **Your progress is saved as you go**, after every answer and every gate. Choose **Save partial and resume later** to stop, and the next `/gaia-spec` offers to resume.
-- **Long sessions** pause when the context fills up, like any other: Claude saves, then you continue here or clear and resume. See [Work lifecycle](/workflow/work-lifecycle/#resuming-long-work).
+- **Long sessions** pause when the context reaches the red band, like any other: Claude saves, then you continue here or clear and resume. See [Work lifecycle](/workflow/work-lifecycle/#resuming-long-work).
 
 ## After the plan runs
 
 Before it writes any code, the plan's orchestrator turns each browser UAT into a Playwright test that fails at first. It closes out the SPEC after the implementation merges. See [`/gaia-plan`](/workflow/plan/#uat-specs).
-
-`/gaia-spec` no longer mirrors SPECs to GitHub issues, and no longer runs on spec-kit.
 
 The run ends with a [cost box](/reference/cost/) covering the spec and the plan.
 

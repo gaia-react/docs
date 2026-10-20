@@ -77,8 +77,6 @@ When to add: a new meta page is appropriate when it documents how the wiki itsel
 - `finish` pushes the branch, opens one pull request, posts a `GAIA-Audit` status marking the change as outside the audit's scope, and queues auto-merge. It deletes the branch if nothing changed.
 - `refresh-nudge` updates the statusline's wiki nudge after the merge, from the main checkout's new drift.
 
-`--branch-aware` and `sync land` are removed in 2.0.0.
-
 ## gaia:maintainer-only block convention
 
 Some files that ship contain blocks that do not: pages under `wiki/concepts/` and `wiki/decisions/`, files under `.claude/` such as `.claude/rules/pr-merge.md`, the `.gaia/audit-ci.yml` roster, and `.githooks/pre-commit`. The block convention is:

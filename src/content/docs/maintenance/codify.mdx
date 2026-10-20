@@ -5,7 +5,7 @@ description: Turn a problem the Code Audit Team keeps finding into a guard (an a
 
 `/gaia-codify` looks at what the [Code Audit Team](/workflow/code-audit-team/) keeps finding across merged pull requests and proposes a guard so the problem stops coming back. For each repeat problem it recommends the lightest fix that would work (the one that adds least to what Claude reads on every task), explains it in plain language, and asks you once to accept the plan. Nothing is authored or switched on without your answer.
 
-It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, on a branch of its own, ending in a pull request. Only you start it, by typing it; Claude never runs it on its own. In 1.x it was `/gaia-harden`. There is no alias.
+It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, on a branch of its own, ending in a pull request. Only you start it, by typing it; Claude never runs it on its own.
 
 ## When to use it
 
@@ -62,9 +62,5 @@ A rule `/gaia-codify` writes carries a one-line comment after its frontmatter sa
 That comment is what stops the pattern from being counted again. [`/gaia-cleanse`](/maintenance/cleanse/) treats a marked rule like any other, except it never removes one because its pattern stopped showing up: a pattern that stops showing up means the rule is working.
 
 The run ends with a [cost line](/reference/cost/).
-
-## Upgrading from 1.x
-
-Declines recorded by 1.x `/gaia-harden` no longer apply, and each declined candidate re-surfaces once. On each machine other than the one that ran the migration, run `rm -f .gaia/local/harden/declines.json`. See [Upgrading from 1.x](/getting-started/upgrading/#every-other-machine).
 
 Source: `.claude/skills/gaia/references/codify.md`.

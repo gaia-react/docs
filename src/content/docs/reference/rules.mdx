@@ -59,10 +59,6 @@ GAIA ships rules in two places:
 | `storybook` | Story location and typing, titles, decorator order, layout, and Chromatic light and dark modes. | `app/**/*.stories.tsx`, `.storybook/**` |
 | `tailwind` | Use the role-based color tokens (named for their purpose, not their color), never raw palette classes or arbitrary colors. Tailwind v4 config lives in CSS. | `app/**/*.tsx`, `app/**/*.css` |
 
-## Retired in 2.0.0
-
-`dep-audit`, `knip`, `instruction-files`, and `repo-relative-paths` are removed; their guidance lives where it is used, and the repo-relative path principle is in the root `CLAUDE.md`. `/update-gaia` offers to remove the old files.
-
 ## Adding your own
 
 Add a Markdown file under `.claude/rules/` (or `frontend/.claude/rules/` for a rule that only applies to the app). Give it a `paths:` pattern unless it truly needs to load in every session, because an always-loaded rule uses up context in every session. [`/gaia-codify`](/maintenance/codify/) writes path-scoped rules from recurring audit findings, and [`/gaia-cleanse`](/maintenance/cleanse/) and [`/gaia-fitness`](/maintenance/fitness/) keep rules lean.

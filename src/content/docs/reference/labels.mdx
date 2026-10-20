@@ -56,17 +56,3 @@ The severity labels are shades of red, darkest for critical.
 ## Not created
 
 GitHub's default `good first issue` and `help wanted` labels are deliberately absent from GAIA's registry: they invite one-off contributions from people who do not know the background of the work.
-
-## Renamed in 2.0.0
-
-`gaia labels sync` renames these, and every issue keeps its label:
-
-| 1.x | 2.0.0 |
-|---|---|
-| `severity:important` | `severity:major` |
-| `severity:suggestion` | `severity:minor` |
-| `priority:high` | `severity:major` |
-| `priority:critical` | `severity:critical` |
-| `needs-human-review` | `needs-human` |
-
-Update the old names in your own workflows or templates by hand; find them with `git grep -n -E 'priority:(high|critical)|needs-human-review'`. The 1.x `gaia-ci` label is deprecated; `gaia labels sync --prune-deprecated` removes it.

@@ -57,7 +57,3 @@ Every maintenance command (`/gaia-wiki`, `/gaia-residue`, `/gaia-codify`, `/gaia
 A run that ends with nothing to publish removes its empty branch and worktree.
 
 Each run ends with a [cost line](/reference/cost/) showing what it spent.
-
-## GAIA CI is gone
-
-GAIA 1.x could run wiki sync, dependency updates, a security audit, and stale-branch cleanup on GitHub Actions. 2.0.0 removes that: Claude no longer runs on GitHub Actions. The commands above run locally, and the statusline tells you when each one is due. The Tests, Chromatic, and PR Conventions workflows still ship; see [Git hooks and conventions](/workflow/git-conventions/#github-workflows-that-ship).
