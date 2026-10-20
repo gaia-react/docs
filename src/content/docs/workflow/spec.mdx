@@ -49,7 +49,7 @@ A SPEC moves through four statuses: `draft`, `ready`, `merged`, and `abandoned`.
 ## The flow
 
 1. **Reserve** the SPEC number and write the first draft.
-2. **Gate 1: shape.** Before asking anything, Claude shows in plain English what it thinks you want and the proposed UATs (automated acceptance tests, written as Given/When/Then). You confirm or revise. Claude saves a copy of what you confirmed so later steps can catch the SPEC drifting away from it.
+2. **Gate 1: shape.** Before asking anything, Claude shows in plain language what it thinks you want and the proposed UATs (automated acceptance tests, written as Given/When/Then). You confirm or revise. Claude saves a copy of what you confirmed so later steps can catch the SPEC drifting away from it.
 3. **Questions.** One question at a time, each based on your last answer. The questions stop once every topic is settled, or at most after 10 real questions (5 in auto mode). When Claude needs facts, it runs the research itself and brings you the findings.
 4. **Self-review.** A sub-agent checks that the draft still matches what you confirmed at gate 1 and does not contradict itself. Critical and major problems come to you.
 5. **SPEC audit.** Before the final gate, independent reviewers check the draft's claims against your actual code. Each problem is either fixed in the draft or written into `AUDIT.md`, beside the SPEC, as an instruction for the plan. The draft is not saved yet, so fixing it needs no formal reopening.

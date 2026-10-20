@@ -57,7 +57,7 @@ Long work resumes from a small saved state, such as `STATE.md` in the run's fold
 
 ## A feature, start to finish
 
-1. **Settle what to build.** Run `/gaia-spec add saved-search filters`. It asks a few questions, confirms the intent and the acceptance tests in plain English, and saves a SPEC. Then it plans the SPEC in the same session and ends with a kickoff prompt.
+1. **Settle what to build.** Run `/gaia-spec add saved-search filters`. It asks a few questions, confirms the intent and the acceptance tests in plain language, and saves a SPEC. Then it plans the SPEC in the same session and ends with a kickoff prompt.
 2. **Build it.** Run `/clear` and paste the kickoff prompt. The orchestrator (the session that runs the plan) works in its own worktree. It turns the SPEC's browser acceptance tests into Playwright tests that fail at first, builds each phase with sub-agents, commits each phase once it passes the Quality Gate, and opens a draft pull request.
 3. **Audit and merge.** The [Code Audit Team](/workflow/code-audit-team/) reviews the pull request, a fixer repairs what the reviewers find, and Claude posts the `GAIA-Audit` check once the review passes. Ask Claude to merge.
 4. **Handle the small stuff directly.** "Fix the date formatting in the invoice header" is a single prompt. Claude still claims the issue, isolates the change, and audits the pull request.

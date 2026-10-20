@@ -37,7 +37,7 @@ A skill is a folder of instructions that Claude loads when your request matches 
 
 Each `SKILL.md` has a `description:` field listing the phrasings and situations that load it. A skill loads when that description matches what you said, not on every prompt. Saying "scaffold a card called price-card" loads `new-component`; saying "this useEffect fires twice" loads `react-code`.
 
-`/gaia-wiki`, `/update-deps`, and `/update-gaia` are skills, so asking in plain English triggers them too. They also appear in the statusline (`🧠`, `📦`, `🚀`) when they have work to do.
+`/gaia-wiki`, `/update-deps`, and `/update-gaia` are skills, so asking in plain language triggers them too. They also appear in the statusline (`🧠`, `📦`, `🚀`) when they have work to do.
 
 Some commands are user-only: `/gaia-init`, `/setup-gaia`, `/gaia-fitness`, `/gaia-forensics`, `/gaia-codify`, `/gaia-residue`, and `/gaia-serena-sync`. They set `disable-model-invocation`, so Claude never starts them on its own and they do not appear in its list of skills. Type them yourself as slash commands.
 
