@@ -48,6 +48,8 @@ It runs like every [maintenance command](/maintenance/#how-maintenance-commands-
 
 When sync stops partway (a first run, a rewritten history it cannot recover from, an interruption), consolidate and lint are skipped, and whatever sync completed still lands. A cancelled run commits nothing.
 
+The run ends with a [cost line](/reference/cost/), which includes the time it waits for the merge.
+
 ## The three stages
 
 ### Sync

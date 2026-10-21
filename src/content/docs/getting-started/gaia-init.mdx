@@ -76,8 +76,10 @@ If you removed i18n, it removes all of it cleanly.
 - [Serena](https://github.com/oraios/serena) MCP server, registered globally for your Claude Code:
 
   ```bash
-  claude mcp add serena -s user -- uvx --from git+https://github.com/oraios/serena@v1.7.0 serena start-mcp-server --context claude-code --project-from-cwd --open-web-dashboard false
+  claude mcp add serena -s user -- uvx --from git+https://github.com/oraios/serena@v2.1.0 serena start-mcp-server --context claude-code --project-from-cwd --open-web-dashboard false --agent-interface tools
   ```
+
+  `--agent-interface tools` keeps Serena's symbol tools, one per operation, which GAIA's `code-search` rule sends code questions to. Without it, a new Serena 2 install gives Claude a single `serena_repl` tool instead.
 
   Serena needs `uv`, Astral's tool for running Python programs. If `uv` is missing, `/gaia-init` installs it first with `curl -LsSf https://astral.sh/uv/install.sh | sh`.
 

@@ -133,11 +133,11 @@ The note sets up only the machine that runs it. Every teammate, and every other 
    mkdir -p frontend/.claude/skills && mv .claude/skills/react-doctor frontend/.claude/skills/react-doctor
    ```
 
-8. **Re-register Serena at v1.7.0**, before anyone commits a `.serena/project.yml` that Serena updated automatically:
+8. **Re-register Serena at v2.1.0**, before anyone commits a `.serena/project.yml` that Serena updated automatically:
 
    ```bash
    claude mcp remove serena -s user
-   claude mcp add serena -s user -- uvx --from git+https://github.com/oraios/serena@v1.7.0 serena start-mcp-server --context claude-code --project-from-cwd --open-web-dashboard false
+   claude mcp add serena -s user -- uvx --from git+https://github.com/oraios/serena@v2.1.0 serena start-mcp-server --context claude-code --project-from-cwd --open-web-dashboard false --agent-interface tools
    ```
 
 9. **Rename abbreviated settings variables** you export in a shell profile, CI, or `.env`. `GAIA_LEDGER_LOCK_TIMEOUT_SECS`, `GAIA_LEDGER_LOCK_STALE_SECS`, and `GAIA_LEDGER_LOCK_POLL_SECS` now end in `_SECONDS`. `GAIA_SPEC_REMOTE_TIMEOUT_SECONDS`, `GAIA_SPEC_ALLOCATION_MAXIMUM_RETRIES`, `GAIA_TITLE_MAXIMUM_LENGTH`, and `GAIA_WIKI_FETCH_MINIMUM_INTERVAL_MINUTES` replace their abbreviated forms. An old name is ignored without any warning.

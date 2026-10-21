@@ -98,6 +98,8 @@ A `chore(deps)` pull request that changes only dependency files (such as `packag
 
 It also reports when the global `playwright-cli` binary is behind, and offers to upgrade it.
 
+The run ends with a [cost line](/reference/cost/).
+
 ## Release-age window
 
 [pnpm](https://pnpm.io/) refuses to install a release younger than 3 days (`minimumReleaseAge` in `pnpm-workspace.yaml`), and the setting is strict. **Why:** a compromised package version is usually caught and pulled within days, so waiting keeps a poisoned release out of your lockfile. See the [gate reference](/reference/gates/#release-age-window).

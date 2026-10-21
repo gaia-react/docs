@@ -40,7 +40,7 @@ GAIA has two audiences and the docs must keep them strictly separate:
 
 **The inverse rule (softer):** a contributor docs page should not duplicate what's already in the adopter docs. Cross-link instead.
 
-## GAIA's actual surface (verified against gaia `f4b15e61`, 2026-10-21, GAIA 2.0.0; volatile, re-check before publishing)
+## GAIA's actual surface (verified against gaia `37515c34`, 2026-10-21, GAIA 2.0.0; volatile, re-check before publishing)
 
 GAIA 2.0.0 is a pnpm workspace: the shared harness at the root (`.claude/`, `.gaia/`, `.githooks/`, `.github/`, `wiki/`, root `CLAUDE.md`) and the React app plus its frontend-only harness in `frontend/` (`frontend/app/`, `frontend/.claude/{rules,skills,agents}`, `frontend/CLAUDE.md`). Every 1.x `app/...` path is now `frontend/app/...`. Releases ship as `gaia-bundle-<tag>.tar.gz` with a `.sha256`.
 
