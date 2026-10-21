@@ -5,12 +5,14 @@ sidebar:
   order: 3
 ---
 
-GAIA ships seven [sub-agents](https://code.claude.com/docs/en/sub-agents) in `.claude/agents/`. You never start one yourself: a workflow starts each one when it needs it. Each sub-agent starts with a fresh context, so a reviewer judges the work without the reasoning of the session that wrote it, and its reading stays out of your session's context. Each agent uses a fixed model and runs at `medium` effort whatever your session's `/effort` is, unless `CLAUDE_CODE_EFFORT_LEVEL` is set. The fixed effort needs Claude Code 2.1.292 or later.
+GAIA ships nine [sub-agents](https://code.claude.com/docs/en/sub-agents) in `.claude/agents/`. You never start one yourself: a workflow starts each one when it needs it. Each sub-agent starts with a fresh context, so a reviewer judges the work without the reasoning of the session that wrote it, and its reading stays out of your session's context. Each agent uses a fixed model and runs at `medium` effort whatever your session's `/effort` is, unless `CLAUDE_CODE_EFFORT_LEVEL` is set. The fixed effort needs Claude Code 2.1.292 or later. Each agent can use only the tools listed in its definition, which keeps what it starts with small. On Claude Code 2.1.304 or later, that also leaves Claude Code's list of skills and its list of deferred tools out of the agent's context.
 
 | Agent | Model | Started by | Edits files? |
 |---|---|---|---|
 | [`code-audit-frontend`](#code-audit-frontend) | Opus | the audit loop | No |
 | [`code-audit-github-workflows`](#code-audit-github-workflows) | Opus | the audit loop | No |
+| [`audit-rule-specialist`](#audit-rule-specialist) | Haiku | `code-audit-frontend` | No (read-only) |
+| [`audit-refuter`](#audit-refuter) | Sonnet | `code-audit-frontend` | No (read-only) |
 | [`audit-loop-unit`](#audit-loop-unit) | Opus | the merge workflow | Commits fix rounds |
 | [`audit-light-reviewer`](#audit-light-reviewer) | Sonnet | the audit loop, for a light review | No (read-only) |
 | [`worthiness-evaluator`](#worthiness-evaluator) | Opus | the `tdd` skill | No |
@@ -25,9 +27,25 @@ The audit before each merge is done by a team. Each member is responsible for th
 
 The default member. Responsible for the app and its tooling: `frontend/app/**`, tests, [Storybook](https://storybook.js.org/) and [Playwright](https://playwright.dev/) trees, manifests, build and lint configs, root tooling such as `.npmrc`, and `frontend/.claude/**`. It reviews what lint and types cannot: security (a top priority), performance, how well the code fits the architecture, robustness and edge cases, accessibility, and maintainability. It also flags slow nested lookups (one loop inside another) that are split across two components or functions, where they are easy to miss.
 
-Three specialist sub-agents review React patterns and accessibility, [TypeScript](https://www.typescriptlang.org/) and architecture, and translations. Library-specific rules load from `frontend/.claude/agents/code-audit-frontend/`: `cn`, [Conform](https://conform.guide/), the form components, React buckets, react-i18next, and [shadcn](https://ui.shadcn.com/). It also runs [React Doctor](https://github.com/millionco/react-doctor), [Knip](https://knip.dev/), and a dependency security advisory check, and merges their output into its report in a Tooling table. Those findings are advisory: they never block its approval.
+Line-by-line rule checks go to [`audit-rule-specialist`](#audit-rule-specialist) agents, one per area: React patterns and accessibility, [TypeScript](https://www.typescriptlang.org/) and architecture, and translations. Library-specific rules live in `frontend/.claude/agents/code-audit-frontend/`: `cn`, [Conform](https://conform.guide/), the form components, React buckets, react-i18next, and [shadcn](https://ui.shadcn.com/). It also runs [React Doctor](https://github.com/millionco/react-doctor), [Knip](https://knip.dev/), and a dependency security advisory check, and merges their output into its report in a Tooling table. Those findings are advisory: they never block its approval.
 
-Before it reports a Critical or Major finding, a separate agent with no shared context tries to disprove it. A finding that does not hold up is dropped or downgraded. Each specialist's reply ends with a `Files reviewed` count, so a specialist that stopped early is caught and run again instead of being read as clean.
+Before it reports a Critical or Major finding, an [`audit-refuter`](#audit-refuter) tries to disprove it. A finding that does not hold up is dropped or downgraded.
+
+If a specialist or refuter cannot start because Claude Code has not loaded its agent type (a session started before an update that added it), `code-audit-frontend` does that review itself and says so in its report. Restart Claude Code to load the new types.
+
+### audit-rule-specialist
+
+Checks changed files against the line-level rules for one area and reports every violation, graded and tagged with a confidence. It starts only when the change has files for its area:
+
+- **React patterns and accessibility**: any changed `.tsx` file.
+- **TypeScript and architecture**: any changed `.ts` or `.tsx` file, language files included.
+- **Translations**: a changed language file under `frontend/app/languages/`, or a changed file that calls the translation functions (`useTranslation`, `<Trans`, `i18n.t(`, or `t(`).
+
+It is given the paths of the library rule files for its area and reads each one in full. It edits nothing. Its reply ends with a `Files reviewed` count, so a specialist that stopped early is caught and run again instead of being read as clean.
+
+### audit-refuter
+
+Tries to disprove one Critical or Major finding from `code-audit-frontend`. It reads the flagged line, the code that calls it, and the tests that cover it. It can overturn the finding only with concrete evidence: a guard at a `file:line` that stops the problem, a test that already checks the right behavior, or proof the failing path cannot be reached. Without that, the finding stands. It edits nothing.
 
 ### code-audit-github-workflows
 

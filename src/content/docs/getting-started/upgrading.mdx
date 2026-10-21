@@ -15,7 +15,7 @@ Only 1.6.1 can migrate. On an older 1.x version, update to 1.6.1 first.
 
 On the machine that does the migration:
 
-1. Run `claude update` so Claude Code is 2.1.292 or later. The 2.0.0 audit that merges the migration needs it.
+1. Run `claude update` so Claude Code is 2.1.292 or later. The 2.0.0 audit that merges the migration needs it. On 2.1.304 or later, the audit agents start with a smaller context and cost less.
 2. From the main copy of your 1.6.1 project (not a worktree), with no uncommitted changes, run `/update-gaia`.
 3. The 2.0.0 release notes open with a notice for 1.6.1 projects. Claude chooses **Abort** at the update question and offers to migrate instead. Choosing **Proceed** there stops with `FETCH_FAILED` and changes nothing.
 4. Say yes. Only then does Claude download `gaia-bundle-v2.0.0.tar.gz`, check it against its published `.sha256` checksum, unpack it, and follow the `.gaia/migrations/2.0.0.md` note inside it, in the same session.
@@ -46,7 +46,7 @@ Spec work that is not finished carries over: a finalized SPEC, a plan written bu
 - Every commit goes through your git hooks as they are at that point in the migration. The note never uses `--no-verify`.
 - For every file that comes from GAIA, Claude compares three versions: the 1.6.1 original, yours, and the 2.0.0 one. Your changes stay, GAIA's changes come in, and you are asked about any real conflict.
 - It never deletes an uncommitted or untracked file of yours without asking where to keep it, never opens a `.env` file (env files are moved, not read), and never copies GAIA's lockfile (`pnpm install` regenerates it).
-- It ends by opening one pull request, which merges through the 2.0.0 [Code Audit Team](/workflow/code-audit-team/).
+- It ends by opening one pull request, which merges through the 2.0.0 [Code Audit Team](/workflow/code-audit-team/). Restart Claude Code from the project before that audit runs, so the two new audit agents, `audit-rule-specialist` and `audit-refuter`, load. In a session started earlier, `code-audit-frontend` does their reviews itself and says so in its report.
 
 ### What moves
 

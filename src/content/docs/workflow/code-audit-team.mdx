@@ -49,7 +49,13 @@ The list of members (the roster) lives in `.gaia/audit-ci.yml` under `auditors:`
 
 Each file goes to the first member whose pattern matches it, and the default member's patterns are checked last, so a workflow file belongs to `code-audit-github-workflows`.
 
-`code-audit-frontend` also runs three tools on every review and lists what they find in its report, as advice that never blocks approval: [React Doctor](https://github.com/millionco/react-doctor) for React problems, [Knip](https://knip.dev/) for unused files, exports, and dependencies, and a check for known security advisories in your dependencies.
+`code-audit-frontend` also runs three tools and lists what they find in its report, as advice that never blocks approval:
+
+- [React Doctor](https://github.com/millionco/react-doctor) for React problems, when the change touches a `.ts` or `.tsx` file.
+- [Knip](https://knip.dev/) for unused files, exports, and dependencies, when the change touches a `.ts` or `.tsx` file, a `package.json`, `pnpm-workspace.yaml`, or the lockfile.
+- A check for known security advisories in your dependencies, on every review.
+
+If GAIA cannot work out what the change touches, all three run.
 
 Members only report problems. They never edit a file. A separate fixer makes the repairs, and a script checks each repair before it is kept.
 

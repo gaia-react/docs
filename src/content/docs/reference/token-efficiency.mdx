@@ -72,6 +72,8 @@ The [audit loop](/workflow/code-audit-team/#the-audit-loop) runs its review roun
 
 Your session receives about 1/200th of what the largest sub-agent holds.
 
+Each reviewer also starts small. In a first-round audit of a frontend change on a new project, `code-audit-frontend` starts with about 26.7k tokens of context (2.7% of a 1M-token window), each [rule specialist](/reference/agents/#audit-rule-specialist) with about 5.9k (0.6%), and `audit-loop-unit` with about 22.7k (2.3%). These figures are medians of five runs on Claude Code 2.1.305, recorded in `wiki/concepts/Code Review Audit Agent.md`.
+
 A [light review](/workflow/code-audit-team/#light-review) also keeps small changes cheap for the reviewers. On two one-line changes to the same file, the light review peaked at 10.2k tokens of context, and the full review at 113k.
 
 What an audit costs in billed tokens is a separate question from how much of your context it takes. See [Cost and usage ledger](/reference/cost/).
