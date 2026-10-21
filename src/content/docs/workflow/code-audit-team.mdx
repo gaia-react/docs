@@ -63,7 +63,7 @@ Members only report problems. They never edit a file. A separate fixer makes the
 
 `.gaia/audit-ci.yml` ships with GAIA, and you edit it to fit your project. When you add code beside `frontend/`, such as a backend, decide who reviews it:
 
-- **Give it its own member.** A member is an agent file in `.claude/agents/` that says what to review for, plus an entry under `auditors:` that gives the member's name and file patterns. This is the better choice for code in another language or stack.
+- **Give it its own member.** A member is a [Claude Code sub-agent](https://code.claude.com/docs/en/sub-agents) file in `.claude/agents/` that says what to review for, plus an entry under `auditors:` that gives the member's name and file patterns. This is the better choice for code in another language or stack.
 - **Add its patterns to an existing member** whose review fits the code.
 
 Until you do one of these, the new files are not skipped. A file no member covers goes to `code-audit-frontend`, the default member, so the merge still waits for a review, but one written for a React app. Only a pull request whose every file is outside the audit's scope (wiki pages, `.claude/` files, GAIA's own `.gaia/` files, docs, and Markdown files at the root) merges with no member's review.
@@ -81,6 +81,28 @@ bash .gaia/scripts/verify-audit-roster.sh
 ```
 
 It reports a file that no member covers and that is not listed under `unowned:`, and a pattern that matches no file. Listing a path under `unowned:` only quiets that report. It does not skip the review. If `.gaia/audit-ci.yml` has no `auditors:` block, the audit refuses to run rather than falling back to a built-in list.
+
+### Library rules for code-audit-frontend
+
+`code-audit-frontend` keeps the rules for specific libraries in `frontend/.claude/agents/code-audit-frontend/`, one Markdown file per library. GAIA ships files for `cn`, [Conform](https://conform.guide/), the form components, React buckets, react-i18next, and [shadcn/ui](https://ui.shadcn.com/). When you add, replace, or remove a library whose usage is worth checking in review, add, replace, or delete its file. The agent file itself does not change.
+
+Each file starts with frontmatter that says which [rule specialists](/reference/agents/#audit-rule-specialist) get its rules:
+
+```yaml
+---
+subagents: [react-patterns, typescript]
+library: '@conform-to/zod'
+---
+```
+
+- `subagents` lists one or more of `react-patterns` (`.tsx` files), `typescript` (`.ts` and `.tsx` files), and `translation` (language files and files that call the translation functions). Write the list on one line, as above. A list spread over several lines, or a file with no `subagents:` line, is reported as an error finding.
+- `library` names the package the file covers. Nothing reads it.
+
+The rules themselves are plain Markdown below the frontmatter. To add a file, give Claude a prompt like this one, with your own library:
+
+```text
+Add a code-audit-frontend library rule file for TanStack Query in frontend/.claude/agents/code-audit-frontend/. Include the usage mistakes a reviewer should flag, with a bad and a good example for each, and send its rules to the react-patterns and typescript specialists.
+```
 
 ## Per-member clearance
 
