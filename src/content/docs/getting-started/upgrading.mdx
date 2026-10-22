@@ -15,7 +15,7 @@ Only 1.6.1 can migrate. On an older 1.x version, update to 1.6.1 first.
 
 On the machine that does the migration:
 
-1. Run `claude update` so Claude Code is 2.1.292 or later. The 2.0.0 audit that merges the migration needs it. On 2.1.304 or later, the audit agents start with a smaller context and cost less.
+1. Run `claude update` so Claude Code is 2.1.287 or later. The 2.0.0 audit that merges the migration needs it. On 2.1.304 or later, the audit agents start with a smaller context and cost less.
 2. From the main copy of your 1.6.1 project (not a worktree), with no uncommitted changes, run `/update-gaia`.
 3. The 2.0.0 release notes open with a notice for 1.6.1 projects. Claude chooses **Abort** at the update question and offers to migrate instead. Choosing **Proceed** there stops with `FETCH_FAILED` and changes nothing.
 4. Say yes. Only then does Claude download `gaia-bundle-v2.0.0.tar.gz`, check it against its published `.sha256` checksum, unpack it, and follow the `.gaia/migrations/2.0.0.md` note inside it, in the same session.
@@ -33,7 +33,7 @@ Before changing anything, the note checks your project and stops with a clear me
 - You are in a worktree, not your main copy of the repo
 - There are uncommitted changes (commit or discard them first, including unfinished TDD work)
 - A plan has started running (finish and merge it, or abandon it)
-- Claude Code is older than 2.1.292
+- Claude Code is older than 2.1.287
 - `gh` is not logged in, or `jq`, `tar`, or `shasum` is missing
 
 Spec work that is not finished carries over: a finalized SPEC, a plan written but not started, or a `/gaia-spec` draft in progress.
@@ -101,7 +101,7 @@ The note sets up only the machine that runs it. Every teammate, and every other 
    corepack enable pnpm
    ```
 
-3. **Claude Code 2.1.292 or later.**
+3. **Claude Code 2.1.287 or later.**
 
    ```bash
    claude update
