@@ -147,7 +147,7 @@ A resumed session reads that saved state and the run's artifact list and nothing
 
 ### Context bands
 
-Claude cannot see how full its own context is, so the [statusline](/workflow/statusline/#the-context-bar) tracks it in four bands. GAIA asks you to clear long before Claude Code's own automatic compaction, which only starts when the context window is nearly full:
+Claude cannot see how full its own context is. Claude Code reports it only to the statusline, so GAIA's [statusline](/workflow/statusline/#the-context-bar) saves each reading, and a hook checks it after every tool call. When the context reaches one of four bands, the hook tells Claude. GAIA asks you to clear long before Claude Code's own automatic compaction, which only starts when the context window is nearly full:
 
 | Band | On a 1M-token window | On a 200K-token window | What happens |
 |---|---|---|---|
