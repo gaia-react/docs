@@ -80,7 +80,7 @@ Counts, size budgets, and references to missing paths are measured by GAIA's own
    - **Discuss / refine**: talk it through. Claude updates the report and asks again.
    - **Decline**: delete the report. Nothing is applied, filed, or published.
 
-When the report proposes no changes, the run skips the verification round and the question and finishes on its own, after a recount confirms it checked every store.
+When the report proposes no changes, the run skips the verification round and the question and finishes on its own, but only after a check confirms the report compared every memory and rules file with the wiki. If that check fails, it says what the report missed and asks the usual question instead.
 
 <Aside type="tip" title="Safe by default">
 Running `/gaia-cleanse` researches and reports. Nothing in memory, rules, or the wiki changes until you choose Apply.
