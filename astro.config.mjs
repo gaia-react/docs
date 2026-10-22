@@ -148,7 +148,6 @@ export default defineConfig({
 						{ label: '/gaia-residue', slug: 'maintenance/residue' },
 						{ label: '/gaia-wiki', slug: 'maintenance/wiki' },
 						{ label: '/gaia-fitness', slug: 'maintenance/fitness' },
-						{ label: '/gaia-serena-sync', slug: 'maintenance/serena-sync' },
 					],
 				},
 				{

@@ -1,13 +1,13 @@
 ---
 title: Maintenance
-description: 'The GAIA commands that keep a project in shape as it grows: GAIA itself, dependencies, what Claude loads at startup, problems reviews keep finding, the tech-debt backlog, trade-offs accepted at merge, the wiki, the Claude setup, and Serena.'
+description: 'The GAIA commands that keep a project in shape as it grows: GAIA itself, dependencies, what Claude loads at startup, problems reviews keep finding, the tech-debt backlog, trade-offs accepted at merge, the wiki, and the Claude setup.'
 ---
 
 GAIA ships commands for doing work and commands for keeping the project in shape. This page covers the second kind. A project's upkeep (dependencies, the wiki, Claude's memory, the debt backlog) drifts a little with every change, and small, regular passes keep each one cheap to fix. You rarely need to remember them: each one surfaces as a statusline nudge when it is due.
 
 ## Commands
 
-The commands are listed in the order their nudges appear on the [statusline](/workflow/statusline/#nudges), except `/gaia-serena-sync`, which comes last because it is the one you will need least often.
+The commands are listed in the order their nudges appear on the [statusline](/workflow/statusline/#nudges).
 
 | Command | Nudge | What it does |
 | --- | --- | --- |
@@ -19,7 +19,6 @@ The commands are listed in the order their nudges appear on the [statusline](/wo
 | [`/gaia-debt`](/maintenance/debt/) | 🐛 | Fixes the `tech-debt` backlog, highest severity then oldest first, one issue or a related batch per run, through the audit gate. Closes the issues on merge. |
 | [`/gaia-residue`](/maintenance/residue/) | 🧹 | Goes through the trade-offs reviewers accepted at merge: dismiss each one, keep it for later, or turn it into a tech-debt issue. Never fixes code. |
 | [`/gaia-wiki`](/maintenance/wiki/) | 🧠 | Runs wiki sync, consolidate, and lint with fixes, as one commit and one pull request. Takes no arguments. |
-| [`/gaia-serena-sync`](/maintenance/serena-sync/) | 🔭 | Adds languages your project has grown to [Serena](https://github.com/oraios/serena)'s index, on your yes. |
 
 ## The statusline
 
@@ -35,7 +34,6 @@ Pick by symptom:
 - The `tech-debt` backlog has grown: [`/gaia-debt`](/maintenance/debt/).
 - Trade-offs accepted at merge have piled up in merged pull requests: [`/gaia-residue`](/maintenance/residue/).
 - The wiki trails the code, or wiki pages overlap: [`/gaia-wiki`](/maintenance/wiki/).
-- The project grew a language Serena is not indexing: [`/gaia-serena-sync`](/maintenance/serena-sync/).
 
 The boundary between `/gaia-cleanse` and `/gaia-wiki` is deliberate. `/gaia-cleanse` reconciles memory and auto-loaded files against the wiki. Redundancy and broken links inside the wiki belong to `/gaia-wiki`. Conflicts between two instruction files belong to Claude Code's own `/doctor prompt-audit`.
 

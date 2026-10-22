@@ -183,6 +183,6 @@ Claude Code compacts a session on its own when the context fills: it replaces th
 
 ## Commands that run only in the main checkout
 
-`/setup-gaia`, `/gaia-debt`, and the maintenance commands (`/gaia-wiki`, `/gaia-residue`, `/gaia-codify`, `/gaia-fitness`, `/gaia-cleanse`, `/gaia-serena-sync`, `/update-deps`, `/update-gaia`) refuse inside a linked worktree and name the main checkout to run them from. The ones that change the repository create their own worktree or branch for the work. See the [Maintenance overview](/maintenance/#how-maintenance-commands-run).
+`/setup-gaia`, `/gaia-debt`, and the maintenance commands (`/gaia-wiki`, `/gaia-residue`, `/gaia-codify`, `/gaia-fitness`, `/gaia-cleanse`, `/update-deps`, `/update-gaia`) refuse inside a linked worktree and name the main checkout to run them from. The ones that change the repository create their own worktree or branch for the work. See the [Maintenance overview](/maintenance/#how-maintenance-commands-run).
 
 Commands that start new work (SPECs, plans, tech-debt fixes, one-off changes) offer to pull first when your checkout's GAIA version is behind the remote. Resuming earlier work is never interrupted by that offer.

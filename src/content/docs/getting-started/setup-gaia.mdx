@@ -39,11 +39,10 @@ Skipped if this clone already finished its machine setup (a new project finishes
 
 ### Install Tools
 
-Three outside tools, the same as step 5 of [`/gaia-init`](/getting-started/gaia-init/#5-claude-tooling):
+Two outside tools, the same as step 5 of [`/gaia-init`](/getting-started/gaia-init/#5-claude-tooling):
 
 - **[React Doctor](https://github.com/millionco/react-doctor)** skill, installed under `frontend/.claude/skills/` by `bash .gaia/scripts/install-react-doctor.sh`.
 - **Playwright CLI** binary, installed globally.
-- **[Serena](https://github.com/oraios/serena)** MCP server at v2.1.0 with its tools interface pinned (`--agent-interface tools`), with `uv` installed first if missing. If Serena is already registered, the "name already exists" error counts as success. A registration with an older version, or without `--agent-interface tools`, is out of date: run `claude mcp remove serena -s user`, run `/setup-gaia` again, and restart Claude Code.
 
 ### Install Plugins
 

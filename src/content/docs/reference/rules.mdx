@@ -23,7 +23,6 @@ GAIA ships rules in two places:
 | `issue-claim` | Before work that closes a GitHub issue, check for the `in-progress` label and add it. Follow the work lifecycle. Claim `tech-debt` issues only through `/gaia-debt`. |
 | `pr-merge` | Before any `gh pr merge`, run the audit and post `GAIA-Audit` as the last step. The audit loop runs on its own until it reaches the branch checkpoint, which only a person can answer. |
 | `quality-gate` | Run the Quality Gate before any commit that touches source, unless nothing in the gate's scope is staged. |
-| `serena-cc-override` | When [Serena](https://github.com/oraios/serena) is set up, use its tools for finding functions, classes, and other code symbols, instead of Read and Grep. Does nothing without Serena. |
 | `shell-cwd` | No `cd` in Bash calls; use absolute paths. Each hook finds its script from the checkout the shell is in, so a `cd` into another checkout can switch the guards off without any warning. See [Hooks](/reference/hooks/). |
 | `subagent-dispatch` | A sub-agent writes its result to a JSON file, and a check reads that file to tell an empty result from a missing one. A missing reply is re-run instead of being read as "found nothing". |
 
@@ -33,7 +32,6 @@ GAIA ships rules in two places:
 |---|---|---|
 | `ambient-context-resolution` | Scripts get the repository root, base branch, and commit from their input, not from the current folder or `HEAD`. | `.gaia/scripts/**/*.sh`, `.claude/hooks/**/*.sh`, `.github/workflows/**/*.yml`, `.gaia/**/*.ts`, `**/*.bats` |
 | `code-comments` | A comment says something the code itself does not; the merge audit checks comments by the same standard. | app, test, [Playwright](https://playwright.dev/), and [Storybook](https://storybook.js.org/) source under `frontend/`, `.gaia/**/*.ts` and `.sh`, `.claude/hooks/**/*.sh`, `.github/**/*.sh`, and `**/*.bats` |
-| `code-search` | Use Serena's MCP tools to look up code symbols. Grep is still the right tool for prose, strings, non-code files, and languages Serena does not index. | code files in any language |
 | `file-placement` | New hooks go at the root of `.claude/hooks/`, and how to register one so it keeps working. Project scripts go outside `.gaia/`, never in `.gaia/scripts/`. | `.claude/hooks/**`, `.gaia/scripts/**` |
 | `guards-must-fail` | A guard and its tests must be seen failing before anyone trusts them. | hooks, scripts, workflows, and Playwright specs |
 | `no-abbreviations` | Descriptive names in every language, alongside the `naming-conventions` skill. | code files in any language |

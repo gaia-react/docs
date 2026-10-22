@@ -73,17 +73,6 @@ If you removed i18n, it removes all of it cleanly.
 
 - [React Doctor](https://github.com/millionco/react-doctor): `bash .gaia/scripts/install-react-doctor.sh` installs the `react-doctor` skill under `frontend/.claude/skills/`, so it only loads in sessions that work on the app.
 - [Playwright CLI](https://github.com/microsoft/playwright-cli) binary: `npm install -g @playwright/cli@latest`. The `playwright-cli` skill that ships with GAIA uses it, and [`/update-deps`](/maintenance/update-deps/) reports when it falls behind.
-- [Serena](https://github.com/oraios/serena) MCP server, registered globally for your Claude Code:
-
-  ```bash
-  claude mcp add serena -s user -- uvx --from git+https://github.com/oraios/serena@v2.1.0 serena start-mcp-server --context claude-code --project-from-cwd --open-web-dashboard false --agent-interface tools
-  ```
-
-  `--agent-interface tools` keeps Serena's symbol tools, one per operation, which GAIA's `code-search` rule sends code questions to. Without it, a new Serena 2 install gives Claude a single `serena_repl` tool instead.
-
-  Serena needs `uv`, Astral's tool for running Python programs. If `uv` is missing, `/gaia-init` installs it first with `curl -LsSf https://astral.sh/uv/install.sh | sh`.
-
-  Start Claude Code as usual with `claude`. The `serena-cc-override` rule that ships with GAIA tells Claude to prefer Serena's symbol tools when it reads and searches code.
 
 **Plugins.**
 
