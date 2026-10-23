@@ -61,6 +61,18 @@ For the larger skills, a description costs 1% to 2% of the full skill. A small s
 
 [Hooks](/reference/hooks/) run outside the conversation. Most add nothing unless they block something, and then they add only the message they print. Two add text when you reach a point that needs it: the branch workflow text when you move onto a branch or worktree, and the checkpoint instructions when the context gets heavy (see [Context bands](#context-bands)).
 
+## Deterministic scripts
+
+Much of GAIA's checking, counting, and grading is done by deterministic scripts: they follow fixed rules, so the same input always gives the same result. A script's work costs no Claude tokens. Only its short result reaches Claude. GAIA uses scripts wherever an answer has to come out the same every time, and leaves the parts that need judgment to Claude. For example:
+
+- **Gates** are [hooks](/reference/hooks/) that allow or block a commit or a risky command by fixed rules, so Claude cannot talk its way past one. See the [gate reference](/reference/gates/).
+- **The audit** runs [React Doctor](https://github.com/millionco/react-doctor), [Knip](https://knip.dev/), and a dependency advisory check next to its reviewers, and a script checks every repair before it is kept. See the [Code Audit Team](/workflow/code-audit-team/).
+- **[`/gaia-fitness`](/maintenance/fitness/)** grades your Claude setup with a fixed list of rules. Its advisory notes never change the grade.
+- **[Scaffolders](/skills/scaffolders/)** create new components, hooks, routes, and services with GAIA's bundled `gaia scaffold` command, from the project's templates.
+- **[Cost lines](/models-and-context/cost/)** are added up by a script from GAIA's usage records, never estimated by Claude.
+
+When the audit keeps finding the same kind of problem, [`/gaia-codify`](/maintenance/codify/) proposes a guard for it, such as a check, a skill, or a rule, and adds it once you approve.
+
 ## The audit
 
 The [audit loop](/workflow/code-audit-team/#the-audit-loop) runs its review rounds in sub-agents, outside your main session. Each sub-agent has its own context window, and your session gets back only a short report.
