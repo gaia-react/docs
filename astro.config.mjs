@@ -43,10 +43,6 @@ export default defineConfig({
 		'/commands/handoff-pickup': '/workflow/work-lifecycle/#resuming-long-work',
 		'/getting-started/setup-gaia-ci': '/getting-started/setup-gaia/',
 		'/getting-started/setup-cloned-gaia-project': '/getting-started/setup-gaia/',
-		'/reference/token-efficiency': '/models-and-context/token-efficiency/',
-		'/reference/cost': '/models-and-context/cost/',
-		'/maintenance/debt': '/workflow/debt/',
-		'/workflow/forensics': '/maintenance/forensics/',
 		'/contributors/health-audit': '/contributors/#before-a-release',
 	},
 	integrations: [
