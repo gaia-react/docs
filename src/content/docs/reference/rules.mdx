@@ -36,7 +36,7 @@ GAIA ships rules in two places:
 | `guards-must-fail` | A guard and its tests must be seen failing before anyone trusts them. | hooks, scripts, workflows, and Playwright specs |
 | `no-abbreviations` | Descriptive names in every language, alongside the `naming-conventions` skill. | code files in any language |
 | `user-questions` | Ask a choice as an `AskUserQuestion` menu: recommended option first, at most four options, one question per decision. A list of review findings, each with its own recommendation, is one decision: every finding prints as text, then one question asks **Accept all as recommended** or **Revise**. | skills, commands, and agents (root and `frontend/`), plus a few wiki pages about the merge workflow and the Quality Gate |
-| `wiki-style` | Present-tense prose; no historical phrasing or roadmap stated as current; no SPEC, PR, or commit references in body prose. | `wiki/**/*.md`, app source, and harness Markdown |
+| `wiki-style` | Present-tense prose; no historical phrasing or roadmap stated as current; no SPEC, PR, or commit references in body prose. | `wiki/**/*.md` and the Markdown files for skills, commands, agents, and rules |
 | `working-doc-ids` | No SPEC, plan, or audit IDs, no paths to one machine's [notebook](/workflow/notebook/) or `.gaia/local/` entries, and none of your own issue or PR numbers, in code or prose. Hooks also enforce most of this ([gate](/reference/gates/#machine-local-references)). | app, test, and harness source |
 
 ## Frontend (`frontend/.claude/rules/`)
@@ -46,10 +46,10 @@ GAIA ships rules in two places:
 | `accessibility` | Keyboard reachability, alt text, focus management, semantic HTML over ARIA roles, color never the only indicator. | `app/components/**`, `app/pages/**` |
 | `api-service` | Points Claude to the API Service Pattern and the `new-service` skill. | `app/services/**`, `test/mocks/**` |
 | `coding-guidelines-react` | React file and folder layout and naming: kebab-case folders, `index.tsx`, `use-<name>.ts` hooks, `tests/` folders. | `app/**`, `test/**`, `.playwright/**`, `.storybook/**` |
-| `design-baseline` | GAIA's neutral styling is a placeholder, not a design system; confirm the design direction before extending tokens. | `app/styles/**`, `app/components/**`, `app/pages/**`, `app/routes/**` |
+| `design-baseline` | GAIA's neutral styling is a placeholder, not a design system; confirm the design direction before extending tokens. | `app/styles/**`, `app/components/**`, `app/pages/**` |
 | `i18n` | Every user-facing string comes from `t()`; namespace and key-file conventions. | `app/routes/**`, `app/pages/**`, `app/components/**`, `app/languages/**` |
 | `playwright` | Spec layout, semantic selectors, web-first assertions, the hydration helper, [MSW](https://mswjs.io/) in dev. | `.playwright/**`, `playwright.config.*` |
-| `ports` | Each checkout owns its dev, Storybook, and Playwright ports; read them from `bash .gaia/scripts/ports.sh`, never hardcode 5173 or 6006. | app, test, and server configs |
+| `ports` | Each checkout owns its dev, Storybook, and Playwright ports; read them from `bash .gaia/scripts/ports.sh`, never hardcode 5173 or 6006. | Test, Playwright, Storybook, and server config files, and `package.json` |
 | `react-router-docs` | Read the [React Router](https://reactrouter.com/) docs in `node_modules/react-router/docs`, which match the installed version, and check remix-utils before writing a basic utility from scratch. | routes, pages, `app/root.tsx`, middleware |
 | `routes` | Thin route files (loader, action, meta, one-line page render); UI in `app/pages/`. | `app/routes/**`, `app/pages/**` |
 | `shadcn-ui` | The `ui` components copied in from [shadcn/ui](https://ui.shadcn.com/) are not edited; add components with `pnpm shadcn add`. | `app/components/ui/**` |

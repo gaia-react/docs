@@ -88,7 +88,7 @@ The rest of this page lists every gate. For each one you get what it stops, the 
 - **Stops:** `git commit` of a new test for code with predictable output (utilities, parsers, hooks) when that test has never been seen failing in its current form.
 - **Why:** a test that passed from the start may not test anything. See [Proving a test can fail](/workflow/tdd/#proving-a-test-can-fail).
 - **When:** before `git commit` (`red-verify-commit-check`). Only tests that are new in the commit need a recorded failure; editing or renaming a test that already exists never does. Exempt: stories and [Playwright](https://playwright.dev/) tests, type-only tests, tests whose title is computed (a template literal or a `test.each` row), tests the classifier finds have no predictable result (component interaction, async work, layout), and test files that arrive unchanged from a GAIA release. A component or page test the classifier exempts goes through the [worthiness check](#worthiness-verdict) instead.
-- **Clear it:** Claude runs the test on its own file (`pnpm test --run <test-file>`) with the test failing, so the failure is recorded, then makes it pass. A failure is recorded only when Claude runs the test.
+- **Clear it:** while the test fails, Claude runs it on its own file as a separate command (`pnpm -C <package dir> test --run <test-file>`, with the path relative to that package, for example `pnpm -C frontend test --run app/utils/x.test.ts`), so the failure is recorded, then makes it pass. A failure is recorded only when Claude runs the test. A command that also puts the implementation back records nothing.
 
 ## Pull requests and merge
 

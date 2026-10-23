@@ -22,7 +22,7 @@ conversation) apply it.
 
 ## How to invoke
 
-It drives this checkout's dev server, so it refuses inside a linked worktree; run it from the main checkout.
+It runs in the main checkout or a linked worktree. The dev server and Playwright use that tree's own ports (`bash .gaia/scripts/ports.sh` prints them).
 
 The skill loads only when you clearly ask about rendering: the `/gaia-react-perf`
 command, or a request in plain words that mentions renders.

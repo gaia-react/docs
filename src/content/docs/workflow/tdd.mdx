@@ -69,7 +69,7 @@ For code that gives the same result every run (utilities, service parsers, most 
 
 Claude writes the test against a function that does not exist yet, or a stub that returns the wrong value, so the test fails because the code is missing. Then it writes the code. It never breaks working code to force a failure.
 
-When the gate stops a commit, Claude runs the test file on its own (`pnpm test --run <test-file>`) while it fails, so the failure is recorded, then makes it pass. See [the RED gate](/reference/gates/#test-seen-failing-first-red-gate) for the exemptions.
+When the gate stops a commit, Claude runs the test file on its own, as a separate command (`pnpm -C <package dir> test --run <test-file>`), while it fails, so the failure is recorded, then makes it pass. See [the RED gate](/reference/gates/#test-seen-failing-first-red-gate) for the exemptions.
 
 ### Everything else: the worthiness review
 
