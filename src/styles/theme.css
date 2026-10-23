@@ -186,3 +186,9 @@ header.header,
 	width: auto;
 	max-width: 100%;
 }
+
+/* Sidebar links marked with the sidebar-child class in astro.config.mjs sit
+   indented under the page before them. */
+.sidebar-content a.sidebar-child {
+	margin-inline-start: 1rem;
+}
