@@ -9,11 +9,13 @@ import { Aside } from '@astrojs/starlight/components';
 
 This page shows how GAIA's pieces fit together in normal use, so you know what to do once setup is done.
 
-## Mostly, you just prompt as usual
-
-Working in GAIA is the same as working with any coding agent: you describe what you want, and it does the work. GAIA's rules, skills, and guardrails are in place from the start of every session, so they apply to every ordinary request. You never call them yourself.
+GAIA's rules, skills, and guardrails are in place from the start of every session, so they apply to every ordinary request. You never call them yourself.
 
 They take up very little of Claude's context: about 8.4k tokens at session start, [under 1%](/models-and-context/token-efficiency/) of a 1M-token window. Most [rules](/reference/rules/) load only when Claude works on the files they cover, and a [skill](/skills/) adds just its description until it is used. Checks that must give the same answer every time, such as gates, grading, and cost, run as [deterministic scripts](/models-and-context/token-efficiency/#deterministic-scripts) instead of asking Claude.
+
+## Mostly, you just prompt as usual
+
+Working in GAIA is the same as working with any coding agent: you describe what you want, and it does the work.
 
 Ask for a component, a fix, a refactor:
 
