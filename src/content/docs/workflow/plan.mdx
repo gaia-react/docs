@@ -116,7 +116,7 @@ In [auto mode](#auto-mode), no question is asked: clear-cut fixes are applied, a
 The orchestrator runs in the fresh session:
 
 - **Where it runs** follows your team's [isolation policy](/workflow/work-lifecycle/#3-isolate): a separate worktree by default. The branch is named `<type>/spec-<nnn>-<slug>` for a SPEC's plan or `<type>/plan-<nnn>-<slug>` otherwise, where `<type>` is the Conventional Commits type of the change. The PR Conventions check expects the pull request title's type to match.
-- **Each phase** hands its tasks to sub-agents, Sonnet by default. Sub-agents only edit files: they never commit, push, or run git commands that change the shared checkout. The orchestrator commits each phase after the Quality Gate passes.
+- **Each phase** hands its tasks to sub-agents, Sonnet by default. Sub-agents only edit files: they never commit, push, or run git commands that change the shared checkout. The orchestrator commits each phase after the Quality Gate passes. See [Who does what](/workflow/work-lifecycle/#who-does-what).
 - **A task whose context reaches the red band** hands off to a fresh agent. When one task has to hand off too often, the plan stops and asks you.
 - **The pull request** opens as a draft and goes through the [Code Audit Team](/workflow/code-audit-team/). Once every member has cleared it, the orchestrator prints a summary and the cost of the whole implementation, then asks you before it merges.
 

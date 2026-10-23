@@ -64,7 +64,7 @@ These hooks never block anything. They record what happened (test failures, gran
 | `pr-merge-cost` | PostToolUse (`gh pr merge`) | Prints the pull request's cost box. |
 | `issue-claim-release` | PostToolUse (`gh pr merge`) | Removes `in-progress` from every issue the merged pull request closes, once the merge is confirmed. |
 | `debt-sentinel-touch` | PostToolUse (`gh` issue and merge commands) | Refreshes the statusline's tech-debt count. |
-| `workflow-doctrine-inject` | SessionStart, PostToolUse (EnterWorktree, `git`, `gh pr checkout`) | Adds GAIA's working rules to the session when it works on a branch or in a worktree, and redirects a plain `git worktree add` under `.claude/worktrees/` to `EnterWorktree`. |
+| `workflow-doctrine-inject` | SessionStart, PostToolUse (EnterWorktree, `git`, `gh pr checkout`) | Adds GAIA's working rules to the session when it works on a branch or in a worktree (the roles are described in [Who does what](/workflow/work-lifecycle/#who-does-what)), and redirects a plain `git worktree add` under `.claude/worktrees/` to `EnterWorktree`. |
 | `context-checkpoint-inject` | PostToolUse | When context use reaches the red, fire, or skull level on the statusline, tells the main session to save its place and ask whether to continue or clear. |
 | `context-checkpoint-subagent` | PostToolUse | The same checkpoint for a sub-agent that was given a file to save its place in. |
 | `provision-worktree` | SessionStart, PostToolUse (EnterWorktree) | Links shared files into a worktree, gives it its own set of ports and a port file, and installs dependencies and typed routes. After `/clear` or compaction it repairs only a worktree that was never set up, so a set-up worktree costs nothing. |

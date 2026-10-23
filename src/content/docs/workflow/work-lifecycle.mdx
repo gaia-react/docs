@@ -71,6 +71,34 @@ Every committed task gets a draft pull request, even when you did not ask for on
 
 <Flowchart {...lifecycle} />
 
+## Who does what
+
+When a task is big enough to hand off, Claude splits it across sub-agents. A sub-agent is a separate Claude instance with its own fresh context that reports back to your session when it finishes. Each one gets a single role:
+
+| Role | Who | What it does |
+|---|---|---|
+| Advisor | A read-only sub-agent | Investigates and writes its findings to a file. It changes none of your project's code. |
+| Decider | Your session | Reads the findings, decides what to do, and asks you when the choice is yours. |
+| Executor | A sub-agent | Edits files, and nothing else. |
+| Verifier | A check after the executors | Compares the executors' changes with the plan before anything is committed. |
+
+Only your session runs git commands that change the repository: staging, committing, pushing, and creating branches. Advisors and executors can read git history but never change it. When a commit needs the [Quality Gate](/workflow/code-audit-team/#quality-gate), your session runs it once, after that commit's executors finish and the verifier passes.
+
+**Why:**
+
+- Wide reading happens in the advisors, so your session's context holds the decision instead of the search.
+- Executors share one working copy. A single git command from one executor could quietly discard another executor's unsaved edits.
+- Running the gate once per commit, not after every executor, avoids paying for a slow check several times and checking half-finished work nobody will commit.
+
+Some work never leaves your session at all. See [How GAIA picks a model](/models-and-context/model-choice/#how-gaia-picks-a-model).
+
+Two exceptions:
+
+- A command with its own steps follows them where they differ. A [`/gaia-plan` run](/workflow/plan/#execution), for example, commits once per phase.
+- In the [audit loop](/workflow/code-audit-team/#the-audit-loop), the `audit-loop-unit` sub-agent commits and pushes its own fix rounds and runs the Quality Gate for them, so that reading does not land in your session. A script checks every round's repairs, and a hook caps how many rounds it can run. Your session still decides the checkpoint and the merge.
+
+The `workflow-doctrine-inject` [hook](/reference/hooks/) adds these rules to your session when it starts working on a branch or in a worktree.
+
 ## 1. Claim
 
 Claiming applies only when the work closes an existing GitHub issue. Work with no issue behind it, such as a quick fix you asked for in a prompt, skips this step.
