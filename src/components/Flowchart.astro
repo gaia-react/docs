@@ -2,7 +2,7 @@
 // A small flowchart drawn as static SVG at build time: no client script, no
 // diagram library. Nodes sit on a grid (col, row); edges are drawn as right
 // angles. Each node can name the model that does the step, shown as text and
-// as a colored stripe, so color is never the only cue.
+// as a colored border, so color is never the only cue.
 
 type Model = 'haiku' | 'sonnet' | 'opus' | 'top' | 'session';
 
@@ -159,7 +159,6 @@ const lines = (node: Node) => (Array.isArray(node.text) ? node.text : [node.text
 				return (
 					<g class:list={['node', node.model && `model-${node.model}`, node.decision && 'decision']}>
 						<rect x={x} y={y} width={w} height={h} rx="6" class="box" />
-						{node.model && <rect x={x} y={y} width="5" height={h} rx="2" class="stripe" />}
 						{text.map((line, index) => (
 							<text x={cx} y={top + index * LINE_H} text-anchor="middle" class="label">
 								{line}
@@ -230,9 +229,6 @@ const lines = (node: Node) => (Array.isArray(node.text) ? node.text : [node.text
 		font-weight: 600;
 		letter-spacing: 0.06em;
 		text-transform: uppercase;
-	}
-	.stripe {
-		fill: var(--model-color);
 	}
 	.node .model {
 		fill: var(--model-color);
