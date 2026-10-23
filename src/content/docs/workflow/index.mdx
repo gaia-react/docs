@@ -25,9 +25,11 @@ The code skills ([TypeScript](https://www.typescriptlang.org/), React, [Tailwind
 
 Notice the prompt did not ask for a test. GAIA works test-first: for a feature or a bug fix, Claude writes a test that fails, then writes the code that makes it pass. A Claude Code hook on `git commit` enforces this. It refuses to commit a new test that was never seen failing first. Some tests are exempt, such as stories and type-only tests; see the [RED gate](/reference/gates/#test-seen-failing-first-red-gate).
 
-## Every committed change follows one lifecycle
+## Every task follows one lifecycle
 
-When Claude commits work, with or without a command, it follows the same steps. It claims the issue if there is one, names the branch, and isolates the work so tasks running at the same time never touch each other. It commits through the [Quality Gate](/workflow/code-audit-team/#quality-gate), opens a draft pull request, and has the [Code Audit Team](/workflow/code-audit-team/) audit it. Then it merges and cleans up. Hooks block risky actions along the way. See [Work lifecycle](/workflow/work-lifecycle/) for each step, and [Git hooks and conventions](/workflow/git-conventions/) for the commit and title rules.
+When Claude does a task for you, with or without a command, it follows the same steps. It claims the issue if there is one, names the branch, and isolates the work so tasks running at the same time never touch each other. It commits through the [Quality Gate](/workflow/code-audit-team/#quality-gate), opens a draft pull request, and has the [Code Audit Team](/workflow/code-audit-team/) audit it. Then it merges and cleans up. Hooks block risky actions along the way. See [Work lifecycle](/workflow/work-lifecycle/) for each step, and [Git hooks and conventions](/workflow/git-conventions/) for the commit and title rules.
+
+The exception is an edit you say you will review or commit yourself: Claude leaves it uncommitted and skips all of this.
 
 ## When to reach for a command
 
