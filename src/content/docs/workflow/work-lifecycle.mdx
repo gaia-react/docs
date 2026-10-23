@@ -222,7 +222,7 @@ Every commit passes the commit hooks. A commit that touches source or build conf
 
 ## 5. Audit
 
-Claude runs the full audit on every pull request before merge, including small one-off changes. There is no shortcut. See [Code Audit Team](/workflow/code-audit-team/).
+Claude audits every pull request before merge, including small one-off changes. The audit is never skipped, though a small change can go to a [light review](/workflow/code-audit-team/#light-review). See [Code Audit Team](/workflow/code-audit-team/).
 
 For ad-hoc work you did not ask Claude to merge, it stops here and reports the pull request as ready to merge, leaving the branch, worktree, and pull request in place.
 

@@ -166,10 +166,12 @@ The rest of this page lists every gate. For each one you get what it stops, the 
 
 ### Reading secrets
 
-- **Stops:** reading `.env` and `.env.<name>` files (but not `.env.example`), keys, certificates, credential files, and anything under a `secrets` directory, through Read, Grep, or Bash. It also stops plain `env` or `printenv`, which print every environment variable.
+- **Stops:** reading `.env` and `.env.<name>` files (but not `.env.example`), keys, certificates, files whose name contains `credential` (TypeScript source files such as `credentialService.ts` excepted), and anything under a `secrets` directory, through Read, Grep, or Bash. It also stops plain `env` or `printenv`, which print every environment variable.
 - **Why:** anything Claude reads goes into the session transcript and is sent to the model. Once a secret has been read, it is exposed.
 - **When:** before the tool call runs (`block-sensitive-read`).
 - **Clear it:** refer to the variable by name, set a value for one command with `env NAME=value <cmd>`, and keep real values out of anything Claude reads.
+
+When you turn on Claude Code's [sandbox](/getting-started/setup-gaia/#sandbox-decision), its read deny list in `.claude/settings.json` blocks the same files for shell commands too.
 
 ### Writing secrets
 
