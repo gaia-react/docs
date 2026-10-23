@@ -72,10 +72,12 @@ The run ends with a [cost line](/models-and-context/cost/).
 
 What each label means is in [Labels](/reference/labels/#tech-debt).
 
-The grades are guidance only: Claude can change a footprint after reading the code. To return a `severity:investigate` issue to the backlog, answer its question and re-grade it in one edit: `gh issue edit <n> --remove-label severity:investigate --add-label severity:<tier> --body-file <path>`, with the answer in the body.
+The grades are guidance only: Claude can change a footprint after reading the code. To return a `severity:investigate` issue to the backlog, answer its question and have Claude re-grade it, with the answer written into the issue body:
+
+```text
+Issue #<n> is graded severity:investigate. The answer to its question is: <answer>. Re-grade it to the right severity and put the answer in the issue body.
+```
 
 <Aside type="note">
 `/gaia-debt` fixes issues; it does not file them. See [How an issue is filed](/workflow/tech-debt/#how-an-issue-is-filed).
 </Aside>
-
-Source: `.claude/skills/gaia/references/debt.md`.

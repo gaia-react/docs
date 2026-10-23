@@ -9,13 +9,13 @@ import LabelPill from '../../../components/LabelPill.astro';
 
 GAIA's labels give every issue the same few facts: what kind of work it is, how urgent, how hard, and whether someone has it. [`/gaia-debt`](/workflow/debt/) uses them to decide what to fix first, and anyone on the team can see the state of an issue at a glance. The labels are all defined in one file, `.gaia/labels.json`. `gaia labels sync` creates the labels your repository is missing and renames labels whose names changed, so every issue keeps its label. It also updates a label's description to match GAIA's. When a label's color differs from GAIA's, it tells you instead of overwriting your color.
 
-[`/setup-gaia`](/getting-started/setup-gaia/) and [`/update-gaia`](/maintenance/update-gaia/) run the sync. You can also run it yourself:
+[`/setup-gaia`](/getting-started/setup-gaia/) and [`/update-gaia`](/maintenance/update-gaia/) run the sync. To run it at any other time, ask Claude:
 
-```bash
-.gaia/cli/gaia labels sync
+```text
+Sync GAIA's GitHub labels. Show me what would change first.
 ```
 
-Add `--dry-run` to see what it would change, or `--adopt` to replace your colors with GAIA's. If your GitHub token is not allowed to edit labels, it prints the `gh label` commands for you to run yourself.
+To replace your own label colors with GAIA's, say so in the same request. If your GitHub account is not allowed to edit labels, the sync prints the `gh label` commands instead, for someone who has that permission, such as a repository admin, to run.
 
 ## Tech debt
 
@@ -35,7 +35,7 @@ Add `--dry-run` to see what it would change, or `--adopt` to replace your colors
 | <LabelPill name="debt:spec-pending" /> | Handed to `/gaia-spec`; on hold until the SPEC starts |
 | <LabelPill name="debt:spec-active" /> | A SPEC is in progress for this issue, or is keeping it open until a recorded condition is met |
 
-Every issue carries `tech-debt`, a severity, and a footprint. A difficulty is added only when the filer read the cited code, so an issue without one is normal. At most three `severity:investigate` issues can be open at once: a fourth filing is refused until one is answered and re-graded ([how](/workflow/debt/#labels)).
+Every issue carries `tech-debt`, a severity, and a footprint. A difficulty is added only when the filer read the cited code, so an issue without one is normal. At most three `severity:investigate` issues can be open at once. When three are open, Claude does not file a fourth as `investigate`: it grades that finding itself from the code, or resolves one of the open ones first by answering its question and re-grading it ([how](/workflow/debt/#labels)).
 
 ## Work in progress
 

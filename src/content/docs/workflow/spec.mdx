@@ -129,6 +129,12 @@ A SPEC moves through four statuses: `draft`, `ready`, `merged`, and `abandoned`.
 Confirming gate 2 saves the SPEC and locks it. To change a saved SPEC you must formally reopen it, with a written reason and a record of how the UATs change, and the lint enforces this. Get it right before you confirm.
 </Aside>
 
+`/gaia-spec` has no reopen option. When a plan stops because a UAT can no longer hold, ask Claude to reopen the SPEC:
+
+```text
+Reopen SPEC-<NNN>. Reason: <why the UAT cannot hold>. Change the UAT about <behavior> to: <new Given/When/Then>. Follow the SPEC reopen steps.
+```
+
 ## The SPEC audit
 
 Before gate 2, a team of reviewers checks the draft. Each one is a fresh sub-agent that reads your code and the draft for itself, so it checks the SPEC against what is really there, not against what the conversation assumed. The audit runs on every SPEC, and you cannot skip it.
@@ -193,5 +199,3 @@ If Claude cannot start sub-agents in your session, the audit is skipped, the sel
 Before it writes any code, the plan's orchestrator turns the UATs into tests that fail at first. It closes out the SPEC after the implementation merges. See [`/gaia-plan`](/workflow/plan/#uat-specs).
 
 The run ends with a [cost box](/models-and-context/cost/) covering the spec and the plan.
-
-Source: `.claude/skills/gaia/references/spec.md`.

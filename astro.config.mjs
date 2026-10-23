@@ -43,7 +43,7 @@ export default defineConfig({
 		'/commands/handoff-pickup': '/workflow/work-lifecycle/#resuming-long-work',
 		'/getting-started/setup-gaia-ci': '/getting-started/setup-gaia/',
 		'/getting-started/setup-cloned-gaia-project': '/getting-started/setup-gaia/',
-		'/contributors/health-audit': '/contributors/#before-a-release',
+		'/contributors/health-audit': '/contributors/release/',
 	},
 	integrations: [
 		starlight({

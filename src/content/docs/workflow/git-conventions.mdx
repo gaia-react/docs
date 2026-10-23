@@ -15,22 +15,24 @@ The hooks live in `.githooks/`. Git finds them through its `core.hooksPath` sett
 
 | Hook | What it runs |
 |---|---|
-| `pre-commit` | For each package that has staged files: typecheck, [lint-staged](https://github.com/lint-staged/lint-staged) ([ESLint](https://eslint.org/), [Prettier](https://prettier.io/), and [Stylelint](https://stylelint.io/) on the staged files), and the tests for the staged files. It also refuses the commit when GAIA's generated settings file no longer matches its sources. |
-| `commit-msg` | Checks the message with [commitlint](https://commitlint.js.org/) against `commitlint.config.mjs`. A message that does not follow Conventional Commits is refused, and so is any commit when commitlint cannot run. |
+| `pre-commit` | For each package that has staged files: typecheck, [lint-staged](https://github.com/lint-staged/lint-staged) ([ESLint](https://eslint.org/), [Prettier](https://prettier.io/), and [Stylelint](https://stylelint.io/) on the staged files), and the tests for the staged files. When GAIA's generated settings file no longer matches its sources, it stops the commit and names the regenerate step. Claude fixes what fails and commits again. |
+| `commit-msg` | Checks the message with [commitlint](https://commitlint.js.org/) against `commitlint.config.mjs`. A message that does not follow Conventional Commits is refused, and so is any commit when commitlint cannot run. Claude reads the refusal, rewrites the message, and commits again. |
 
-The test step launches headless Chromium for stories and hook tests, so run `pnpm install:browsers` once per machine.
+Both hooks also run when you commit by hand in your own terminal. Then the failure is yours to see: the hook prints what failed, and you can ask Claude to fix it and commit.
+
+The test step launches headless Chromium for stories and hook tests. [`/gaia-init`](/getting-started/gaia-init/) and [`/setup-gaia`](/getting-started/setup-gaia/) install it. Otherwise, run `pnpm install:browsers` yourself once per machine. It installs the browsers' system libraries too, which can ask for your password.
 
 ### Checking a clone
 
-When a clone's hooks are not active, nothing reports it, so a broken setup looks exactly like a working one. Check it:
+When a clone's hooks are not active, nothing reports it, so a broken setup looks exactly like a working one. This can happen when `pnpm install` ran with any `CI` environment variable set, even `CI=false`, because the setup step skips itself then. Check each new clone:
 
-```bash
-git config --get core.hooksPath
+```text
+Check that this clone's git hooks are active, and turn them on if they are not.
 ```
 
-It must print `.githooks`. If it does not, run `pnpm install` or `git config core.hooksPath .githooks`. Any non-empty `CI` variable, including `CI=false`, makes `prepare` skip the setup.
+Claude checks that git's `core.hooksPath` setting is `.githooks` and sets it if it is not.
 
-**Why:** the pre-commit hook is the minimum check that stops a commit failing typecheck, lint, or its tests from landing. Claude cannot skip it either: a Claude Code hook denies `git commit` and `git push` with `--no-verify`, `-n` on a commit, or `-c core.hooksPath=<path>`. See the [gate reference](/reference/gates/#no-verify).
+**Why:** the pre-commit hook is the minimum check that stops a commit failing typecheck, lint, or its tests from landing. Claude cannot skip it either: if it tries `git commit` or `git push` with `--no-verify`, `-n` on a commit, or `-c core.hooksPath=<path>`, a Claude Code hook sends the command back, and Claude fixes the failures instead. See the [gate reference](/reference/gates/#no-verify).
 
 ## Conventional Commits
 
@@ -42,13 +44,13 @@ The type at the front of every line makes the history easy to scan and filter: y
 
 A squash merge uses the pull request title as the commit's first line on the default branch, followed by ` (#<number>)`. GAIA checks that whole line, so the 100-character limit applies to the title plus that suffix. A title that passes the commit-msg hook can still be one character too long once the suffix is added.
 
-Before `gh pr create` or `gh pr edit` runs with a title, a Claude Code hook checks the title with the same commitlint setup CI uses, and blocks a title that would fail. It also blocks `gh pr create --fill` (and `-f`) with no `--title`, because the title GitHub would fill in cannot be checked in advance. Pass `--title`.
+Before `gh pr create` or `gh pr edit` runs with a title, a Claude Code hook checks the title with the same commitlint setup CI uses, and blocks a title that would fail. The refusal tells Claude what failed, so Claude shortens or corrects the title and runs the command again. You don't have to do anything. It also blocks `gh pr create --fill` (and `-f`) with no `--title`, because the title GitHub would fill in cannot be checked in advance. Claude passes `--title` instead.
 
 By default, [`/setup-gaia`](/getting-started/setup-gaia/#phase-squash-only-merges) sets your repository to allow only squash merges, with the PR title as the commit's first line. So the title check covers exactly what lands on the default branch.
 
 ## Draft pull requests
 
-Every pull request Claude opens for this repository opens as a draft. A hook blocks `gh pr create` without `--draft`. When the audit passes and posts `GAIA-Audit`, the pull request is marked ready for review, and a refusal turns it back into a draft.
+Every pull request Claude opens for this repository opens as a draft. If Claude leaves off `--draft`, a hook sends the command back and Claude adds it. When the audit passes and posts `GAIA-Audit`, the pull request is marked ready for review, and a member's refusal turns it back into a draft.
 
 **Why:** reviewers are notified when a pull request is ready, and in a GAIA project that is when the audit passes. A pull request opened as ready notifies them before any audit has run. Pull requests to another repository are allowed without `--draft`.
 
@@ -64,7 +66,7 @@ A **worktree** is an extra folder linked to the same repository, with its own br
 
 GAIA runs most work in a worktree, each on its own new branch. Your team's isolation policy decides when Claude uses a worktree and when it uses a branch in your current checkout. See [Isolate](/workflow/work-lifecycle/#3-isolate).
 
-Every branch GAIA creates, in a worktree or not, is named by one shared script, in the form `<kind>/<rest>`. See [Name](/workflow/work-lifecycle/#2-name). Commits and pushes to `main` or `master` are denied, as are force-pushes naming them. Work on a branch and open a pull request.
+Every branch GAIA creates, in a worktree or not, is named in the form `<kind>/<rest>`. See [Name](/workflow/work-lifecycle/#2-name). Claude never commits or pushes to `main` or `master`, or force-pushes them: a hook turns those commands back, and Claude works on a branch and opens a pull request instead.
 
 ## GitHub workflows that ship
 

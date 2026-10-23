@@ -103,13 +103,13 @@ The `workflow-doctrine-inject` [hook](/reference/hooks/) adds these rules to you
 
 Claiming applies only when the work closes an existing GitHub issue. Work with no issue behind it, such as a quick fix you asked for in a prompt, skips this step.
 
-When there is an issue, Claude reads its labels first. An issue already labeled `in-progress` belongs to someone else, so Claude tells you instead of competing for it. Otherwise it claims the issue:
+When there is an issue, Claude reads its labels first. An issue already labeled `in-progress` belongs to someone else, so Claude tells you instead of competing for it. Otherwise it claims the issue by adding the `in-progress` label.
 
-```bash
-gh issue edit <n> --add-label in-progress
+The claim is released automatically when the pull request that closes the issue (with `Closes #<n>` in its body) merges through `gh pr merge` in a Claude session. Any other ending, such as closing the pull request without merging or dropping the work, leaves the claim set. Ask Claude to release it:
+
+```text
+I'm dropping the work on issue #<n>. Release its in-progress claim.
 ```
-
-The claim is released automatically when the pull request that closes the issue (with `Closes #<n>` in its body) merges through `gh pr merge` in a Claude session. Any other ending leaves the claim set, so remove it by hand with `gh issue edit <n> --remove-label in-progress`.
 
 **Why:** when two agents or two people start the same issue, the work gets done twice and the two versions then conflict at merge. See the [gate reference](/reference/gates/#issue-claim).
 
@@ -117,7 +117,7 @@ A `tech-debt` issue is never claimed by hand: run `/gaia-debt <n>` instead, whic
 
 ## 2. Name
 
-Claude never makes up a branch name. One shared script (`branch-name-lib.sh`) generates every branch name GAIA creates, in the form `<kind>/<rest>`:
+Claude never makes up a branch name. One shared GAIA script generates every branch name GAIA creates, in the form `<kind>/<rest>`:
 
 | Work | Branch |
 |---|---|
@@ -172,9 +172,13 @@ GAIA uses Claude Code's built-in worktrees under `.claude/worktrees/`. When a se
 - **Shared state is linked, not copied.** GAIA's machine-local state (`.gaia/local`), the [Notebook](/workflow/notebook/), and the main checkout's `frontend/.env` are linked into the worktree. Nothing written there disappears when the worktree is removed, and your secrets stay in one file instead of being duplicated into every worktree. Separately, Claude cannot read `.env` files in any checkout. See the [gate reference](/reference/gates/#reading-secrets).
 - **Dependencies install and typed routes are generated in the background.** A new worktree has no `node_modules`, so GAIA runs `pnpm install --frozen-lockfile` in it. It then runs React Router's `typegen`, which writes [TypeScript](https://www.typescriptlang.org/) types for each route's URL params and loader data, so route code type-checks against the worktree's own routes. See React Router's [type safety guide](https://reactrouter.com/explanation/type-safety). Both steps run as a background job so the session does not wait for them, and Claude is told where the job's log is while it runs.
 - **Each checkout has its own ports.** See [Ports per worktree](#ports-per-worktree).
-- **A guard keeps edits in the right copy.** An edit to a file in a different checkout from the session's worktree is denied. When a session moves into a worktree, Claude may still hold absolute paths it used in the main checkout. Those paths still point to real files, just in the wrong copy, so an edit through one would change the main checkout without any warning. See the [gate reference](/reference/gates/#worktree-path-mismatch).
+- **A guard keeps edits in the right copy.** If Claude aims an edit at a different checkout from the session's worktree, a guard sends it back, and Claude redoes the edit with the worktree's path. When a session moves into a worktree, Claude may still hold absolute paths it used in the main checkout. Those paths still point to real files, just in the wrong copy, so an edit through one would change the main checkout without any warning. See the [gate reference](/reference/gates/#worktree-path-mismatch).
 
-If a worktree's links break, repair them with `bash .gaia/scripts/link-worktree.sh`.
+If a worktree's links break, ask Claude to repair them:
+
+```text
+This worktree's GAIA links are broken. Repair them.
+```
 
 What a worktree holds, next to the main checkout:
 
@@ -205,9 +209,9 @@ Every checkout gets its own dev, [Storybook](https://storybook.js.org/), and [Pl
 - **The main checkout keeps the default ports:** 5173 (dev) and 6006 (Storybook).
 - **Each worktree gets a numbered slot**, the lowest one free, and its ports are the defaults plus that number. Slot 1 is 5174 and 6007, slot 2 is 5175 and 6008. Slots cover the `frontend/` package only.
 - **A worktree keeps its slot** every time a session returns to it. The one exception is a slot that a live worktree of another GAIA project also holds, which can happen, for example, with worktrees created before GAIA shared slots across projects. Then the worktree moves to the lowest free slot and GAIA rewrites its port file.
-- **`pnpm dev`, `pnpm storybook`, and `pnpm pw` use the worktree's ports automatically.** They read them from `frontend/.gaia-ports`, which GAIA rewrites each time a session enters the worktree, so don't edit it. To see a tree's ports, run `bash .gaia/scripts/ports.sh` (`--field dev`, `storybook`, `site-url`, or `slot` prints one value).
-- **A taken port is refused, never swapped.** A server refuses to start on a port that is already in use instead of quietly picking another one. Playwright reuses a running server only when it belongs to its own worktree. A direct `storybook dev` skips this check and can move to another port, so start Storybook with `pnpm storybook`.
-- **A worktree with no port file refuses `pnpm dev`, `pnpm storybook`, and `pnpm pw`** rather than borrow the main checkout's ports. Fix it with `bash .claude/hooks/provision-worktree.sh <worktree path>`.
+- **`pnpm dev`, `pnpm storybook`, and `pnpm pw` use the worktree's ports automatically.** They read them from `frontend/.gaia-ports`, which GAIA rewrites each time a session enters the worktree, so don't edit it. To see a tree's ports, ask Claude: `Which ports does this worktree use?`
+- **A taken port stops the server, never swaps it.** A server will not start on a port that is already in use instead of quietly picking another one, so you never end up testing another checkout's server by mistake. Playwright reuses a running server only when it belongs to its own worktree. A direct `storybook dev` skips this check and can move to another port, so start Storybook with `pnpm storybook`.
+- **A worktree with no port file will not start `pnpm dev`, `pnpm storybook`, or `pnpm pw`** rather than borrow the main checkout's ports. When Claude hits this, it runs the setup step the message names and starts the server again. If you started the server yourself, ask Claude to fix it: `This worktree has no port file. Set it up again.`
 - **Leftover servers are stopped for you, carefully.** At a later session start, GAIA stops servers that a Claude session started once that session has ended, and servers left running by a removed worktree. A server you started yourself is never stopped automatically, and Claude asks before stopping anything on a port another worktree owns.
 
 <Aside type="note" title="Slots are shared across your GAIA projects">
@@ -238,13 +242,7 @@ Who decides when to merge depends on what started the work:
 | [`/gaia-residue`](/maintenance/residue/), [`/gaia-codify`](/maintenance/codify/), [`/gaia-fitness`](/maintenance/fitness/) | The command asks before it merges, and you can leave the pull request open instead. |
 | [`/update-gaia`](/maintenance/update-gaia/) | It opens a draft pull request and stops. You merge it when you are ready. |
 
-Claude squash-merges, then waits for the merge to land:
-
-```bash
-bash .gaia/scripts/pr-wait-merge.sh --pr <N>
-```
-
-The script ends with one result (`MERGED`, `CONFLICTING`, `CHECK_FAILED`, `TIMEOUT`, `CLOSED`). It stops as soon as the pull request has a conflict or a required check fails, instead of waiting forever. Cleanup runs only after `MERGED`. A hook blocks Claude from writing its own wait loop for the same reason: a loop that waits only for `MERGED` never ends once the merge can no longer happen.
+Claude squash-merges, then waits for the merge to land. The wait ends with one result (`MERGED`, `CONFLICTING`, `CHECK_FAILED`, `TIMEOUT`, `CLOSED`). It stops as soon as the pull request has a conflict or a required check fails, instead of waiting forever. Cleanup runs only after `MERGED`. A hook blocks Claude from writing its own wait loop for the same reason: a loop that waits only for `MERGED` never ends once the merge can no longer happen.
 
 ## 7. Clean up
 
@@ -264,7 +262,7 @@ Work that spans sessions resumes from a small saved state, rewritten in place. W
 - Other work on a branch saves to `.gaia/local/runs/<branch>/STATE.md`
 - Work on the default branch saves to `.gaia/local/runs/session-<session id>/STATE.md`
 
-A resumed session reads that saved state and the run's artifact list and nothing else. A saved place does not last forever. Once its branch no longer exists, GAIA deletes a branch's run folder after 7 days. A save made on the default branch is deleted after 30 days.
+A resumed session reads that saved state and the files it lists, and nothing else. A saved place does not last forever. Once its branch no longer exists, GAIA deletes a branch's run folder after 7 days. A save made on the default branch is deleted after 30 days.
 
 When the context reaches GAIA's [red band](/models-and-context/token-efficiency/#context-bands), Claude finishes the current step, saves its place, and asks one question:
 
@@ -279,6 +277,6 @@ Where the bands sit, how Claude knows it has reached one, and why GAIA asks so e
 
 ## Commands that run only in the main checkout
 
-`/setup-gaia`, `/gaia-debt`, and the maintenance commands (`/gaia-wiki`, `/gaia-residue`, `/gaia-codify`, `/gaia-fitness`, `/gaia-cleanse`, `/update-deps`, `/update-gaia`) refuse inside a linked worktree and name the main checkout to run them from. The ones that change the repository create their own worktree or branch for the work. See the [Maintenance overview](/maintenance/#how-maintenance-commands-run).
+`/setup-gaia`, `/gaia-debt`, and the maintenance commands (`/gaia-wiki`, `/gaia-residue`, `/gaia-codify`, `/gaia-fitness`, `/gaia-cleanse`, `/update-deps`, `/update-gaia`) stop inside a linked worktree and name the main checkout. Open Claude Code there and run the command again. The ones that change the repository create their own worktree or branch for the work. See the [Maintenance overview](/maintenance/#how-maintenance-commands-run).
 
 Commands that start new work (SPECs, plans, tech-debt fixes, one-off changes) offer to pull first when your checkout's GAIA version is behind the remote. Resuming earlier work is never interrupted by that offer.

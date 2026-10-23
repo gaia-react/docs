@@ -36,11 +36,11 @@ You rarely edit anything here by hand. When you want to change a setting, ask Cl
 | `init-state.json` | `/gaia-init`'s progress | Exists only while `/gaia-init` runs | `/gaia-init` | Not applicable |
 | `local/` | Machine-local state | Gitignored | Hooks and commands | Never touched |
 
-"Merged" means the three-way merge described in [Ownership classes](/maintenance/update-gaia/#ownership-classes). A file you never changed is replaced with GAIA's new version. A file you changed keeps your changes, and a real conflict becomes a question.
+"Merged" means the three-way merge described in [The three-way merge](/maintenance/update-gaia/#the-three-way-merge). A file you never changed is replaced with GAIA's new version. A file you changed keeps your changes, and a real conflict becomes a question.
 
 ## Files GAIA ships
 
-These come with every release. Each one, except `VERSION` and `manifest.json`, has a class in `.gaia/manifest.json`. Nearly all are `owned`, which means GAIA maintains them fully. `audit-ci.yml` is `shared`: GAIA provides the starting version and you customize it.
+These come with every release. Each one, except `VERSION` and `manifest.json`, has a class in `.gaia/manifest.json` that decides how `/update-gaia` merges it; the classes are explained in [How GAIA classes its files](/maintenance/update-gaia/#how-gaia-classes-its-files). Nearly every file in `.gaia/` is `owned` (GAIA maintains it). `audit-ci.yml` is `shared`: GAIA provides the starting version and you customize it.
 
 ### VERSION and manifest.json
 
@@ -52,13 +52,13 @@ Don't edit either file by hand. A wrong version makes the next update compare yo
 
 ### cli/
 
-`.gaia/cli/gaia` is the bundled `gaia` CLI. Hooks and commands call it, and you can run it yourself, for example `./.gaia/cli/gaia labels sync`. Run `./.gaia/cli/gaia --help` for the full list of subcommands.
+`.gaia/cli/gaia` is the bundled `gaia` CLI, a command-line tool that GAIA's hooks and commands call. You don't need to run it. Ask Claude for what you want instead, for example `Sync GAIA's GitHub labels.`
 
 `.gaia/cli/templates/` holds the templates `gaia scaffold` fills in for new components, hooks, routes, and services. See [Scaffolders](/skills/scaffolders/).
 
 ### scripts/
 
-The shell scripts that GAIA's hooks, commands, and skills run: the work lifecycle, the audit loop, worktree setup, the usage ledger, and more. You run a few of them yourself when a page tells you to, such as the residue sweep that `/update-gaia` prints at the end of an update. Otherwise you don't call them directly.
+The shell scripts that GAIA's hooks, commands, and skills run: the work lifecycle, the audit loop, worktree setup, the usage ledger, and more. You don't call them directly. When a step needs one, Claude runs it.
 
 ### statusline/
 
@@ -87,11 +87,11 @@ The types allowed at the start of a commit message or pull request title, such a
 
 ### setup-features.json
 
-The list of setup steps `/setup-gaia` owns. Each step has an id and a decision: `applied`, `declined`, or `not-applicable`. Decisions for project-level steps are committed in `project.json`, and decisions for machine-level steps stay in `.gaia/local/setup-state.json`. When a release adds a step, `/setup-gaia` runs it even on a project whose setup is already complete. See [Owed setup features](/getting-started/setup-gaia/#phase-owed-setup-features).
+The list of setup steps `/setup-gaia` owns. Each step has an id and a decision: `applied`, `declined`, or `not-applicable`. Decisions for project-level steps are committed in `project.json`, and decisions for machine-level steps stay in `.gaia/local/setup-state.json`. When a release adds a step, `/setup-gaia` runs it even on a project whose setup is already complete. See [New setup steps from later releases](/getting-started/setup-gaia/#phase-new-setup-steps-from-later-releases).
 
 ### state-registry.json
 
-A list of everything GAIA keeps under `.gaia/local/`: what each entry is, whether a linked worktree shares it, and when it gets cleaned up. It also lists files that features removed in earlier releases left behind, which the residue sweep deletes. See [Cleaning up `.gaia/local/`](#cleaning-up-gaialocal).
+A list of everything GAIA keeps under `.gaia/local/`: what each entry is, whether a linked worktree shares it, and when it gets cleaned up. It also lists files that features removed in earlier releases left behind, which the [leftover-file cleanup](/maintenance/update-gaia/#leftover-file-cleanup) deletes after an update. See [Cleaning up `.gaia/local/`](#cleaning-up-gaialocal).
 
 ## Files your project writes
 
@@ -106,7 +106,7 @@ The packages in your workspace that GAIA's harness covers, as a list of `{name, 
 Team settings and project setup decisions, shared by everyone on the repository:
 
 - `sandbox_recommended` and `isolation_policy`, the two team settings. See [Team settings](/getting-started/setup-gaia/#phase-team-settings).
-- `fitness_commit_threshold`, optional: how many of your team's harness commits since the last `/gaia-fitness` run show its statusline nudge. Without it the count is 15. No command writes it; edit the file. See [The statusline nudge](/maintenance/fitness/#the-statusline-nudge).
+- `fitness_commit_threshold`, optional: how many of your team's harness commits since the last `/gaia-fitness` run show its statusline nudge. Without it the count is 15. No command sets it, so ask Claude, for example `Set the /gaia-fitness nudge threshold in .gaia/project.json to <n> commits.` See [The statusline nudge](/maintenance/fitness/#the-statusline-nudge).
 - `setup_decisions`, the decision recorded for each project-level step in `setup-features.json`.
 
 `/gaia-init` creates the file with GAIA's defaults. `/setup-gaia` adds decisions, and only a repo admin running `/setup-gaia --reconfigure` changes the team settings. `/update-gaia` adds decisions for setup steps a new release brings, and commits them with the update. Its merge never overwrites the file.
@@ -144,7 +144,7 @@ A linked worktree's `.gaia/local` is a link to the main checkout's copy, so ever
 | `declined-updates.json` | Updates you snoozed in [`/update-deps`](/maintenance/update-deps/#snoozing). |
 | `ports/` | Which ports each worktree's dev servers use. See [Ports per worktree](/workflow/work-lifecycle/#ports-per-worktree). |
 | `cache/` | Caches that can be rebuilt, including the verified release bundles `/update-gaia` downloads (`cache/shared/update-gaia/`) and the statusline's update check. |
-| `protected/` | State that only hooks or a person may write. Claude's tools cannot write or delete anything here. A person edits it from a terminal outside Claude Code. |
+| `protected/` | State that only hooks or you may write, such as the audit loop's state. Claude's tools cannot write or delete anything here, so Claude cannot fake an approval. You need to touch it only if a state file is corrupt: then you move it aside from a terminal outside Claude Code, and Claude prints the exact command for you. See [Audit markers and loop state](/reference/gates/#audit-markers-and-loop-state). |
 
 `state-registry.json` is the complete list.
 
@@ -155,13 +155,7 @@ Because git ignores this folder, leftovers never show up in a diff, so GAIA clea
 - **After a merge.** The work lifecycle's cleanup step removes the merged branch's audit, run, and pull request state. See [Clean up](/workflow/work-lifecycle/#7-clean-up).
 - **A daily sweep.** At most once a day, at session start, a background job applies each entry's cleanup rule from `state-registry.json`. Depending on the entry, that happens once its branch has been merged and deleted, once its worktree is gone, or after a set number of days. Some entries are kept for good: the usage ledger, setup state, and settings. The sweep works only from local information (git branches, the worktree list, the notebook catalog) and makes no network calls. It never leaves `.gaia/local/`, never follows a link, and never blocks a session.
 
-Files that a removed feature left behind have no owner to clean them up. `/update-gaia` prints a command at the end of every update that lists them and, with `--apply`, deletes them:
-
-```sh
-bash .gaia/scripts/state-registry-lib.sh residue-sweep --apply
-```
-
-Run it from the main checkout. Without `--apply` it only lists what it found. It deletes nothing that `state-registry.json` doesn't name as left behind.
+Files that a removed feature left behind have no owner to clean them up. The [leftover-file cleanup](/maintenance/update-gaia/#leftover-file-cleanup) after an update deletes them, and only them.
 
 ## Next to .gaia/
 
@@ -170,4 +164,8 @@ Two more GAIA folders sit at the root of your project, beside `.gaia/`:
 - **`.notebook/`** holds your SPECs, plans, and research. It is gitignored and lives in the main checkout. See the [Notebook](/workflow/notebook/).
 - **`.gaia-backup/`** holds a copy of every file `/update-gaia` overwrote, in one folder per run. It is gitignored. Once you commit an update, git history is the lasting record, and the next update clears out the old backups.
 
-When GAIA sets up a worktree and finds a real folder where a link should go, it moves that folder aside to `<name>.bak.<timestamp>`, such as `.gaia/local.bak.<timestamp>`, instead of deleting it. These backups are gitignored too. Look through one before you delete it: it can hold state written in the worktree before it was set up.
+When GAIA sets up a worktree and finds a real folder where a link should go, it moves that folder aside to `<name>.bak.<timestamp>`, such as `.gaia/local.bak.<timestamp>`, instead of deleting it. These backups are gitignored too. Check one before you delete it, since it can hold state written in the worktree before it was set up. Ask Claude:
+
+```text
+Compare .gaia/local.bak.<timestamp> with .gaia/local and tell me whether anything in the backup is worth keeping before I delete it.
+```

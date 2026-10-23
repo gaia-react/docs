@@ -5,18 +5,28 @@ sidebar:
   order: 4
 ---
 
-The `gaia` binary is the bundled CLI at `.gaia/cli/gaia`, shipped in every project. Projects rarely run it directly; skills, hooks, and slash commands run it for them. Every subcommand prints a help block on `--help`, and `gaia --help` lists them all.
+The `gaia` binary is the bundled CLI at `.gaia/cli/gaia`, shipped in every project. Projects rarely run it directly; skills, hooks, and slash commands run it for them. `gaia --help` lists the subcommands, and most of them print a help block on `--help`. A few leaf commands do not: `gaia scaffold hook --help`, for example, prints an unknown-flag error. To read one in plain words, ask:
+
+```text
+Run .gaia/cli/gaia <subcommand> --help and explain each option in plain words.
+```
 
 If you work on the CLI, this page maps its subcommands. The source lives under `.gaia/cli/src/`, which the release bundle leaves out.
 
 ## Build layout
 
-`.gaia/cli` is a package in the root [pnpm](https://pnpm.io/) workspace. At release, the scrub removes it from the shipped `pnpm-workspace.yaml` and `pnpm-lock.yaml`, and every CLI source file is left out of the bundle. `pnpm -C .gaia/cli bundle` builds two binaries:
+`.gaia/cli` is a package in the root [pnpm](https://pnpm.io/) workspace. At release, the scrub removes it from the shipped `pnpm-workspace.yaml` and `pnpm-lock.yaml`, and every CLI source file is left out of the bundle. The build (`pnpm -C .gaia/cli bundle`) produces two binaries, and both are committed:
 
 - `.gaia/cli/gaia`: the shipped binary. Entry point `src/index.ts`.
-- `.gaia/cli/gaia-maintainer`: the maintainer binary, carrying `labels docs` and the release namespace. Entry point `src/index.maintainer.ts`. Excluded from the bundle.
+- `.gaia/cli/gaia-maintainer`: the maintainer binary, carrying `labels docs` and the release commands. Entry point `src/index.maintainer.ts`. Excluded from the bundle. `labels docs` rewrites the label tables in `wiki/concepts/GitHub Labels.md` from `.gaia/labels.json`.
 
-`src/index.ts` imports no maintainer-only code, so esbuild (the bundler) leaves that code out of the shipped binary. The committed binaries must match a fresh build from source. Any change under `.gaia/cli/src` means rebuilding and committing them (the pre-commit hook does this on the GAIA repo), and CI checks it.
+`src/index.ts` imports no maintainer-only code, so esbuild (the bundler) leaves that code out of the shipped binary.
+
+The committed binaries must match a fresh build from source, and you never rebuild them by hand. When a commit stages CLI source, `.gaia/cli/package.json`, a `.gaia/cli/tsconfig*.json`, or the root `pnpm-lock.yaml`, the pre-commit hook rebuilds both binaries and adds them to the commit. If CLI source has unstaged or untracked edits, it stops the commit and names them, because the build reads the working files and would bake those edits in. Claude stages the edits or sets them aside, then commits again. The hook needs the CLI's dependencies in `.gaia/cli/node_modules`, which `pnpm install` provides; without them it only warns, and CI's freshness check fails the pull request instead. If that happens, ask:
+
+```text
+CI says the committed CLI binaries are stale. Rebuild them from .gaia/cli/src and commit them in a new commit.
+```
 
 ## Top-level subcommands
 
@@ -38,7 +48,7 @@ gaia init finalize
 gaia init resume [--from-step <N>]
 ```
 
-`configure-data-layer` prints one JSON line naming the files it changed and the commands to run next, and can be re-run after init (for example `--query true` to add [TanStack Query](https://tanstack.com/query/latest) later). `init` refuses to run outside a scaffolded project root, and in the GAIA source itself.
+`configure-data-layer` prints one JSON line naming the files it changed and the commands to run next, and can be re-run after init (for example `--query true` to add [TanStack Query](https://tanstack.com/query/latest) later). `init` stops with a message outside a scaffolded project root, and in the GAIA source itself.
 
 ### `gaia scaffold`
 
@@ -68,13 +78,25 @@ gaia setup drift [--features <path>]
 
 `gaia labels sync` brings a repository's labels in line with `.gaia/labels.json`. See [Labels](/reference/labels/).
 
+The label tables in `wiki/concepts/GitHub Labels.md` come from the same file, through the maintainer binary's `labels docs`. Nothing reminds you to regenerate them yet, and no check catches a stale page, so after any change to `.gaia/labels.json`, ask:
+
+```text
+I changed .gaia/labels.json. Regenerate the label tables in wiki/concepts/GitHub Labels.md with the maintainer CLI's labels docs command and stage the result.
+```
+
 ### `gaia packages`
 
 `gaia packages sync-settings [--check]` generates `<package>/.claude/settings.json` from the root settings and the package's overlay. The pre-commit hook checks it.
 
 ### `gaia update`
 
-The merge steps behind [`/update-gaia`](/maintenance/update-gaia/): `merge-package`, `merge-workspace`, and `merge-audit-ci` (each merges its file field by field and reports what it applied and what conflicted), `merge-region` and `regen-regions` (for generated regions of a file), and `lockfile-command`.
+The merge steps behind [`/update-gaia`](/maintenance/update-gaia/): `merge-package`, `merge-workspace`, and `merge-audit-ci` (each merges its file field by field and reports what it applied and what conflicted), `merge-region` and `regen-regions` (for generated regions, below), and `lockfile-command`.
+
+#### Generated regions
+
+A generated region is a block inside a shipped file, between a pair of marker comments, that a GAIA script writes rather than a person. Today there is one: the `gaia:audit-remit` block in each Code Audit Team member's agent file, written from the `.gaia/audit-ci.yml` roster by `.gaia/scripts/write-audit-remits.sh`. `/update-gaia` regenerates a region by running its script instead of merging the text line by line.
+
+Every region must be registered in `.gaia/cli/src/release/region-registry.ts`. Nothing else in the build detects one, so an unregistered region gets merged like hand-written text.
 
 ### `gaia update-deps`
 
@@ -90,7 +112,7 @@ For [`/gaia-codify`](/maintenance/codify/): `codify-tally` counts how often each
 
 ### `gaia residue-tally`, `gaia residue-cursor`, `gaia residue-record`
 
-For [`/gaia-residue`](/maintenance/residue/): `residue-tally` counts the residuals to triage, `residue-cursor` remembers where a run stopped so the next one resumes there, and `residue-record` records dismissals. `GAIA_RESIDUE_CAP` sets one batch's size.
+For [`/gaia-residue`](/maintenance/residue/): `residue-tally` counts the residuals to triage, `residue-cursor` remembers where a run stopped so the next one resumes there, and `residue-record` records what you decided for each residual (dismissed, kept, or suppressed). `GAIA_RESIDUE_CAP` sets one batch's size.
 
 ### `gaia react-perf`
 
@@ -104,16 +126,17 @@ The steps behind [`/gaia-wiki`](/maintenance/wiki/), including `chain`, which ru
 
 The fire-and-forget usage ping sent by `/gaia-init`, `/setup-gaia`, and `/update-gaia`. `GAIA_TELEMETRY_PING_DISABLE=1` suppresses it.
 
-## Where to find tests
+## Tests
 
-Test files sit beside their source under `.gaia/cli/src/`, run by [Vitest](https://vitest.dev/):
+Test files sit beside their source under `.gaia/cli/src/`, run by [Vitest](https://vitest.dev/). Fixtures live under `.gaia/cli/test-fixtures/`. GAIA's shell layer is tested by [bats](https://github.com/bats-core/bats-core) suites under `.gaia/scripts/tests/` and `.gaia/tests/`.
 
-```bash
-pnpm -C .gaia/cli typecheck
-pnpm -C .gaia/cli test --run
+When a commit touches `.gaia/cli/`, the [Quality Gate](/reference/gates/#quality-gate) adds the CLI's typecheck and lint. The required CI check also runs the CLI's Vitest tests (see [CI workflows](/contributors/ci/#cli-testsyml)). Before the first audit on your branch, the verification runner runs the bats suites that cover the files you changed (see [Before you open a pull request](/contributors/#what-runs-while-you-work)). To run any of them on demand, ask:
+
+```text
+Run the CLI's typecheck, lint, and Vitest tests, then the bats suites that cover the files I changed, under bash 5. Fix anything that fails.
 ```
 
-Fixtures live under `.gaia/cli/test-fixtures/`. GAIA's shell layer is tested by bats suites under `.gaia/scripts/tests/` and `.gaia/tests/`; see [CI workflows](/contributors/ci/).
+The prompt asks for bash 5 because CI uses it. macOS ships bash 3.2, where some failing assertions pass silently, so a local pass there is weaker than CI's.
 
 ## Surfaces excluded from this reference
 

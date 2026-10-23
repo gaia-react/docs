@@ -56,7 +56,15 @@ The run ends with a [cost line](/models-and-context/cost/), which includes the t
 
 Sync goes through every commit since the last one the wiki checked, up to `HEAD`, decides which ones matter to the wiki, and updates the affected pages. Commits that change nothing the wiki describes are skipped, and only commits that led to a wiki change are logged. Changes to services and hooks are written to their pages under `wiki/modules/`.
 
-State lives in `wiki/.state.json`. When the wiki is more than 30 commits behind, sync asks first. You can choose to sync only the most recent 20 and treat everything older as done. Which commits count can be tuned with `gaia.wikiClassify` in `package.json`.
+When the wiki is more than 30 commits behind, sync asks first. You can choose to sync only the most recent 20 and treat everything older as done.
+
+Sync decides which commits matter by which files they change. By default it treats files under `frontend/app/` as your source code. If your code also lives elsewhere (for example a backend package), ask Claude:
+
+```text
+Make /gaia-wiki treat changes under backend/src as source code too.
+```
+
+Claude records this under `gaia.wikiClassify` in the root `package.json`, which `/update-gaia` leaves alone.
 
 ### Consolidate
 
@@ -73,36 +81,40 @@ Each finding is one question:
 - **Keep both**: note on the main page that you have seen it, so it is not raised again.
 - **Skip**: leave it for the next run.
 
-The report overwrites one file each run, `wiki/meta/consolidate-report.md`.
+The report overwrites one file each run, `wiki/meta/consolidate-report.md` (`wiki/meta/` is created on the first run).
 
 ### Lint
 
-Lint runs every check from scratch and overwrites one report, `wiki/meta/lint-report.md`:
+Lint runs every check from scratch and overwrites one report, `wiki/meta/lint-report.md` (`wiki/meta/` is created on the first run):
 
 | Check | Finds |
 |---|---|
-| #11 Wiki drift | How many commits the wiki trails `HEAD`. |
-| #12 Dead paths | Repository paths in backticks in wiki text that no longer exist. |
-| #13 Narrative ID drift | SPEC and UAT numbers in prose where they should not appear. |
-| #14 Orphan pages | Pages no other page links to. |
-| #15 Frontmatter gaps | Pages missing `type` or `status`. |
-| #16 Empty sections | Headings with no content before the next heading. |
-| #17 Broken wikilinks | Wikilinks that resolve to no page. |
+| Wiki drift | How many commits the wiki trails `HEAD`. |
+| Dead paths | Repository paths in backticks in wiki text that no longer exist. |
+| Narrative ID drift | SPEC and UAT numbers in prose where they should not appear. |
+| Orphan pages | Pages no other page links to. |
+| Frontmatter gaps | Pages missing `type` or `status`. |
+| Empty sections | Headings with no content before the next heading. |
+| Broken wikilinks | Wikilinks that resolve to no page. |
 
 Lint then fixes what it found. Simple fixes (a missing frontmatter field, an index entry for an orphan page, a path to a file that was renamed) apply without asking. Fixes that need judgment ask you. Every finding ends up fixed, filed as a `tech-debt` issue, or left alone because you chose to.
 
-## The session-start janitor
+## Cleanup at session start
 
 At every session start, a hook cleans up after earlier wiki runs. It deletes local wiki branches whose work is already merged. When it finds one, it runs one `git fetch` with a time limit and fast-forwards your default branch if it is checked out and has no uncommitted changes. So a run that ended before its merge landed never leaves your default branch out of date.
 
-The fetch times out after `GAIA_WIKI_FETCH_TIMEOUT_SECONDS` (default 5). Set it to `0` to turn the fetch off. `GAIA_WIKI_FETCH_MINIMUM_INTERVAL_MINUTES` (default 60) limits how often it runs.
+Two environment variables tune that fetch. `GAIA_WIKI_FETCH_TIMEOUT_SECONDS` (default 5) sets its time limit in seconds, from 1 to 30; `0` turns the fetch off, and with it the deletion of merged wiki branches. `GAIA_WIKI_FETCH_MINIMUM_INTERVAL_MINUTES` (default 60) sets the shortest gap between fetches, at least 5 minutes; `0` removes the gap, so the hook may fetch at every session start. The hook reads them when a session starts. Ask Claude to add one to the `env` block of `.claude/settings.local.json` (your machine only, never committed), then restart Claude Code:
+
+```text
+Set GAIA_WIKI_FETCH_TIMEOUT_SECONDS to 15 in the env block of .claude/settings.local.json.
+```
+
+You can export it in your shell profile instead; restart Claude Code either way.
 
 ## What ships in the wiki
 
-GAIA ships wiki pages describing what it installs: concepts, decisions, and modules, including `wiki/concepts/GAIA Scripts.md` (GAIA's scripts by family and folder), `wiki/concepts/Worktrees.md`, and `wiki/concepts/Local Working State.md`. They describe GAIA's conventions as your project's own. Sections you add to a GAIA-shipped page are kept when [`/update-gaia`](/maintenance/update-gaia/) merges a new release.
+GAIA ships wiki pages describing what it installs: concepts, decisions, and modules. They describe GAIA's conventions as your project's own. Ask Claude about any GAIA convention; it answers from these pages. Sections you add to a GAIA-shipped page are kept when [`/update-gaia`](/maintenance/update-gaia/) merges a new release.
 
 ## Related
 
 [`/gaia-cleanse`](/maintenance/cleanse/) handles memory and auto-loaded files that duplicate or contradict the wiki. `/gaia-wiki` handles redundancy and broken links inside the wiki itself.
-
-Source: `.claude/skills/gaia/references/wiki.md`.

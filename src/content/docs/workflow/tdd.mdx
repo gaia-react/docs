@@ -57,7 +57,7 @@ In the React app, each behavior is tested at the lowest layer that can check it.
 
 **Stories are the component tests.** A play function is a script that clicks and types like a user, run in a real Chromium browser. Claude does not write a separate test file that renders the component again. Every story is also checked for accessibility, and a story that opts out of that check fails the tests unless the opt-out is recorded with a reason in `frontend/test/story-a11y-opt-out.test.tsx`.
 
-Stories and hook tests need Chromium. [`/gaia-init`](/getting-started/gaia-init/) and [`/setup-gaia`](/getting-started/setup-gaia/) install it; outside them, run `pnpm install:browsers` once in `frontend/`.
+Stories and hook tests need Chromium. [`/gaia-init`](/getting-started/gaia-init/) and [`/setup-gaia`](/getting-started/setup-gaia/) install it; outside them, run `pnpm install:browsers` yourself once per machine. It installs the browsers' system libraries too, which can ask for your password.
 
 ## Proving a test can fail
 
@@ -65,11 +65,11 @@ A test that passed from the start may not test anything. GAIA checks this in one
 
 ### Code with predictable output: seen failing first
 
-For code that gives the same result every run (utilities, service parsers, most hooks), a test must be seen failing before it passes. When Claude runs the tests, GAIA records every test that fails. A commit by Claude that adds a new test with no recorded failure for its current content is refused. Editing or renaming an existing test never needs a new failure.
+For code that gives the same result every run (utilities, service parsers, most hooks), a test must be seen failing before it passes. When Claude runs the tests, GAIA records every test that fails. If Claude tries to commit a new test with no recorded failure for its current content, a hook sends the commit back. Editing or renaming an existing test never needs a new failure.
 
 Claude writes the test against a function that does not exist yet, or a stub that returns the wrong value, so the test fails because the code is missing. Then it writes the code. It never breaks working code to force a failure.
 
-When the gate stops a commit, Claude runs the test file on its own, as a separate command (`pnpm -C <package dir> test --run <test-file>`), while it fails, so the failure is recorded, then makes it pass. See [the RED gate](/reference/gates/#test-seen-failing-first-red-gate) for the exemptions.
+When the gate stops a commit, Claude runs the test file on its own, as a separate command, while it fails, so the failure is recorded, then makes it pass. See [the RED gate](/reference/gates/#test-seen-failing-first-red-gate) for the exemptions.
 
 ### Everything else: the worthiness review
 

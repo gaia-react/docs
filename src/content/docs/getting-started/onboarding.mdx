@@ -9,7 +9,7 @@ GAIA onboards you as you build. Every rule, hook, check, and command is ready to
 
 - **Rules load.** Some rules are always loaded and shape what Claude writes from the first prompt. Others apply to certain folders or file types and load only when the work touches those files. See [Rules](/reference/rules/).
 - **Skills trigger from plain prompts.** Ask for a component and `new-component` scaffolds it; edit a hook and `react-code` applies. See [Skills](/skills/).
-- **Guards are on.** Hooks block reading secrets, dangerous deletes, and commits to `main`, whether or not you skip permission prompts. See [Hooks](/reference/hooks/).
+- **Guards are on.** Hooks keep Claude from reading secrets, running dangerous deletes, and committing to `main`, in every permission mode. When one fires, Claude takes the safe route and carries on. See [Hooks](/reference/hooks/).
 - **The [statusline](/workflow/statusline/)** shows `⚙️ /setup-gaia` until this machine's setup is done.
 
 ## First commit
