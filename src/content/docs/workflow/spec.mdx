@@ -166,7 +166,7 @@ Every critical or major finding then goes to a separate reviewer whose job is to
 
 On the Deep audit, three reviewers try to disprove each finding, each from a different angle: correctness, security, and whether the problem actually happens as described. A finding stays only if at least two of the three fail to disprove it. A completeness reviewer then looks for anything every lens missed.
 
-When the lenses raise a very large number of findings (more than 24 critical or major ones on the Standard audit, more than 8 on the Deep audit), one reviewer per lens checks all of that lens's findings instead, and the completeness review is skipped. This caps the number of reviewers, and so the time and tokens the audit spends, however many findings come in. Little is lost: with that many findings, several lenses have usually raised the same problem on their own, which already cross-checks it, and that much volume already covers the gaps a completeness reviewer would hunt for.
+When the lenses raise a very large number of findings (more than 24 critical or major ones on the Standard audit, more than 8 on the Deep audit), one reviewer per lens checks all of that lens's findings instead, and the completeness review is skipped. That keeps the number of reviewers fixed, so the audit's time and token cost stay the same no matter how many findings come in. Little is lost: with that many findings, several lenses have usually raised the same problem on their own, which already cross-checks it, and that much volume already covers the gaps a completeness reviewer would hunt for.
 
 ### What happens to a finding that survives
 
