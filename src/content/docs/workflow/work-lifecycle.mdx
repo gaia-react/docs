@@ -135,13 +135,13 @@ Claude never makes up a branch name. One shared script (`branch-name-lib.sh`) ge
 
 ### Why GAIA works in worktrees
 
-A [git worktree](https://git-scm.com/docs/git-worktree) is a second working copy of the same repository, in its own folder and on its own branch, sharing one history. By default, GAIA gives every task its own worktree. Your team can change that with the [isolation policy](#isolation-policy). Working in worktrees buys you:
+A [git worktree](https://git-scm.com/docs/git-worktree) is a second working copy of the same repository, in its own folder and on its own branch, sharing one history. By default, GAIA gives every task its own worktree. Your team can change that with the [isolation policy](#isolation-policy). This means:
 
-- **Tasks that run side by side.** A plan, a bug fix, and a dependency update can each run in their own session at the same time. None of them sees another's edits, and none of them touches the checkout you are working in.
-- **A checkout that stays yours.** Your main checkout keeps its branch and your own edits while a task runs in its worktree. Claude never stashes your work to start a task.
-- **Worktrees that are ready to use.** GAIA links the shared files, installs dependencies, and gives each worktree its own ports, so the app, Storybook, and tests can run in several worktrees at once. See [Worktrees provision themselves](#worktrees-provision-themselves) and [Ports per worktree](#ports-per-worktree).
-- **The same GAIA in every worktree.** Hooks, gates, and the audit work in a worktree the same way they do in the main checkout. GAIA is designed so that nothing done in one worktree blocks another or is attributed to it.
-- **Safe cleanup.** After the merge, Claude removes the worktree, unless it still holds uncommitted or unpushed work. See [Clean up](#7-clean-up).
+- **Tasks run side by side.** A plan, a bug fix, and a dependency update can each run in their own session at the same time. None of them sees another's edits, and none of them touches the checkout you are working in.
+- **Your checkout stays yours.** It keeps its branch and your own edits while a task runs in its worktree. Claude never stashes your work to start a task.
+- **Each worktree is ready to use.** GAIA links the shared files, installs dependencies, and gives each worktree its own ports, so the app, Storybook, and tests can run in several worktrees at once. See [Worktrees provision themselves](#worktrees-provision-themselves) and [Ports per worktree](#ports-per-worktree).
+- **GAIA works the same in every worktree.** Hooks, gates, and the audit work in a worktree the same way they do in the main checkout. GAIA is designed so that nothing done in one worktree blocks another or is attributed to it.
+- **Cleanup is safe.** After the merge, Claude removes the worktree, unless it still holds uncommitted or unpushed work. See [Clean up](#7-clean-up).
 
 A few commands are the exception: they run only from the main checkout. See [Commands that run only in the main checkout](#commands-that-run-only-in-the-main-checkout).
 
