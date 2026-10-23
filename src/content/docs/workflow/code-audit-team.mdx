@@ -266,3 +266,9 @@ GAIA also has a cheaper tier for small changes: the [light and quick reviews](#l
 
 You can still run any built-in review yourself as a second opinion, before or after the audit. A different reviewer can catch different things. Its findings are advice only: nothing it says clears or blocks a merge.
 Your project's wiki records the same reasoning in the "Why not Claude Code's built-in review" section of `wiki/decisions/Code Audit Team.md`.
+
+## Whole-app security audits
+
+The Code Audit Team reviews each pull request's diff, so it cannot see a security problem that spans files the diff never touches. For a periodic whole-app pass, you can run [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill), an open-source (MIT) skill, on your own app. It is third-party: GAIA does not install, run, or maintain it, and it is not a Code Audit Team member.
+
+Run it by hand now and then, for example before a release, not on every pull request. Keep each run scoped and in its `quick` profile. Runs on the same repository build on each other, so a rerun targets what changed and what earlier runs left open. A scoped quick run on a GAIA project takes about 10 to 19 agents and 15 to 20 minutes. See its README for setup, including the sandbox it needs before it runs your app's code.
