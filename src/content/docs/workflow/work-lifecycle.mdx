@@ -74,7 +74,7 @@ Every committed task gets a draft pull request, even when you did not ask for on
 
 Claiming applies only when the work closes an existing GitHub issue. Work with no issue behind it, such as a quick fix you asked for in a prompt, skips this step.
 
-When there is an issue, Claude reads its labels first. An issue already labeled `in-progress` belongs to someone else, so Claude tells you and picks different work instead of competing for it. Otherwise it claims the issue:
+When there is an issue, Claude reads its labels first. An issue already labeled `in-progress` belongs to someone else, so Claude tells you instead of competing for it. Otherwise it claims the issue:
 
 ```bash
 gh issue edit <n> --add-label in-progress
