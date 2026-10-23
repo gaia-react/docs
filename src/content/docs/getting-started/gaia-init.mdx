@@ -34,7 +34,7 @@ Every question is a menu with the recommended option first. In interactive mode 
 
 - **Primary language.** The main language for your app's UI. The first option is the language you have been typing in. The second is always a different real language: English when you type in another language, otherwise your system locale's language, or Spanish. Type any other language, by name (French, Japanese) or code (`fr`, `ja`), through the menu's Other answer.
 - **Additional languages.** Keep only the primary language with translation support (i18n) still set up (recommended, so you can add languages later with no rework), add more languages now, or remove i18n entirely. Removing it is hard to undo, so pick it only if you are sure the app will only ever use one language.
-- **GitHub username for CODEOWNERS.** GAIA reads your handle from the [GitHub CLI](https://cli.github.com/) you are logged in to (`gh api user`) and offers it first. Choose **Set it later** to write a placeholder you replace before pushing, or type a different handle. If detection fails, GAIA asks you to type your handle rather than guessing.
+- **GitHub username for CODEOWNERS.** GAIA reads your handle from the [GitHub CLI](https://cli.github.com/) you are logged in to (`gh api user`) and offers it first. Choose **Set it later** to write a placeholder that `/setup-gaia` offers to replace before its first push, or type a different handle. If detection fails, GAIA asks you to type your handle rather than guessing.
 - **Project title.** Your folder name in title case (for example `my-cool-app` becomes `My Cool App`), or the folder name as it is. Type your own title through Other. The slug (the kebab-case name used in package names and paths) comes from the title, so it is never asked separately. To set both, type `Title / slug`.
 - **Backend field casing.** How your backend names JSON fields. `camelCase` (recommended) passes keys through unchanged. `snake_case` makes the services convert keys: `snake_case` in requests and responses, camelCase in your code (`create({isSnakeCaseEnabled: true})`). **Not sure** is treated as camelCase.
 - **[TanStack Query](https://tanstack.com/query/latest).** Off by default: route loaders handle data and nothing extra is installed. **Yes** installs TanStack Query and sets up its provider and [Storybook](https://storybook.js.org/) decorator.
@@ -67,9 +67,17 @@ With your answers, `/gaia-init`:
 
 If you removed i18n, it removes all of it cleanly.
 
+To add a language after init, ask Claude. It follows the same steps init uses, which stay in the project for this:
+
+```text
+Add <language> to the app.
+```
+
+Removing i18n later deletes those steps too, since adding a language would then first need i18n rebuilt.
+
 ### 4. Project files and build check
 
-- Creates `.github/CODEOWNERS` with your GitHub handle as the repo-wide owner. When it has no real handle, it writes the placeholder `REPLACE-WITH-YOUR-GITHUB-HANDLE` and tells you to replace it before you push. GitHub also warns about the unknown owner, so you won't miss it. Nothing later checks for the placeholder, so replace it before your first push by asking Claude:
+- Creates `.github/CODEOWNERS` with your GitHub handle as the repo-wide owner. When it has no real handle, it writes the placeholder `REPLACE-WITH-YOUR-GITHUB-HANDLE`, and GitHub warns about the unknown owner. [`/setup-gaia`](/getting-started/setup-gaia/#phase-github-repository) offers to replace it before its first push, with the GitHub login you are signed in to. To set it sooner, ask Claude:
 
   ```text
   Set my GitHub handle in CODEOWNERS. My handle is <your-handle>.
@@ -118,7 +126,7 @@ Then start Claude again, and run /setup-gaia. After your first push, /setup-gaia
 The statusline shows /update-deps when packages are outdated or have security advisories; run it when you are ready.
 ```
 
-If `.github/CODEOWNERS` still holds the placeholder owner, a required follow-up to replace it comes first (see [step 4](#4-project-files-and-build-check) for the prompt).
+If `.github/CODEOWNERS` still holds the placeholder owner, the message opens with a note that `/setup-gaia` offers to set your handle before its first push (see [step 4](#4-project-files-and-build-check)).
 
 Exit Claude and relaunch from inside the project folder. New plugins and skills only load in a new session.
 
@@ -130,10 +138,13 @@ From there you are ready to build. Run `pnpm dev` to start the app locally, or a
 
 ## Resuming after a failure
 
-`/gaia-init` records its progress as it goes. If something breaks partway through, the failing step prints an error saying what went wrong, and init stops. Fix the cause (or ask Claude to). Claude cannot start `/gaia-init` itself, but it can run init's resume step, which picks up from the saved progress:
+`/gaia-init` records its progress as it goes. If a step fails partway through, Claude shows the error, names the cause, and recovers the run itself:
+
+- **A cause inside the project:** Claude fixes it and resumes.
+- **A cause only you can fix**, such as a credential, a system package, or a disk or network problem: Claude says what to change and asks whether it is fixed. Choose **Fixed, resume** and Claude picks up from the failed step. Choose **Stop here** to finish later.
+
+Init's scripted steps that already finished are skipped, and the rest run again with the answers you already gave. A failed install or build check is run again by Claude itself. If you stopped, ask Claude to resume when you are ready, before init has finished:
 
 ```text
-I fixed the problem. Run .gaia/cli/gaia init resume to finish GAIA init from the step that failed.
+Resume /gaia-init from the step that failed.
 ```
-
-Steps that already finished are skipped, and the rest run again with the answers you already gave.

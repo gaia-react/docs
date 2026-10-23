@@ -21,7 +21,7 @@ GAIA ships rules in two places:
 | `coding-guidelines` | Kebab-case files and folders. Keep code simple: no handling for situations that cannot happen, but real failures are handled with limits. Change only what the task needs. Use TDD. Leave formatting and auto-fixable lint to `pnpm lint`. React file layout lives in `coding-guidelines-react`. |
 | `context-discipline` | Keep the main session's context small by handing reading-heavy work to sub-agents. Choose models from GAIA's model table. Research goes in `.notebook/research/<date>-<topic>/`. Long work resumes from one `STATE.md` file. |
 | `fenced-copy-paste-blocks` | Anything meant for you to paste goes, whole, in its own plain three-backtick fence, never in prose or a blockquote, so Claude Code shows it with a copy button. A handoff prompt carries its own context instead of pointing back at the session. |
-| `issue-claim` | Before work that closes a GitHub issue, check for the `in-progress` label and add it. Follow the work lifecycle. Claim `tech-debt` issues only through `/gaia-debt`. |
+| `issue-claim` | Before work that closes a GitHub issue, check for the `in-progress` label and add it. Release it when Claude closes the pull request unmerged or you drop the work. Follow the work lifecycle. Claim `tech-debt` issues only through `/gaia-debt`. |
 | `pr-merge` | Before any `gh pr merge`, run the audit and post `GAIA-Audit` as the last step. The audit loop runs on its own until it reaches the branch checkpoint, which only you can answer. |
 | `quality-gate` | Run the Quality Gate before any commit that touches source, unless nothing in the gate's scope is staged. |
 | `shell-cwd` | No `cd` in Bash calls; use absolute paths. Each hook finds its script from the checkout the shell is in, so a `cd` into another checkout can switch the guards off without any warning. See [Hooks](/reference/hooks/). |
@@ -49,7 +49,7 @@ GAIA ships rules in two places:
 | `api-service` | Points Claude to the API Service Pattern and the `new-service` skill. | `app/services/**`, `test/mocks/**` |
 | `coding-guidelines-react` | React file and folder layout and naming: kebab-case folders, `index.tsx`, `use-<name>.ts` hooks, `tests/` folders. | `app/**`, `test/**`, `.playwright/**`, `.storybook/**` |
 | `design-baseline` | GAIA's neutral styling is a placeholder, not a design system; confirm the design direction before extending tokens. | `app/styles/**`, `app/components/**`, `app/pages/**` |
-| `i18n` | Every user-facing string comes from `t()`; namespace and key-file conventions. | `app/routes/**`, `app/pages/**`, `app/components/**`, `app/languages/**` |
+| `i18n` | Every user-facing string comes from `t()`; namespace and key-file conventions; which steps to follow to add a language or remove i18n. | `app/routes/**`, `app/pages/**`, `app/components/**`, `app/languages/**` |
 | `playwright` | Spec layout, semantic selectors, web-first assertions, the hydration helper, [MSW](https://mswjs.io/) in dev. | `.playwright/**`, `playwright.config.*` |
 | `ports` | Each checkout owns its dev, Storybook, and Playwright ports. Claude reads them from GAIA's ports script and never hardcodes 5173 or 6006. | Test, Playwright, Storybook, and server config files, and `package.json` |
 | `react-router-docs` | Read the [React Router](https://reactrouter.com/) docs in `node_modules/react-router/docs`, which match the installed version, and check remix-utils before writing a basic utility from scratch. | routes, pages, `app/root.tsx`, middleware |

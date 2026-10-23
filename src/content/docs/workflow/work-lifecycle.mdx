@@ -105,7 +105,7 @@ Claiming applies only when the work closes an existing GitHub issue. Work with n
 
 When there is an issue, Claude reads its labels first. An issue already labeled `in-progress` belongs to someone else, so Claude tells you instead of competing for it. Otherwise it claims the issue by adding the `in-progress` label.
 
-The claim is released automatically when the pull request that closes the issue (with `Closes #<n>` in its body) merges through `gh pr merge` in a Claude session. Any other ending, such as closing the pull request without merging or dropping the work, leaves the claim set. Ask Claude to release it:
+The claim is released automatically when the pull request that closes the issue (with `Closes #<n>` in its body) merges through `gh pr merge` in a Claude session. Claude also releases it when it closes that pull request without merging, unless a replacement pull request takes over the same issue. A merge on github.com leaves the claim set. When you drop the work, tell Claude, and it releases the claim:
 
 ```text
 I'm dropping the work on issue #<n>. Release its in-progress claim.

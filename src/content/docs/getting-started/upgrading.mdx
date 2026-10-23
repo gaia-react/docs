@@ -94,39 +94,36 @@ Claude moves your env files back, switches to `main`, deletes the migration bran
 
 ## Every other machine
 
-The note sets up only the machine that runs it. Every teammate, and every other machine you use, does the following once after pulling the merged migration, from the root of the main copy of the repo. Node 22.22.0 or newer is required.
+The note sets up only the machine that runs it. Every teammate, and every other machine you use, catches up once after pulling the merged migration, from the root of the main copy of the repo. Node 22.22.0 or newer is required.
 
-1. **Update Claude Code** to 2.1.287 or later. Run this in your terminal, since it updates Claude Code itself:
+1. **Make sure the project is on GAIA 2.1.0 or later.** `/setup-gaia` does the catch-up from 2.1.0 on. If the project is still on 2.0.x, run `/update-gaia` and merge the update first. That happens once for the project, not once per machine.
+2. **Update Claude Code** to 2.1.287 or later. Run this in your terminal, since it updates Claude Code itself:
 
    ```bash
    claude update
    ```
 
-2. **Start Claude in the project and paste this prompt.** Until the git hooks are turned on, that clone runs no pre-commit hook, and nothing tells you so.
+3. **Start Claude in the project and type `/setup-gaia`.** On a machine that was on GAIA 1.x, setup finds what 1.x left behind and fixes each item. It asks before deleting the retired files, removing Serena or the plugin, renaming and pushing branches, and running the leftover-file cleanup. The install and the two moves run without a question.
+   - runs `pnpm install` for the new `frontend/` layout
+   - deletes the retired local GAIA files (`.gaia/cache`, `.gaia/local/handoff`, and an old decline ledger)
+   - moves your specs, plans, and research into the [Notebook](/workflow/notebook/)
+   - moves a root React Doctor skill under `frontend/.claude/skills/`
+   - removes Serena, which 2.0.0 dropped
+   - renames each unmerged `spec-<nnn>-<slug>` branch to its 2.0.0 name and pushes it
+   - finds the old abbreviated `GAIA_*` variable names in your shell profile and CI workflows, and offers to fix the workflows
+   - offers to uninstall the claude-obsidian plugin if you do not use it outside GAIA
+   - runs the [leftover-file cleanup](/maintenance/update-gaia/#leftover-file-cleanup)
 
-   ```text
-   This clone was on GAIA 1.6.1 and I just pulled the merged 2.0.0 migration. Do the 2.0.0 per-machine steps on this machine, from this main checkout, asking me before you delete anything:
-   1. Enable pnpm at the version package.json pins (corepack enable pnpm, or npm install -g pnpm if corepack is missing), then run pnpm install and confirm pnpm --version matches the pin. If pnpm stops with ERR_PNPM_BAD_PM_VERSION, tell me how to make the pinned version available instead of bypassing the check.
-   2. Check that git config core.hooksPath prints .githooks. If it does not, set it.
-   3. Delete the retired local GAIA files: .gaia/cache, .gaia/local/handoff, and a version 1 decline ledger, which can be at .gaia/local/harden/declines.json or .gaia/local/codify/declines.json. Delete a ledger only if its "version" field is 1.
-   4. Move specs, plans and research into the notebook by running bash .gaia/scripts/notebook/move.sh run, and show me its report.
-   5. If .claude/skills/react-doctor exists at the root, move it under frontend/.claude/skills/.
-   6. Remove Serena: unregister its MCP server and delete any leftover .serena folder.
-   7. Rename any unmerged spec-<nnn>-<slug> branch to feat/spec-<nnn>-<slug> and push it.
-   8. Check my shell profile and CI workflows for the old abbreviated GAIA_* variable names and tell me what to rename.
-   9. Run GAIA's leftover-file cleanup (the residue-sweep in .gaia/scripts/state-registry-lib.sh), show me the list, then apply it if I agree.
-   ```
+   Until it runs, the statusline shows a `/setup-gaia` nudge. Running `/update-gaia` on a machine that is behind can also do this catch-up.
 
-   Claude Code may ask you to approve running the notebook move script; approve it. Run the prompt from the main copy of the repo, not a worktree: the leftover-file cleanup does not run inside a worktree.
+   Setup also asks to turn the git hooks on if they are off, enables pnpm at the pinned version, installs Chromium (the browser the tests run in), and records this machine's 2.0.0 choices. Claude Code may ask you to approve running the notebook move script; approve it. A step that fails is reported and retried on the next `/setup-gaia` run.
 
-   Claude cannot open `.env` files, so check those yourself for the old variable names. `GAIA_LEDGER_LOCK_TIMEOUT_SECS`, `GAIA_LEDGER_LOCK_STALE_SECS`, and `GAIA_LEDGER_LOCK_POLL_SECS` now end in `_SECONDS`. `GAIA_SPEC_REMOTE_TIMEOUT_SECONDS`, `GAIA_SPEC_ALLOCATION_MAXIMUM_RETRIES`, `GAIA_TITLE_MAXIMUM_LENGTH`, and `GAIA_WIKI_FETCH_MINIMUM_INTERVAL_MINUTES` replace their abbreviated forms. An old name is ignored without any warning.
+   Claude cannot open `.env` files, so check `frontend/.env` yourself for the old variable names. `GAIA_LEDGER_LOCK_TIMEOUT_SECS`, `GAIA_LEDGER_LOCK_STALE_SECS`, and `GAIA_LEDGER_LOCK_POLL_SECS` now end in `_SECONDS`. `GAIA_SPEC_REMOTE_TIMEOUT_SECONDS`, `GAIA_SPEC_ALLOCATION_MAXIMUM_RETRIES`, `GAIA_TITLE_MAXIMUM_LENGTH`, and `GAIA_WIKI_FETCH_MINIMUM_INTERVAL_MINUTES` replace their abbreviated forms. An old name is ignored without any warning. Setup leaves your shell profile files to you too: it names each match and its new name.
 
-   Until the notebook move runs, the spec and plan commands stop and say the move is needed. The leftover-file list in the last step names each file's reason; files it does not recognize are listed and never deleted.
-
-3. **Type `/setup-gaia`** to record this machine's 2.0.0 choices. It also enables pnpm at the pinned version and installs Chromium, the browser the tests run in.
+   Until the notebook move runs, the spec and plan commands stop and say the move is needed.
 
 <Aside type="note">
-GAIA no longer enables the claude-obsidian plugin, and Python 3.11 is no longer a prerequisite. The wiki stays an Obsidian vault. If you installed the plugin only for GAIA, ask Claude to remove it:
+GAIA no longer enables the claude-obsidian plugin, and Python 3.11 is no longer a prerequisite. The wiki stays an Obsidian vault. On the machine that ran the migration, if you installed the plugin only for GAIA, ask Claude to remove it:
 
 ```text
 I installed claude-obsidian only for GAIA. Uninstall it from my user settings.

@@ -69,7 +69,7 @@ The rest of this page lists every gate: what it stops, why, when it runs, who ac
 - **Why:** it is the fixed, scripted check that keeps code failing typecheck, lint, or its own tests out of history, no matter what the Claude session decided.
 - **When:** at `git commit`, through the native git hook `.githooks/pre-commit`.
 - **Who acts:** Claude, and you only when you commit by hand.
-- **Clear it:** Claude fixes the failures it prints and commits again. If you commit by hand and it stops you, ask Claude to fix what it printed. If no hook runs at all, the clone's git hooks may be switched off, and nothing reports that. Ask Claude:
+- **Clear it:** Claude fixes the failures it prints and commits again. If you commit by hand and it stops you, ask Claude to fix what it printed. If no hook runs at all, the clone's git hooks may be switched off, and nothing reports that at commit time. `/setup-gaia` checks for this on every run and offers to turn them on. Between runs, ask Claude:
 
   ```text
   Check that this clone's git hooks are active, and turn them on if they are not.
@@ -116,8 +116,8 @@ The rest of this page lists every gate: what it stops, why, when it runs, who ac
 - **Stops:** Claude starting work on a GitHub issue already labelled `in-progress`.
 - **Why:** two agents or two people who start the same ticket do the work twice, then fight over the merge.
 - **When:** before a branch or worktree is created for work that closes an issue. This is a rule Claude follows (`.claude/rules/issue-claim.md`), not a hook, so nothing blocks the work mechanically.
-- **Who acts:** Claude, and you only when a claim was left behind by abandoned work.
-- **Clear it:** Claude tells you the issue is taken and picks different work. The label comes off when Claude merges the claiming pull request with `gh pr merge`; a merge on github.com leaves it set. A claim left behind by abandoned work is the one case for you: on a `tech-debt` issue, the next `/gaia-debt` run removes it; on any other issue, it stays until you release it. Ask Claude:
+- **Who acts:** Claude, and you only to tell Claude the work is dropped.
+- **Clear it:** Claude tells you the issue is taken and picks different work. The label comes off when Claude merges the claiming pull request with `gh pr merge`, and Claude also removes it when it closes that pull request without merging. On a `tech-debt` issue, the next `/gaia-debt` run removes a claim left behind. A merge on github.com leaves the label set, and so does work you stop without saying so. Tell Claude when you drop the work:
 
   ```text
   I'm dropping the work on issue #<n>. Release its in-progress claim.
