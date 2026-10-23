@@ -4,6 +4,44 @@ description: How GAIA records real problems it finds outside the change at hand 
 ---
 
 import { Aside } from '@astrojs/starlight/components';
+import Flowchart from '../../../components/Flowchart.astro';
+
+export const disposition = {
+	title: 'Where an audit finding ends up',
+	description:
+		'A finding in the pull request\'s own change is fixed by default, or, if not fixed, accepted as a residual. Outside the change, a security-sensitive finding is filed as a tech-debt issue only in a private repository, and otherwise goes to a local record under .gaia/local/audit/security/. A non-security finding is waived when it is in GAIA\'s audit machinery or a file the pull request changes, and this change neither caused it nor points to it as handled elsewhere. Otherwise it is filed as a tech-debt issue, which /gaia-debt fixes. Residuals and waived findings are recorded in the pull request body, and once they are 30 days old /gaia-residue asks you to dismiss, keep, or promote each one to a tech-debt issue.',
+	cols: 4,
+	nodes: [
+		{ id: 'finding', col: 0, row: 0, text: 'The audit raises a finding' },
+		{ id: 'scope', col: 0, row: 1, decision: true, text: ["In the pull request's", 'own change?'] },
+		{ id: 'security', col: 1, row: 1, decision: true, text: 'Security-sensitive?' },
+		{ id: 'private', col: 2, row: 1, decision: true, text: 'Private repository?' },
+		{ id: 'local', col: 3, row: 1, text: ['Local record under', '.gaia/local/audit/security/'] },
+		{ id: 'fixed', col: 0, row: 2, text: 'Fixed (the default)' },
+		{ id: 'accepted', col: 0, row: 3, text: ['Or accepted as a', 'residual, with a reason'] },
+		{ id: 'waive', col: 1, row: 2, decision: true, text: ['Waivable? In machinery or a', 'changed file, and not caused', 'or deferred by this PR'] },
+		{ id: 'filed', col: 2, row: 2, text: 'Filed as a tech-debt issue' },
+		{ id: 'recorded', col: 0, row: 4, span: 2, text: ['Residuals and waived findings are', 'recorded in the pull request body'] },
+		{ id: 'debt', col: 2, row: 3, text: '/gaia-debt fixes it' },
+		{ id: 'residue', col: 0, row: 5, span: 2, text: ['Once 30 days old, /gaia-residue', 'asks: dismiss, keep, or promote'] },
+	],
+	edges: [
+		{ from: 'finding', to: 'scope' },
+		{ from: 'scope', to: 'fixed', label: 'Yes' },
+		{ from: 'scope', to: 'security', label: 'No' },
+		{ from: 'security', to: 'private', label: 'Yes' },
+		{ from: 'private', to: 'local', label: 'No' },
+		{ from: 'private', to: 'filed', label: 'Yes' },
+		{ from: 'security', to: 'waive', label: 'No' },
+		{ from: 'waive', to: 'filed', label: 'No' },
+		{ from: 'waive', to: 'recorded' },
+		{ from: 'fixed', to: 'accepted', label: 'If not' },
+		{ from: 'accepted', to: 'recorded' },
+		{ from: 'filed', to: 'debt' },
+		{ from: 'recorded', to: 'residue' },
+		{ from: 'residue', to: 'filed', label: 'Promote', back: true },
+	],
+};
 
 While Claude works on one change, it often notices a real problem somewhere else: in a caller of the function it edited, in a test next to the file, in a page of the wiki. Fixing that problem in the same pull request would mix unrelated work into the change and make it harder to review. Ignoring it loses it. GAIA does neither: it records the problem as a `tech-debt` issue on GitHub, so it gets fixed later, on its own branch, with its own review.
 
@@ -11,6 +49,10 @@ This page covers how that debt is created. Two maintenance commands then work th
 
 - [`/gaia-debt`](/maintenance/debt/) fixes `tech-debt` issues.
 - [`/gaia-residue`](/maintenance/residue/) reviews the findings that were recorded without being filed, and turns the ones that matter into `tech-debt` issues.
+
+Where each finding the audit raises ends up:
+
+<Flowchart {...disposition} />
 
 ## Where debt comes from
 

@@ -5,7 +5,56 @@ sidebar:
   order: 2
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import { Aside, FileTree } from '@astrojs/starlight/components';
+import Flowchart from '../../../components/Flowchart.astro';
+
+export const lifecycle = {
+	title: 'The work lifecycle',
+	description:
+		"If the work closes an issue that is already labeled in-progress, Claude tells you and picks other work. Otherwise it claims the issue. Work with no issue skips the claim. Claude names the branch, isolates the work in a worktree or feature branch, commits through the Quality Gate and opens a draft pull request, and runs the audit. Then the merge depends on the work: a command or plan run merges or asks you, ad-hoc work waits until you ask, and /update-gaia stops for you to merge it. Claude squash-merges and waits with pr-wait-merge. Any result other than MERGED stops and reports. Before cleanup, uncommitted or unpushed work keeps the worktree and branch. Otherwise Claude cleans up back to a pulled default branch.",
+	cols: 3,
+	nodes: [
+		{ id: 'issue', col: 0, row: 0, decision: true, text: ['Does the work close', 'a GitHub issue?'] },
+		{ id: 'taken', col: 1, row: 0, decision: true, text: ['Is it already', 'labeled in-progress?'] },
+		{ id: 'other', col: 2, row: 0, text: ['Claude tells you and', 'picks other work'] },
+		{ id: 'claim', col: 1, row: 1, text: ['1. Claim: add the', 'in-progress label'] },
+		{ id: 'name', col: 0, row: 2, text: '2. Name the branch' },
+		{ id: 'isolate', col: 0, row: 3, text: ['3. Isolate: a worktree or', 'a feature branch'] },
+		{ id: 'commit', col: 0, row: 4, text: ['4. Commit, open a', 'draft pull request'] },
+		{ id: 'audit', col: 0, row: 5, text: '5. Audit' },
+		{ id: 'who', col: 0, row: 6, decision: true, text: 'Who merges?' },
+		{ id: 'command', col: 0, row: 7, text: ['A command or plan run', 'merges, or asks you'] },
+		{ id: 'adhoc', col: 1, row: 7, text: ['Ad-hoc work waits', 'until you ask'] },
+		{ id: 'update', col: 2, row: 7, text: ['/update-gaia stops:', 'you merge it'] },
+		{ id: 'merge', col: 0, row: 8, text: ['6. Squash-merge, then', 'wait with pr-wait-merge'] },
+		{ id: 'merged', col: 0, row: 9, decision: true, text: 'Result is MERGED?' },
+		{ id: 'stopped', col: 1, row: 9, span: 2, text: ['Stops and reports: CONFLICTING,', 'CHECK_FAILED, TIMEOUT, or CLOSED'] },
+		{ id: 'left', col: 0, row: 10, decision: true, text: ['Uncommitted or', 'unpushed work?'] },
+		{ id: 'keep', col: 1, row: 10, span: 2, text: ['Keeps the worktree and branch,', 'tells you what is left'] },
+		{ id: 'clean', col: 0, row: 11, text: ['7. Clean up to a pulled', 'default branch'] },
+	],
+	edges: [
+		{ from: 'issue', to: 'taken', label: 'Yes' },
+		{ from: 'taken', to: 'other', label: 'Yes' },
+		{ from: 'taken', to: 'claim', label: 'No' },
+		{ from: 'issue', to: 'name', label: 'No' },
+		{ from: 'claim', to: 'name' },
+		{ from: 'name', to: 'isolate' },
+		{ from: 'isolate', to: 'commit' },
+		{ from: 'commit', to: 'audit' },
+		{ from: 'audit', to: 'who' },
+		{ from: 'who', to: 'command' },
+		{ from: 'who', to: 'adhoc' },
+		{ from: 'who', to: 'update' },
+		{ from: 'command', to: 'merge' },
+		{ from: 'adhoc', to: 'merge', label: 'You ask' },
+		{ from: 'merge', to: 'merged' },
+		{ from: 'merged', to: 'stopped', label: 'No' },
+		{ from: 'merged', to: 'left', label: 'Yes' },
+		{ from: 'left', to: 'keep', label: 'Yes' },
+		{ from: 'left', to: 'clean', label: 'No' },
+	],
+};
 
 Every change Claude commits follows one lifecycle, whether a command drives it (`/gaia-plan`, `/gaia-debt`, a maintenance command) or you just asked for a fix in plain language:
 
@@ -18,6 +67,8 @@ Every change Claude commits follows one lifecycle, whether a command drives it (
 7. **Clean up** back to a pulled default branch.
 
 Every committed task gets a draft pull request, even when you did not ask for one. If you say you will review or commit an edit yourself, Claude leaves it uncommitted on your current branch and none of these steps apply.
+
+<Flowchart {...lifecycle} />
 
 ## 1. Claim
 
@@ -81,6 +132,28 @@ GAIA uses Claude Code's built-in worktrees under `.claude/worktrees/`. When a se
 - **A guard keeps edits in the right copy.** An edit to a file in a different checkout from the session's worktree is denied. When a session moves into a worktree, Claude may still hold absolute paths it used in the main checkout. Those paths still point to real files, just in the wrong copy, so an edit through one would change the main checkout without any warning. See the [gate reference](/reference/gates/#worktree-path-mismatch).
 
 If a worktree's links break, repair them with `bash .gaia/scripts/link-worktree.sh`.
+
+What a worktree holds, next to the main checkout:
+
+<FileTree>
+- my-app/ the main checkout
+  - .gaia/
+    - local/ GAIA's machine-local state, the only copy
+  - .notebook/ the only copy
+  - frontend/
+    - .env your secrets, the only copy
+  - .claude/
+    - worktrees/
+      - my-task/ one worktree
+        - .gaia/
+          - local/ a link to the main checkout's copy
+        - .notebook/ a link
+        - node_modules/ its own install
+        - frontend/
+          - .env a link
+          - node_modules/ its own install
+          - .gaia-ports this worktree's ports, for example 5174 and 6007
+</FileTree>
 
 ### Ports per worktree
 

@@ -5,6 +5,8 @@ sidebar:
   order: 6
 ---
 
+import BandScale from '../../../components/BandScale.astro';
+
 Everything GAIA adds to a session takes up part of Claude's context window, the fixed amount of text Claude can hold at once. GAIA keeps that part small: most of it loads only when a task needs it.
 
 The usage figures on this page were measured in a new GAIA 2.0.0 project on Opus 5.5. Percentages are of a 1M-token context window.
@@ -87,6 +89,35 @@ Claude cannot see how full its own context is. Claude Code reports it only to th
 | Red | 300K tokens (30%) | 100K tokens (50%) | The statusline turns red. Claude saves its place and asks. |
 | 🔥 | 375K tokens (37.5%) | 125K tokens (62.5%) | The statusline shows 🔥. Claude asks again and recommends clearing. |
 | 💀 | 450K tokens (45%) | 150K tokens (75%) | The statusline shows 💀. Claude asks again and recommends clearing. |
+
+<BandScale
+	title="Context bands against the whole window"
+	description="On a 1M-token window the bands sit at 250K (yellow), 300K (red), 375K (fire) and 450K (skull), all before the halfway mark, while Claude Code's auto-compaction starts at about 967K. On a 200K-token window the bands sit at 60K, 100K, 125K and 150K, and auto-compaction starts at the 200K limit."
+	rows={[
+		{
+			label: '1M window',
+			total: 1000000,
+			bands: [
+				{ label: 'Yellow 250K', at: 250000 },
+				{ label: 'Red 300K', at: 300000 },
+				{ label: '🔥 375K', at: 375000 },
+				{ label: '💀 450K', at: 450000 },
+			],
+			compact: { label: 'Auto-compaction ~967K', at: 967000 },
+		},
+		{
+			label: '200K window',
+			total: 200000,
+			bands: [
+				{ label: 'Yellow 60K', at: 60000 },
+				{ label: 'Red 100K', at: 100000 },
+				{ label: '🔥 125K', at: 125000 },
+				{ label: '💀 150K', at: 150000 },
+			],
+			compact: { label: 'Auto-compaction 200K', at: 200000 },
+		},
+	]}
+/>
 
 The red band sits at 300,000 tokens or half the window, whichever is smaller. 🔥 is 1.25 times red and 💀 is 1.5 times red. To ask even earlier, a person can lower the red band in `.gaia/local/protected/checkpoint-override.json`, for example `{"version":1,"context_checkpoint":{"ask_tokens":100000}}`. The file can only lower it, never raise it, and **Claude cannot edit it**.
 

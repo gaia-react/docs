@@ -4,6 +4,47 @@ description: Settle what to build through a guided conversation, save a locked S
 ---
 
 import { Aside } from '@astrojs/starlight/components';
+import Flowchart from '../../../components/Flowchart.astro';
+
+export const specAudit = {
+	title: 'The SPEC audit',
+	description:
+		'Claude sizes up the draft: Standard for a low-stakes, narrow SPEC, Deep for a high-stakes one or one that touches security or a data migration. The four core lenses run, plus a specialist lens for each area the draft touches. With more than 24 critical or major findings on Standard, or more than 8 on Deep, one reviewer per lens checks all of that lens\'s findings. Otherwise each finding gets one refuter on Standard, or three on Deep, where it stays only if at least two fail to disprove it. On Deep, a completeness reviewer then looks for what every lens missed. Minor findings skip refutation. Each surviving finding either fixes the draft, when the SPEC is wrong, or becomes an instruction in AUDIT.md, when the build needs steering. Then comes gate 2.',
+	cols: 3,
+	nodes: [
+		{ id: 'size', col: 0, row: 0, span: 3, text: 'Claude sizes up the draft' },
+		{ id: 'standard', col: 0, row: 1, text: ['Standard: low stakes,', 'narrow scope'] },
+		{ id: 'deep', col: 2, row: 1, text: ['Deep: high stakes, security,', 'or a data migration'] },
+		{ id: 'lenses', col: 0, row: 2, span: 3, text: ['The 4 core lenses, plus a specialist lens', 'for each area the draft touches'] },
+		{ id: 'many', col: 0, row: 3, span: 3, decision: true, text: ['More than 24 critical or major findings', 'on Standard, or more than 8 on Deep?'] },
+		{ id: 'batched', col: 0, row: 4, text: ['Yes: one reviewer per lens', 'checks all of its findings'] },
+		{ id: 'one', col: 1, row: 4, text: ['No, Standard: one', 'refuter per finding'] },
+		{ id: 'three', col: 2, row: 4, text: ['No, Deep: 3 refuters, it', 'stays if 2 fail to disprove'] },
+		{ id: 'complete', col: 2, row: 5, text: ['Completeness reviewer:', 'what every lens missed'] },
+		{ id: 'kinds', col: 0, row: 6, span: 3, text: 'Each finding that survives is one of two kinds' },
+		{ id: 'draft', col: 0, row: 7, text: ['The SPEC is wrong: the', 'fix goes into the draft'] },
+		{ id: 'steer', col: 2, row: 7, text: ['The build needs steering:', 'an instruction in AUDIT.md'] },
+		{ id: 'gate', col: 0, row: 8, span: 3, text: 'Gate 2: the brief' },
+	],
+	edges: [
+		{ from: 'size', to: 'standard' },
+		{ from: 'size', to: 'deep' },
+		{ from: 'standard', to: 'lenses' },
+		{ from: 'deep', to: 'lenses' },
+		{ from: 'lenses', to: 'many' },
+		{ from: 'many', to: 'batched' },
+		{ from: 'many', to: 'one' },
+		{ from: 'many', to: 'three' },
+		{ from: 'three', to: 'complete' },
+		{ from: 'batched', to: 'kinds' },
+		{ from: 'one', to: 'kinds' },
+		{ from: 'complete', to: 'kinds' },
+		{ from: 'kinds', to: 'draft' },
+		{ from: 'kinds', to: 'steer' },
+		{ from: 'draft', to: 'gate' },
+		{ from: 'steer', to: 'gate' },
+	],
+};
 
 `/gaia-spec` turns a feature idea into a SPEC through a guided conversation. A SPEC is a written description of what to build and how to test it, locked once saved. The command then plans the SPEC in the same session with [`/gaia-plan`](/workflow/plan/) and ends at the plan's KICKOFF prompt. It never writes the code itself: the building starts in a fresh session.
 
@@ -90,6 +131,8 @@ Confirming gate 2 saves the SPEC and locks it. To change a saved SPEC you must f
 ## The SPEC audit
 
 Before gate 2, a team of reviewers checks the draft. Each one is a fresh sub-agent that reads your code and the draft for itself, so it checks the SPEC against what is really there, not against what the conversation assumed. The audit runs on every SPEC, and you cannot skip it.
+
+<Flowchart {...specAudit} />
 
 ### How hard it looks
 

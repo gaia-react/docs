@@ -6,6 +6,37 @@ sidebar:
 ---
 
 import { Aside } from '@astrojs/starlight/components';
+import Flowchart from '../../../components/Flowchart.astro';
+
+export const checkpoint = {
+	title: 'The branch checkpoint',
+	description:
+		'A checkpoint comes when the context reaches its line, rounds stop making progress, or the round limit is reached. With nobody watching, Claude pushes the fixes, leaves the pull request open, and prints the audit-grant line. Otherwise Claude shows where things stand and asks one question. Continue allows one more batch of rounds, in this session or a new one. Accept the remainder, offered only when the loop has a reason to stop, no Critical or security finding is left, and every member left readable findings, runs a last review round with no fixes and records the residuals. Stop and file the remainder files the remaining findings as tech-debt issues and leaves the pull request open.',
+	cols: 3,
+	nodes: [
+		{ id: 'trigger', col: 0, row: 0, span: 3, text: ['A checkpoint: the context line, rounds stop', 'making progress, or the round limit'] },
+		{ id: 'watching', col: 0, row: 1, decision: true, text: 'Is someone watching?' },
+		{ id: 'unattended', col: 1, row: 1, span: 2, text: ['Pushes the fixes, leaves the PR open,', 'prints the audit-grant line for you'] },
+		{ id: 'ask', col: 0, row: 2, span: 3, text: 'Claude shows where things stand and asks one question' },
+		{ id: 'continue', col: 0, row: 3, text: ['Continue, in this', 'session or a new one'] },
+		{ id: 'accept', col: 1, row: 3, text: ['Accept the remainder,', 'only when offered'] },
+		{ id: 'stop', col: 2, row: 3, text: ['Stop and file', 'the remainder'] },
+		{ id: 'more', col: 0, row: 4, text: ['One more batch', 'of rounds'] },
+		{ id: 'last', col: 1, row: 4, text: ['A last review round with no', 'fixes, residuals recorded'] },
+		{ id: 'filed', col: 2, row: 4, text: ['Findings filed as tech-debt', 'issues, the PR stays open'] },
+	],
+	edges: [
+		{ from: 'trigger', to: 'watching' },
+		{ from: 'watching', to: 'unattended', label: 'No' },
+		{ from: 'watching', to: 'ask', label: 'Yes' },
+		{ from: 'ask', to: 'continue' },
+		{ from: 'ask', to: 'accept' },
+		{ from: 'ask', to: 'stop' },
+		{ from: 'continue', to: 'more' },
+		{ from: 'accept', to: 'last' },
+		{ from: 'stop', to: 'filed' },
+	],
+};
 
 Every change in a GAIA project is checked twice before it merges. The [Quality Gate](#quality-gate) runs before each commit, and the Code Audit Team reviews the pull request before it merges.
 
@@ -167,6 +198,8 @@ audit-accept
 ```
 
 You can also type `audit-accept` on purpose to accept when the menu does not offer it. Claude never types, writes, or fakes either line, and a hook blocks Claude from writing to the checkpoint's saved state. A session running with nobody watching never asks and never grants more rounds: it pushes the round's fixes, leaves the pull request open, and prints the `audit-grant` line for you to type later.
+
+<Flowchart {...checkpoint} />
 
 **Why:** a loop nobody watches keeps spending with no limit. And without the checkpoint, "is another round worth it?" would be decided mid-loop by the session least able to judge it. See the [gate reference](/reference/gates/#audit-checkpoint).
 

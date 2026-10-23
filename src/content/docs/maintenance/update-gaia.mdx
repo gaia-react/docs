@@ -3,6 +3,52 @@ title: /update-gaia
 description: Pull the latest GAIA release into your project without overwriting your customizations.
 ---
 
+import Flowchart from '../../../components/Flowchart.astro';
+
+export const steps = {
+	title: 'What /update-gaia does',
+	description:
+		'It checks where it runs and finds the latest release. If your checkout is behind the remote, it fast-forwards and offers to continue from there. If a teammate\'s update is still in progress, it stops and names their pull request. It downloads and verifies both bundles, and a checksum mismatch stops it. It picks the migration notes, and a blocking note stops the run and offers to follow that note first. It shows the changelog. Abort leaves your project unchanged. On Proceed it creates an update worktree and claims the update with a draft pull request, merges every file and asks about each real conflict, follows after-merge notes and new setup features, writes the new version, runs the Quality Gate and shows a summary, asks once to commit and pushes for the audit, and prints the residue sweep to run after the merge.',
+	cols: 2,
+	nodes: [
+		{ id: 'where', col: 0, row: 0, text: ['1. Check where it runs,', 'find the latest release'] },
+		{ id: 'behind', col: 0, row: 1, decision: true, text: ['2. Your checkout behind', 'the remote?'] },
+		{ id: 'ff', col: 1, row: 1, text: ['Fast-forward, then offer', 'to continue from there'] },
+		{ id: 'claim', col: 0, row: 2, decision: true, text: ["3. A teammate's update", 'still in progress?'] },
+		{ id: 'theirs', col: 1, row: 2, text: ['Stop and name', 'their pull request'] },
+		{ id: 'verify', col: 0, row: 3, text: ['4. Download and verify', 'both bundles'] },
+		{ id: 'mismatch', col: 1, row: 3, text: 'Checksum mismatch: stop' },
+		{ id: 'notes', col: 0, row: 4, text: '5. Pick the migration notes' },
+		{ id: 'blocking', col: 1, row: 4, text: ['A blocking note: stop', 'and offer to follow it'] },
+		{ id: 'proceed', col: 0, row: 5, decision: true, text: ['6. Changelog shown:', 'Proceed?'] },
+		{ id: 'abort', col: 1, row: 5, text: ['Abort: your project', 'is left unchanged'] },
+		{ id: 'worktree', col: 0, row: 6, text: ['7. Update worktree, claim', 'with a draft PR'] },
+		{ id: 'merge', col: 0, row: 7, text: ['8. Merge every file, ask', 'about each real conflict'] },
+		{ id: 'after', col: 0, row: 8, text: ['9. After-merge notes and', 'new setup features'] },
+		{ id: 'gate', col: 0, row: 9, text: ['10. New version, Quality', 'Gate, summary'] },
+		{ id: 'commit', col: 0, row: 10, text: ['11. Ask once to commit,', 'push for the audit'] },
+		{ id: 'sweep', col: 0, row: 11, text: ['12. Print the residue sweep', 'for after the merge'] },
+	],
+	edges: [
+		{ from: 'where', to: 'behind' },
+		{ from: 'behind', to: 'ff', label: 'Yes' },
+		{ from: 'behind', to: 'claim', label: 'No' },
+		{ from: 'claim', to: 'theirs', label: 'Yes' },
+		{ from: 'claim', to: 'verify', label: 'No' },
+		{ from: 'verify', to: 'mismatch' },
+		{ from: 'verify', to: 'notes' },
+		{ from: 'notes', to: 'blocking' },
+		{ from: 'notes', to: 'proceed' },
+		{ from: 'proceed', to: 'abort' },
+		{ from: 'proceed', to: 'worktree', label: 'Proceed' },
+		{ from: 'worktree', to: 'merge' },
+		{ from: 'merge', to: 'after' },
+		{ from: 'after', to: 'gate' },
+		{ from: 'gate', to: 'commit' },
+		{ from: 'commit', to: 'sweep' },
+	],
+};
+
 `/update-gaia` pulls the latest GAIA release into your project. It merges each file by comparing three versions: your file, the same file in the GAIA release your project is on, and the same file in the latest release (a [three-way merge](#the-three-way-merge)). GAIA's changes come in, your customizations stay, and you answer one question per real conflict. When a new release is available, the statusline shows a `🚀 /update-gaia` indicator.
 
 It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, in a worktree of its own, ending in a pull request.
@@ -29,6 +75,8 @@ Click the `🚀 /update-gaia` statusline indicator, or ask in plain language:
 10. **Writes the new version** and manifest, runs the Quality Gate, and shows a summary: every file by outcome, every answer, every item still deferred, and any action the release notes say you owe (a dependency GAIA dropped, a file it removed), with the exact command. Those are suggestions; nothing is removed for you. It also records the harness files where it combined your edits with GAIA's, so the statusline can suggest [`/gaia-fitness`](/maintenance/fitness/#the-statusline-nudge) to review them once the update lands.
 11. **Asks once to commit**, then pushes. The push updates the claim pull request, whose description is replaced with the summary; without a claim, it opens a draft pull request, `chore(gaia): update to <tag>`. Either way the pull request merges through the [Code Audit Team](/workflow/code-audit-team/).
 12. **Prints the residue sweep**, a cleanup command to run from the main checkout once the pull request merges: `bash .gaia/scripts/state-registry-lib.sh residue-sweep --apply`. It deletes files under `.gaia/local` that retired features left behind.
+
+<Flowchart {...steps} />
 
 The run ends with a [cost line](/models-and-context/cost/).
 
