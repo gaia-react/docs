@@ -22,7 +22,7 @@ Each merge records the pull request's findings in a comment on it, and the count
 
 ## What counts as recurring
 
-A kind of finding (its finding class) becomes a candidate once it appears on **3 or more different merged pull requests within the last 90 days**, at any severity, and no rule from an earlier run already covers it. Findings the audit could not place in a class are counted too, and surface as their own signal when they recur.
+A kind of finding (its finding class) becomes a candidate once it appears on **3 or more different merged pull requests within the last 90 days**, at any severity, and no rule from an earlier run already covers it. Findings the audit could not place in a class are counted too, and surface as their own signal when they recur. A finding the audit accepted as a residual instead of fixing (listed in the pull request under `## Accepted residuals (recorded, not fixed)`, see [What gets recorded instead of filed](/workflow/tech-debt/#what-gets-recorded-instead-of-filed)) is left out, because the decision not to fix it is already made. Waived and filed findings still count.
 
 The count reads your merged pull requests through `gh`. When it cannot, the run says so ("this is not an all-clear") instead of reporting nothing.
 
@@ -128,7 +128,7 @@ A written rule is the weakest option: it advises instead of enforcing, and Claud
 
 ### Decline and defer
 
-- **Decline** records, on this machine only, that you are not acting on the pattern. It comes back only if the pattern keeps growing noticeably: at least 3 more pull requests, and a clearly larger share of audited pull requests than when you declined. The record lives in `.gaia/local/codify/` and is never shared, so a teammate still sees the nudge.
+- **Decline** records, on this machine only, that you are not acting on the pattern. It comes back only if the pattern keeps growing noticeably: at least 3 more pull requests, and a clearly larger share of audited pull requests than when you declined. It also comes back once after a GAIA update changes how findings are counted, so you can decide again on the new numbers. The record lives in `.gaia/local/codify/` and is never shared, so a teammate still sees the nudge.
 - **Defer** records nothing of its own. The candidate still appears in the next review; the nudge stays quiet until the pattern grows or the counting changes.
 
 ## Promoted rules

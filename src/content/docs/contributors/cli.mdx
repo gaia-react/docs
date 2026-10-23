@@ -78,7 +78,7 @@ gaia setup drift [--features <path>]
 
 `gaia labels sync` brings a repository's labels in line with `.gaia/labels.json`. See [Labels](/reference/labels/).
 
-The label tables in `wiki/concepts/GitHub Labels.md` come from the same file, through the maintainer binary's `labels docs`. Nothing reminds you to regenerate them yet, and no check catches a stale page, so after any change to `.gaia/labels.json`, ask:
+The label tables in `wiki/concepts/GitHub Labels.md` come from the same file, through the maintainer binary's `labels docs`. `labels docs --check` writes nothing and fails when the page no longer matches the file. The pre-commit hook runs it when a commit stages `.gaia/labels.json` or the page, and the required CI check runs it too. Regenerating is still a step Claude takes on request, so after any change to `.gaia/labels.json`, ask:
 
 ```text
 I changed .gaia/labels.json. Regenerate the label tables in wiki/concepts/GitHub Labels.md with the maintainer CLI's labels docs command and stage the result.
