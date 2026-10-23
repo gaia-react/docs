@@ -51,7 +51,7 @@ Walk all five layers below. For each item, capture a record:
 
 ```
 {
-  "kind":         "command | skill | sub-route | cli-subcommand | hook | rule | agent | workflow | wiki-page",
+  "kind":         "command | skill | reference | cli-subcommand | hook | githook | rule | agent | workflow | wiki-page",
   "path":         "<path relative to gaia/>",
   "name":         "<canonical name; see per-layer rules>",
   "description":  "<one-line description if applicable, else null>",
@@ -76,33 +76,27 @@ Path: `gaia/.claude/commands/*.md`. For each file:
 - `kind = "command"`
 - `name` = frontmatter `name`, falling back to filename without `.md`
 - `description` = frontmatter `description`
-- Path-level audience via `RELEASE_EXCLUDE` (e.g., `gaia-release.md` and `health-audit.md` are excluded → contributor).
+- Path-level audience via `RELEASE_EXCLUDE` (e.g., `gaia-release.md` and `distribution-vet.md` are excluded → contributor). The `name` carries the leading slash (`/gaia-spec`).
 
-#### Layer 2: top-level skills
+#### Layer 2: skills
 
-Path: `gaia/.claude/skills/*/SKILL.md` (one folder per skill, except `gaia/` whose sub-routes are Layer 3).
+Paths: `gaia/.claude/skills/*/SKILL.md` (root harness) and `gaia/frontend/.claude/skills/*/SKILL.md` (frontend harness). Skip `react-doctor`: it installs per machine and is gitignored. `gaia/.claude/skills/gaia/` has no `SKILL.md`; its `references/` folder is Layer 3.
 
 - `kind = "skill"`
 - `name` = frontmatter `name`
+- `path` = path relative to `gaia/`, so frontend skills start `frontend/.claude/skills/`
 - `description` = frontmatter `description` (which holds trigger phrases)
 
-The `gaia` skill itself is captured as one Layer 2 item (the router). Its sub-routes are captured as Layer 3.
+#### Layer 3: workflow references
 
-#### Layer 3: `/gaia` skill sub-routes
-
-Paths:
-
-- `gaia/.claude/skills/gaia/references/*.md` → invoked as `/gaia <basename-without-md>`
-- `gaia/.claude/skills/gaia/references/wiki/*.md` → invoked as `/gaia wiki <basename-without-md>`
-
-Skip the `references/forensics/` and `references/wiki/` *folders* themselves (the .md files inside are the surface; folder-level subfolders without a sibling .md are sub-namespaces).
+Path: `gaia/.claude/skills/gaia/references/**/*.md`. These are the workflows behind the `/gaia-*` slash commands (Layer 1). They are not invoked by name, so docs cite them through their command, never as `/gaia <sub>` (the 1.x form).
 
 For each:
 
-- `kind = "sub-route"`
-- `name` = `/gaia <basename>` for top-level; `/gaia wiki <basename>` for the `wiki/` subfolder
+- `kind = "reference"`
+- `name` = path under `references/` without `.md` (`spec`, `cleanse/apply`, `setup/per-machine`)
 - `description` = first line of the file body that isn't frontmatter or a heading-only line (best-effort; falls back to the H1)
-- All adopter unless `RELEASE_EXCLUDE` says otherwise.
+- Audience per Step 2; several are `mixed`.
 
 #### Layer 4: bundled CLI
 
@@ -112,7 +106,7 @@ The subcommand surface is parsed from the routers:
 
 - Top-level: `gaia/.gaia/cli/src/index.ts`: read the `SUBCOMMAND_HANDLERS` keys. Never copy a list from this file; re-derive it every run (at gaia 2.1.0 it held `codify-ledger`, `codify-tally`, `fitness`, `init`, `labels`, `packages`, `ping`, `react-perf`, `residue-*`, `sandbox`, `scaffold`, `setup`, `update`, `update-deps`, `wiki`).
 - Per-namespace: read each `gaia/.gaia/cli/src/<ns>/index.ts` for its handler keys. Capture only routed subcommands, not library helpers that sit in the same folder.
-- The release namespace lives only in the contributor-only `.gaia/cli/gaia-maintainer` binary. Capture it as `audience: contributor` and `excluded_from_docs: true`: its subcommand list is obscured per `DO_NOT_DOCUMENT`.
+- The release namespace lives only in the contributor-only `.gaia/cli/gaia-maintainer` binary. Do not capture it: its subcommand list is obscured per `DO_NOT_DOCUMENT`.
 
 For each subcommand, capture:
 
@@ -129,10 +123,11 @@ Mark any name containing `_internal-` as `excluded_from_docs: true` per `DO_NOT_
 Walk these globs and capture each file:
 
 - Hooks: `gaia/.claude/hooks/*.sh` → `kind = "hook"`, `name` = filename. `description` = first non-shebang comment line if present, else null.
-- Rules: `gaia/.claude/rules/*.md` → `kind = "rule"`, `name` = basename without `.md`, `description` = frontmatter `description` or H1. Plus `gaia/.claude/rules/_internal/*.md` (currently empty by convention: list as zero items if absent, do not error).
-- Agents: `gaia/.claude/agents/*.md` → `kind = "agent"`, `name` = frontmatter `name`, `description` = frontmatter `description`.
+- Git hooks: `gaia/.githooks/*` → `kind = "githook"`, `name` = filename (`pre-push` is contributor-only).
+- Rules: `gaia/.claude/rules/*.md`, `gaia/.claude/rules/maintainers/*.md` (contributor-only) and `gaia/frontend/.claude/rules/*.md` → `kind = "rule"`, `name` = basename without `.md` for root rules, `maintainers/<basename>` for the maintainer folder, `frontend:<basename>` for frontend rules (`frontend:i18n`), `description` = frontmatter `description` or H1.
+- Agents: `gaia/.claude/agents/*.md` → `kind = "agent"`, `name` = frontmatter `name`, `description` = frontmatter `description`. Plus the frontend auditor's extension files, `gaia/frontend/.claude/agents/code-audit-frontend/*.md`, with `name` = `code-audit-frontend/<basename>`.
 - CI workflows: `gaia/.github/workflows/*.yml` → `kind = "workflow"`, `name` = filename, `description` = top-level `name:` field in the yaml.
-- Wiki pages: `gaia/wiki/**/*.md` → `kind = "wiki-page"`, `name` = relative path under `wiki/`, `description` = frontmatter `description` if present, else H1.
+- Wiki pages: `gaia/wiki/**/*.md` → `kind = "wiki-page"`, `name` = `path` (the full `wiki/...` form, e.g. `wiki/concepts/Forensics.md`; the snapshot keys on it, so any other form turns every page into a false NEW + REMOVED pair), `description` = frontmatter `description` if present, else H1.
 
 ### Step 3: Compute content hash deterministically
 
@@ -210,7 +205,7 @@ hash rule: frontmatter + first 40 body lines (sha256)
 ## counts by layer
 - commands: <n> (adopter <a>, contributor <c>, mixed <m>)
 - skills: <n> (...)
-- sub-routes: <n> (...)
+- references: <n> (...)
 - cli-subcommands: <n> (...)
 - hooks: <n> (...)
 - rules: <n> (...)
@@ -294,7 +289,7 @@ End with one line confirming the file was written and the gaia commit it was cap
 
 ## Common surface-walk hazards
 
-- `gaia/.claude/skills/gaia/references/forensics/` and `gaia/.claude/skills/gaia/references/wiki/` are sub-namespace folders. Iterate the `.md` files inside; do not treat the folder itself as a sub-route.
+- Folders under `gaia/.claude/skills/gaia/references/` (`spec/`, `plan/`, `cleanse/`, `debt/`, `forensics/`, `wiki/`, `setup/`) are not records; the `.md` files inside are.
 - `gaia/.claude/skills/<name>/` may contain files other than `SKILL.md` (e.g., `references/`, supporting markdown). Only `SKILL.md` is the surface record at Layer 2.
 - The `gaia` binary CLI source is excluded from the adopter tarball, but the binary itself ships. Source-survey reports CLI subcommands by their *invocation* audience (who can run the command) and notes when the consumer of a subcommand is contributor-only (e.g., `release` subcommands).
 - `gaia/wiki/.obsidian/` is not surface; skip it.
