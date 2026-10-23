@@ -27,7 +27,7 @@ On the machine that does the migration:
 
 1. Run `claude update` in your terminal so Claude Code is 2.1.287 or later. It updates Claude Code itself, so it runs outside Claude. The 2.0.0 audit that merges the migration needs it. On 2.1.304 or later, the audit agents start with a smaller context and cost less.
 2. From the main copy of your 1.6.1 project (not a worktree), with no uncommitted changes, run `/update-gaia`.
-3. The 2.0.0 release notes open with a notice for 1.6.1 projects. The update question offers **Proceed** or **Abort**. Claude answers **Abort** for you, because the normal update cannot move a 1.x project, and offers the migration instead.
+3. The release notes open with a notice for 1.6.1 projects. Every 2.x release carries it, so it appears whichever 2.x version is the latest. The update question offers **Proceed** or **Abort**. Claude answers **Abort** for you, because the normal update cannot move a 1.x project, and offers the migration instead.
 4. Say yes. Only then does Claude download `gaia-bundle-v2.0.0.tar.gz`, check it against its published `.sha256` checksum, unpack it, and follow the `.gaia/migrations/2.0.0.md` note inside it, in the same session.
 
 Nothing in the repository changes before the note's first step: no stash, commit, or branch.
