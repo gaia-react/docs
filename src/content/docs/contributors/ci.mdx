@@ -25,6 +25,8 @@ Triggers on `v*.*.*` tag pushes. Builds and publishes the release bundle.
 10. **Build** `gaia-bundle-<tag>.tar.gz` and its `.sha256`. The `gaia-bundle-` prefix is deliberate. A 1.6.1 `/update-gaia` looks for `gaia-<tag>.tar.gz`, so the new name makes it fail at the download instead of misreading the new folder layout.
 11. **Compose the release body**, starting with the line that sends 1.6.1 projects to the 2.0.0 migration, then **create the GitHub Release** with both files.
 
+The job holds a `contents: write` token and keeps it tight. The checkout does not save the token to git config, the CLI workspace install runs with `--ignore-scripts` so no package install script runs there, and of the later steps only **Create GitHub Release** receives the token.
+
 ## cli-tests.yml
 
 Its jobs run on pull requests to `main` and on `workflow_dispatch`. The workflow also lists pushes to `main` as a trigger, but every job skips on a push. The `workflow_dispatch` run is how you produce the required check on a commit that got no pull-request run. Three jobs:
