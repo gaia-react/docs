@@ -19,7 +19,8 @@ GAIA ships rules in two places:
 | Rule | What it enforces |
 |---|---|
 | `coding-guidelines` | Kebab-case files and folders. Keep code simple: no handling for situations that cannot happen, but real failures are handled with limits. Change only what the task needs. Use TDD. Leave formatting and auto-fixable lint to `pnpm lint`. React file layout lives in `coding-guidelines-react`. |
-| `context-discipline` | Keep the main session's context small by handing reading-heavy work to sub-agents. Choose models from GAIA's model table. Research goes in `.notebook/research/<date>-<topic>/`. Long work resumes from one `STATE.md` file. A prompt meant for pasting goes in a fenced code block. |
+| `context-discipline` | Keep the main session's context small by handing reading-heavy work to sub-agents. Choose models from GAIA's model table. Research goes in `.notebook/research/<date>-<topic>/`. Long work resumes from one `STATE.md` file. |
+| `fenced-copy-paste-blocks` | Anything meant for you to paste goes, whole, in its own plain three-backtick fence, never in prose or a blockquote, so Claude Code shows it with a copy button. A handoff prompt carries its own context instead of pointing back at the session. |
 | `issue-claim` | Before work that closes a GitHub issue, check for the `in-progress` label and add it. Follow the work lifecycle. Claim `tech-debt` issues only through `/gaia-debt`. |
 | `pr-merge` | Before any `gh pr merge`, run the audit and post `GAIA-Audit` as the last step. The audit loop runs on its own until it reaches the branch checkpoint, which only a person can answer. |
 | `quality-gate` | Run the Quality Gate before any commit that touches source, unless nothing in the gate's scope is staged. |
