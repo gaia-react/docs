@@ -54,6 +54,7 @@ export const lifecycle = {
 		{ from: 'left', to: 'keep', label: 'Yes' },
 		{ from: 'left', to: 'clean', label: 'No' },
 	],
+	narrow: { cols: 2, at: { issue: [0, 0], taken: [1, 0], claim: [0, 1], other: [1, 1], name: [0, 2], isolate: [1, 2], commit: [0, 3], audit: [1, 3], who: [0, 4], update: [1, 4], command: [0, 5], adhoc: [1, 5], merge: [0, 6], merged: [0, 7], stopped: [1, 7], left: [0, 8], keep: [1, 8], clean: [0, 9] } },
 };
 
 Every change Claude commits follows one lifecycle, whether a command drives it (`/gaia-plan`, `/gaia-debt`, a maintenance command) or you just asked for a fix in plain language:

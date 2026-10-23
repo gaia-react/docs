@@ -1,8 +1,10 @@
 ---
 // Context bands drawn on a 0-100% bar per window size, as static SVG at build
-// time. Band labels alternate above and below the bar so close marks don't
-// collide. The band table on the page carries the exact figures; this shows
-// where they sit against the whole window.
+// time. The band table on the page carries the exact figures; this shows
+// where they sit against the whole window. The figure is a CSS container:
+// under 600px a narrow drawing replaces the wide one, with each window's
+// label above its bar and the band labels spread over four levels so close
+// marks don't collide.
 
 interface Mark {
 	label: string;
@@ -24,82 +26,131 @@ interface Props {
 }
 
 const { title, description, rows } = Astro.props;
-
-const LABEL_W = 104;
-const BAR_W = 560;
-const BAR_H = 16;
-const ROW_H = 92;
-const BAR_TOP = 36;
-const PAD = 8;
-const width = PAD * 2 + LABEL_W + BAR_W;
-const height = PAD * 2 + rows.length * ROW_H;
 const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
-const x = (row: Row, at: number) => PAD + LABEL_W + (at / row.total) * BAR_W;
+interface Layout {
+	key: string;
+	pad: number;
+	labelW: number;
+	barW: number;
+	barH: number;
+	rowH: number;
+	font: number;
+	minWidth: number;
+	// Offset of the bar from the top of its row, and the label level of each
+	// band (in band order) and of the compaction mark: negative is above the
+	// bar, positive below, and the size picks the line.
+	barTop: number;
+	levels: number[];
+	compactLevel: number;
+	rowLabelAbove: boolean;
+}
+
+const WIDE: Layout = { key: 'wide', pad: 8, labelW: 104, barW: 560, barH: 16, rowH: 92, font: 12, minWidth: 560, barTop: 36, levels: [-1, 1, -1, 1], compactLevel: -1, rowLabelAbove: false };
+const NARROW: Layout = { key: 'narrow', pad: 8, labelW: 0, barW: 344, barH: 14, rowH: 126, font: 11, minWidth: 0, barTop: 58, levels: [-1, 1, -2, 2], compactLevel: -1, rowLabelAbove: true };
+
+const LEVEL = 14;
+
+const draw = (l: Layout) => {
+	const width = l.pad * 2 + l.labelW + l.barW;
+	const height = l.pad * 2 + rows.length * l.rowH;
+	const x = (row: Row, at: number) => l.pad + l.labelW + (at / row.total) * l.barW;
+	const labelY = (barY: number, level: number) => (level < 0 ? barY - 4 - (-level - 1) * LEVEL - 6 : barY + l.barH + 4 + (level - 1) * LEVEL + 12);
+	const tickEnd = (barY: number, level: number) => (level < 0 ? labelY(barY, level) + 4 : labelY(barY, level) - l.font);
+	const rowsOut = rows.map((row, index) => {
+		const top = l.pad + index * l.rowH;
+		const barY = top + l.barTop;
+		return {
+			row,
+			barY,
+			labelX: l.pad,
+			labelY: l.rowLabelAbove ? top + 14 : barY + l.barH - 3,
+			zones: row.bands.map((band, i) => {
+				const end = row.bands[i + 1]?.at ?? row.total;
+				return { x: x(row, band.at), w: x(row, end) - x(row, band.at), i };
+			}),
+			marks: [
+				...row.bands.map((band, i) => ({ x: x(row, band.at), label: band.label, level: l.levels[i], anchor: 'middle', dashed: false })),
+				{ x: x(row, row.compact.at), label: row.compact.label, level: l.compactLevel, anchor: 'end', dashed: true },
+			].map((mark) => ({
+				...mark,
+				ty: labelY(barY, mark.level),
+				y1: mark.level < 0 ? tickEnd(barY, mark.level) : barY,
+				y2: mark.level < 0 ? barY + l.barH : tickEnd(barY, mark.level),
+			})),
+		};
+	});
+	return { width, height, rowsOut };
+};
+
+const drawings = [WIDE, NARROW].map((layout) => ({ layout, ...draw(layout) }));
 ---
 
 <figure class="band-scale">
-	<div class="scroll">
-		<svg
-			viewBox={`0 0 ${width} ${height}`}
-			role="img"
-			aria-labelledby={`${slug}-title ${slug}-desc`}
-			style={`min-width: 560px; max-width: ${width}px`}
-		>
-			<title id={`${slug}-title`}>{title}</title>
-			<desc id={`${slug}-desc`}>{description}</desc>
-			{rows.map((row, rowIndex) => {
-				const top = PAD + rowIndex * ROW_H;
-				const barY = top + BAR_TOP;
-				const compactX = x(row, row.compact.at);
-				return (
-					<g>
-						<text x={PAD} y={barY + BAR_H - 3} class="row-label">
-							{row.label}
-						</text>
-						<rect x={PAD + LABEL_W} y={barY} width={BAR_W} height={BAR_H} rx="3" class="track" />
-						{row.bands.map((band, index) => {
-							const end = row.bands[index + 1]?.at ?? row.total;
-							return (
-								<rect
-									x={x(row, band.at)}
-									y={barY}
-									width={x(row, end) - x(row, band.at)}
-									height={BAR_H}
-									class={`zone zone-${index}`}
-								/>
-							);
-						})}
-						{row.bands.map((band, index) => {
-							const bx = x(row, band.at);
-							const above = index % 2 === 0;
-							return (
-								<g>
-									<line x1={bx} x2={bx} y1={above ? barY - 6 : barY} y2={above ? barY + BAR_H : barY + BAR_H + 6} class="tick" />
-									<text x={bx} y={above ? barY - 10 : barY + BAR_H + 20} text-anchor="middle" class="mark">
-										{band.label}
-									</text>
-								</g>
-							);
-						})}
-						<line x1={compactX} x2={compactX} y1={barY - 6} y2={barY + BAR_H + 6} class="tick compact" />
-						<text x={Math.min(compactX, PAD + LABEL_W + BAR_W)} y={barY - 10} text-anchor="end" class="mark compact-label">
-							{row.compact.label}
-						</text>
-					</g>
-				);
-			})}
-		</svg>
-	</div>
+	{
+		drawings.map(({ layout, width, height, rowsOut }) => {
+			const id = `${slug}-${layout.key}`;
+			return (
+				<div class={`scroll ${layout.key}`}>
+					<svg
+						viewBox={`0 0 ${width} ${height}`}
+						role="img"
+						aria-labelledby={`${id}-title ${id}-desc`}
+						style={`min-width: ${layout.minWidth}px; max-width: ${width}px`}
+					>
+						<title id={`${id}-title`}>{title}</title>
+						<desc id={`${id}-desc`}>{description}</desc>
+						{rowsOut.map((r) => (
+							<g>
+								<text x={r.labelX} y={r.labelY} class="row-label" font-size={layout.font + 1}>
+									{r.row.label}
+								</text>
+								<rect x={layout.pad + layout.labelW} y={r.barY} width={layout.barW} height={layout.barH} rx="3" class="track" />
+								{r.zones.map((zone) => (
+									<rect x={zone.x} y={r.barY} width={zone.w} height={layout.barH} class={`zone zone-${zone.i}`} />
+								))}
+								{r.marks.map((mark) => (
+									<g>
+										<line x1={mark.x} x2={mark.x} y1={mark.y1} y2={mark.y2} class:list={['tick', mark.dashed && 'compact']} />
+										<text
+											x={mark.x}
+											y={mark.ty}
+											text-anchor={mark.anchor}
+											class:list={['mark', mark.dashed && 'compact-label']}
+											font-size={layout.font}
+										>
+											{mark.label}
+										</text>
+									</g>
+								))}
+							</g>
+						))}
+					</svg>
+				</div>
+			);
+		})
+	}
 	<figcaption>{title}</figcaption>
 </figure>
 
 <style>
 	.band-scale {
 		margin: 1.5rem 0;
+		container-type: inline-size;
 	}
 	.scroll {
 		overflow-x: auto;
+	}
+	.narrow {
+		display: none;
+	}
+	@container (max-width: 600px) {
+		.wide {
+			display: none;
+		}
+		.narrow {
+			display: block;
+		}
 	}
 	svg {
 		display: block;
@@ -113,7 +164,6 @@ const x = (row: Row, at: number) => PAD + LABEL_W + (at / row.total) * BAR_W;
 		color: var(--gaia-muted);
 	}
 	.row-label {
-		font-size: 13px;
 		fill: var(--gaia-ink);
 	}
 	.track {
@@ -140,7 +190,6 @@ const x = (row: Row, at: number) => PAD + LABEL_W + (at / row.total) * BAR_W;
 		stroke-dasharray: 3 3;
 	}
 	.mark {
-		font-size: 12px;
 		fill: var(--gaia-ink);
 	}
 	.compact-label {

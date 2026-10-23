@@ -44,6 +44,7 @@ export const specAudit = {
 		{ from: 'draft', to: 'gate' },
 		{ from: 'steer', to: 'gate' },
 	],
+	narrow: { cols: 2, at: { size: [0, 0, 2], standard: [0, 1], deep: [1, 1], lenses: [0, 2, 2], many: [0, 3, 2], one: [0, 4], three: [1, 4], batched: [0, 5], complete: [1, 5], kinds: [0, 6, 2], draft: [0, 7], steer: [1, 7], gate: [0, 8, 2] } },
 };
 
 `/gaia-spec` turns a feature idea into a SPEC through a guided conversation. A SPEC is a written description of what to build and how to test it, locked once saved. The command then plans the SPEC in the same session with [`/gaia-plan`](/workflow/plan/) and ends at the plan's KICKOFF prompt. It never writes the code itself: the building starts in a fresh session.
