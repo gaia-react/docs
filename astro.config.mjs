@@ -50,6 +50,15 @@ export default defineConfig({
 			title: 'GAIA Docs',
 			description: 'Documentation for GAIA. Order and focus for Claude Code.',
 			customCss: ['./src/styles/theme.css'],
+			// Same icon and social card as gaiareact.com (copied from website/public/).
+			head: [
+				{ tag: 'link', attrs: { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' } },
+				{ tag: 'meta', attrs: { property: 'og:image', content: 'https://docs.gaiareact.com/og-image.png' } },
+				{ tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
+				{ tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
+				{ tag: 'meta', attrs: { property: 'og:image:alt', content: 'GAIA' } },
+				{ tag: 'meta', attrs: { name: 'twitter:image', content: 'https://docs.gaiareact.com/og-image.png' } },
+			],
 			// Keep our bespoke src/pages/404.astro; don't let Starlight inject its own.
 			disable404Route: true,
 			editLink: {
