@@ -25,10 +25,10 @@ Click the `🚀 /update-gaia` statusline indicator, or ask in plain language:
 6. **Shows the full changelog** from your version to the latest, including every release in between, and asks **Proceed** or **Abort**. Abort leaves your project unchanged. The downloaded bundles are kept for the next run.
 7. **Creates an update worktree** on an `update/v<version>-<timestamp>` branch, from the default branch, whichever branch your main checkout holds. Your checkout's branch, files, and `node_modules` stay as you left them. The run then opens a draft pull request with an empty commit to mark the update as in progress, so two teammates never update at once. If it can't open one, it warns and continues without it.
 8. **Merges every file** (see [The three-way merge](#the-three-way-merge)), then asks you one question per real conflict, up to four per prompt. Every answer is recorded in `.gaia/update-decisions.json`, which is committed with the update, so the next update does not ask again. An item you put off is asked again at the next update.
-9. **Follows after-merge migration notes** and carries any new [setup steps](/getting-started/setup-gaia/#phase-new-setup-steps-from-later-releases) the release adds.
+9. **Follows after-merge migration notes** and carries any new project-wide [setup steps](/getting-started/setup-gaia/#phase-new-setup-steps-from-later-releases) the release adds. New setup steps for this machine wait for the merge (step 12), because they act on your main checkout, not the update's worktree.
 10. **Writes the new version** and manifest, runs the Quality Gate, and shows a summary: every file by outcome, every answer, every item still deferred, and any action the release notes say you owe (a dependency GAIA dropped, a file it removed), with the exact command. Those are suggestions; nothing is removed for you. Ask Claude to carry out any of them. It also records the harness files where it combined your edits with GAIA's, so the statusline can suggest [`/gaia-fitness`](/maintenance/fitness/#the-statusline-nudge) to review them once the update lands.
 11. **Asks once to commit**, then pushes. The push updates the draft pull request from step 7, whose description is replaced with the summary; if there isn't one, it opens a draft pull request, `chore(gaia): update to <tag>`. Either way the pull request merges through the [Code Audit Team](/workflow/code-audit-team/).
-12. **Tells you the [leftover-file cleanup](#leftover-file-cleanup) comes after the merge.** When Claude merges the update's pull request, it offers the cleanup.
+12. **Tells you what comes after the merge.** When Claude merges the update's pull request, it offers the [leftover-file cleanup](#leftover-file-cleanup) and runs the new setup steps for this machine in your main checkout. After a merge made elsewhere, such as on github.com, run `/setup-gaia` from your main checkout to carry those setup steps.
 
 The run ends with a [cost line](/models-and-context/cost/).
 
@@ -83,7 +83,7 @@ Every file the merge overwrites or deletes is backed up first, under `.gaia-back
 
 GAIA keeps machine-local state under `.gaia/local/`, which is never committed. When a release retires a feature, the files that feature kept there are no longer used, and the leftover-file cleanup deletes them. Files it doesn't recognize are listed and never deleted.
 
-The cleanup can't run inside the update's worktree: it needs the new release's list of retired files in your main checkout, which arrives only when the update's pull request merges and your main checkout pulls it. So the cleanup runs after the merge. When Claude merges the update's pull request, its cleanup step pulls your main checkout, lists the leftover files, and asks before deleting them.
+The cleanup can't run inside the update's worktree: it needs the new release's list of retired files in your main checkout, which arrives only when the update's pull request merges and your main checkout pulls it. So the cleanup runs after the merge. When Claude merges the update's pull request, its cleanup step pulls your main checkout, lists the leftover files, and asks before deleting them. It then runs any new setup steps for this machine that the update held back.
 
 If that pull was skipped or failed, Claude tells you so, and if you merged on github.com, nothing offers it. In either case, once your main checkout is pulled, start Claude there (not in a worktree: a worktree's `.gaia/local/` is only a link to the main checkout's) and ask:
 
@@ -91,7 +91,9 @@ If that pull was skipped or failed, Claude tells you so, and if you merged on gi
 The GAIA update merged. Run GAIA's leftover-file cleanup from this main checkout, show me the list, then apply it if I agree.
 ```
 
-Every machine has its own `.gaia/local/`, so each teammate's copy has its own leftovers. A teammate who runs `/update-gaia` after the update merged gets the cleanup offered: the run pulls the update into their checkout (step 2), shows the leftover files, and asks before deleting them. A teammate who pulled the update some other way can paste the same prompt.
+Then type `/setup-gaia` there to run the held-back setup steps for this machine.
+
+Every machine has its own `.gaia/local/`, so each teammate's copy has its own leftovers. A teammate who runs `/update-gaia` after the update merged gets the cleanup offered: the run pulls the update into their checkout (step 2), runs the new setup steps for their machine, shows the leftover files, and asks before deleting them. A teammate who pulled the update some other way can paste the same prompt.
 
 ## Stopping and resuming
 

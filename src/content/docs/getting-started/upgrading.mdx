@@ -114,7 +114,7 @@ The note sets up only the machine that runs it. Every teammate, and every other 
    - offers to uninstall the claude-obsidian plugin if you do not use it outside GAIA
    - runs the [leftover-file cleanup](/maintenance/update-gaia/#leftover-file-cleanup)
 
-   Until it runs, the statusline shows a `/setup-gaia` nudge. Running `/update-gaia` on a machine that is behind can also do this catch-up.
+   Until it runs, the statusline shows a `/setup-gaia` nudge. `/update-gaia` can also do it: on a machine that is behind, its pull runs the catch-up, and on the machine that runs the update, Claude runs it in the main checkout after merging the update's pull request.
 
    Setup also asks to turn the git hooks on if they are off, enables pnpm at the pinned version, installs Chromium (the browser the tests run in), and records this machine's 2.0.0 choices. Claude Code may ask you to approve running the notebook move script; approve it. A step that fails is reported and retried on the next `/setup-gaia` run.
 
