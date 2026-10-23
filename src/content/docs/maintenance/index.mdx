@@ -1,45 +1,43 @@
 ---
 title: Maintenance
-description: 'The GAIA commands that keep a project in shape as it grows: GAIA itself, dependencies, what Claude loads at startup, problems reviews keep finding, the tech-debt backlog, trade-offs accepted at merge, the wiki, and the Claude setup.'
+description: 'The GAIA commands that keep a project in shape as it grows: GAIA itself, dependencies, what Claude loads at startup, problems reviews keep finding, trade-offs accepted at merge, the wiki, the Claude setup, and bug reports for GAIA itself.'
 ---
 
-GAIA ships commands for doing work and commands for keeping the project in shape. This page covers the second kind. A project's upkeep (dependencies, the wiki, Claude's memory, the debt backlog) drifts a little with every change, and small, regular passes keep each one cheap to fix. You rarely need to remember them: each one surfaces as a statusline nudge when it is due.
+GAIA ships commands for doing work and commands for keeping the project in shape. This page covers the second kind. A project's upkeep (dependencies, the wiki, Claude's memory) drifts a little with every change, and small, regular passes keep each one cheap to fix. You rarely need to remember them: each one except `/gaia-forensics` surfaces as a statusline nudge when it is due.
 
 ## Commands
-
-The commands are listed in the order their nudges appear on the [statusline](/workflow/statusline/#nudges).
 
 | Command | Nudge | What it does |
 | --- | --- | --- |
 | [`/update-gaia`](/maintenance/update-gaia/) | 🚀 | Pulls the latest GAIA release into your project with a three-way merge, verifying the release bundle first. |
 | [`/update-deps`](/maintenance/update-deps/) | 📦 | Resolves security advisories, then updates outdated packages by group, through one quality gate. |
 | [`/gaia-cleanse`](/maintenance/cleanse/) | 🔎 | Cleans up Claude's memory and the files it loads at startup: what repeats or disagrees with the wiki, what is out of date, and what makes the startup context too large. Asks before changing anything. |
-| [`/gaia-fitness`](/maintenance/fitness/) | 💪 | Checks your Claude setup (skills, commands, agents, rules, hooks, settings, `CLAUDE.md` files, wiki) against a fixed list of rules, grades it F to A+, and fixes your own files one at a time on a yes. |
 | [`/gaia-codify`](/maintenance/codify/) | 🔨 | Turns a problem the Code Audit Team keeps finding into a guard: an automated check, a skill, or a rule for matching files, with your approval. |
-| [`/gaia-debt`](/workflow/debt/) | 🐛 | Fixes the `tech-debt` backlog, highest severity then oldest first, one issue or a related batch per run, through the audit gate. Closes the issues on merge. |
 | [`/gaia-residue`](/maintenance/residue/) | 🧹 | Goes through the trade-offs reviewers accepted at merge: dismiss each one, keep it for later, or turn it into a tech-debt issue. Never fixes code. |
 | [`/gaia-wiki`](/maintenance/wiki/) | 🧠 | Runs wiki sync, consolidate, and lint with fixes, as one commit and one pull request. Takes no arguments. |
+| [`/gaia-fitness`](/maintenance/fitness/) | 💪 | Checks your Claude setup (skills, commands, agents, rules, hooks, settings, `CLAUDE.md` files, wiki) against a fixed list of rules, grades it F to A+, and fixes your own files one at a time on a yes. |
+| [`/gaia-forensics`](/maintenance/forensics/) | – | Turns a GAIA command or hook that went wrong into a bug report with secrets removed, and offers to file it. Only reads: it changes nothing in your project. |
 
 ## The statusline
 
-The right side of the [statusline](/workflow/statusline/) names each command above when it has work to do, with a short reason, for example `🐛 /gaia-debt (3 issues)`. A nudge clears once the command has done its work. Nudges show only in the main checkout, where these commands run.
+The right side of the [statusline](/workflow/statusline/) names each command above except `/gaia-forensics`, and also [`/gaia-debt`](/workflow/debt/), when it has work to do, with a short reason, for example `🐛 /gaia-debt (3 issues)`. A nudge clears once the command has done its work. Nudges show only in the main checkout, where these commands run.
 
 ## Which one to run
 
 Pick by symptom:
 
 - Claude's starting context feels heavy, or the memory on your machine has grown large: [`/gaia-cleanse`](/maintenance/cleanse/).
-- The integration feels off, a skill is not triggering, a rule is not loading: [`/gaia-fitness`](/maintenance/fitness/).
 - The audit keeps flagging the same kind of problem: [`/gaia-codify`](/maintenance/codify/).
-- The `tech-debt` backlog has grown: [`/gaia-debt`](/workflow/debt/).
 - Trade-offs accepted at merge have piled up in merged pull requests: [`/gaia-residue`](/maintenance/residue/).
 - The wiki trails the code, or wiki pages overlap: [`/gaia-wiki`](/maintenance/wiki/).
+- The integration feels off, a skill is not triggering, a rule is not loading: [`/gaia-fitness`](/maintenance/fitness/).
+- A GAIA command or hook went wrong: [`/gaia-forensics`](/maintenance/forensics/).
 
 The boundary between `/gaia-cleanse` and `/gaia-wiki` is deliberate. `/gaia-cleanse` reconciles memory and auto-loaded files against the wiki. Redundancy and broken links inside the wiki belong to `/gaia-wiki`. Conflicts between two instruction files belong to Claude Code's own `/doctor prompt-audit`.
 
 ## How maintenance commands run
 
-Every maintenance command (`/update-gaia`, `/update-deps`, `/gaia-cleanse`, `/gaia-codify`, `/gaia-residue`, `/gaia-wiki`, `/gaia-fitness`) follows the same pattern:
+Every maintenance command except `/gaia-forensics` (`/update-gaia`, `/update-deps`, `/gaia-cleanse`, `/gaia-codify`, `/gaia-residue`, `/gaia-wiki`, `/gaia-fitness`) follows the same pattern:
 
 1. **It starts from the main checkout.** Inside a linked worktree it refuses and names the main checkout to run it from. The exceptions are `/update-deps` and `/update-gaia`, which also accept their own `deps/` or `update/` worktree, so a re-run continues there.
 2. **It offers to pull first** when your checkout's GAIA version is behind the remote's.
@@ -50,3 +48,5 @@ Every maintenance command (`/update-gaia`, `/update-deps`, `/gaia-cleanse`, `/ga
 A run that ends with nothing to publish removes its empty branch and worktree.
 
 Each run ends with a [cost line](/models-and-context/cost/) showing what it spent.
+
+`/gaia-forensics` works differently. It only reads, so it needs no branch or pull request: it saves its report under `.gaia/local/forensics/` and, when the problem looks like a GAIA bug, asks before filing it as a GitHub issue. See [`/gaia-forensics`](/maintenance/forensics/).
