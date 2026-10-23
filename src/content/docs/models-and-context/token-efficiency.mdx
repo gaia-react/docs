@@ -7,7 +7,7 @@ sidebar:
 
 import BandScale from '../../../components/BandScale.astro';
 
-Everything GAIA adds to a session takes up part of Claude's context window, the fixed amount of text Claude can hold at once. GAIA keeps that part small: most of it loads only when a task needs it.
+Everything GAIA adds to a session takes up part of Claude's context window, the fixed amount of text Claude can hold at once. GAIA keeps that part small on purpose. Its rules, skills, and instruction files are cut down to what changes how Claude works. Each instruction lives in one place instead of being repeated across files, and is checked against the code it describes to keep it accurate. Most of it loads only when a task needs it, which leaves more of the window for your work.
 
 The usage figures on this page were measured in a new GAIA 2.0.0 project on Opus 5.5. Percentages are of a 1M-token context window.
 
