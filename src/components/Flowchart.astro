@@ -1,0 +1,263 @@
+---
+// A small flowchart drawn as static SVG at build time: no client script, no
+// diagram library. Nodes sit on a grid (col, row); edges are drawn as right
+// angles. Each node can name the model that does the step, shown as text and
+// as a colored stripe, so color is never the only cue.
+
+type Model = 'haiku' | 'sonnet' | 'opus' | 'top' | 'session';
+
+interface Node {
+	id: string;
+	col: number;
+	row: number;
+	text: string | string[];
+	model?: Model;
+	decision?: boolean;
+	span?: number;
+}
+
+interface Edge {
+	from: string;
+	to: string;
+	label?: string;
+	// Route up the right-hand side, back to an earlier row.
+	back?: boolean;
+}
+
+interface Props {
+	title: string;
+	description: string;
+	cols: number;
+	nodes: Node[];
+	edges: Edge[];
+}
+
+const { title, description, cols, nodes, edges } = Astro.props;
+
+const MODEL_LABELS: Record<Model, string> = {
+	haiku: 'Haiku',
+	sonnet: 'Sonnet',
+	opus: 'Opus',
+	top: 'Opus or Fable',
+	session: 'Your model',
+};
+
+const COL_W = 220;
+const ROW_H = 108;
+const NODE_H = 66;
+const INSET = 18;
+const PAD = 8;
+const LINE_H = 16;
+const hasBack = edges.some((edge) => edge.back);
+const GUTTER = hasBack ? 96 : 0;
+
+const rows = Math.max(...nodes.map((node) => node.row)) + 1;
+const width = PAD * 2 + cols * COL_W + GUTTER;
+const height = PAD * 2 + (rows - 1) * ROW_H + NODE_H;
+const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+const arrowId = `arrow-${slug}`;
+
+const box = (node: Node) => {
+	const span = node.span ?? 1;
+	const x = PAD + node.col * COL_W + INSET;
+	const y = PAD + node.row * ROW_H;
+	const w = span * COL_W - INSET * 2;
+	return { x, y, w, h: NODE_H, cx: x + w / 2, cy: y + NODE_H / 2 };
+};
+
+const byId = new Map(nodes.map((node) => [node.id, node]));
+const rightEdge = PAD + cols * COL_W;
+
+const paths = edges.map((edge) => {
+	const from = byId.get(edge.from);
+	const to = byId.get(edge.to);
+	if (!from || !to) throw new Error(`Flowchart "${title}": unknown edge ${edge.from} -> ${edge.to}`);
+	const a = box(from);
+	const b = box(to);
+
+	if (edge.back) {
+		const gx = rightEdge + 24;
+		return {
+			d: `M ${a.x + a.w} ${a.cy} H ${gx} V ${b.cy} H ${b.x + b.w + 2}`,
+			label: edge.label,
+			lx: gx + 6,
+			ly: (a.cy + b.cy) / 2,
+			anchor: 'start',
+		};
+	}
+
+	if (from.row === to.row) {
+		const leftToRight = a.cx < b.cx;
+		const x1 = leftToRight ? a.x + a.w : a.x;
+		const x2 = leftToRight ? b.x - 2 : b.x + b.w + 2;
+		return {
+			d: `M ${x1} ${a.cy} H ${x2}`,
+			label: edge.label,
+			lx: (x1 + x2) / 2,
+			ly: a.cy - 6,
+			anchor: 'middle',
+		};
+	}
+
+	const y1 = a.y + a.h;
+	const y2 = b.y - 2;
+	if (Math.abs(a.cx - b.cx) < 1) {
+		return {
+			d: `M ${a.cx} ${y1} V ${y2}`,
+			label: edge.label,
+			lx: a.cx + 6,
+			ly: (y1 + y2) / 2 + 4,
+			anchor: 'start',
+		};
+	}
+	// An edge that skips a row turns just above its target, so it runs down
+	// an empty column instead of along the edges below its source.
+	const gap = (ROW_H - NODE_H) / 2;
+	const mid = to.row - from.row > 1 ? b.y - gap : y1 + gap;
+	return {
+		d: `M ${a.cx} ${y1} V ${mid} H ${b.cx} V ${y2}`,
+		label: edge.label,
+		lx: b.cx + 6,
+		ly: mid + 14,
+		anchor: 'start',
+	};
+});
+
+const lines = (node: Node) => (Array.isArray(node.text) ? node.text : [node.text]);
+---
+
+<figure class="flowchart">
+	<div class="scroll">
+		<svg
+			viewBox={`0 0 ${width} ${height}`}
+			role="img"
+			aria-labelledby={`${slug}-title ${slug}-desc`}
+			style={`min-width: ${Math.min(width, 560)}px; max-width: ${width}px`}
+		>
+			<title id={`${slug}-title`}>{title}</title>
+			<desc id={`${slug}-desc`}>{description}</desc>
+			<defs>
+				<marker id={arrowId} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+					<path d="M 0 0 L 10 5 L 0 10 z" class="arrowhead" />
+				</marker>
+			</defs>
+			{paths.map((path) => (
+				<path d={path.d} class="edge" marker-end={`url(#${arrowId})`} />
+			))}
+			{paths.map((path) =>
+				path.label ? (
+					<text x={path.lx} y={path.ly} text-anchor={path.anchor} class="edge-label">
+						{path.label}
+					</text>
+				) : null,
+			)}
+			{nodes.map((node) => {
+				const { x, y, w, h, cx } = box(node);
+				const text = lines(node);
+				const total = text.length + (node.model ? 1 : 0);
+				const top = y + h / 2 - ((total - 1) * LINE_H) / 2 + 4;
+				return (
+					<g class:list={['node', node.model && `model-${node.model}`, node.decision && 'decision']}>
+						<rect x={x} y={y} width={w} height={h} rx="6" class="box" />
+						{node.model && <rect x={x} y={y} width="5" height={h} rx="2" class="stripe" />}
+						{text.map((line, index) => (
+							<text x={cx} y={top + index * LINE_H} text-anchor="middle" class="label">
+								{line}
+							</text>
+						))}
+						{node.model && (
+							<text x={cx} y={top + text.length * LINE_H} text-anchor="middle" class="model">
+								{MODEL_LABELS[node.model]}
+							</text>
+						)}
+					</g>
+				);
+			})}
+		</svg>
+	</div>
+	<figcaption>{title}</figcaption>
+</figure>
+
+<style>
+	.flowchart {
+		margin: 1.5rem 0;
+	}
+	.scroll {
+		overflow-x: auto;
+	}
+	svg {
+		display: block;
+		width: 100%;
+		height: auto;
+		font-family: var(--gaia-font-body);
+	}
+	figcaption {
+		margin-top: 0.5rem;
+		font-size: var(--sl-text-sm);
+		color: var(--gaia-muted);
+	}
+	.edge {
+		fill: none;
+		stroke: var(--gaia-muted);
+		stroke-width: 1.5;
+	}
+	.arrowhead {
+		fill: var(--gaia-muted);
+	}
+	.edge-label {
+		font-size: 12px;
+		fill: var(--gaia-ink-dim);
+		paint-order: stroke;
+		stroke: var(--gaia-canvas);
+		stroke-width: 4px;
+	}
+	.box {
+		fill: var(--gaia-surface);
+		stroke: var(--gaia-line);
+		stroke-width: 1.5;
+	}
+	.decision .box {
+		fill: var(--gaia-canvas);
+		stroke: var(--gaia-ink-dim);
+		stroke-dasharray: 5 4;
+	}
+	.label {
+		font-size: 13px;
+		fill: var(--gaia-ink);
+	}
+	.model {
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+	.stripe {
+		fill: var(--model-color);
+	}
+	.node .model {
+		fill: var(--model-color);
+	}
+	.model-opus,
+	.model-top {
+		--model-color: var(--gaia-accent);
+	}
+	.model-sonnet {
+		--model-color: var(--gaia-secondary-soft);
+	}
+	.model-haiku {
+		--model-color: var(--gaia-warn-soft);
+	}
+	.model-session {
+		--model-color: var(--gaia-ink-dim);
+	}
+	.model-opus .box,
+	.model-top .box {
+		stroke: var(--gaia-accent-2);
+	}
+	.model-sonnet .box {
+		stroke: var(--gaia-secondary-2);
+	}
+	.model-haiku .box {
+		stroke: var(--gaia-warn-2);
+	}
+</style>

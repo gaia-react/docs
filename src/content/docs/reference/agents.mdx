@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-GAIA ships nine [sub-agents](https://code.claude.com/docs/en/sub-agents) in `.claude/agents/`. You never start one yourself: a workflow starts each one when it needs it. Each sub-agent starts with a fresh context, so a reviewer judges the work without the reasoning of the session that wrote it, and its reading stays out of your session's context. Each agent uses a fixed model and runs at your session's `/effort` level, so a low-effort session audits at low and a high one at high. `CLAUDE_CODE_EFFORT_LEVEL` overrides it on a machine. Each agent can use only the tools listed in its definition, which keeps what it starts with small. On Claude Code 2.1.304 or later, that also leaves Claude Code's list of skills and its list of deferred tools out of the agent's context.
+GAIA ships nine [sub-agents](https://code.claude.com/docs/en/sub-agents) in `.claude/agents/`. You never start one yourself: a workflow starts each one when it needs it. Each sub-agent starts with a fresh context, so a reviewer judges the work without the reasoning of the session that wrote it, and its reading stays out of your session's context. Each agent uses a [fixed model](/models-and-context/model-choice/) and runs at your session's `/effort` level, so a low-effort session audits at low and a high one at high. `CLAUDE_CODE_EFFORT_LEVEL` overrides it on a machine. Each agent can use only the tools listed in its definition, which keeps what it starts with small. On Claude Code 2.1.304 or later, that also leaves Claude Code's list of skills and its list of deferred tools out of the agent's context.
 
 | Agent | Model | Started by | Edits files? |
 |---|---|---|---|

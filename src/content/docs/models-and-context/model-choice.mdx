@@ -1,0 +1,194 @@
+---
+title: Model choice
+description: Which Claude model each GAIA workflow uses at each step, how GAIA picks it, and what you control.
+---
+
+import Flowchart from '../../../components/Flowchart.astro';
+
+export const overview = {
+	title: 'How GAIA picks a model for a step',
+	description:
+		'A step that needs you, is small, or is quick back-and-forth stays in your session on your model. Any other step goes to a sub-agent on the model for that kind of work: Haiku for rule, template, and list work; Sonnet for a judgment call on each item and for changes with a written plan; Opus for review; Opus or Fable for plans and design.',
+	cols: 4,
+	nodes: [
+		{ id: 'step', col: 0, row: 0, text: 'A workflow reaches a step' },
+		{ id: 'ask', col: 0, row: 1, decision: true, text: ['Does it need you, or is it', 'small or back-and-forth?'] },
+		{ id: 'session', col: 1, row: 1, model: 'session', text: 'Your session does it' },
+		{ id: 'sub', col: 0, row: 2, text: ['A sub-agent does it, on the', 'model for that kind of work'] },
+		{ id: 'haiku', col: 0, row: 3, model: 'haiku', text: ['Rules, templates,', 'lists'] },
+		{ id: 'sonnet', col: 1, row: 3, model: 'sonnet', text: ['A call on each item,', 'a change with a plan'] },
+		{ id: 'opus', col: 2, row: 3, model: 'opus', text: 'Review' },
+		{ id: 'top', col: 3, row: 3, model: 'top', text: 'Plans and design' },
+	],
+	edges: [
+		{ from: 'step', to: 'ask' },
+		{ from: 'ask', to: 'session', label: 'Yes' },
+		{ from: 'ask', to: 'sub', label: 'No' },
+		{ from: 'sub', to: 'haiku' },
+		{ from: 'sub', to: 'sonnet' },
+		{ from: 'sub', to: 'opus' },
+		{ from: 'sub', to: 'top' },
+	],
+};
+
+export const plan = {
+	title: 'Models in /gaia-plan',
+	description:
+		'The planner keeps your model when you are on Opus or Fable. In auto mode, or with nobody to ask, it uses Opus. Otherwise Claude asks: Opus, Fable, or your model. The planner writes the plan. Each phase then runs its tasks in Sonnet sub-agents, and the planner can raise one phase to Opus. The UAT fidelity judge, on Opus, checks the acceptance tests against the SPEC, and the pull request goes to the Code Audit Team.',
+	cols: 3,
+	nodes: [
+		{ id: 'pick', col: 0, row: 0, span: 3, decision: true, text: "Pick the planner's model" },
+		{ id: 'keep', col: 0, row: 1, model: 'top', text: ['On Opus or Fable:', 'keep it'] },
+		{ id: 'auto', col: 1, row: 1, model: 'opus', text: ['Auto mode, or', 'nobody to ask'] },
+		{ id: 'askyou', col: 2, row: 1, model: 'session', text: ['Otherwise Claude asks:', 'Opus, Fable, or yours'] },
+		{ id: 'planner', col: 0, row: 2, span: 3, text: 'The planner writes the plan' },
+		{ id: 'tasks', col: 0, row: 3, span: 3, model: 'sonnet', text: ["Each phase's tasks run in sub-agents", '(the planner can raise a phase to Opus)'] },
+		{ id: 'uat', col: 0, row: 4, span: 3, model: 'opus', text: ['The UAT fidelity judge checks the', 'acceptance tests against the SPEC'] },
+		{ id: 'audit', col: 0, row: 5, span: 3, text: 'The Code Audit Team reviews the pull request' },
+	],
+	edges: [
+		{ from: 'pick', to: 'keep' },
+		{ from: 'pick', to: 'auto' },
+		{ from: 'pick', to: 'askyou' },
+		{ from: 'keep', to: 'planner' },
+		{ from: 'auto', to: 'planner' },
+		{ from: 'askyou', to: 'planner' },
+		{ from: 'planner', to: 'tasks' },
+		{ from: 'tasks', to: 'uat' },
+		{ from: 'uat', to: 'audit' },
+	],
+};
+
+export const audit = {
+	title: 'Models in the Code Audit Team',
+	description:
+		'audit-loop-unit, on Opus, runs the rounds outside your session. A member, on Opus, reviews its files, or audit-light-reviewer, on Sonnet, reviews a small change since the last full review. code-audit-frontend also hands line-level rule checks to audit-rule-specialist agents on Haiku, and each of its own Critical or Major findings to an audit-refuter on Sonnet. A fixer on Sonnet repairs the findings. A script checks each repair, the Quality Gate runs, and the round is committed. The next round starts until every member has cleared the change, and then your session merges it.',
+	cols: 3,
+	nodes: [
+		{ id: 'pr', col: 0, row: 0, span: 3, text: 'The pull request is ready for audit' },
+		{ id: 'unit', col: 0, row: 1, span: 3, model: 'opus', text: ['audit-loop-unit runs the rounds', 'outside your session'] },
+		{ id: 'member', col: 0, row: 2, span: 2, model: 'opus', text: ['A member reviews its files.', 'code-audit-frontend also starts:'] },
+		{ id: 'light', col: 2, row: 2, model: 'sonnet', text: ['audit-light-reviewer, for a', 'small change since a review'] },
+		{ id: 'specialist', col: 0, row: 3, model: 'haiku', text: ['audit-rule-specialist,', 'one per area'] },
+		{ id: 'refuter', col: 1, row: 3, model: 'sonnet', text: ['audit-refuter, one per', 'Critical or Major finding'] },
+		{ id: 'fixer', col: 0, row: 4, span: 3, model: 'sonnet', text: 'A fixer repairs what the reviewers found' },
+		{ id: 'check', col: 0, row: 5, span: 3, text: ['A script checks each repair, the Quality Gate', 'runs, and the round is committed'] },
+		{ id: 'merge', col: 0, row: 6, span: 3, model: 'session', text: 'Every member has cleared it: your session merges' },
+	],
+	edges: [
+		{ from: 'pr', to: 'unit' },
+		{ from: 'unit', to: 'member' },
+		{ from: 'unit', to: 'light' },
+		{ from: 'member', to: 'specialist' },
+		{ from: 'member', to: 'refuter' },
+		{ from: 'specialist', to: 'fixer' },
+		{ from: 'refuter', to: 'fixer' },
+		{ from: 'light', to: 'fixer' },
+		{ from: 'fixer', to: 'check' },
+		{ from: 'check', to: 'unit', label: 'Next round', back: true },
+		{ from: 'check', to: 'merge', label: 'All clear' },
+	],
+};
+
+export const deps = {
+	title: 'Models in /update-deps',
+	description:
+		'After you approve the preview, a Haiku agent runs the override check and the minor and patch updates. Each major update group gets its own agent: Opus for react, react-router, storybook, and typescript; Sonnet for eslint and every other group. A Haiku agent refreshes sub-dependencies. Your session handles the security fixes, because they can need your answer. A Haiku agent runs the override check again.',
+	cols: 2,
+	nodes: [
+		{ id: 'preview', col: 0, row: 0, span: 2, model: 'session', text: 'You approve the preview' },
+		{ id: 'waveA', col: 0, row: 1, span: 2, model: 'haiku', text: ['Override check, then', 'minor and patch updates'] },
+		{ id: 'big', col: 0, row: 2, model: 'opus', text: ['Major: react, react-router,', 'storybook, typescript'] },
+		{ id: 'rest', col: 1, row: 2, model: 'sonnet', text: ['Major: eslint and', 'every other group'] },
+		{ id: 'transitive', col: 0, row: 3, span: 2, model: 'haiku', text: 'Sub-dependencies refresh' },
+		{ id: 'security', col: 0, row: 4, span: 2, model: 'session', text: 'Security fixes' },
+		{ id: 'recheck', col: 0, row: 5, span: 2, model: 'haiku', text: 'Override check again' },
+	],
+	edges: [
+		{ from: 'preview', to: 'waveA' },
+		{ from: 'waveA', to: 'big' },
+		{ from: 'waveA', to: 'rest' },
+		{ from: 'big', to: 'transitive' },
+		{ from: 'rest', to: 'transitive' },
+		{ from: 'transitive', to: 'security' },
+		{ from: 'security', to: 'recheck' },
+	],
+};
+
+GAIA does not run everything on one model. Your session's model handles the conversation, the decisions, and every step that needs you. When a workflow hands a step to a [sub-agent](https://code.claude.com/docs/en/sub-agents) (a separate Claude instance with its own fresh context), the workflow names the sub-agent's model, chosen for that kind of work. This page lists every one of those choices.
+
+## How GAIA picks a model
+
+Every choice follows one table, kept in your project at `wiki/concepts/Workflow Doctrine.md`. GAIA ranks models by how well they fit the work: how much reasoning it needs, and how closely the model has to stick to its instructions. Price decides only between two models that fit equally well.
+
+| Kind of work | Model | Why it fits |
+|---|---|---|
+| Pulling out, sorting, or listing items by a written rule | Haiku | A rule decides each item, and the result can be counted or checked. |
+| Following a template, a rule id, or a written convention: scaffolding, or a fix for a specific lint or accessibility rule | Haiku | The template already holds the answer. More reasoning adds nothing. |
+| Reading widely and making a call on each item: research, checking a finding, verifying | Sonnet | The instructions carry the judgment, and Sonnet applies it one item at a time without straying from them. |
+| A bounded change with a written plan and a check behind it | Sonnet | The plan carries the judgment, and Sonnet sticks to the plan. |
+| Review: finding what a change got wrong | Opus | It needs sustained judgment and a wide view. A missed defect costs more than the price difference. |
+| Specs, plans, and design or architecture decisions | Opus, or Fable when your session is on Fable or you pick it | One weak choice here carries into everything built on it. |
+
+Some steps never leave your session, whatever kind of work they are: a step that needs to ask you something (a sub-agent cannot ask you questions), small work, and quick edit-run-fix loops, where handing off costs more than it saves.
+
+<Flowchart {...overview} />
+
+### Effort
+
+GAIA never sets effort. Every sub-agent runs at your session's `/effort` level, the same as work your session does itself, so a low-effort session reviews at low and a high-effort one at high. `CLAUDE_CODE_EFFORT_LEVEL` overrides the level on a machine. GAIA chooses the model. You choose the effort.
+
+## Model at each step
+
+A step not listed here runs on your session's model. That covers `/gaia-debt`, `/gaia-residue`, `/gaia-codify`, `/gaia-forensics`, and any sub-agent a workflow starts without naming a model.
+
+| Workflow | Step | Model |
+|---|---|---|
+| [`/gaia-spec`](/workflow/spec/) | Writing the SPEC, asking you questions, its audit | Your model. On a model other than Opus or Fable, Claude first offers to stop so you can switch with `/model`. Auto mode skips the offer. |
+| [`/gaia-plan`](/workflow/plan/) | The planner | Opus or Fable. On Opus or Fable it keeps your model. Otherwise Claude asks: Opus (recommended), Fable, or your model. Auto mode uses Opus without asking. |
+| | Each phase's task sub-agents | Sonnet. The planner can raise a phase to Opus when it judges that phase to be deep design work, and names the phase and the reason in the plan. |
+| | [`uat-fidelity-judge`](/reference/agents/#uat-fidelity-judge) | Opus |
+| [Code Audit Team](/workflow/code-audit-team/) | [`audit-loop-unit`](/reference/agents/#audit-loop-unit), which runs the rounds | Opus |
+| | Members: [`code-audit-frontend`](/reference/agents/#code-audit-frontend), [`code-audit-github-workflows`](/reference/agents/#code-audit-github-workflows) | Opus |
+| | [`audit-rule-specialist`](/reference/agents/#audit-rule-specialist), started by `code-audit-frontend` | Haiku |
+| | [`audit-refuter`](/reference/agents/#audit-refuter), for `code-audit-frontend`'s own Critical and Major findings | Sonnet |
+| | [`audit-light-reviewer`](/reference/agents/#audit-light-reviewer) | Sonnet |
+| | The fixer | Sonnet |
+| [`tdd` skill](/workflow/tdd/) | [`worthiness-evaluator`](/reference/agents/#worthiness-evaluator) | Opus |
+| [`/gaia-fitness`](/maintenance/fitness/) | [`fitness-judge`](/reference/agents/#fitness-judge), and the agent that proposes fixes | Sonnet |
+| [`/gaia-cleanse`](/maintenance/cleanse/) | Writing the report, then applying it | Sonnet, one agent each |
+| [`/gaia-wiki`](/maintenance/wiki/) | Sync, and finding consolidate issues | Sonnet |
+| | Lint checks | Haiku |
+| | Consolidate questions and lint fixes | Your model |
+| [`/update-deps`](/maintenance/update-deps/) | Override checks, minor and patch updates, sub-dependency refresh | Haiku |
+| | Major updates to react, react-router, storybook, or typescript | Opus |
+| | Major updates to eslint and every other group | Sonnet |
+| | Security fixes | Your model |
+| [`/update-gaia`](/maintenance/update-gaia/) | The agent that merges the update into your project | Opus when the update crosses a major version, Sonnet otherwise |
+| [Scaffolders and fix skills](/skills/) | `new-component`, `new-route`, `new-hook`, `new-service`, `eslint-fixes`, `a11y-fixes` | Haiku |
+
+## Workflow flowcharts
+
+These show the workflows where the model changes from step to step.
+
+<Flowchart {...plan} />
+
+<Flowchart {...audit} />
+
+<Flowchart {...deps} />
+
+## Skills that set a model
+
+Six skills set Haiku in their frontmatter: the four scaffolders (`new-component`, `new-route`, `new-hook`, `new-service`) and the two fix skills (`eslint-fixes`, `a11y-fixes`). When one of them loads, Claude Code runs the rest of that turn on Haiku. That is right for these skills, because the turn that loads them does nothing but follow a template or fix a specific rule.
+
+Every other skill leaves the model alone and runs on yours. Some look like lookups but load in the middle of other work, such as `typescript` and `tailwind`. A Haiku setting there would move the rest of your implementation turn to Haiku. Others need judgment, such as `react-code`.
+
+A pinned skill runs the rest of the turn on its model even when you picked a stronger one, so a pin on judgment work would hold that work back. Set a model on a skill you write only when every use of it is template or rule-id work.
+
+## What you control
+
+- **Your session's model**, with `/model`. It runs every step that is not listed in the table, and everything that needs you.
+- **The planner's model**, when `/gaia-plan` asks.
+- **Effort**, with `/effort`, for your session and every sub-agent.
+
+What each step costs shows up in the [cost and usage ledger](/models-and-context/cost/).

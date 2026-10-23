@@ -31,7 +31,7 @@ Both sides share one row, the left side first and the nudges right-aligned besid
 
 ### The context bar
 
-Claude cannot see how full its own context is, so the bar shows it for you. A model's answers get worse as its context fills, so knowing where you stand tells you when to [clear and resume](/workflow/token-efficiency/#why-so-early) before quality drops. The bar's color follows the same bands GAIA uses to decide when to ask you to clear:
+Claude cannot see how full its own context is, so the bar shows it for you. A model's answers get worse as its context fills, so knowing where you stand tells you when to [clear and resume](/models-and-context/token-efficiency/#why-so-early) before quality drops. The bar's color follows the same bands GAIA uses to decide when to ask you to clear:
 
 | Band | Bar |
 | --- | --- |
@@ -41,9 +41,9 @@ Claude cannot see how full its own context is, so the bar shows it for you. A mo
 | 🔥 | <code style={{ background: '#1a1b26' }}><S c="#f87171">▓▓▓▓░░░░░░</S> 38% 🔥</code> |
 | 💀 | <code style={{ background: '#1a1b26' }}><S c="#f87171">▓▓▓▓▓░░░░░</S> 46% 💀</code> |
 
-The examples use a 1M-token window. Where each band starts is on [Token efficiency](/workflow/token-efficiency/#context-bands), and what Claude does when the context reaches one is on [Work lifecycle](/workflow/work-lifecycle/#resuming-long-work).
+The examples use a 1M-token window. Where each band starts is on [Token efficiency](/models-and-context/token-efficiency/#context-bands), and what Claude does when the context reaches one is on [Work lifecycle](/workflow/work-lifecycle/#resuming-long-work).
 
-The statusline also saves each reading, which is how GAIA [tells Claude](/workflow/token-efficiency/#context-bands) when the context reaches a band. Without GAIA's statusline, Claude gets no band warnings, and the [audit checkpoint](/reference/gates/#audit-checkpoint) falls back to counting rounds.
+The statusline also saves each reading, which is how GAIA [tells Claude](/models-and-context/token-efficiency/#context-bands) when the context reaches a band. Without GAIA's statusline, Claude gets no band warnings, and the [audit checkpoint](/reference/gates/#audit-checkpoint) falls back to counting rounds.
 
 ### Using your own statusline
 

@@ -145,7 +145,7 @@ Work that spans sessions resumes from a small saved state, rewritten in place. W
 
 A resumed session reads that saved state and the run's artifact list and nothing else. A saved place does not last forever. Once its branch no longer exists, GAIA deletes a branch's run folder after 7 days. A save made on the default branch is deleted after 30 days.
 
-When the context reaches GAIA's [red band](/workflow/token-efficiency/#context-bands), Claude finishes the current step, saves its place, and asks one question:
+When the context reaches GAIA's [red band](/models-and-context/token-efficiency/#context-bands), Claude finishes the current step, saves its place, and asks one question:
 
 - **Continue here**: keep working until the next band.
 - **Clear and resume**: Claude prints a continuation prompt in a fenced code block. Run `/clear` and paste it.
@@ -154,7 +154,7 @@ At 🔥 and 💀, the two fullest bands, Claude always recommends clearing. Sess
 
 You can also ask Claude for a continuation prompt at any time. It always arrives in a fenced code block, ready to paste.
 
-Where the bands sit, how Claude knows it has reached one, and why GAIA asks so early are on [Token efficiency](/workflow/token-efficiency/#context-bands).
+Where the bands sit, how Claude knows it has reached one, and why GAIA asks so early are on [Token efficiency](/models-and-context/token-efficiency/#context-bands).
 
 ## Commands that run only in the main checkout
 

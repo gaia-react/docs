@@ -71,7 +71,7 @@ These hooks never block anything. They record what happened (test failures, gran
 | `ports-session-start` | SessionStart | Records which session started which dev server, and stops servers left behind by ended sessions and removed worktrees. |
 | `wiki-session-start` | SessionStart | Cleans up after a `/gaia-wiki` run whose session ended before its merge finished (deletes the leftover local wiki branch and updates the base branch), and lists merged worktrees with the commands to remove them. |
 | `debt-session-reconcile` | SessionStart | Re-checks the `/gaia-debt` count shown on the statusline against GitHub. |
-| `usage-capture` | SessionStart, Stop | Records the session's model usage to the local [usage ledger](/reference/cost/). |
+| `usage-capture` | SessionStart, Stop | Records the session's model usage to the local [usage ledger](/models-and-context/cost/). |
 | `state-reaper-session-start` | SessionStart | At most once every 24 hours, starts a background cleanup of spent entries in `.gaia/local` (state left by merged branches and removed worktrees, and entries past their age limit). The usage ledger and your price override are never removed. |
 
 `local-janitor.sh` and `post-audit-status.sh` ship in `.claude/hooks/` but are not registered as hooks themselves. The session-start hook runs the first, and the merge workflow calls the second to post `GAIA-Audit`.

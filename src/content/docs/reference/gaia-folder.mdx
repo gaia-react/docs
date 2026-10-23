@@ -133,8 +133,8 @@ A linked worktree's `.gaia/local` is a link to the main checkout's copy, so ever
 |---|---|
 | `setup-state.json` | This machine's setup progress and its decisions for machine-level setup steps. Deleting it makes `/setup-gaia` ask those questions again. |
 | `settings.json` | Per-machine choices, such as whether the statusline's left side is GAIA's or your own. `/setup-gaia` writes it. |
-| `telemetry/usage.jsonl` | The usage ledger behind every cost readout. See [Cost and usage ledger](/reference/cost/). |
-| `telemetry/token-rates.override.json` | Your own token prices, if you set any. See [Prices](/reference/cost/#prices). |
+| `telemetry/usage.jsonl` | The usage ledger behind every cost readout. See [Cost and usage ledger](/models-and-context/cost/). |
+| `telemetry/token-rates.override.json` | Your own token prices, if you set any. See [Prices](/models-and-context/cost/#prices). |
 | `audit/` | The Code Audit Team's clearances, findings, and security reports. |
 | `runs/` | Per-branch run state, such as the `STATE.md` a long piece of work saves before you resume it. |
 | `red-ledger/`, `worthiness-ledger/` | Records of tests seen failing first and of worthiness verdicts, one set per worktree. See [Test-driven development](/workflow/tdd/). |
