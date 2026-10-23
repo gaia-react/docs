@@ -48,7 +48,7 @@ While Claude works on one change, it often notices a real problem somewhere else
 
 This page covers how that debt is created. Two maintenance commands then work through it:
 
-- [`/gaia-debt`](/maintenance/debt/) fixes `tech-debt` issues.
+- [`/gaia-debt`](/workflow/debt/) fixes `tech-debt` issues.
 - [`/gaia-residue`](/maintenance/residue/) reviews the findings that were recorded without being filed, and turns the ones that matter into `tech-debt` issues.
 
 Where each finding the audit raises ends up:
@@ -110,11 +110,11 @@ An issue filed while the repository is private becomes public if you later make 
 
 ## Investigate issues
 
-When a finding's severity cannot be judged yet, it is filed as `severity:investigate`. The issue must state the open question and what would settle it. At most three can be open at once. `/gaia-debt` never offers an `investigate` issue until it has a real severity. To re-grade one, see [`/gaia-debt`](/maintenance/debt/#labels).
+When a finding's severity cannot be judged yet, it is filed as `severity:investigate`. The issue must state the open question and what would settle it. At most three can be open at once. `/gaia-debt` never offers an `investigate` issue until it has a real severity. To re-grade one, see [`/gaia-debt`](/workflow/debt/#labels).
 
 ## Working through the debt
 
-- When `tech-debt` issues are open, the statusline shows `🐛 /gaia-debt (N issues)`. Run [`/gaia-debt`](/maintenance/debt/) to fix the most severe, oldest issues first, one issue or a batch of related ones per run.
+- When `tech-debt` issues are open, the statusline shows `🐛 /gaia-debt (N issues)`. Run [`/gaia-debt`](/workflow/debt/) to fix the most severe, oldest issues first, one issue or a batch of related ones per run.
 - When 5 or more residuals are 30 days old, the statusline shows `🧹 /gaia-residue (N residuals)`. Run [`/gaia-residue`](/maintenance/residue/) to decide each one.
 - When the same kind of finding keeps coming back, [`/gaia-codify`](/maintenance/codify/) proposes a guard so it stops recurring.
 

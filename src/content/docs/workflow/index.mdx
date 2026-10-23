@@ -37,7 +37,7 @@ The `/gaia-*` commands are for specific moments, not everyday driving:
 | --- | --- | --- |
 | Starting a feature whose shape isn't settled | [`/gaia-spec`](/workflow/spec/) | Pins down intent and acceptance tests, saves a SPEC, and plans it in the same session. |
 | Turning a big feature into parallel work | [`/gaia-plan`](/workflow/plan/) | Splits it into phases, defines the shared types and interfaces the phases build on, and writes a kickoff prompt you paste to start the work. |
-| A GAIA command or hook misbehaved | [`/gaia-forensics`](/workflow/forensics/) | Works out what went wrong and, if it is a bug, drafts a report ready to file. |
+| A GAIA command or hook misbehaved | [`/gaia-forensics`](/maintenance/forensics/) | Works out what went wrong and, if it is a bug, drafts a report ready to file. |
 
 **When to skip them.** Small, clear changes do not need a spec or a plan. "Fix the timezone bug in the invoice header" is just a prompt. A spec and a plan are worth the extra time on larger work whose details are still unclear.
 
@@ -66,7 +66,7 @@ You rarely reach for these yourself, and you do not have to memorize them. Each 
 | --- | --- | --- |
 | The Claude integration feels off | [`/gaia-fitness`](/maintenance/fitness/) | Lints skills, rules, commands, agents, hooks, and settings, grades them, and heals your own files. |
 | Memory or auto-loaded files have drifted | [`/gaia-cleanse`](/maintenance/cleanse/) | Finds instructions that repeat the wiki, contradict it, or are out of date. |
-| Tech-debt issues have piled up | [`/gaia-debt`](/maintenance/debt/) | Fixes the backlog, highest severity first, through the audit gate. |
+| Tech-debt issues have piled up | [`/gaia-debt`](/workflow/debt/) | Fixes the backlog, highest severity first, through the audit gate. |
 | The audit keeps flagging the same thing | [`/gaia-codify`](/maintenance/codify/) | Turns the recurring finding into a check, a skill, or a rule. |
 | Accepted trade-offs have piled up | [`/gaia-residue`](/maintenance/residue/) | Goes through the known issues reviewers accepted at merge and dismisses, keeps, or turns each into a tech-debt issue. |
 | The wiki has fallen behind the code | [`/gaia-wiki`](/maintenance/wiki/) | Updates the project wiki Claude reads from, merges overlapping pages, and fixes broken links and formatting. |

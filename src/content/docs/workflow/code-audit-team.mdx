@@ -66,7 +66,7 @@ Before any commit that stages source code (`.ts`, `.tsx`, `.js`, `.jsx`, `.mjs`,
 | Dev server (`bash .gaia/scripts/dev-smoke.sh`) | This checkout's own dev server starts and its home page loads. The script stops only the server it started, so it never stops a server another session is using. |
 | Build (`pnpm build`) | The production build succeeds. |
 
-Claude fixes every warning, not only errors, before it reports. It then shows you a table of the results and asks whether to commit or hold the change for your review. Inside a workflow that commits on its own (the audit's fix round, [`/gaia-debt`](/maintenance/debt/), and a plan's phase commits), a clean gate commits without asking, because that workflow has its own point where you review.
+Claude fixes every warning, not only errors, before it reports. It then shows you a table of the results and asks whether to commit or hold the change for your review. Inside a workflow that commits on its own (the audit's fix round, [`/gaia-debt`](/workflow/debt/), and a plan's phase commits), a clean gate commits without asking, because that workflow has its own point where you review.
 
 The gate is a rule Claude follows, not a hook. The pre-commit hook is the part that runs no matter what ([gate reference](/reference/gates/#pre-commit-floor)). The shipped gate checks only `frontend/`. A package you add beside it, such as a backend, needs a gate of its own ([The backend is left to you](/getting-started/project-layout/#the-backend-is-left-to-you)).
 

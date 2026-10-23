@@ -19,7 +19,7 @@ When the [Code Audit Team](/workflow/code-audit-team/) clears a pull request, so
 
 - **Dismiss** (the default): the trade-off stands and needs nothing more.
 - **Keep**: snooze it. It comes back in 14 days (`GAIA_RESIDUE_KEEP_DAYS`).
-- **Promote**: file it as a `tech-debt` issue, so [`/gaia-debt`](/maintenance/debt/) can fix it. Promoting should be the exception and needs a reason. Promoting too freely makes the backlog grow instead of shrink.
+- **Promote**: file it as a `tech-debt` issue, so [`/gaia-debt`](/workflow/debt/) can fix it. Promoting should be the exception and needs a reason. Promoting too freely makes the backlog grow instead of shrink.
 
 A dismissal or a keep is recorded in `.gaia/audit-residual-dismissals.jsonl`, a committed file that is only ever added to. A promotion is recorded by the issue it files.
 

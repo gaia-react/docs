@@ -85,7 +85,7 @@ The claim is released automatically when the pull request that closes the issue 
 
 **Why:** when two agents or two people start the same issue, the work gets done twice and the two versions then conflict at merge. See the [gate reference](/reference/gates/#issue-claim).
 
-A `tech-debt` issue is never claimed by hand: run `/gaia-debt <n>` instead, which owns that claim. See [`/gaia-debt`](/maintenance/debt/).
+A `tech-debt` issue is never claimed by hand: run `/gaia-debt <n>` instead, which owns that claim. See [`/gaia-debt`](/workflow/debt/).
 
 ## 2. Name
 
@@ -187,7 +187,7 @@ Who decides when to merge depends on what started the work:
 |---|---|
 | Ad-hoc work (a plain request) | Only when you ask. A later message asking to merge counts. |
 | A plan run from its kickoff prompt | At the end of the run, Claude prints a summary and asks one question: merge it, or hold the merge. |
-| [`/gaia-debt`](/maintenance/debt/), [`/gaia-wiki`](/maintenance/wiki/), [`/update-deps`](/maintenance/update-deps/), [`/gaia-cleanse`](/maintenance/cleanse/) | As part of the run, once the audit passes (`/gaia-wiki` posts its own) and the required checks are green. You do not need to ask. |
+| [`/gaia-debt`](/workflow/debt/), [`/gaia-wiki`](/maintenance/wiki/), [`/update-deps`](/maintenance/update-deps/), [`/gaia-cleanse`](/maintenance/cleanse/) | As part of the run, once the audit passes (`/gaia-wiki` posts its own) and the required checks are green. You do not need to ask. |
 | [`/gaia-residue`](/maintenance/residue/), [`/gaia-codify`](/maintenance/codify/), [`/gaia-fitness`](/maintenance/fitness/) | The command asks before it merges, and you can leave the pull request open instead. |
 | [`/update-gaia`](/maintenance/update-gaia/) | It opens a draft pull request and stops. You merge it when you are ready. |
 

@@ -48,6 +48,6 @@ Triggers on pull requests to `main`. Two advisory jobs:
 
 ## forensics-triage.yml
 
-Triggers on issues `opened` or `labeled` with `gaia-forensics`, the label [`/gaia-forensics`](/workflow/forensics/) files with. Runs Claude Code to triage the report. It skips an issue already labeled `gaia-triaged`, then parses the report, classifies it, and checks whether the fix is in scope. For an in-scope fix it creates a fix branch, runs the Quality Gate, and opens a draft pull request. A final step always adds the `gaia-triaged` label, however the run went.
+Triggers on issues `opened` or `labeled` with `gaia-forensics`, the label [`/gaia-forensics`](/maintenance/forensics/) files with. Runs Claude Code to triage the report. It skips an issue already labeled `gaia-triaged`, then parses the report, classifies it, and checks whether the fix is in scope. For an in-scope fix it creates a fix branch, runs the Quality Gate, and opens a draft pull request. A final step always adds the `gaia-triaged` label, however the run went.
 
 Its helpers live in `.github/forensics/`, all contributor-only. The scope check rejects any edit under `.github/workflows/`, so triage can never change its own workflow; that is a security boundary.
