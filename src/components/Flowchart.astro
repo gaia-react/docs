@@ -1,0 +1,372 @@
+---
+// A small flowchart drawn as static SVG at build time: no client script, no
+// diagram library. Nodes sit on a grid (col, row); edges are drawn as right
+// angles. Each node can name the model that does the step, shown as text and
+// as a colored border, so color is never the only cue.
+//
+// A chart can carry a second, narrow arrangement for phones (`narrow`). The
+// figure is a CSS container, so the narrow drawing replaces the wide one when
+// the content column is under 600px. Node text wraps to fit in the narrow
+// drawing. An edge whose straight path would cross a box, or that goes back
+// to an earlier row, runs in its own lane down the side of the chart.
+
+type Model = 'haiku' | 'sonnet' | 'opus' | 'top' | 'session';
+type Place = [col: number, row: number, span?: number];
+
+interface Node {
+	id: string;
+	col: number;
+	row: number;
+	text: string | string[];
+	model?: Model;
+	decision?: boolean;
+	span?: number;
+}
+
+interface Edge {
+	from: string;
+	to: string;
+	label?: string;
+	// An edge to an earlier row is always drawn as a loop; this marks one
+	// on the same row or later that should loop too.
+	back?: boolean;
+}
+
+interface Props {
+	title: string;
+	description: string;
+	cols: number;
+	nodes: Node[];
+	edges: Edge[];
+	// Phone arrangement: column count and, per node id, a new place. Nodes
+	// not listed keep their wide place.
+	narrow?: { cols: number; at?: Record<string, Place> };
+}
+
+const { title, description, cols, nodes, edges, narrow } = Astro.props;
+
+const MODEL_LABELS: Record<Model, string> = {
+	haiku: 'Haiku',
+	sonnet: 'Sonnet',
+	opus: 'Opus',
+	top: 'Opus or Fable',
+	session: 'Your model',
+};
+
+interface Metrics {
+	colW: number;
+	inset: number;
+	pad: number;
+	font: number;
+	modelFont: number;
+	lineH: number;
+	minH: number;
+	gap: number;
+	charW: number;
+	lane: number;
+	wrap: boolean;
+}
+
+const WIDE: Metrics = { colW: 220, inset: 18, pad: 8, font: 13, modelFont: 11, lineH: 16, minH: 66, gap: 42, charW: 6.9, lane: 12, wrap: false };
+
+const narrowMetrics = (count: number): Metrics => ({
+	colW: 344 / count,
+	inset: 10,
+	pad: 4,
+	font: 12,
+	modelFont: 10,
+	lineH: 15,
+	minH: 50,
+	gap: 34,
+	charW: 6.4,
+	lane: 10,
+	wrap: true,
+});
+
+const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+// Greedy word wrap. A word longer than the line breaks after a slash or hyphen.
+const wrapText = (text: string, maxChars: number) => {
+	const words = text.split(/\s+/).flatMap((word) => (word.length <= maxChars ? [word] : (word.match(/[^/-]+[/-]?/g) ?? [word])));
+	const lines: string[] = [];
+	let line = '';
+	for (const word of words) {
+		const joiner = line === '' || /[/-]$/.test(line) ? '' : ' ';
+		if (line !== '' && (line + joiner + word).length > maxChars) {
+			lines.push(line);
+			line = word;
+		} else {
+			line += joiner + word;
+		}
+	}
+	if (line) lines.push(line);
+	return lines;
+};
+
+const draw = (columns: number, places: Record<string, Place>, m: Metrics) => {
+	const placed = nodes.map((node) => {
+		const [col, row, span] = places[node.id] ?? [node.col, node.row, node.span];
+		const w = (span ?? 1) * m.colW - m.inset * 2;
+		const raw = Array.isArray(node.text) ? node.text : [node.text];
+		const lines = m.wrap ? wrapText(raw.join(' '), Math.floor((w - 12) / m.charW)) : raw;
+		const h = Math.max(m.minH, (lines.length + (node.model ? 1 : 0)) * m.lineH + 20);
+		return { node, col, row, w, lines, h, x0: col * m.colW + m.inset };
+	});
+
+	const rowCount = Math.max(...placed.map((p) => p.row)) + 1;
+	const rowH = Array.from({ length: rowCount }, (_, row) => Math.max(m.minH, ...placed.filter((p) => p.row === row).map((p) => p.h)));
+	const rowY: number[] = [];
+	rowH.reduce((y, h, row) => {
+		rowY[row] = y;
+		return y + h + m.gap;
+	}, m.pad);
+
+	const byId = new Map(placed.map((p) => [p.node.id, p]));
+	const crosses = (x: number, top: number, bottom: number, skip: string[]) =>
+		placed.some(
+			(p) => !skip.includes(p.node.id) && x > p.x0 - 2 && x < p.x0 + p.w + 2 && bottom > rowY[p.row] && top < rowY[p.row] + rowH[p.row],
+		);
+
+	// Decide each edge's route first, so the grid can make room for side lanes.
+	const gridW = columns * m.colW;
+	const routes = edges.map((edge) => {
+		const a = byId.get(edge.from);
+		const b = byId.get(edge.to);
+		if (!a || !b) throw new Error(`Flowchart "${title}": unknown edge ${edge.from} -> ${edge.to}`);
+		if (b.row < a.row || edge.back) return { kind: 'back' as const };
+		if (b.row === a.row) return { kind: 'plain' as const };
+		const ax = a.x0 + a.w / 2;
+		const bx = b.x0 + b.w / 2;
+		const yA = rowY[a.row] + rowH[a.row];
+		const yB = rowY[b.row];
+		const turn = b.row - a.row > 1 ? yB - m.gap / 2 : yA + m.gap / 2;
+		const skip = [a.node.id, b.node.id];
+		if (!crosses(ax, yA, turn, skip) && !crosses(bx, turn, yB, skip)) return { kind: 'plain' as const };
+		const side = ax < gridW / 2 ? ('left' as const) : ('right' as const);
+		// Leave and enter through the sides when nothing sits beside either box.
+		const clear = (box: typeof a) =>
+			!placed.some((p) => p.row === box.row && p !== box && (side === 'left' ? p.x0 < box.x0 : p.x0 > box.x0));
+		return { kind: 'side' as const, side, flank: clear(a) && clear(b) };
+	});
+
+	const leftLanes = routes.filter((r) => r.kind === 'side' && r.side === 'left').length;
+	const rightLanes = routes.filter((r) => r.kind === 'back' || (r.kind === 'side' && r.side === 'right')).length;
+	const left = m.pad + (leftLanes ? leftLanes * m.lane + 4 : 0);
+	const width = left + gridW + (rightLanes ? rightLanes * m.lane + 18 : 0) + m.pad;
+	const height = rowY[rowCount - 1] + rowH[rowCount - 1] + m.pad;
+
+	const boxes = new Map(
+		placed.map((p) => {
+			const x = left + p.x0;
+			const y = rowY[p.row];
+			const h = rowH[p.row];
+			return [p.node.id, { node: p.node, lines: p.lines, w: p.w, row: p.row, x, y, h, cx: x + p.w / 2, cy: y + h / 2 }];
+		}),
+	);
+
+	let leftIndex = 0;
+	let rightIndex = 0;
+	const paths = edges.map((edge, index) => {
+		const a = boxes.get(edge.from)!;
+		const b = boxes.get(edge.to)!;
+		const route = routes[index];
+		const label = edge.label;
+
+		if (route.kind === 'back') {
+			const gx = left + gridW + 6 + rightIndex++ * m.lane;
+			return { d: `M ${a.x + a.w} ${a.cy} H ${gx} V ${b.cy} H ${b.x + b.w + 2}`, label, lx: gx + 4, ly: (a.cy + b.cy) / 2, anchor: 'middle', rotate: true };
+		}
+
+		if (a.row === b.row) {
+			const leftToRight = a.cx < b.cx;
+			const x1 = leftToRight ? a.x + a.w : a.x;
+			const x2 = leftToRight ? b.x - 2 : b.x + b.w + 2;
+			return { d: `M ${x1} ${a.cy} H ${x2}`, label, lx: (x1 + x2) / 2, ly: a.cy - 6, anchor: 'middle' };
+		}
+
+		const y1 = a.y + a.h;
+		const y2 = b.y - 2;
+		const below = y1 + m.gap / 2;
+		const above = b.y - m.gap / 2;
+
+		if (route.kind === 'side') {
+			const gx = route.side === 'left' ? left - 6 - leftIndex++ * m.lane : left + gridW + 6 + rightIndex++ * m.lane;
+			if (route.flank) {
+				const out = route.side === 'left' ? a.x : a.x + a.w;
+				const into = route.side === 'left' ? b.x - 2 : b.x + b.w + 2;
+				return { d: `M ${out} ${a.cy} H ${gx} V ${b.cy} H ${into}`, label, lx: (gx + into) / 2, ly: b.cy - 6, anchor: 'middle' };
+			}
+			return { d: `M ${a.cx} ${y1} V ${below} H ${gx} V ${above} H ${b.cx} V ${y2}`, label, lx: b.cx + 5, ly: y2 - 6, anchor: 'start' };
+		}
+
+		if (Math.abs(a.cx - b.cx) < 1) {
+			return { d: `M ${a.cx} ${y1} V ${y2}`, label, lx: a.cx + 5, ly: (y1 + y2) / 2 + 4, anchor: 'start' };
+		}
+		const turn = b.row - a.row > 1 ? above : below;
+		return { d: `M ${a.cx} ${y1} V ${turn} H ${b.cx} V ${y2}`, label, lx: b.cx + 5, ly: y2 - 6, anchor: 'start' };
+	});
+
+	return { width, height, boxes: [...boxes.values()], paths, m };
+};
+
+const wide = draw(cols, {}, WIDE);
+const small = narrow ? draw(narrow.cols, narrow.at ?? {}, narrowMetrics(narrow.cols)) : null;
+const drawings = [
+	{ key: 'wide', drawing: wide, minWidth: Math.min(wide.width, 560) },
+	...(small ? [{ key: 'narrow', drawing: small, minWidth: 0 }] : []),
+];
+---
+
+<figure class:list={['flowchart', small && 'has-narrow']}>
+	{
+		drawings.map(({ key, drawing, minWidth }) => {
+			const { width, height, boxes, paths, m } = drawing;
+			const id = `${slug}-${key}`;
+			return (
+				<div class={`scroll ${key}`}>
+					<svg
+						viewBox={`0 0 ${width} ${height}`}
+						role="img"
+						aria-labelledby={`${id}-title ${id}-desc`}
+						style={`min-width: ${minWidth}px; max-width: ${width}px`}
+					>
+						<title id={`${id}-title`}>{title}</title>
+						<desc id={`${id}-desc`}>{description}</desc>
+						<defs>
+							<marker id={`${id}-arrow`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+								<path d="M 0 0 L 10 5 L 0 10 z" class="arrowhead" />
+							</marker>
+						</defs>
+						{paths.map((path) => (
+							<path d={path.d} class="edge" marker-end={`url(#${id}-arrow)`} />
+						))}
+						{boxes.map((box) => {
+							const total = box.lines.length + (box.node.model ? 1 : 0);
+							const top = box.y + box.h / 2 - ((total - 1) * m.lineH) / 2 + m.font / 3;
+							return (
+								<g class:list={['node', box.node.model && `model-${box.node.model}`, box.node.decision && 'decision']}>
+									<rect x={box.x} y={box.y} width={box.w} height={box.h} rx="6" class="box" />
+									{box.lines.map((line, index) => (
+										<text x={box.cx} y={top + index * m.lineH} text-anchor="middle" class="label" font-size={m.font}>
+											{line}
+										</text>
+									))}
+									{box.node.model && (
+										<text x={box.cx} y={top + box.lines.length * m.lineH} text-anchor="middle" class="model" font-size={m.modelFont}>
+											{MODEL_LABELS[box.node.model]}
+										</text>
+									)}
+								</g>
+							);
+						})}
+						{paths.map((path) =>
+							path.label ? (
+								<text
+									x={path.lx}
+									y={path.ly}
+									text-anchor={path.anchor}
+									class="edge-label"
+									font-size={m.font - 1}
+									transform={path.rotate ? `rotate(90 ${path.lx} ${path.ly})` : undefined}
+								>
+									{path.label}
+								</text>
+							) : null,
+						)}
+					</svg>
+				</div>
+			);
+		})
+	}
+	<figcaption>{title}</figcaption>
+</figure>
+
+<style>
+	.flowchart {
+		margin: 1.5rem 0;
+		container-type: inline-size;
+	}
+	.scroll {
+		overflow-x: auto;
+	}
+	.narrow {
+		display: none;
+	}
+	@container (max-width: 600px) {
+		.has-narrow .wide {
+			display: none;
+		}
+		.has-narrow .narrow {
+			display: block;
+		}
+	}
+	svg {
+		display: block;
+		width: 100%;
+		height: auto;
+		font-family: var(--gaia-font-body);
+	}
+	figcaption {
+		margin-top: 0.5rem;
+		font-size: var(--sl-text-sm);
+		color: var(--gaia-muted);
+	}
+	.edge {
+		fill: none;
+		stroke: var(--gaia-muted);
+		stroke-width: 1.5;
+	}
+	.arrowhead {
+		fill: var(--gaia-muted);
+	}
+	.edge-label {
+		fill: var(--gaia-ink-dim);
+		paint-order: stroke;
+		stroke: var(--gaia-canvas);
+		stroke-width: 4px;
+	}
+	.box {
+		fill: var(--gaia-surface);
+		stroke: var(--gaia-line);
+		stroke-width: 1.5;
+	}
+	.decision .box {
+		fill: var(--gaia-canvas);
+		stroke: var(--gaia-ink-dim);
+		stroke-dasharray: 5 4;
+	}
+	.label {
+		fill: var(--gaia-ink);
+	}
+	.model {
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+	.node .model {
+		fill: var(--model-color);
+	}
+	.model-opus,
+	.model-top {
+		--model-color: var(--gaia-accent);
+	}
+	.model-sonnet {
+		--model-color: var(--gaia-secondary-soft);
+	}
+	.model-haiku {
+		--model-color: var(--gaia-warn-soft);
+	}
+	.model-session {
+		--model-color: var(--gaia-ink-dim);
+	}
+	.model-opus .box,
+	.model-top .box {
+		stroke: var(--gaia-accent-2);
+	}
+	.model-sonnet .box {
+		stroke: var(--gaia-secondary-2);
+	}
+	.model-haiku .box {
+		stroke: var(--gaia-warn-2);
+	}
+</style>

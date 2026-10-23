@@ -1,0 +1,236 @@
+---
+title: React performance
+description: A diagnostic that records real React renders for one interaction and finds the component that re-renders when it should not, and why. It measures; it does not fix.
+sidebar:
+  order: 3
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+GAIA includes a render-performance diagnostic that finds the wasted re-renders
+behind a slow interaction and names exactly what to fix. You point it at one
+specific interaction, like a button click, and it singles out the component that
+re-renders when it shouldn't and explains what is causing the extra work.
+
+The render capture is built on [bippy](https://github.com/aidenybai/bippy), the
+same library that [react-scan](https://github.com/aidenybai/react-scan) uses to
+read React's internal component tree (the fiber tree).
+
+It measures. It does not fix anything itself. The diagnosis names the component,
+the input that keeps changing, and the recommended fix; you (or Claude, in normal
+conversation) apply it.
+
+## How to invoke
+
+It runs in the main checkout or a linked worktree. The dev server and Playwright use that tree's own ports (`bash .gaia/scripts/ports.sh` prints them).
+
+The skill loads only when you clearly ask about rendering: the `/gaia-react-perf`
+command, or a request in plain words that mentions renders.
+
+**Triggers** on phrasing like "profile renders", "measure renders", "why is X
+re-rendering", or "diagnose render performance". It does **not** trigger on vague
+"feels slow", "janky", or "optimize my app".
+
+**Example phrasing:** "profile renders on the dashboard table", "why does the
+theme toggle re-render the header", "measure renders on the checkout form".
+
+It also needs one small, specific interaction to measure: a button click or a
+local state change on a specific page. It refuses a page navigation or "the whole
+app". A navigation re-renders the whole page, so the problem gets lost among
+hundreds of framework renders. A small interaction re-renders only the part of the
+page it affects, so the culprit stands out as one clear row. If you don't name a
+target, the skill asks for one first.
+
+## The workflow
+
+The diagnostic writes a large raw capture to disk, then reduces it to a small
+summary. Even for a trivial interaction the raw file is roughly 172 KB, about 43K
+tokens. It never enters the conversation; Claude reads only the summary.
+
+### 1. Capture
+
+The skill writes a short, temporary [Playwright](https://playwright.dev/) test file (a spec) that performs
+your target interaction, using the committed capture helper at
+`frontend/.playwright/react-perf/capture.ts`. The helper records every render your
+interaction causes and writes the raw data to
+`.gaia/local/cache/<run>/renders.json` at the repository root.
+
+```ts
+import {expect, test} from '@playwright/test';
+import {collectRenderDump, installRenderCapture} from '../react-perf/capture';
+import {hydration} from '../utils';
+
+test('drive the target micro-interaction and capture renders', async ({page}) => {
+  // isStrictModeDisabled gives honest, non-doubled timings (see the caveat below).
+  await installRenderCapture(page, {isStrictModeDisabled: true});
+
+  await page.goto('/'); // the target route
+  await hydration(page); // wait for hydration before interacting
+
+  // Drive the micro-interaction (a button click or local state change).
+  const toggle = page.locator('header').getByRole('button');
+  await expect(toggle).toBeVisible();
+  await toggle.click();
+
+  // isRunDirectoryKept: true is required, or the run dir auto-deletes on process
+  // exit before the reduce step can read it.
+  const result = await collectRenderDump(page, {isRunDirectoryKept: true});
+  console.log(`RAW_DUMP_PATH=${result.rawPath}`);
+});
+```
+
+Run it. The Playwright config starts the dev server for you.
+
+<Aside type="caution">
+The capture only works on a development build. A production build is rejected.
+</Aside>
+
+```sh
+pnpm pw react-perf-drive
+```
+
+The spec logs `RAW_DUMP_PATH=...`. That absolute path is the input to the reduce
+step. The temporary spec is removed once the diagnosis is done.
+
+### 2. Reduce
+
+Next, the skill runs GAIA's bundled CLI on the raw file to produce a small, ranked
+summary: `gaia react-perf reduce <RAW_DUMP_PATH>`. The `gaia` command comes from
+the project's installed packages, so the skill runs it for you; you don't type it
+into a separate terminal.
+
+The reduce step drops renders that come from the framework rather than your code,
+ranks the findings, and prints a `ReducedSummary` as JSON. The frame budget, the
+time one frame gets at 60 frames per second, defaults to 16ms; pass
+`--frame-budget-ms <n>` to change it. Input it cannot read prints a structured
+error and exits non-zero. The skill reads only that summary.
+
+### 3. Diagnose
+
+A component wrapped in `memo` is supposed to skip re-rendering when its inputs
+have not changed. The diagnostic looks for renders where that memo was defeated
+(`memoDefeated`), not just for anything that re-rendered. A render is
+memo-defeated when the memo-wrapped component re-renders and every input that
+changed is a newly created object or function: a new reference, so `Object.is`
+sees it as different from the last render.
+
+Renders where nothing meaningful changed are not reported on their own, because
+chasing them leads to wrapping everything in memo for no real gain. Findings are ranked by how many renders were
+memo-defeated times how long the slowest one took (`memoDefeatedCount` times
+`maxTotalTime`). A component is flagged on timing alone only when it and its
+children take longer than the frame budget to render.
+
+Read the top finding (`rank: 1`) like this: the component re-rendered
+`renderCount` times during the interaction, and `memoDefeatedCount` of those were
+memo-defeated. `unstableInputs` names the inputs that defeated the memo.
+`maxTotalTime` and `exceedsFrameBudget` say whether the component and its
+children are actually expensive to render.
+
+### 4. Hand off the fix
+
+Fix the structure first. If a value never changes, move it out of the component
+to a constant at the top of the file (module level). A value that depends on
+render state is memoized for you by the React Compiler, so if it still arrives
+unstable, the compiler skipped the component (a bailout). Fix the cause of the
+bailout, or apply one of the exception cases in the [`react-code`](/skills/code/#react-code) skill. Don't add
+`useMemo` or `useCallback` by hand. `unstableInputs` tells you which case you have.
+
+| Unstable input | Structural fix (try first) | When it depends on render state |
+|---|---|---|
+| An inline object or array prop (`prop:<name>`) | Move the literal to a module-level `const` | Fix the compiler bailout, or apply an exception case |
+| A callback prop (`prop:<name>`) | Move the handler to module level when it uses nothing from the component | Fix the compiler bailout, or apply an exception case |
+| A context value built on every render (`context`) | Move a static value to a module-level const, or split the context so components that don't use the changed part stop re-rendering | Fix the compiler bailout, or apply an exception case |
+| A child component defined inside another component's body | Move the component to module level | Not a memoization fix |
+
+The reduce never labels that last case. It works from a flat list of renders and
+cannot tell that a component was defined inside another, so `reactDoctorRule`
+names only the prop or context instability it sees, or is `null`. Recognize the
+case from the component name and the unstable input, then move the component to
+module level.
+
+### 5. Verify
+
+After the fix, re-run the same drive spec and reduce. Confirm that the finding's
+`memoDefeatedCount` drops to 0. A memo that really works skips its render
+entirely, so the capture records nothing for it and the component disappears from
+`findings`. That absence is the clearest proof.
+
+## Reading the summary
+
+Each entry in `findings[]` carries these fields. Read them by name.
+
+| Field | What it tells you |
+|---|---|
+| `componentName`, `isMemo` | The app's component, and whether it is wrapped in `memo` |
+| `renderCount` | Re-renders during the interaction (first renders not counted) |
+| `memoDefeatedCount` | How many of those were memo-defeated (the main signal) |
+| `unstableInputs` | What defeated the memo: `prop:<name>`, `state[<i>]`, or `context` |
+| `totalSelfTime`, `maxTotalTime` | Total render time of the component itself, and the longest render of the component plus its children |
+| `exceedsFrameBudget` | Whether that longest render crosses the frame budget |
+| `reactDoctorRule` | A label naming the code pattern behind it (see below) |
+| `rank` | Position in the ranked list (1 is the top finding) |
+
+The summary also reports `totals` (records, updates, mounts, renders filtered out
+as framework, app components, and the overall memo-defeated count),
+`unknownNameCount` (renders whose component name could not be found, which is
+worth investigating in itself), `strictModeTimingCaveat`, `profilingAvailable`,
+and `rendererVersion`.
+
+The `reactDoctorRule` field names the code pattern that most likely causes the
+problem and points at the matching fix. The reduce emits
+`jsx-no-new-object-as-prop` when most of the instability comes from props,
+`jsx-no-constructed-context-values` when most of it comes from context, or `null`
+when only state is unstable. These labels help you read the diagnosis. They are
+not [ESLint](https://eslint.org/) rules that run, and the diagnostic never compares them with lint
+output.
+
+## When to stop
+
+Stop when both stop-signal fields are true:
+
+> Stop when `stopSignal.zeroAppMemoDefeated` is true **and**
+> `stopSignal.noAppFrameBudgetBreach` is true.
+
+The memo-defeat count catches cheap mistakes: a memo that silently does nothing.
+The frame-budget check catches the rarer case of a part of the page that is slow
+to render, which the count alone can miss. You need both, not either.
+
+Leftover findings are noted as out of scope instead of chased. A framework row (a
+router or library internal that the name check missed) is not something your app
+can fix, and an app finding far below the frame budget is too small to notice and
+not worth fixing.
+
+## Under the React Compiler
+
+React Compiler is on by default and memoizes components for you, so the capture counts a compiled component (one carrying the compiler's memo cache) as `isMemo: true`. A memo-defeated render on a compiled component therefore means its inputs arrive unstable from code the compiler does not compile (a third-party component, or a file opted out with `"use no memo"`). It does not mean a manual memo is missing.
+
+The recommended fix is still structural first: move a value that never changes to a module-level constant. The compiler memoizes values that depend on render state, so when one still arrives unstable, the compiler skipped that code (a bailout, caused by breaking a Rule of React). Fix the bailout, or apply one of the exception cases in the [`react-code`](/skills/code/#react-code) skill. Never wrap everything in memo.
+
+To measure what the compiler itself saves, compare re-render counts between captures taken with `isReactCompilerEnabled` off and on in `frontend/react-compiler.config.ts`.
+
+## When to use it, and when not
+
+Use it to find out why a memo that should skip a render does not, on one concrete
+interaction.
+
+Keep the cost in perspective. Saving renders often makes no difference anyone can
+notice. A memo-defeated render of a small component with no children costs about
+0.038ms, hundreds of times under the 16ms frame budget. The diagnostic mainly
+finds broken memos and values that are recreated on every render. It is most
+valuable when the component whose memo is defeated is expensive to render, along
+with its children (`exceedsFrameBudget: true`). Don't let a finding with no
+noticeable cost tempt you into wrapping everything in memo.
+
+Two more limits worth knowing:
+
+- **Timings need an honest baseline.** Under React's StrictMode, components
+  render twice, which roughly doubles the measured times. The capture above turns
+  StrictMode off for honest numbers. If a run leaves StrictMode on, the summary
+  sets `strictModeTimingCaveat: true`; compare those timings with each other, but
+  don't read them as real durations.
+- **Telling app code from framework code is a guess based on names.** The reduce
+  decides whether a render is framework noise or your code by the component's
+  name, not by where it is defined. A component with an unusual name can slip
+  through, which is one more reason a person reviews the fix.
+
+Source: `frontend/.claude/skills/gaia-react-perf/SKILL.md`.

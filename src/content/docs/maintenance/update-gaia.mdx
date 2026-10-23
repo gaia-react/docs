@@ -1,0 +1,100 @@
+---
+title: /update-gaia
+description: Pull the latest GAIA release into your project without overwriting your customizations.
+---
+
+`/update-gaia` pulls the latest GAIA release into your project. It merges each file by comparing three versions: your file, the same file in the GAIA release your project is on, and the same file in the latest release (a [three-way merge](#the-three-way-merge)). GAIA's changes come in, your customizations stay, and you answer one question per real conflict. When a new release is available, the statusline shows a `🚀 /update-gaia` indicator.
+
+It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, in a worktree of its own, ending in a pull request.
+
+## How to invoke
+
+Click the `🚀 /update-gaia` statusline indicator, or ask in plain language:
+
+- "update GAIA"
+- "pull the latest GAIA"
+- "apply the new GAIA release"
+
+## What it does
+
+1. **Checks where it is running.** Refuses inside a linked worktree other than its own update worktree. Reads your current GAIA version from `.gaia/VERSION` and looks up the latest release. Never moves you to an older version.
+2. **Pulls first if your checkout is behind.** When your main checkout's GAIA version is behind the remote's, it fast-forwards your checkout instead of updating, then offers to continue from the pulled copy.
+3. **Checks for a teammate's update.** Before any download, it reads the open update claims. If a teammate's claim is still active, your run stops and names their pull request. If the claim is your own, the run resumes it or closes it to start fresh. The statusline also shows when a teammate's update is in progress.
+4. **Downloads and verifies the bundles.** Each release ships as `gaia-bundle-<tag>.tar.gz` with a `.sha256`. The bundle for your current version and the latest bundle are both checked against their published checksums before anything else happens, and cached under `.gaia/local/cache/shared/update-gaia/`. A mismatch stops the run. If a fresh download still doesn't match, the release is damaged or tampered with; report it upstream.
+5. **Picks the migration notes** shipped in the verified bundle (see [Migration notes](#migration-notes)).
+6. **Shows the full changelog** from your version to the latest, including every release in between, and asks **Proceed** or **Abort**. Abort leaves your project unchanged. The verified bundles stay in the update cache.
+7. **Creates an update worktree** on an `update/v<version>-<timestamp>` branch, from the default branch, whichever branch your main checkout holds. Your checkout's branch, files, and `node_modules` stay as you left them. The run then claims the update with an empty commit and a draft pull request, so two teammates never update at once. If the claim can't be made, it warns and continues without one.
+8. **Merges every file** (see [The three-way merge](#the-three-way-merge)), then asks you one question per real conflict, up to four per prompt. Every answer is recorded in `.gaia/update-decisions.json`, which is committed with the update, so the next update does not ask again. An item you put off is asked again at the next update.
+9. **Follows after-merge migration notes** and carries any new [setup features](/getting-started/setup-gaia/#phase-owed-setup-features) the release adds.
+10. **Writes the new version** and manifest, runs the Quality Gate, and shows a summary: every file by outcome, every answer, every item still deferred, and any action the release notes say you owe (a dependency GAIA dropped, a file it removed), with the exact command. Those are suggestions; nothing is removed for you. It also records the harness files where it combined your edits with GAIA's, so the statusline can suggest [`/gaia-fitness`](/maintenance/fitness/#the-statusline-nudge) to review them once the update lands.
+11. **Asks once to commit**, then pushes. The push updates the claim pull request, whose description is replaced with the summary; without a claim, it opens a draft pull request, `chore(gaia): update to <tag>`. Either way the pull request merges through the [Code Audit Team](/workflow/code-audit-team/).
+12. **Prints the residue sweep**, a cleanup command to run from the main checkout once the pull request merges: `bash .gaia/scripts/state-registry-lib.sh residue-sweep --apply`. It deletes files under `.gaia/local` that retired features left behind.
+
+The run ends with a [cost line](/models-and-context/cost/).
+
+**Why the checksum:** a tampered or corrupted bundle would be merged straight into your Claude setup and hooks. See the [gate reference](/reference/gates/#update-gaia-checksum).
+
+## The three-way merge
+
+For every file GAIA ships, `/update-gaia` compares three copies:
+
+- **Yours**: the file in your project now.
+- **Base**: the same file in the GAIA release your project is on, the version in `.gaia/VERSION`.
+- **Latest**: the same file in the new release.
+
+The base is what makes the merge safe. Comparing yours with the base shows what you changed. Comparing the latest with the base shows what GAIA changed. So the merge never has to guess whose edit a difference is.
+
+| What changed since the base | What happens |
+| --- | --- |
+| Only you changed the file, or nobody did | Yours stays as it is. |
+| Only GAIA changed it | GAIA's new version replaces yours. |
+| You both changed it | The two sets of changes are merged, then checked by Claude (below). |
+| The file is new in the release | It is added. |
+| You deleted the file | It stays deleted. |
+| GAIA removed the file, and you never edited it | It is deleted. |
+| GAIA removed the file, and you edited it | You are asked whether to remove it or keep it. |
+
+When you both changed a file, `git merge-file` merges the two line by line. Claude then reads your change and GAIA's change side by side, even when the text merged cleanly. Two edits can solve the same problem on different lines and merge without a conflict into duplicate or contradictory instructions, which a line-by-line merge cannot see.
+
+- **Separate concerns that merged cleanly** are written with no question.
+- **Everything else** becomes one question: a text conflict, two changes to the same thing, or changes that contradict each other. The answers are **Combine** (both changes in one version, shown to you first), **Keep mine**, **Take GAIA's**, and **Decide later**, with the recommended one first. When your change covers something GAIA's misses, Claude suggests opening an issue on [gaia-react/gaia](https://github.com/gaia-react/gaia) describing it.
+
+Every file the merge overwrites or deletes is backed up first, under `.gaia-backup/<timestamp>/` in the update worktree (gitignored).
+
+### Ownership classes
+
+Each file's class in `.gaia/manifest.json` sets a few details of the merge:
+
+| Class | Who controls it |
+| --- | --- |
+| `owned` | GAIA fully. |
+| `shared` | GAIA provides the starting version, you customize it. |
+| `wiki-owned` | Wiki pages GAIA provides, handled like `shared`. Sections you added are kept. |
+| Yours (implicit) | Anything not in the manifest, plus `wiki/log.md`, `.gaia/VERSION`, `.gaia/manifest.json`, and `.gaia/update-decisions.json`. Never touched by the merge. |
+
+`package.json`, `pnpm-workspace.yaml`, and `.gaia/audit-ci.yml` are merged key by key instead of as whole files, so your own dependencies, overrides, build approvals, and roster entries are never touched. Some shipped files contain sections a command generates; after the merge, that command regenerates them.
+
+## Stopping and resuming
+
+Every stop after the update worktree exists leaves it in place, changes nothing in your main checkout, and prints the worktree's path and the commands to discard it:
+
+```text
+git worktree remove --force <worktree path>
+git branch -D <branch>
+```
+
+Re-run `/update-gaia` to resume. If a run stopped before writing the new version, re-running safely repeats the merge and your answers. If it stopped after writing the version but before committing, re-run it inside the update worktree and it picks up at the Quality Gate.
+
+## Migration notes
+
+A release can ship migration notes in its bundle, under `.gaia/migrations/<version>.md`, for steps a file merge cannot do: moving a directory tree, rewriting a config, removing a retired feature. `/update-gaia` reads notes only from the verified bundle, never from your working tree or a URL. It follows the notes for every version between yours and the latest, oldest first.
+
+- **After-merge** notes run after the merge and before the version write. They are safe to repeat.
+- **Blocking** notes stop the update before anything is branched or merged. `/update-gaia` names the note and asks whether to follow it now. Following the note brings you to that note's version; re-run `/update-gaia` afterwards to get anything newer.
+
+## Gotchas
+
+- Run it from the main checkout. Inside any other linked worktree it refuses and tells you whether an update is pending.
+- An update to the same version that is already applied but not committed is reported as such, never as "up to date". Commit it, or run `git checkout -- .gaia/VERSION` to start over.
+
+Source: `.claude/skills/update-gaia/SKILL.md`.

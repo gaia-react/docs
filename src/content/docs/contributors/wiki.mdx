@@ -1,18 +1,18 @@
 ---
 title: Contributor wiki content
-description: wiki/entities and wiki/meta are excluded from the end user tarball. Contributor-only wiki content and the gaia:maintainer-only block convention.
+description: "Contributor-only wiki directories, the gaia:maintainer-only block convention, the wiki/.state.json state model, and the gaia wiki CLI subcommands."
 sidebar:
   order: 6
 ---
 
-Two directories under `gaia/wiki/` are excluded from the end user tarball by `.gaia/release-exclude`:
+Two directories under `gaia/wiki/` are excluded from the release bundle by `.gaia/release-exclude`:
 
 - `wiki/entities/`: named systems, products, and people tracked across the codebase.
 - `wiki/meta/`: process and convention pages about the wiki itself.
 
-Three individual concept and decision pages are also excluded: `wiki/concepts/Release Workflow.md`, `wiki/decisions/Bundle-time Scrub.md`, and `wiki/decisions/Forensics Triage Workflow.md`.
+Individual concept and decision pages are excluded too, each because its subject is maintainer-only: `wiki/concepts/Release Workflow.md`, `wiki/concepts/Release-Notes.md`, `wiki/decisions/Bundle-time Scrub.md`, `wiki/decisions/CLI-Binary-Split.md`, `wiki/decisions/Folding Shell Scripts into the CLI Binary.md`, `wiki/decisions/Forensics Triage Workflow.md`, `wiki/decisions/Sharded CI Test Matrix.md`, `wiki/decisions/Shell Guard Fixture Discrimination.md`, `wiki/decisions/Local Test Runtime.md`, and `wiki/decisions/Dependabot as a Data Source.md`. `.gaia/release-exclude` is the authoritative list.
 
-The user-facing wiki workflow (`/gaia-wiki sync`, `/gaia-wiki consolidate`, `/gaia-wiki lint`) lives in end user docs. This page covers content that contributors maintain on the template repo's own wiki.
+The wiki workflow every project runs, [`/gaia-wiki`](/maintenance/wiki/), is in the main docs. This page covers content contributors maintain on the GAIA repo's own wiki.
 
 ## wiki/entities/
 
@@ -21,32 +21,79 @@ Pages here describe named entities the GAIA team tracks. Current entries:
 - `GAIA.md`: the project itself, including history, naming convention, and supporting links.
 - `Steven Sacks.md`: author and maintainer.
 
-Entity pages use the `entity` type frontmatter with an `entity_type` discriminator (`project`, `person`, etc.).
+Entity pages use the `entity` type in their frontmatter, with an `entity_type` field saying what kind of entity it is (`project`, `person`, etc.).
 
-When to add: a new entity becomes worth tracking on its own page when it gets cross-linked from concept or decision pages and when its identity is useful to disambiguate from other names. Generic concepts go under `wiki/concepts/`, not here.
+When to add: give an entity its own page once concept or decision pages link to it and a page of its own helps tell it apart from similar names. Generic concepts go under `wiki/concepts/`, not here.
 
 ## wiki/meta/
 
-Pages here describe the wiki's own process. The directory currently holds wiki lint reports and consolidate reports dated by run, plus a dashboard. The reports are generated artifacts of `/gaia-wiki lint` and `/gaia-wiki consolidate` runs.
+Pages here describe the wiki's own process. `/gaia-wiki` writes two reports here, each overwritten on every run, with earlier runs in the commit history:
 
-When to add: a new meta page is appropriate when it documents how the wiki itself works (a new convention, a new dashboard, a new workflow). Generated lint and consolidate reports land here automatically; do not write them by hand.
+- `wiki/meta/lint-report.md`, from the lint stage.
+- `wiki/meta/consolidate-report.md`, from the consolidate stage.
+
+Do not write these by hand. The directory is release-excluded, so a fresh project has no `wiki/meta/` until its first `/gaia-wiki` run creates it.
+
+When to add: a new meta page is appropriate when it documents how the wiki itself works (a new convention, a new dashboard, a new workflow).
+
+## wiki/.state.json
+
+`wiki/sync` and `wiki/consolidate` share a single state file at `wiki/.state.json`. Only CLI subcommands write it, and each write replaces the file in one step. Do not edit it by hand while a workflow is running.
+
+| Field | Written by | Value |
+|---|---|---|
+| `version` | `state-init` | Always `1`. |
+| `last_evaluated_sha` | sync | Full 40-char SHA of HEAD at the last sync evaluation. |
+| `last_evaluated_at` | sync | ISO-8601 timestamp of the last sync evaluation. |
+| `last_consolidated_sha` | sync (bootstrap) / consolidate | Full 40-char SHA at consolidate completion; bootstrapped by sync on first run. |
+| `last_consolidated_at` | consolidate | ISO-8601 timestamp at consolidate completion. |
+
+`gaia wiki state-init <sha>` creates the file on a fresh project (refuses if it already exists). `gaia wiki state-bump <field> <value>` updates a single field and preserves all others. `gaia wiki state --json` reads the file and reports how far the wiki has fallen behind the code (drift severity), the head SHA, and page counts per domain.
+
+## gaia wiki CLI primitives
+
+`gaia wiki` has these subcommands. `/gaia-wiki` and its subagents call them; you rarely run them by hand except to debug.
+
+| Subcommand | Description |
+|---|---|
+| `state [--json]` | Drift report: commits since `last_evaluated_sha`, severity, page counts per domain. |
+| `commit-classify --since <sha> [--json]` | Mark each commit since `<sha>` as `WORTHY` (worth a wiki update) or `SKIP`. |
+| `state-init <sha>` | Create `wiki/.state.json` (refuses if the file already exists). |
+| `state-bump <field> <value>` | Update one field in `wiki/.state.json`, keeping all the others. |
+| `log-prepend --sha <h> --decision <D> --reason "..."` | Prepend a decision line to `wiki/log.md`. |
+| `page-index [--json]` | List every wiki page with its frontmatter and wikilinks. |
+| `orphans [--json]` | Pages no other page links to. |
+| `near-collisions [--max-distance N]` | Page names in the same domain that differ by only a few characters (Levenshtein distance). |
+| `dead-paths [--json]` | Repo paths written in backticks in wiki text that no longer exist. |
+| `frontmatter [--json]` | Pages missing required frontmatter (`type`, `status`). Excludes `wiki/meta/`. |
+| `empty-sections [--json]` | Headings with no content and no subheadings; a heading with subheadings is never flagged. |
+| `broken-links [--json]` | Wikilinks whose target page does not exist. |
+| `chain <begin\|commit\|finish\|refresh-nudge>` | Runs the full `/gaia-wiki` chain on one branch with one pull request. |
+
+`chain` subcommands:
+
+- `begin` runs on the branch `/gaia-wiki` already created (a `wiki/<YYYY-MM-DD-HHMM>` branch, in a worktree by default) and refuses `main` and `master`.
+- `commit` commits every stage's `wiki/` edits as one commit titled `wiki: <date> <time> UTC`; a no-op when nothing changed; refuses when non-wiki changes are present.
+- `finish` pushes the branch and opens one pull request as a draft (or ready, on a private repository that refuses drafts). On a branch that requires `GAIA-Audit`, it posts that status marking the change as outside the audit's scope. It then marks the pull request ready and queues auto-merge. If marking it ready fails, the pull request stays an open draft and auto-merge is not queued.
+- When nothing changed, `finish` opens no pull request. In a normal checkout it deletes the empty branch. In a linked worktree it leaves the branch for the caller to remove, and with uncommitted changes it leaves everything in place for review.
+- `refresh-nudge` updates the statusline's wiki nudge after the merge, from the main checkout's new drift.
 
 ## gaia:maintainer-only block convention
 
-Some pages under `wiki/concepts/`, `wiki/decisions/`, `.claude/`, and `.specify/extensions/gaia/` ship to end users but contain blocks that do not. The block convention is:
+Some files that ship contain blocks that do not: pages under `wiki/concepts/` and `wiki/decisions/`, files under `.claude/` such as `.claude/rules/pr-merge.md`, the `.gaia/audit-ci.yml` roster, and `.githooks/pre-commit`. The block convention is:
 
 ```markdown
 <!-- gaia:maintainer-only:start -->
-This block is contributor-only. It gets stripped from the end user
+This block is contributor-only. It gets stripped from the release
 tarball by the bundle-time scrub during release.
 <!-- gaia:maintainer-only:end -->
 ```
 
-The shipped file is a subset of the source: the markers and everything between them get removed by the scrub before the tarball builds. The literal phrase is `maintainer-only`; this is the on-disk identifier and matches the comment text in `.gaia/release-exclude` and the step name in `release.yml`. Public-facing references in the docs site use "Contributors."
+The shipped file is a subset of the source: the scrub removes the markers and everything between them before the tarball is built. The literal phrase is `maintainer-only`; this is the on-disk identifier and matches the comment text in `.gaia/release-exclude`. Public-facing references in the docs site use "Contributors."
 
-When to use the block convention rather than path-level exclusion: use blocks when most of a page is end user-relevant but a section needs to stay internal. Use path-level exclusion (an entry in `.gaia/release-exclude`) when the entire file is contributor-only.
+When to use the block convention rather than path-level exclusion: use blocks when most of a page is relevant to every project but a section needs to stay internal. Use path-level exclusion (an entry in `.gaia/release-exclude`) when the entire file is contributor-only.
 
 ## Cross-references
 
-- end user wiki workflow: see the `/gaia-wiki` skill in end user docs.
-- The `.gaia/release-exclude` manifest is the authoritative path-level exclusion list. Anything matched there is also skipped by `gaia-maintainer release manifest`, so the end user manifest never references files an end user cannot have.
+- The wiki workflow every project runs: [`/gaia-wiki`](/maintenance/wiki/).
+- The `.gaia/release-exclude` manifest is the authoritative path-level exclusion list. The maintainer's release tooling also skips anything listed there, so the shipped manifest never lists a file a project cannot have.

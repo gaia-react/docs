@@ -1,73 +1,99 @@
 ---
 title: Hooks
-description: Reference for the shell hooks GAIA registers with Claude Code.
+description: Reference for the Claude Code hooks GAIA registers, what each one does, and which ones can stop a tool call.
 sidebar:
   order: 1
 ---
 
-Most of GAIA's hooks live at `.claude/hooks/*.sh` and are registered in `.claude/settings.json` under the `hooks` key, keyed by event name. A few helper scripts under `.gaia/scripts/` are registered the same way for events outside the standard tool-call surface.
+[Hooks](https://code.claude.com/docs/en/hooks) are scripts Claude Code runs at set moments: before or after a tool call, when a session starts or stops, and when you send a message. GAIA registers them in `.claude/settings.json`. The app's `frontend/.claude/settings.json` is generated from the root settings plus an overlay file, so the same hooks run in both places. The scripts live in `.claude/hooks/`.
 
-Most hooks here either block dangerous tool calls outright (deny the call with a reason shown to Claude) or inject a one-line nudge into context. A few are advisory: they run, log a reminder to stderr, and exit clean.
+Unlike [rules](/reference/rules/), which Claude reads and follows, hooks are scripts that always behave the same way. A guard hook blocks a tool call no matter what the model decided, and its message tells you the allowed form of the command or the next step. A permission mode that skips prompts, such as auto mode, does not skip hooks.
 
-For Claude Code's own hook documentation, see [the Hooks reference on docs.claude.com](https://docs.claude.com/en/docs/claude-code/hooks).
+Some advisory hooks that react to `git` or `gh` commands carry an `if` filter, so they start only for the commands they apply to. Guard hooks never have one, so they always run. Each hook command finds its script from the root of the checkout the shell is in (`git rev-parse --show-toplevel`). A `cd` within the same checkout changes nothing. A `cd` into another checkout makes the hooks look for their scripts there instead: a clone without them runs no guards at all, and nothing reports it. That is why the `shell-cwd` rule bans `cd`. When `jq` is missing, a blocking hook refuses the call rather than letting it through.
 
-## SessionStart
+Why each guard exists, and how to clear it, is in the [gate reference](/reference/gates/).
 
-| Hook | What it does | Path |
+## Guards (can deny a tool call)
+
+### Bash and Monitor commands
+
+| Hook | Denies |
+|---|---|
+| `block-main-destructive-git` | Commits on `main` or `master`, force-pushes that name them, any push from them or that pushes `main`, `master`, or `HEAD`, and a `git checkout` or `git switch` that would move the main checkout off another session's open-PR branch. |
+| `block-no-verify` | `git commit` or `git push` with `--no-verify`, `-n` on a commit, or `-c core.hooksPath=<path>`. |
+| `block-rm-rf` | `rm -rf` of `/`, an absolute path outside the allowed scratch folders, `$HOME`, `.`, `*`, dotfile globs, `.git`, `.claude` and its children, and `node_modules`, plus `--no-preserve-root`. Scratch paths and the session scratchpad are allowed. |
+| `block-sensitive-read` | Reading dotenv files (`.env` and every `.env.<name>` except `.env.example`), keys (`.key`, `.pem`), files whose name contains `credential` (except TypeScript source), and anything under a `secrets` directory, through any Bash command that reads files, `source`, redirects, and filter flags such as `rg -g '*.key'`. Also plain `env` or `printenv`, which print every environment variable. Also registered on Read and Grep. |
+| `block-manifest-write` | Writes to `.gaia/manifest.json`, which lists only the files GAIA ships. `/update-gaia` writes it through a specific exemption. |
+| `block-invalid-pr-title` | A `gh pr create` or `gh pr edit` whose title would fail the PR Conventions lint once it becomes the squash-merge commit message (the title plus ` (#<n>)`), and `--fill` with no `--title`. |
+| `block-machine-local-ref-gh-text` | A `gh pr create`, `gh pr edit`, `gh issue create`, or `gh issue edit` whose title or body names a SPEC, UAT, or plan number, or a path to a specific entry under `.notebook/` or `.gaia/local/`. See [the gate](/reference/gates/#machine-local-references). |
+| `block-pr-create-without-draft` | A `gh pr create` for this repository without `--draft`. |
+| `block-fork-pr-checkout` | `gh pr checkout` or a `git fetch` of `pull/<n>/head` for a pull request from a fork, or one that `gh` cannot identify as fork or not. |
+| `block-handrolled-pr-poll` | A shell loop that checks `gh pr view` or `gh pr checks` over and over without reading `mergeable`; use `bash .gaia/scripts/pr-wait-merge.sh --pr <N>`. |
+| `pr-merge-audit-check` | `gh pr merge` until every Code Audit Team member responsible for the changed files has approved it. For a pull request outside the audit's scope, or a `chore(deps)` pull request that only changes dependency manifests, it posts the `skipped:` status itself. |
+| `worthiness-presence-check` | `gh pr merge` when a changed test has no worthiness record for its current content. In scope: stories, [Playwright](https://playwright.dev/) tests, and component or page tests whose result the classifier finds is not predictable. It checks only that the record exists, not its verdict. |
+| `red-verify-commit-check` | `git commit` of a new, passing test for code with predictable output (utilities, parsers, hooks) that was never seen failing. Exemptions are listed under [the RED gate](/reference/gates/#test-seen-failing-first-red-gate). |
+| `block-audit-loop-write` | Writes to the audit loop's protected state and context readings, running by hand the scripts that record a person's grant, and running the local-state cleanup scripts that only a hook may start. |
+
+### Edit, Write, and MultiEdit
+
+| Hook | Denies or asks |
+|---|---|
+| `block-secrets-write` | Content that contains an AWS key, a GitHub token, a private key header, or a variable with a secret-sounding name set to a real-looking value (including `export`, `declare`, and `local` forms), and any write to a `.env` file except `.env.example`. |
+| `block-eslint-config-edit` | **Asks** you to confirm any edit to an `eslint.config.*` file, and explains why: a config edit can silence a rule just as easily as it can make an approved migration. |
+| `block-manifest-write` | Writes to `.gaia/manifest.json`. |
+| `block-worktree-path-mismatch` | An edit whose path points into a different checkout than the worktree the session is working in. Writes to the main checkout's `.notebook/` are exempt. |
+| `block-audit-loop-write` | Writes to the audit loop's protected state. |
+
+### Agent and Task dispatches
+
+| Hook | Limits |
+|---|---|
+| `audit-loop-bound` | Each start of the audit loop or of a Code Audit Team member, per branch. It checks the context checkpoint, whether rounds are still making progress, and the hard limit on rounds, and blocks at a checkpoint until a person answers. |
+
+## Recorders and context
+
+These hooks never block anything. They record what happened (test failures, grants, usage) or add guidance to the session at the right moment.
+
+| Hook | Event | What it does |
 |---|---|---|
-| `wiki-session-start` | Records HEAD into `.git/claude-session-start` so the Stop hook can detect wiki commits during the session, and re-asserts per-machine memory contracts. | `.claude/hooks/wiki-session-start.sh` |
+| `audit-loop-grant` | UserPromptSubmit | Records `audit-grant <n>` or `audit-accept`, typed as your whole message in an interactive session. |
+| `audit-loop-ask-grant` | PostToolUse (AskUserQuestion) | Records your answer to the audit checkpoint's question. |
+| `post-findings-block-on-merge` | PreToolUse (`gh pr merge`) | Posts one comment collecting the pull request's audit findings, which `/gaia-codify` later counts. Never blocks. |
+| `capture-red-observations` | PostToolUse and PostToolUseFailure (Bash) | Records failing test runs, so the RED gate can see a test failed before it passed. |
+| `capture-gh-artifact` | PostToolUse (`gh pr create`) | Links the pull request to its branch in the usage ledger. |
+| `pr-merge-cost` | PostToolUse (`gh pr merge`) | Prints the pull request's cost box. |
+| `issue-claim-release` | PostToolUse (`gh pr merge`) | Removes `in-progress` from every issue the merged pull request closes, once the merge is confirmed. |
+| `debt-sentinel-touch` | PostToolUse (`gh` issue and merge commands) | Refreshes the statusline's tech-debt count. |
+| `workflow-doctrine-inject` | SessionStart, PostToolUse (EnterWorktree, `git`, `gh pr checkout`) | Adds GAIA's working rules to the session when it works on a branch or in a worktree (the roles are described in [Who does what](/workflow/work-lifecycle/#who-does-what)), and redirects a plain `git worktree add` under `.claude/worktrees/` to `EnterWorktree`. |
+| `context-checkpoint-inject` | PostToolUse | When context use reaches the red, fire, or skull level on the statusline, tells the main session to save its place and ask whether to continue or clear. |
+| `context-checkpoint-subagent` | PostToolUse | The same checkpoint for a sub-agent that was given a file to save its place in. |
+| `provision-worktree` | SessionStart, PostToolUse (EnterWorktree) | Links shared files into a worktree, gives it its own set of ports and a port file, and installs dependencies and typed routes. After `/clear` or compaction it repairs only a worktree that was never set up, so a set-up worktree costs nothing. |
+| `ports-session-start` | SessionStart | Records which session started which dev server, and stops servers left behind by ended sessions and removed worktrees. |
+| `wiki-session-start` | SessionStart | Cleans up after a `/gaia-wiki` run whose session ended before its merge finished (deletes the leftover local wiki branch and updates the base branch), and lists merged worktrees with the commands to remove them. |
+| `debt-session-reconcile` | SessionStart | Re-checks the `/gaia-debt` count shown on the statusline against GitHub. |
+| `usage-capture` | SessionStart, Stop | Records the session's model usage to the local [usage ledger](/models-and-context/cost/). |
+| `state-reaper-session-start` | SessionStart | At most once every 24 hours, starts a background cleanup of spent entries in `.gaia/local` (state left by merged branches and removed worktrees, and entries past their age limit). The usage ledger and your price override are never removed. |
 
-## Stop
+`local-janitor.sh` and `post-audit-status.sh` ship in `.claude/hooks/` but are not registered as hooks themselves. The session-start hook runs the first, and the merge workflow calls the second to post `GAIA-Audit`.
 
-| Hook | What it does | Path |
-|---|---|---|
-| `wiki-session-stop` | If wiki files were committed during the session, prompts a hot-cache refresh; nags `/gaia-wiki sync` when commits land but `wiki/.state.json` did not advance. | `.claude/hooks/wiki-session-stop.sh` |
-| `wiki-squash-autocommits` | Squashes the trailing run of `wiki: auto-commit` commits into one; on `main`, redirects the squash to a `wiki/*` branch and merges via PR. | `.claude/hooks/wiki-squash-autocommits.sh` |
+## Not hooks, but enforced
 
-## UserPromptSubmit
+- **Native git hooks** in `.githooks/`: `pre-commit` (typecheck, [lint-staged](https://github.com/lint-staged/lint-staged), tests) and `commit-msg` ([commitlint](https://commitlint.js.org/)). Both also refuse [machine-local references](/reference/gates/#machine-local-references). See [Git hooks and conventions](/workflow/git-conventions/).
+- **Permission rules** in `.claude/settings.json`: for example, Claude cannot edit `pnpm-lock.yaml` directly; `pnpm install` regenerates it.
+- **The `GAIA-Audit` required check** on GitHub, registered by [`/setup-gaia`](/getting-started/setup-gaia/).
 
-| Hook | What it does | Path |
-|---|---|---|
-| `wiki-drift-check` | Detects drift between `wiki/.state.json` and HEAD; injects a once-per-session reminder when drifted. | `.claude/hooks/wiki-drift-check.sh` |
+## Adding your own
 
-## UserPromptExpansion
+Ask Claude to write and register the hook for you. When Claude works in `.claude/hooks/`, the `file-placement` rule loads and tells it where the script goes and how to register it. For example:
 
-| Hook | Matcher | What it does | Path |
-|---|---|---|---|
-| `intercept-init` | `init` | Redirects `/init` to `/gaia-init` so the built-in flow does not overwrite GAIA's curated `CLAUDE.md`. | `.claude/hooks/intercept-init.sh` |
+```text
+Add a Claude Code hook that <what it should do, and when>. Put the script in .claude/hooks/, register it in .claude/settings.json in the same form as the hooks already there, run ./.gaia/cli/gaia packages sync-settings so frontend/.claude/settings.json picks it up, and run bash .gaia/scripts/check-hook-command-rooting.sh . to confirm it finds its script.
+```
 
-## PreToolUse (Edit / Write / MultiEdit)
+The last check reads each registration in `.claude/settings.json` and confirms its command finds the script wherever the shell happens to be. You can run it yourself at any time:
 
-| Hook | What it does | Path |
-|---|---|---|
-| `block-env-write` | Denies writes to `.env` and `.env.*` files; allows `.env.example`. | `.claude/hooks/block-env-write.sh` |
-| `block-eslint-config-edit` | Denies edits to `eslint.config.{js,cjs,mjs,ts}`; force fixes back into the source file where the lint error occurred. | `.claude/hooks/block-eslint-config-edit.sh` |
-| `block-lockfile-edit` | Denies direct edits to `pnpm-lock.yaml`; lockfile changes must come from `pnpm install`. | `.claude/hooks/block-lockfile-edit.sh` |
-| `block-secrets-write` | Denies writes that contain AWS keys, GitHub PATs, private-key headers, or non-placeholder `_TOKEN`/`_SECRET`/`_KEY`/`_PASSWORD` assignments. | `.claude/hooks/block-secrets-write.sh` |
-| `block-vitest-globals-tsconfig` | Blocks adding `vitest/globals` to `tsconfig.json`; tests must use explicit imports from `vitest`. | `.claude/hooks/block-vitest-globals-tsconfig.sh` |
-| `check-i18n-strings` | Advisory once-per-session reminder when a `.tsx` file under `app/pages/` or `app/components/` is edited; does not block. | `.claude/hooks/check-i18n-strings.sh` |
-| `check-story-exists` | Advisory reminder to add a Storybook story when a new component `index.tsx` is written without a sibling `tests/index.stories.tsx`. | `.claude/hooks/check-story-exists.sh` |
+```bash
+bash .gaia/scripts/check-hook-command-rooting.sh .
+```
 
-## PreToolUse (Bash)
-
-| Hook | What it does | Path |
-|---|---|---|
-| `block-bare-test` | Blocks bare `pnpm test` / `npm test` invocations; requires `--run` so vitest does not start watch mode. The block is anchored to command position: a `pnpm test` or `npm test` mention inside a commit message, `--body` string, or other quoted text is not an invocation and does not trigger the block. | `.claude/hooks/block-bare-test.sh` |
-| `block-main-destructive-git` | Blocks commits to `main`/`master` and force-pushes to those branches. | `.claude/hooks/block-main-destructive-git.sh` |
-| `block-no-verify` | Denies `git commit` / `git push` that carry a hook bypass (`--no-verify`, or commit-only `-n`), so the commit-time floor (typecheck, lint, test) cannot be skipped. | `.claude/hooks/block-no-verify.sh` |
-| `block-rm-rf` | Denies `rm -rf` against root, `$HOME`, cwd, unscoped globs, `.git`, `node_modules`, and any path outside a small whitelist of scratch dirs. | `.claude/hooks/block-rm-rf.sh` |
-| `pr-merge-audit-check` | Blocks `gh pr merge` until a code-review-audit marker file exists at `.gaia/local/audit/<HEAD-sha>.ok`. | `.claude/hooks/pr-merge-audit-check.sh` |
-| `red-verify-commit-check` | Blocks `git commit` when a new-at-HEAD test that now passes has no recorded failing (RED) run matching its current content. Enforces mechanical TDD: a new test must be observed failing before its passing version can land. Type-only tests (all assertions are type-level via `expectTypeOf`/`assertType`/`@ts-expect-error`, no runtime `expect`) are exempt: they have no runtime failure mode, so `tsc` enforces them instead. | `.claude/hooks/red-verify-commit-check.sh` |
-
-## PostToolUse (Bash)
-
-| Hook | What it does | Path |
-|---|---|---|
-| `capture-red-observations` | After a one-shot vitest run, re-runs the same scope with the JSON reporter and appends each genuinely-failing test to the RED-observation ledger at `.gaia/local/red-ledger/`. Observe-only: never blocks, always exits clean. Pairs with `red-verify-commit-check`. Trigger detection is anchored to command position: a `pnpm test --run` mention inside a commit message or `--body` string is not an invocation and does not fire a re-run. | `.claude/hooks/capture-red-observations.sh` |
-| `wiki-commit-nudge` | After every non-amend `git commit`, injects commit metadata and the current wiki drift count into context. | `.claude/hooks/wiki-commit-nudge.sh` |
-
-## Agent-invoked (no event registration)
-
-| Hook | What it does | Path |
-|---|---|---|
-| `audit-stamp-trailer` | Writes the `GAIA-Audit:` commit trailer on HEAD so CI can recognize an already-audited tree. Called by the `code-review-audit` agent at the end of a clean review. | `.claude/hooks/audit-stamp-trailer.sh` |
+It reads only `.claude/settings.json`. Hooks in `.claude/settings.local.json` are not checked.

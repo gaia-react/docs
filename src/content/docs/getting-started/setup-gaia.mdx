@@ -1,0 +1,150 @@
+---
+title: /setup-gaia
+description: The one setup command for a GAIA project. Run it once after /gaia-init, and again any time. It checks what this clone still needs and runs only those steps.
+sidebar:
+  order: 3
+---
+
+`/setup-gaia` is the one setup command for a GAIA project. Run it once after `/gaia-init`, and run it again any time. It checks what this clone still needs and runs only those phases:
+
+- **Setup for this machine**, which every clone needs: tool installs, plugins, making the statusline scripts executable, `frontend/.env`, the sandbox decision, and, if you have your own global statusline, which statusline draws the left side.
+- **The GitHub repository**: create one, use one you already have, or set one up yourself. Private by default. When you are a repo admin, it also protects the default branch, makes `GAIA-Audit` a required check, and offers squash-only merges.
+- **Team settings** in `.gaia/project.json`: the git isolation policy and the sandbox recommendation. Both come with a default, so a plain run records the default and asks nothing.
+
+It is safe for **any developer** to run at **any time**. You start it by typing it; Claude never starts it on its own. Run it from your main copy of the repo. Inside a worktree it refuses and tells you where the main copy is.
+
+## When to use this
+
+- After `/gaia-init` on a project you created with `npx create-gaia`.
+- After `git clone`-ing an existing GAIA project, once per machine.
+- Any time the statusline shows a `⚙️ /setup-gaia` nudge, or you want to add GitHub to a project that skipped it earlier.
+
+Running it again with no flags on a project that is fully set up prints `GitHub repository already provisioned.` and changes nothing. It never sets up the repo again or changes branch protection. The one exception: if a repo admin runs it and `GAIA-Audit` is not yet a required check, it adds it.
+
+## What runs, and when
+
+The command works out which situation your clone is in (a new project with no GitHub repo yet, an earlier run that didn't finish, a fresh clone, or a project that is already set up) and runs only the phases still needed. Each phase checks for itself whether it is already done and does nothing if so. A re-run is always safe, and even a wrong guess about the situation cannot break anything.
+
+### Prerequisites (every run)
+
+Three checks run every time:
+
+- **Worktree links.** `bash .gaia/scripts/link-worktree.sh` checks the links a git worktree needs to the main copy's shared folders. In your main copy it does nothing. If it prints a `failed:` line (for example, Windows refused to create a symlink), setup stops and shows that line. Fix the cause and run `/setup-gaia` again.
+- **[pnpm](https://pnpm.io/), node_modules, and Chromium.** If `corepack` is available, pnpm is enabled at the pinned version; otherwise it is installed globally with npm. `pnpm install` runs when `node_modules/` is missing. Then setup installs [Chromium](https://www.chromium.org/), the browser the story and hook tests run in, so a fresh clone's first test run and first commit pass. It finishes at once when Chromium is already installed. If it fails, setup stops and shows the command to retry. To install the browsers yourself, run `pnpm install:browsers`.
+- **GitHub CLI check (warning only).** If `gh` is missing or not logged in, you get a warning and setup continues. The pull request merge workflow, `/gaia-plan`, and `/gaia-forensics` rely on `gh`, so install it from [cli.github.com](https://cli.github.com/) and run `gh auth login` when you can.
+
+## Phase: per-machine setup
+
+Skipped if this clone already finished its machine setup (a new project finishes it inside `/gaia-init`). Otherwise these steps run in order. Each one is recorded when it finishes, so a re-run picks up at the first unfinished step.
+
+### Install Tools
+
+Two outside tools, the same as step 5 of [`/gaia-init`](/getting-started/gaia-init/#5-claude-tooling):
+
+- **[React Doctor](https://github.com/millionco/react-doctor)** skill, installed under `frontend/.claude/skills/` by `bash .gaia/scripts/install-react-doctor.sh`.
+- **Playwright CLI** binary, installed globally.
+
+### Install Plugins
+
+```bash
+claude plugin install typescript-lsp@claude-plugins-official
+```
+
+A plugin that is already installed is left as it is.
+
+### Automatic steps
+
+Two steps run with no input from you:
+
+- **Statusline permissions.** Makes the statusline scripts executable again. That permission can be lost when a repo is cloned on a different operating system.
+- **Environment bootstrap.** If `frontend/.env.example` exists and `frontend/.env` does not, a copy is made for you.
+
+### Sandbox decision
+
+Claude Code can run shell commands inside an operating-system sandbox, which limits what those commands and anything they start can reach. GAIA works inside the sandbox, but the sandbox blocks `gh`, git over HTTPS, and `docker` until you allow each one. GAIA calls `gh` throughout its workflow, so expect to allow it early on. That extra step is why the sandbox is opt-in and off by default.
+
+A plain run asks about it only when your team recommends it (`sandbox_recommended: true` in `.gaia/project.json`). When it asks, it first checks that your machine can run the sandbox:
+
+- **Native Windows or WSL1**: the sandbox is unavailable. Setup says so, points you at WSL2, and leaves it off.
+- **Linux or WSL2 missing bubblewrap or socat**: setup prints the install command and leaves the sandbox off until you install them and re-run.
+- **macOS, or Linux with both installed**: one question, with the team's recommendation as the recommended answer. Enabling writes the sandbox settings to `.claude/settings.local.json` (gitignored) and takes effect in your next Claude Code session.
+
+Each machine decides for itself, and your answer is never re-asked on a plain run.
+
+## Phase: GitHub repository
+
+Setup looks at the actual repo, branch, and what has been pushed, not just whether an `origin` remote exists. On a new project this is the first prompt you see:
+
+- **Create the repo on GitHub** (recommended). If you belong to any GitHub organizations, it first asks where the repo should live: your personal account (the default) or one of your organizations, ranked by your commit activity in each over the past year. The repo is created **private**, your default branch is pushed, and the recommended defaults below are applied. Making it public or internal needs a separate confirmation, because a public repo shows your whole pushed history. Right after creating it, setup turns on GitHub's secret-scanning push protection where GitHub offers it. Setup won't create the repo while you have uncommitted changes, because `gh repo create --push` pushes commits only.
+- **Use an existing repo.** You already have a GitHub `origin`, so nothing is created and the recommended defaults are applied.
+- **Set one up manually.** The command prints the `git remote add` and `git push` steps and leaves GitHub alone. Re-run `/setup-gaia` once it is pushed.
+
+### Recommended defaults (admin only)
+
+Applied after you create or pick a repo, and only when you are a repo admin and logged in to `gh`. If you are not an admin, setup skips these with a note, and the rest of this machine's setup still finishes:
+
+- **Default-branch protection.** Added only when the branch has no protection rule; an existing rule is left as it is. On purpose, approvals are not required and admins are not bound by the rule, so a solo developer can still merge their own pull requests.
+- **`GAIA-Audit` as the required check.** When the [pre-merge audit](/workflow/code-audit-team/) passes, GAIA's merge workflow (which runs on your machine) posts the `GAIA-Audit` status. Making it required means a pull request merged with the button on github.com can't skip the audit. Setup adds `GAIA-Audit` to your required checks and keeps the others (`Tests`, `Chromatic`, your own). It also removes the 1.x `code-review-audit` check. Nothing posts that check any more, so leaving it required would block every pull request.
+- **`delete_branch_on_merge`**, so GitHub deletes each pull request's branch when it merges, however it was merged. Applied without asking on a repo this run created; on an existing repo, setup asks.
+- **[Dependabot](https://docs.github.com/en/code-security/dependabot) settings**: security alerts on, Dependabot's own security-fix pull requests off. [`/update-deps`](/maintenance/update-deps/) reads the alerts and fixes vulnerable packages itself, then tests the fix through the quality gate. If you already have a Dependabot npm entry or a Renovate config, setup first warns that you may get duplicate pull requests; it never edits either file.
+
+If one of these settings fails (403 if you are not an admin, 404 if there is no protection rule), setup tells you what someone with admin access needs to run or change, and continues. For `GAIA-Audit` it prints the `gh api` command; for the Dependabot settings it prints the commands to run.
+
+## Phase: team settings
+
+Team settings live in `.gaia/project.json`, which is committed and shared. `/gaia-init` writes GAIA's defaults, so a plain run asks nothing here:
+
+| Setting | Default | What it decides |
+|---|---|---|
+| `isolation_policy` | `always-worktree` | Whether `/gaia-plan`, `/gaia-debt`, and any other work Claude commits run in their own git worktree (`always-worktree`), suggest one (`prefer-worktree`), or suggest a branch in your current copy (`prefer-branch`). See [Work lifecycle](/workflow/work-lifecycle/). |
+| `sandbox_recommended` | `false` | What the sandbox question above recommends to each machine. A recommendation only; each machine still decides. |
+
+Only a repo admin running `/setup-gaia --reconfigure` changes them. A new isolation policy is committed and pushed to the default branch straight away, so the whole team gets it at once. If a GitHub ruleset rejects the push, the command says so and leaves the commit on your machine for you to push or open as a pull request.
+
+## Phase: squash-only merges
+
+GAIA checks that pull request titles follow Conventional Commits, because a squash merge uses the title as the commit message on the default branch. That only works when squash is the only merge method and the squash commit uses the PR title.
+
+When you are a repo admin and merges are not already squash-only, setup turns off merge commits and rebase merges and makes every squash commit use the PR title. On a repo this run created, it does this without asking. On an existing repo it asks, since that repo may have a reason to keep merge commits. If you choose Skip, a plain run never asks again.
+
+## Phase: labels
+
+`gaia labels sync` creates and renames GitHub labels to match GAIA's list of labels. It reports colors that differ from GAIA's without overwriting yours. See [Labels](/reference/labels/). This step never stops setup: if your token can't write labels, you get the `gh label` commands to run yourself, and setup continues.
+
+## Phase: statusline left side
+
+If you have your own global statusline in `~/.claude/settings.json`, setup asks whether GAIA's [statusline](/workflow/statusline/) or yours draws the left side. GAIA's nudges always draw on the right. The answer applies to this machine only and is stored in `.gaia/local/settings.json` (gitignored).
+
+On every run, setup also warns when Claude Code is not running GAIA's statusline script. Without it you get no GAIA nudges, and the audit loop cannot see how full your context is.
+
+## Phase: owed setup features
+
+A later GAIA release can add a new setup step. `/setup-gaia` runs any step listed in `.gaia/setup-features.json` that has no recorded decision yet, so a project that finished setup earlier still picks up new steps.
+
+## Finish
+
+Project decisions recorded this run (`setup_decisions` in `.gaia/project.json`) are committed and pushed to the default branch as `chore(gaia): record setup decisions`, so they reach your team. This machine's setup is marked done. Then the command prints one of two closing lines:
+
+- `You're all set: your GAIA project is ready.` when nothing this machine can do is left.
+- `Setup isn't finished: these project settings are still owed: ...` naming them, when a GitHub step was refused or skipped. Fix the cause and re-run.
+
+Restart Claude Code so the new plugins and skills load.
+
+## Reconfiguring
+
+```sh
+/setup-gaia --reconfigure
+```
+
+`--reconfigure` asks these questions again and nothing else:
+
+- The sandbox decision on this machine. A repo admin's answer also sets the team sandbox recommendation.
+- The team git isolation policy (repo admins only).
+- The squash-only merge offer (repo admins only).
+- The statusline left side.
+
+It never sets up the repo again or changes branch protection.
+
+## On failure: re-run
+
+Every step is safe to run again, even after a run that stopped partway. After fixing the cause (not logged in, a network error, a bad config), run `/setup-gaia` again. Each phase checks what it already finished and picks up at the first unfinished step.

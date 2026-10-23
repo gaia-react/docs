@@ -1,0 +1,93 @@
+---
+title: Project layout
+description: How a GAIA project is laid out (the shared setup at the root and the React app in frontend/), and the frontend stack it ships with.
+sidebar:
+  order: 4
+---
+
+A GAIA project is a [pnpm](https://pnpm.io/) workspace: one repo holding more than one package. The root holds the Claude setup and tooling shared by the whole repo. The React app, and the Claude setup that applies only to it, live in the `frontend/` package.
+
+## The root
+
+| Path | What it holds |
+|---|---|
+| `CLAUDE.md` | Project instructions Claude reads at every session start |
+| `.claude/` | Shared commands, skills, agents, hooks, rules, and settings |
+| `.gaia/` | GAIA's CLI (`.gaia/cli/gaia`), scripts, statusline, the [Code Audit Team](/workflow/code-audit-team/) roster (`audit-ci.yml`), team settings (`project.json`), the label registry, and state kept only on your machine under `.gaia/local/` (gitignored) |
+| `.githooks/` | Git's own hooks: `pre-commit` and `commit-msg` |
+| `.github/` | The Tests, Chromatic, and PR Conventions workflows, and your `CODEOWNERS` |
+| `wiki/` | The project wiki Claude maintains, an Obsidian vault |
+| `.notebook/` | The [Notebook](/workflow/notebook/): specs, plans, and research (gitignored, in your main copy of the repo, not in worktrees) |
+| `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml` | The workspace: one lockfile for the whole repo, the dependencies GAIA's own tooling needs, and pnpm's settings that protect against compromised packages |
+
+The scripts at the root (`pnpm dev`, `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm pw`, `pnpm build`) run in the `frontend` package, so `pnpm lint` and `pnpm -C frontend lint` do the same thing.
+
+### Pinned dependencies
+
+Every dependency in `package.json` is pinned to one exact version, with no `^` or `~` range, and `pnpm add` pins new ones the same way. Pinning helps in three ways:
+
+- **Every install is the same.** A fresh clone, a teammate's machine, and CI all run the versions you tested. A range lets a new upstream release slip in on the next install, with no commit that shows it.
+- **A version changes only on purpose.** Updates arrive through [`/update-deps`](/maintenance/update-deps/), as one pull request that passes the [Quality Gate](/workflow/code-audit-team/#quality-gate) first. When something breaks, the commit that moved the version tells you which package to look at, and reverting it rolls the version back.
+- **A bad release has time to be caught.** pnpm also refuses package versions published in the last three days (see [Release-age window](/reference/gates/#release-age-window)). Most compromised packages are found and pulled within that time.
+
+Renovate's [dependency pinning guide](https://docs.renovatebot.com/dependency-pinning/#why-pin-dependencies) recommends pinning every dependency of an app, for the same reasons. pnpm's [supply chain security guide](https://pnpm.io/supply-chain-security#delay-dependency-updates) explains the release-age delay.
+
+## frontend/
+
+| Path | What it holds |
+|---|---|
+| `frontend/CLAUDE.md` | Instructions for sessions working on the app |
+| `frontend/.claude/` | The app's skills, rules, and Code Audit Team extensions. Its `settings.json` is generated from the root settings plus `settings.overlay.json`. |
+| `frontend/app/` | The [React Router](https://reactrouter.com/) app: `routes/`, `pages/`, `components/` (with [shadcn/ui](https://ui.shadcn.com/) in `components/ui/`), `hooks/`, `services/`, `state/`, `languages/`, `styles/` |
+| `frontend/test/` | Test setup, mocks, and utilities |
+| `frontend/.storybook/` | [Storybook](https://storybook.js.org/) config, including the accessibility settings in `a11y.ts` |
+| `frontend/.playwright/` | [Playwright](https://playwright.dev/) specs and helpers |
+| `frontend/.env` | Your environment file (gitignored). `frontend/.env.example` is the template. |
+| `frontend/package.json` | App dependencies |
+
+Files and folders under `app/components`, `app/pages`, and `app/hooks` are kebab-case: a component is `components/<name>/index.tsx`, a page is `pages/<route path>/page.tsx`, and a hook is `use-<name>.ts`. Each folder keeps its tests and stories in a `tests/` folder beside the code.
+
+Each copy of the repo, your main one and each worktree, gets its own dev, Storybook, and Playwright [ports](/workflow/work-lifecycle/#ports-per-worktree), so they never collide. The main copy uses 5173 and 6006.
+
+## The frontend stack
+
+- **React and React Router.** Routes come from file names through React Router's `@react-router/fs-routes`. Files sit in one flat folder, with dots separating the URL segments (`_public.tsx`, `_session.dashboard.tsx`).
+- **React Compiler**, on by default in the build, dev server, [Vitest](https://vitest.dev/), and Storybook. It is configured in `frontend/react-compiler.config.ts`; set `isReactCompilerEnabled = false` there to turn it off.
+- **shadcn/ui** for components, built on [Base UI](https://base-ui.com/), with [`class-variance-authority`](https://cva.style/) for variants and [`lucide-react`](https://lucide.dev/) for icons. Add components with `pnpm shadcn add <name>`. Forms are built from the `ui` controls with [Conform](https://conform.guide/).
+- **[Tailwind](https://tailwindcss.com/) v4 with role tokens.** Every color is a named role (for example primary or muted), defined once as a shadcn token in `frontend/app/styles/theme.css`. Change your theme by editing those values. `cn` from the `cn` package combines class names.
+- **One way to load route data.** Services use [Ky](https://github.com/sindresorhus/ky) for requests and [Zod](https://zod.dev/) to check every response, and the same code runs on the server and in the browser. A route reads its data on the server, in the browser, or through [TanStack Query](https://tanstack.com/query/latest) (off by default). `create()` leaves keys in camelCase; if your backend uses snake_case, turn on conversion with `create({isSnakeCaseEnabled: true})`.
+- **Stories as tests.** Components are tested through Storybook stories with play functions (scripted interactions), run in a real Chromium browser under Vitest. Every story is checked for accessibility. Hook tests use `vitest-browser-react`. HTTP is mocked with [MSW](https://mswjs.io/) 3. [Chromatic](https://www.chromatic.com/) takes a screenshot of each story in a light and a dark mode.
+- **Translations (i18n)** with react-i18next, unless you removed them at init.
+- **`@gaia-react/lint`** for [ESLint](https://eslint.org/), [Stylelint](https://stylelint.io/), and [commitlint](https://commitlint.js.org/). [Prettier](https://prettier.io/) formats code, and [Knip](https://knip.dev/) finds unused code.
+- **Toolchain:** Node 22.22.0 or newer, pnpm 12 (pinned in `packageManager`), and Vitest 5.
+
+The paths the app submits fetchers to are defined once in `frontend/app/action-paths.ts`, so renaming a route fails a test instead of returning a 404 at runtime. `hydration.spec.ts` is the Playwright example of checking that a page loads with no `console.error` or page errors.
+
+A new project starts plain and unbranded: neutral gray-scale shadcn color tokens, system fonts, and a simple layout. The `design-baseline` rule treats that styling as a placeholder until you settle on your own design.
+
+For the reasoning behind each choice, ask Claude: the decisions live in the project wiki.
+
+## Why no backend?
+
+GAIA ships one frontend framework and no backend. This is an intentional choice.
+
+### The frontend is chosen for you
+
+React Router 8 can be used to build nearly any web app you need. It is widely used and well established, and it can render pages on the server or run entirely in the browser as a single-page app. GAIA ships with server rendering on.
+
+It also isn't tied to one hosting platform, so you can deploy it almost anywhere. See [Deployment](/getting-started/deployment/).
+
+Other frameworks differ in ways that rarely decide whether you *can* build your app, so choosing between them mostly comes down to preference. Settling the choice up front is one less decision to make before you start building.
+
+If React Router truly cannot do something your project needs, you can ask Claude to replace it. Expect a large change: GAIA's frontend rules, skills, scaffolders, and Code Audit Team extensions are written for React Router and would have to change with it.
+
+### The backend is left to you
+
+Backends differ in ways that matter: language, hosting, database, and what your team already knows. Often the choice isn't yours at all, because your company already runs one. Your backend might be a hosted service such as Supabase, a service you write in [TypeScript](https://www.typescriptlang.org/), Python, or Ruby, or an existing company API. GAIA works with any of them.
+
+GAIA's repo is built for this. It is a pnpm workspace, so each backend you add becomes another package beside `frontend/`, with its own `CLAUDE.md`, rules, and skills. To add one, ask Claude: it follows the steps GAIA ships. Those steps include two things the backend needs before its code is checked as well as the frontend's:
+
+- **A Code Audit Team member that covers it.** Code no member covers is not merged unreviewed. Until a member's file patterns cover the backend, the merge waits for `code-audit-frontend`, the default member, to review its files, and that member reviews with a React focus. The steps have Claude register a member for your backend's stack, or give its file patterns to a member whose focus fits. See [Covering new code](/workflow/code-audit-team/#covering-new-code).
+- **A quality gate for its stack.** The shipped [Quality Gate](/workflow/code-audit-team/#quality-gate) checks only `frontend/`, so the steps have Claude add a gate that names the backend's own checks.
+
+Worktrees get their [own ports](/workflow/work-lifecycle/#ports-per-worktree) for `frontend/` only. By default, the frontend's tests mock the API with MSW, so they don't need a backend running. Before Claude runs backend work in a worktree, it asks whether worktrees should share one backend or each run their own.

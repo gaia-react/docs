@@ -1,0 +1,107 @@
+---
+title: Cost and usage ledger
+description: How GAIA records every model call in a local file and shows what each pull request, command, and piece of work cost.
+sidebar:
+  order: 5
+---
+
+GAIA records every model call in a local usage ledger (a log file) and shows what your work cost, always in the same form: tokens, dollars, elapsed time, and active time.
+
+:::tip[Your data stays on your machine]
+The ledger stays on your machine and is never sent anywhere. Working out the price does not use the network either. It is yours to read and use however you like.
+:::
+
+The ledger is `.gaia/local/telemetry/usage.jsonl` in the main checkout, and every worktree writes to the same file. GAIA's cleanup of spent local state never removes it.
+
+## What you see
+
+A single cost prints as one line:
+
+```text
+Cost: 5.2M tokens, $3.41, 14m2s (6m39s active)
+```
+
+Two or more print as a box:
+
+```text
+SPEC-NNN Cost
+
++--------------------------------------------------------+
+|  Spec: 40.9M tokens, $26.15, 1h4m12s (31m52s active)   |
+|  Plan: 46.7M tokens, $23.09, 1h12m40s (48m19s active)  |
++--------------------------------------------------------+
+| Total: 87.6M tokens, $49.24, 2h31m5s (1h20m11s active) |
++--------------------------------------------------------+
+```
+
+Each row is rounded to 0.1M tokens and to the cent, and the Total adds up the rounded rows, so the token and dollar columns always add up.
+
+Each row shows two times:
+
+- **Elapsed time** runs from a run's first model call to its last, so it includes any pauses while you read, answer, or step away. The Total's elapsed time runs from the first spend to the last, so it includes any gap between runs and can be longer than the rows added together.
+- **Active time**, in parentheses, is the part of that span when Claude was working. The Total's active time counts work that two rows share only once, so it can be shorter than the rows added together.
+
+### How active time is counted
+
+- **Your turns.** A turn runs from your prompt to Claude's last piece of work before your next prompt. Time spent waiting for you to answer a question or approve a plan is taken out.
+- **Sub-agents and headless runs.** One stretch, from the first piece of work to the last.
+- **Overlap.** Sessions and sub-agents that run at the same time count once.
+
+Some idle time still counts as active: a turn you leave open without a question pending, a long-running tool, or your machine sleeping in the middle of a turn. A question Claude asks in plain text, rather than through its question or plan-approval prompt, is not taken out either.
+
+Spend recorded without activity data has no active time. When a row mixes both kinds, its active time is a minimum and reads `(6m39s+ active)`. When none of a row's spend has activity data, the parentheses are left out.
+
+### Where it prints
+
+- **Every `gh pr merge`** prints a `PR #<N> Cost` box with **Execute**, **Audit**, and **Total** rows: the work on the branch, and what the Code Audit Team spent reviewing it. When only one of the two cost anything, it prints a single Cost line.
+- **`/gaia-plan`** ends with a box for a plan made from a SPEC: **Spec**, **Plan**, and **Total** rows (one line when only one row has a cost). `/gaia-spec` prints no cost of its own; its run shows up as the Spec row of that box. A plan made without a SPEC ends with a single Cost line. When a plan's work merges, the plan prints the cost of the whole thing, from SPEC to merge, with an **Execute** row for the branch's work.
+- **`/gaia-fitness`, `/gaia-cleanse`, `/gaia-codify`, `/gaia-debt`, `/gaia-residue`, `/gaia-forensics`, `/gaia-wiki`, `/update-deps`, and `/update-gaia`** end with a Cost line. `/gaia-wiki`'s figure includes the time it waits for its pull request to merge.
+
+### Notes under the figures
+
+A `Note:` line under the figures tells you when a figure is not the full picture:
+
+- Usage was still being saved when it was read, so the figures may be low (the note names the command that shows the final numbers).
+- A model has no price, so the cost is a minimum, and that row reads `at least $X.XX`.
+- A run recovered after an interruption counts only one session.
+- Some spend has no activity data, so an active time marked `+` is a minimum.
+
+The `PR #<N> Cost` box that `gh pr merge` prints reports the same conditions as lines starting with `!` under the box, instead of `Note:` lines.
+
+When nothing can be priced, the price reads `cost unavailable`. A figure is never made up.
+
+## What an idea cost
+
+```bash
+bash .gaia/scripts/usage.sh initiative <ref>
+```
+
+Adds up the cost of one piece of work (an initiative) from its first research to its merge, including runs continued after `/clear`. `<ref>` is a SPEC (`SPEC-012`), a plan (`PLAN-004`), an issue (`issue:142`), or a research folder (`research:<date>-<topic>`). Add `--line` for one line or `--box` for the box. Run `bash .gaia/scripts/usage.sh` on its own to see its other subcommands.
+
+A branch's cost is counted toward its initiative automatically when the branch name includes it (`debt/142-...`, `fix/142-...`, a SPEC's plan branch). Otherwise link it once:
+
+```bash
+bash .gaia/scripts/usage.sh link branch:<branch> research:<date>-<topic>
+```
+
+When you clear and resume a long run, the continuation prompt includes a line that connects the new session to the same run, so the cost covers every session.
+
+Costs from before the ledger's first entry are not recorded.
+
+## Prices
+
+Prices come from the rate table that ships with GAIA, `.gaia/scripts/token-rates.json`, which covers current Claude models. New versions arrive through `/update-gaia`. Prices are applied each time figures are shown, not stored, so a corrected rate changes every past figure the next time you look.
+
+To set your own prices, or add a model the table does not have, ask Claude to write a price override for you:
+
+```text
+Create .gaia/local/telemetry/token-rates.override.json in the main checkout with my own token prices: <model id> at $<input> per million input tokens and $<output> per million output tokens. Use the same format as .gaia/scripts/token-rates.json.
+```
+
+The file looks like this:
+
+```json
+{ "models": { "claude-opus-5-5": [ { "input": 4, "output": 20 } ] } }
+```
+
+Prices are dollars per million input and output tokens. Each model you list replaces that model's shipped rates; models you leave out keep theirs. If the file is not a JSON object with a `models` object inside it (including when it is not valid JSON at all), it is ignored, and each cost readout says so once. GAIA's own scripts never write or delete this file, and its cleanup of local state never removes it.

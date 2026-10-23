@@ -3,51 +3,81 @@ title: Quick Start
 description: Scaffold a new GAIA project with npx create-gaia.
 ---
 
-One command scaffolds the GAIA React framework and automatically launches Claude Code for the rest of setup.
+import { Aside } from '@astrojs/starlight/components';
+
+One command creates a new GAIA React project, then launches Claude Code to finish setup.
 
 ## Prerequisites
 
-- Node 22.19 or later. Check with `node --version`.
-- Claude Code installed and reachable as `claude`.
+- Node 22.22.0 or later. Check with `node --version`.
+- Claude Code 2.1.287 or later, reachable as `claude`. Run `claude update` if you are on an older version.
+- The [GitHub CLI](https://cli.github.com/), `gh`, authenticated with `gh auth login`. GAIA's pull request and merge workflow runs on it.
 
-`pnpm` is not required up front. When `pnpm install` runs (the default), `create-gaia` bootstraps pnpm via Corepack if missing, falling back to `npm install -g pnpm`. With `--no-install`, no bootstrap is attempted.
-
-`uv` is required for the Serena MCP server. GAIA will install it for you during setup if you don't already have it.
+`pnpm` is not required up front. If `pnpm install` runs (the default) and [pnpm](https://pnpm.io/) is missing, `create-gaia` installs it for you. With `--no-install`, it installs nothing. GAIA uses pnpm 12, pinned in `package.json`.
 
 ## New GAIA project
 
-For greenfield projects, run this command in the terminal:
+To start a new project, run this in the terminal:
 
 ```bash
 npx create-gaia@latest my-app
 ```
 
-`my-app` becomes the project directory. It must be empty or not yet exist; the scaffolder won't write into a non-empty directory.
+`my-app` becomes the project directory. It must be empty or not exist yet. `create-gaia` won't write into a folder that already has files in it.
 
-1. Downloads the latest GAIA release and installs it
+1. Downloads the latest GAIA release bundle and extracts it
 2. Runs `git init` and creates a single `chore: scaffold from GAIA <version>` commit
 3. Installs the packages
 4. Launches Claude Code in the project directory and runs `/gaia-init` automatically
 
-Follow along with the `/gaia-init` [walkthrough](/getting-started/gaia-init/).
+Follow along with the `/gaia-init` [walkthrough](/getting-started/gaia-init/). Once setup is done, the [Workflow overview](/workflow/) shows how a normal session works, and [Onboarding, as you build](/getting-started/onboarding/) shows what GAIA does as your first commits and pull requests land.
+
+The project is a pnpm workspace: the shared Claude setup at the root, and the React app in `frontend/`. See [Project layout](/getting-started/project-layout/).
+
+### Permissions on the first run
+
+When you scaffold a project, `npx create-gaia` runs `claude --permission-mode auto /gaia-init`. That one run rewrites files, registers tools, and sets up the whole project. In [auto mode](https://code.claude.com/docs/en/permission-modes), Claude Code skips routine permission prompts. A separate classifier model checks each action before it runs and blocks risky ones, such as a force push, piping a download into a shell (`curl | bash`), or a production deploy. Your own ask rules still prompt you.
+
+If auto mode is not available to you (your organization turned it off, or your model does not support it), the session starts in the normal mode instead. Setup still runs; it just asks your permission more often.
+
+The mode applies to that one run only. Nothing stores it. When `/gaia-init` finishes, it tells you to exit Claude and relaunch, because the new skills and plugins load only in a fresh session. Relaunch with plain `claude` to approve actions as they happen, or `claude --permission-mode auto` to skip routine prompts.
+
+Either way, GAIA's guardrails stay on. They are hooks that check every action Claude takes, not permission prompts, so a mode that skips prompts doesn't turn them off. Every new project comes with hooks that block actions like:
+
+- Committing or pushing directly to `main`, or force-pushing it
+- `rm -rf` on dangerous targets (`/`, `~`, `.git`, `.claude`, `node_modules`, the repo root)
+- Reading `.env` files, keys, and credentials, or writing secrets into the repo
+- Committing with `--no-verify`, which would skip the typecheck, lint, and tests the pre-commit hook runs
+- Opening a pull request that is not a draft, or whose title is not a Conventional Commit
+- Merging a pull request the [Code Audit Team](/workflow/code-audit-team/) has not cleared
+
+These hold in every permission mode. See the [hooks reference](/reference/hooks/) for the full set, and the [gate reference](/reference/gates/) for why each one exists.
 
 ## Cloning an existing GAIA project
 
-For existing projects (e.g. created by a teammate), after you clone the repo:
+For a project that already exists (for example, one a teammate created), clone the repo, then:
 
-1. Run `claude --dangerously-skip-permissions`
-2. Run `/setup-cloned-gaia-project` in Claude Code
+1. Run `claude --permission-mode auto`
+2. Run `/setup-gaia` in Claude Code
 
-Follow along with the `/setup-cloned-gaia-project` [walkthrough](/getting-started/setup-cloned-gaia-project/).
+Follow along with the `/setup-gaia` [walkthrough](/getting-started/setup-gaia/).
 
-> **Note**: You can choose not to include `--dangerously-skip-permissions`. Leaving it out adds friction to the setup process, but it's up to you.
+<Aside type="note">
+You can leave out `--permission-mode auto`. Setup then stops to ask your permission more often.
+</Aside>
+
+## Upgrading a 1.x project
+
+A GAIA 1.6.1 project moves to 2.0.0 through a migration Claude runs in your session. See [Upgrading from 1.x](/getting-started/upgrading/).
 
 ## Pinning to a specific version
 
-Useful when you want a specific version of GAIA.
+To install a specific version of GAIA instead of the latest:
 
 ```bash
-npx create-gaia@latest my-app --version v1.0.5
+npx create-gaia@latest my-app --version v2.0.0
 ```
+
+Other flags: `--no-install` skips the dependency install, `--no-git` skips `git init` and the first commit, and `--no-claude` skips launching Claude Code. It prints the next steps instead: `cd` into the project, run `claude --permission-mode auto`, then run `/gaia-init` in Claude Code. You get the same steps when the `claude` command is not installed.
 
 

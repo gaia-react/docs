@@ -1,0 +1,119 @@
+---
+title: /gaia-forensics
+description: Turn a GAIA command or hook that went wrong into a bug report, with secrets removed, ready to file.
+sidebar:
+  order: 6
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+`/gaia-forensics` turns a problem with GAIA itself into a bug report with a fixed structure and with secrets removed. It only reads: it looks at your project's state and never changes, installs, or fixes anything.
+
+A useful bug report needs the details of what went wrong, but logs and paths often carry tokens, environment values, and paths that reveal your machine. Forensics gathers the details and strips those out, so you can file the report without editing it by hand first.
+
+## When to use it
+
+Run it when something GAIA-related goes wrong, and you want to file a useful issue without manually scrubbing paths and tokens out of your logs. Good fit for:
+
+- GAIA commands that stopped partway through, such as a stuck `/update-gaia`.
+- Hooks that blocked a commit or tool call you expected to pass.
+- Wiki sync, scaffold, or quality-gate failures.
+- Dev server problems traced to GAIA configuration.
+
+<Aside type="caution" title="Not for your own code">
+If the failure is in your own application code, this is the wrong tool. Forensics covers only GAIA's own commands, hooks, and configuration.
+</Aside>
+
+## Invocation
+
+```
+/gaia-forensics [optional one-line description]
+```
+
+With an argument, your description is used word for word. Without one, forensics asks one open question (`What went wrong? Describe what you were doing, what you expected, and what happened.`) and waits for your reply.
+
+## What it does
+
+Forensics runs in nine read-only steps:
+
+1. **Capture.** Records a fixed set of facts: GAIA version, Node, [pnpm](https://pnpm.io/), Claude Code version, branch, and whether there are uncommitted changes. It also reads state files that depend on the kind of failure. It never copies the contents of files under `frontend/app/` or `wiki/`, though file names can appear in summaries. `.env*` and `node_modules/` are skipped. Long files are cut short.
+2. **Classify.** Sorts the failure into one of eight kinds (`init`, `update`, `wiki-sync`, `quality-gate`, `hook`, `scaffold`, `dev-server`, `other`) by matching key phrases in your description. It quotes the phrase it matched and names the state file it relied on.
+3. **Diagnose.** Decides whether the failure comes from your setup (wrong Node version, a missing env var, uncommitted changes blocking a command) or is probably a bug. When the evidence points both ways, it picks your setup, since that is the more likely cause.
+4. **Redact.** Strips secrets, identity details, and machine-specific paths out of the report, then double-checks the result. If anything that still looks like a credential gets through, forensics stops instead of writing a report that could leak it.
+5. **Write.** Produces a report in a fixed format: frontmatter (the failure class, GAIA version, created date, optional issue URL) and four fixed sections: `## Symptom`, `## Classification`, `## Capture`, `## Reproduction context`.
+6. **Save.** Writes to `.gaia/local/forensics/<tree>/<timestamp>-<class>.md`, where `<tree>` identifies the checkout and the timestamp is in UTC, in the compact ISO-8601 form shown in the example below.
+7. **Act on the diagnosis.** For a setup problem, it prints the steps to fix it and stops. For a probable bug, it goes on to offer filing an issue.
+8. **Offer to file.** If `gh` is installed, asks once whether to file an issue on `gaia-react/gaia` with the `gaia-forensics` label. If `gh` is not installed, prints the local report path and exits. GitHub silently drops labels from people without triage access to the GAIA repo, which is most people. If the label does not attach, forensics still files the issue and warns you the label is missing.
+9. **Confirm.** Prints a final line with the report path and (if filed) the issue URL.
+
+## Strict body schema
+
+The report always has the same headers in the same order, so filed reports are consistent and easy to sort:
+
+```markdown
+---
+class: <init|update|wiki-sync|quality-gate|hook|scaffold|dev-server|other>
+gaia_version: <semver>
+created: <YYYY-MM-DD>
+gh_issue_url?: <url>
+---
+
+## Symptom
+<one-paragraph user description, redacted>
+
+## Classification
+class: <tag>
+evidence: <verbatim user phrase> + <named state file>
+
+## Capture
+gaia_version: <semver>
+node: <version>
+pnpm: <version>
+claude_code: <version>
+branch: <name>
+dirty: <true|false>
+class_state_files:
+  - <repo-relative path>: <one-line summary>
+
+## Reproduction context
+<plain prose: what you were doing, what you expected, what happened>
+```
+
+The GitHub issue gets the full report, frontmatter and all four sections, exactly as it is in the local file at filing time. After filing, the local file gains the `gh_issue_url` value in its frontmatter.
+
+## Hard constraints
+
+<Aside type="caution">
+These four rules always apply, whatever path the command takes.
+</Aside>
+
+- **Read-only.** Forensics only looks. It never changes, installs, downloads, or fixes anything.
+- **Writes in two places only, plus one temporary file.** The report goes to `.gaia/local/forensics/`, and usage goes to the local usage ledger. Filing an issue also writes one temporary file holding the issue body.
+- **One redaction for both copies.** The local file and the GitHub issue go through the same single pass that removes secrets, so after it they are identical.
+- **Fixed format.** Frontmatter fields, section headers, and section order never change, because sorting filed reports depends on them.
+
+## Example flow
+
+```
+> /gaia-forensics quality-gate refused to merge after I bumped a package
+```
+
+Forensics records the state, classifies the failure as `quality-gate`, reads the relevant state files, removes secrets, and writes the report:
+
+```
+Report saved: .gaia/local/forensics/<tree>/20260509T143022Z-quality-gate.md
+
+File a GitHub issue for this report?
+```
+
+If you say yes and `gh` is installed:
+
+```
+Report: .gaia/local/forensics/<tree>/20260509T143022Z-quality-gate.md | Issue: https://github.com/gaia-react/gaia/issues/342
+```
+
+If you say no, the report stays local and you can attach it to a manual issue later.
+
+## Storage
+
+`.gaia/local/forensics/` is project-local and gitignored. Reports stay on your machine unless you explicitly file them. Reports written in a [worktree](/workflow/work-lifecycle/#3-isolate) are deleted after that worktree is removed. Reports written in your main checkout collect under `.gaia/local/forensics/` until you remove them.

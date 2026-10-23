@@ -1,0 +1,108 @@
+---
+title: /gaia-wiki
+description: Keep the project wiki current. One command runs sync, consolidate, and lint with fixes, and lands them as one commit and one pull request.
+sidebar:
+  order: 7
+---
+
+The wiki at `wiki/` exists for Claude, not for human reading (though Claude uses it to answer questions about the project).
+
+## Why the wiki exists
+
+The wiki keeps an up-to-date, organized description of the project that Claude reads when it needs it, instead of working out the same facts from the source code on every request. Working them out again each time wastes tokens; the wiki saves them.
+
+Without it, every session that needs to reason about a service, a hook contract, or a past architectural decision pays for it twice: once when the source was written, and again when Claude reads the source to answer a question. The wiki records the important facts once and stays current as commits land. Claude reads the wiki for orientation and goes to the source only when it needs more detail.
+
+The wiki is an Obsidian vault, so you can open it in [Obsidian](https://obsidian.md/) if you want to. No plugin is required.
+
+## When to use it
+
+Some work updates the wiki as it goes. When a [plan's pull request](/workflow/plan/) is ready to merge, Claude can promote a summary of what shipped into the wiki on the same branch, and Claude may update a page during other work when it learns something lasting. Nothing makes every change do so, though, so the wiki can fall behind your code. `/gaia-wiki` is the backstop: it catches up whatever the rest of your work missed. Often sync finds little or nothing to add, and consolidate and lint still check the wiki's health.
+
+When the wiki is 20 or more relevant commits behind your code, the statusline shows:
+
+```
+🧠 /gaia-wiki (N commits)
+```
+
+Run `/gaia-wiki` then. It is a skill, so plain-language asks like "sync the wiki" or "run wiki maintenance" work too.
+
+## Usage
+
+```
+/gaia-wiki
+```
+
+It takes no arguments and runs the three [stages](#the-three-stages). Anything you pass prints a one-line notice and is ignored.
+
+It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, in a worktree of its own cut from the default branch.
+
+## What one run does
+
+1. **Sync** brings the wiki up to date with the commits since its last sync.
+2. **Consolidate** finds redundancy and contradictions across wiki pages and asks you about each one.
+3. **Lint** checks the wiki's health and fixes what it finds.
+4. **One commit** with all three stages' edits, titled `wiki: <date> <time> UTC`.
+5. **One pull request** with that title, marked as outside the code audit's scope and set to merge automatically.
+6. Claude **waits for the merge**, removes the worktree and branch, pulls the default branch, and clears the statusline nudge.
+
+When sync stops partway (a first run, a rewritten history it cannot recover from, an interruption), consolidate and lint are skipped, and whatever sync completed still lands. A cancelled run commits nothing.
+
+The run ends with a [cost line](/models-and-context/cost/), which includes the time it waits for the merge.
+
+## The three stages
+
+### Sync
+
+Sync goes through every commit since the last one the wiki checked, up to `HEAD`, decides which ones matter to the wiki, and updates the affected pages. Commits that change nothing the wiki describes are skipped, and only commits that led to a wiki change are logged. Changes to services and hooks are written to their pages under `wiki/modules/`.
+
+State lives in `wiki/.state.json`. When the wiki is more than 30 commits behind, sync asks first. You can choose to sync only the most recent 20 and treat everything older as done. Which commits count can be tuned with `gaia.wikiClassify` in `package.json`.
+
+### Consolidate
+
+Consolidate looks for four kinds of finding, most important first:
+
+- **Supersession**: two pages in the same area cover the same subject, and the newer one should take in the older one.
+- **Reversed decisions**: a decision page whose body reverses an older decision page.
+- **Near-duplicate page names**: names in the same area that differ by at most two characters (ignoring case, and treating `_` as `-`).
+- **Subject-orphaned pages**: pages nothing links to, that match no concept or module page, and that have not changed in 90 days.
+
+Each finding is one question:
+
+- **Apply** (recommended): merge or retire the page. Links to an archived page are rewritten.
+- **Keep both**: note on the main page that you have seen it, so it is not raised again.
+- **Skip**: leave it for the next run.
+
+The report overwrites one file each run, `wiki/meta/consolidate-report.md`.
+
+### Lint
+
+Lint runs every check from scratch and overwrites one report, `wiki/meta/lint-report.md`:
+
+| Check | Finds |
+|---|---|
+| #11 Wiki drift | How many commits the wiki trails `HEAD`. |
+| #12 Dead paths | Repository paths in backticks in wiki text that no longer exist. |
+| #13 Narrative ID drift | SPEC and UAT numbers in prose where they should not appear. |
+| #14 Orphan pages | Pages no other page links to. |
+| #15 Frontmatter gaps | Pages missing `type` or `status`. |
+| #16 Empty sections | Headings with no content before the next heading. |
+| #17 Broken wikilinks | Wikilinks that resolve to no page. |
+
+Lint then fixes what it found. Simple fixes (a missing frontmatter field, an index entry for an orphan page, a path to a file that was renamed) apply without asking. Fixes that need judgment ask you. Every finding ends up fixed, filed as a `tech-debt` issue, or left alone because you chose to.
+
+## The session-start janitor
+
+At every session start, a hook cleans up after earlier wiki runs. It deletes local wiki branches whose work is already merged. When it finds one, it runs one `git fetch` with a time limit and fast-forwards your default branch if it is checked out and has no uncommitted changes. So a run that ended before its merge landed never leaves your default branch out of date.
+
+The fetch times out after `GAIA_WIKI_FETCH_TIMEOUT_SECONDS` (default 5). Set it to `0` to turn the fetch off. `GAIA_WIKI_FETCH_MINIMUM_INTERVAL_MINUTES` (default 60) limits how often it runs.
+
+## What ships in the wiki
+
+GAIA ships wiki pages describing what it installs: concepts, decisions, and modules, including `wiki/concepts/GAIA Scripts.md` (GAIA's scripts by family and folder), `wiki/concepts/Worktrees.md`, and `wiki/concepts/Local Working State.md`. They describe GAIA's conventions as your project's own. Sections you add to a GAIA-shipped page are kept when [`/update-gaia`](/maintenance/update-gaia/) merges a new release.
+
+## Related
+
+[`/gaia-cleanse`](/maintenance/cleanse/) handles memory and auto-loaded files that duplicate or contradict the wiki. `/gaia-wiki` handles redundancy and broken links inside the wiki itself.
+
+Source: `.claude/skills/gaia/references/wiki.md`.

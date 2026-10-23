@@ -1,167 +1,120 @@
 ---
 title: CLI surface
-description: Reference for the gaia binary subcommands invoked by skills, hooks, and slash commands. Source layout for contributors working on the CLI.
+description: Reference for the gaia binary's subcommands, which skills, hooks, and slash commands run, and where their source lives.
 sidebar:
   order: 4
 ---
 
-The `gaia` binary is the bundled CLI that ships with the end user tarball at `.gaia/cli/gaia`. End users do not invoke it directly in normal use. Skills, hooks, and slash commands invoke it for them.
+The `gaia` binary is the bundled CLI at `.gaia/cli/gaia`, shipped in every project. Projects rarely run it directly; skills, hooks, and slash commands run it for them. Every subcommand prints a help block on `--help`, and `gaia --help` lists them all.
 
-Contributors working on the CLI source need the surface map. Source lives under `.gaia/cli/src/` (contributor-only, excluded from the end user tarball). The bundle is rebuilt by `pnpm --filter @gaia-react/cli bundle`.
+If you work on the CLI, this page maps its subcommands. The source lives under `.gaia/cli/src/`, which the release bundle leaves out.
 
 ## Build layout
 
-Two binaries get bundled:
+`.gaia/cli` is a package in the root [pnpm](https://pnpm.io/) workspace. At release, the scrub removes it from the shipped `pnpm-workspace.yaml` and `pnpm-lock.yaml`, and every CLI source file is left out of the bundle. `pnpm -C .gaia/cli bundle` builds two binaries:
 
-- `.gaia/cli/gaia`: end user binary. Entry point: `src/index.ts`. Ships in the tarball.
-- `.gaia/cli/gaia-maintainer`: maintainer binary. Entry point: `src/index.maintainer.ts`. Excluded from the tarball.
+- `.gaia/cli/gaia`: the shipped binary. Entry point `src/index.ts`.
+- `.gaia/cli/gaia-maintainer`: the maintainer binary, carrying `labels docs` and the release namespace. Entry point `src/index.maintainer.ts`. Excluded from the bundle.
 
-The end user binary's `src/index.ts` does not import any maintainer-only handler, so esbuild tree-shakes maintainer surface out of the end user bundle.
+`src/index.ts` imports no maintainer-only code, so esbuild (the bundler) leaves that code out of the shipped binary. The committed binaries must match a fresh build from source. Any change under `.gaia/cli/src` means rebuilding and committing them (the pre-commit hook does this on the GAIA repo), and CI checks it.
 
 ## Top-level subcommands
 
-All subcommands print a help block on `--help`, `-h`, or `help`. Source path links point at the per-subcommand router under `.gaia/cli/src/`.
+Source for each lives in its folder under `.gaia/cli/src/`.
 
 ### `gaia init`
 
-Source: `.gaia/cli/src/init/index.ts`
-
-Per-step handlers consumed by `/gaia-init`. Each handler reads and writes `.gaia/init-state.json` so the slash command can resume on failure.
+Per-step handlers for [`/gaia-init`](/getting-started/gaia-init/). Each records its state in `.gaia/init-state.json` so the command can resume.
 
 ```
 gaia init strip-branding --title <T>
 gaia init configure-i18n --locales <list> --strip <bool>
+gaia init configure-data-layer [--casing <camel|snake>] [--query <bool>] [--layer <folder>]
 gaia init rename --title <T> --kebab <K>
-gaia init wire-statusline --mode <global|project|skip>
+gaia init wire-statusline
+gaia init bootstrap-env
+gaia init write-project-config --sandbox-recommended <bool> [--isolation-policy <policy>]
 gaia init finalize
 gaia init resume [--from-step <N>]
 ```
 
+`configure-data-layer` prints one JSON line naming the files it changed and the commands to run next, and can be re-run after init (for example `--query true` to add [TanStack Query](https://tanstack.com/query/latest) later). `init` refuses to run outside a scaffolded project root, and in the GAIA source itself.
+
 ### `gaia scaffold`
 
-Source: `.gaia/cli/src/scaffold/index.ts`
-
-Code generators invoked by the `new-component`, `new-hook`, `new-route`, and `new-service` skills. Each generator reads templates from `.gaia/cli/src/scaffold/templates/`.
-
-```
-gaia scaffold component <Name>
-gaia scaffold hook <useFoo>
-gaia scaffold route <name>
-gaia scaffold service <name>
-```
+The engine behind the [scaffolder skills](/skills/scaffolders/): `component`, `hook`, `route` (`--data <server|client|query> --service <name> --shape <list|detail>`, groups `_public` and `_session`, `--dry-run`), and `service` (`--layer`, `--mocks`, `--queries-only`).
 
 ### `gaia setup`
 
-Source: `.gaia/cli/src/setup/index.ts`
-
-Per-machine clone setup primitives invoked by `/setup-cloned-gaia-project`. The slash command orchestrates externally-shelled installs (React Doctor, Playwright CLI, Serena MCP, plugins, spec-kit) and calls these primitives to record progress in `.gaia/local/setup-state.json`.
+The steps behind [`/setup-gaia`](/getting-started/setup-gaia/).
 
 ```
-gaia setup status [--json]
-gaia setup mark-step <step>
-gaia setup finalize [--force]
-gaia setup link-worktree [--json]
+gaia setup status|mark-step|finalize [--force]|bootstrap-env
+gaia setup detect-remote|check-admin|warn-existing-tools
+gaia setup enable-delete-branch|configure-dependabot-alerts
+gaia setup write-isolation-policy <always-worktree|prefer-worktree|prefer-branch>
+gaia setup write-sandbox-recommendation <true|false>
+gaia setup record <id> <applied|declined|not-applicable>
+gaia setup drift [--features <path>]
 ```
+
+`drift` lists setup features from `.gaia/setup-features.json` with no recorded decision; `/setup-gaia` and `/update-gaia` act on it.
+
+### `gaia sandbox`
+
+`detect`, `apply`, `record`, and `status` for the decision on whether Bash runs inside the operating system's sandbox. Exits 2 on invalid arguments.
+
+### `gaia labels`
+
+`gaia labels sync` brings a repository's labels in line with `.gaia/labels.json`. See [Labels](/reference/labels/).
+
+### `gaia packages`
+
+`gaia packages sync-settings [--check]` generates `<package>/.claude/settings.json` from the root settings and the package's overlay. The pre-commit hook checks it.
 
 ### `gaia update`
 
-Source: `.gaia/cli/src/update/index.ts`
-
-Wired by the `/update-gaia` skill for the field-aware `pnpm-workspace.yaml` merge step (Step 7b).
-
-```
-gaia update merge-workspace --baseline <file> --latest <file> --current <file> [--json]
-```
-
-A field-aware, read-only verdict oracle for `pnpm-workspace.yaml`. It parses three YAML files (baseline from the prior GAIA release, latest from the incoming tarball, current working-tree copy) and emits a JSON report of `{applied, conflicts, suggestions}`. It never writes the workspace file. The `/update-gaia` skill applies the `applied` entries with the Edit tool so comments, key order, and quote style survive. The `--json` flag switches output from the human summary to the raw JSON report.
+The merge steps behind [`/update-gaia`](/maintenance/update-gaia/): `merge-package`, `merge-workspace`, and `merge-audit-ci` (each merges its file field by field and reports what it applied and what conflicted), `merge-region` and `regen-regions` (for generated regions of a file), and `lockfile-command`.
 
 ### `gaia update-deps`
 
-Source: `.gaia/cli/src/update-deps/index.ts`
-
-Dependency update primitives invoked by the `/update-deps` skill.
-
-```
-gaia update-deps run --emit-updates <path>
-gaia update-deps decline --source <path> --skip <a,b,...>
-gaia update-deps decline --clear
-```
-
-`run` discovers outdated packages, classifies them into Wave A (minor/patch) and Wave B (major), and writes a JSON payload to `<path>`. `decline` records the groups a developer skipped in the interactive preview into `.gaia/local/declined-updates.json` (gitignored, local statusline only) so the statusline nudge stops counting them. `--source` points at the payload written by `run --emit-updates`; `--skip` takes a comma-separated list of package or group names, each expanded to its whole companion group. `--clear` empties the ledger (used when the developer chose "update all").
+The steps behind [`/update-deps`](/maintenance/update-deps/): `run` (finds what is outdated and sorts it into update waves), `decline` (snoozes an update), `global-tools`, `advisories`, `advisory-landed`, `dismiss-alert`, `write-security-cache`, and `check-security-override`.
 
 ### `gaia fitness`
 
-Source: `.gaia/cli/src/fitness/index.ts`
+The [`/gaia-fitness`](/maintenance/fitness/) linter: `check` (the rule catalog and grade), `rules`, `inventory` (also used by `/gaia-cleanse`), `builtins`, `apply` (the only subcommand that writes a fix, and only to a file you own that has not changed since the check), and `render-card`.
 
-Presentation helper invoked by the `/gaia-fitness` skill to render the final report card.
+### `gaia codify-tally`, `gaia codify-ledger`
 
-```
-gaia fitness render-card [--cols N]
-```
+For [`/gaia-codify`](/maintenance/codify/): `codify-tally` counts how often each finding recurs, and `codify-ledger` records the ones you declined.
 
-Reads a `/gaia-fitness` report JSON document on stdin and writes a width-aware ASCII report card to stdout. `--cols` sets the target terminal width (default: autodetect from `process.stdout.columns`, fallback 100). The box self-sizes to the longest content line, clamped to 120 columns and to the terminal width, wrapping remediation text to fit. Categories render alphabetically. The FINDINGS block is omitted when the `findings` array is empty (clean run). The skill pipes the assembled report JSON through this command and pastes the stdout verbatim into its chat reply.
+### `gaia residue-tally`, `gaia residue-cursor`, `gaia residue-record`
 
-### `gaia harden-tally`
+For [`/gaia-residue`](/maintenance/residue/): `residue-tally` counts the residuals to triage, `residue-cursor` remembers where a run stopped so the next one resumes there, and `residue-record` records dismissals. `GAIA_RESIDUE_CAP` sets one batch's size.
 
-Source: `.gaia/cli/src/harden/tally.ts`
+### `gaia react-perf`
 
-Tallies recurring code-review-audit findings for the `/gaia-harden` policy-memory loop.
-
-```
-gaia harden-tally
-```
-
-Reads the rolling 90-day merged-PR window via `gh`, extracts each PR's machine-readable findings block, counts distinct PRs per `finding_class` at error/warning severity, drops classes already covered by a promoted rule or suppressed by the decline ledger, self-cleans stale ledger entries, and prints the candidate list as JSON to stdout. A class is a candidate when it recurs across 3 or more distinct PRs. Network failures are non-fatal: a `gh` error yields an empty candidate list rather than aborting. No flags.
-
-### `gaia harden-ledger`
-
-Source: `.gaia/cli/src/harden/ledger.ts`
-
-Machine-local decline ledger for the `/gaia-harden` policy-memory loop. The ledger is gitignored so a decline on one machine never vetoes the rule for a teammate.
-
-```
-gaia harden-ledger list
-gaia harden-ledger record --finding-class <c> --pr-count <n>
-gaia harden-ledger is-suppressed --finding-class <c> --current-pr-count <n>
-gaia harden-ledger prune --window-classes <c1,c2,...>
-```
-
-`list` prints the full ledger as JSON. `record` upserts one entry keyed by `finding_class`, snapshotting the current PR count at decline time (re-recording overwrites the timestamp and count). `is-suppressed` exits 0 (suppressed) when an entry exists and fewer than 3 distinct PRs carrying the class have merged since the decline; exits 1 (not suppressed) otherwise. `prune` removes entries whose `finding_class` is no longer in the active window, idempotently. Ledger file: `.gaia/local/harden/declines.json`.
+`gaia react-perf reduce <raw.json> [--frame-budget-ms <n>]` condenses a raw render recording into a summary for [`/gaia-react-perf`](/skills/react-performance/).
 
 ### `gaia wiki`
 
-Source: `.gaia/cli/src/wiki/index.ts`
+The steps behind [`/gaia-wiki`](/maintenance/wiki/), including `chain`, which runs the whole `/gaia-wiki` chain on one branch with one pull request. The full subcommand table and the `chain` steps are in [Contributor wiki content](/contributors/wiki/#gaia-wiki-cli-primitives).
 
-Wiki-state primitives consumed by the `/gaia-wiki` skill (`sync`, `consolidate`, `lint`). The primitives are deterministic; the skill orchestrates them.
+### `gaia ping`
 
-```
-gaia wiki state [--json]
-gaia wiki commit-classify --since <sha> [--json]
-gaia wiki state-init <sha>
-gaia wiki state-bump <field> <value>
-gaia wiki log-prepend --sha <h> --decision <D> --reason "..."
-gaia wiki page-index [--json]
-gaia wiki orphans
-gaia wiki near-collisions [--max-distance N]
-gaia wiki dead-paths [--json]
-gaia wiki frontmatter [--json]
-gaia wiki empty-sections [--json]
-gaia wiki sync land [--branch-aware]
-```
-
-`state-init <sha>` refuses if `wiki/.state.json` already exists. `state-bump` performs an atomic single-field update. `sync land` lands staged wiki changes via the correct branch strategy.
+The fire-and-forget usage ping sent by `/gaia-init`, `/setup-gaia`, and `/update-gaia`. `GAIA_TELEMETRY_PING_DISABLE=1` suppresses it.
 
 ## Where to find tests
 
-Per-subcommand test files sit alongside the source: `component.test.ts` next to `component.ts`, etc. The test runner is Vitest. Run from the CLI workspace:
+Test files sit beside their source under `.gaia/cli/src/`, run by [Vitest](https://vitest.dev/):
 
 ```bash
 pnpm -C .gaia/cli typecheck
 pnpm -C .gaia/cli test --run
 ```
 
-Test fixtures live under `.gaia/cli/test-fixtures/`.
+Fixtures live under `.gaia/cli/test-fixtures/`. GAIA's shell layer is tested by bats suites under `.gaia/scripts/tests/` and `.gaia/tests/`; see [CI workflows](/contributors/ci/).
 
 ## Surfaces excluded from this reference
 
-Some namespaces in the source are deliberately undocumented in public contributor docs and are not listed above. They remain visible in the source itself; this page intentionally does not enumerate them.
+Some namespaces are deliberately undocumented in public contributor docs and are not listed above. They remain visible in the source itself.

@@ -1,0 +1,147 @@
+---
+title: /gaia-plan
+description: Split a feature into phases of tasks that sub-agents build. Produces a plan folder and a kickoff prompt you paste into a fresh session.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+`/gaia-plan` splits a complex feature into phases. Each phase holds tasks that can run at the same time, and the types and interfaces the tasks share (the contracts) are fixed up front so the tasks fit together. It does not write the code. It writes a plan folder and gives you one prompt to paste into a fresh session, where an orchestrator (the session that runs the plan) carries it out.
+
+The plan folder is saved in the [Notebook](/workflow/notebook/).
+
+## When to use it
+
+Reach for `/gaia-plan` when the work spans several files or modules, has parts that can be built at the same time (UI, service layer, tests), or would benefit from giving each part its own sub-agent with a fresh context.
+
+For one-line fixes or single-file edits, skip the plan and prompt Claude directly.
+
+For a feature whose goal is not settled yet, run [`/gaia-spec`](/workflow/spec/) instead. It plans its SPEC in the same session, so you do not run `/gaia-plan` separately.
+
+## How to invoke
+
+```
+/gaia-plan a feature description in plain language
+```
+
+From a saved SPEC:
+
+```
+/gaia-plan SPEC-005
+```
+
+With no description at all, `/gaia-plan` asks for one.
+
+### Auto mode
+
+```
+/gaia-plan auto a feature description
+```
+
+Auto mode is for runs nobody is watching. It changes two steps, and every other step runs the same:
+
+- **Planner model.** Normally, on a model other than Opus or Fable, Claude asks which model the planner should use. In auto mode Claude does not ask: on another model the planner uses Opus, and on Opus (or Fable) it keeps your model.
+- **Plan audit review.** Normally, critical and major findings come to you as one list to accept or revise. In auto mode, clear-cut fixes are applied without asking. A finding with more than one reasonable fix is left unapplied and written to an `## Audit notes` section in the plan's `README.md`.
+
+A description is required. A description whose first word is "auto" is always read as auto mode, so reword one that starts with that word.
+
+For your normal work, leave auto mode off: the two questions it removes are worth answering. If you do use it, read the README's `## Audit notes` before you paste the kickoff prompt, since those findings were never put to you.
+
+## What gets produced
+
+The plan is written into the notebook:
+
+| Plan | Folder |
+|---|---|
+| From a SPEC | `.notebook/specs/SPEC-NNN/plan/` (a second plan for the same SPEC is `plan-2/`) |
+| With no SPEC | `.notebook/plans/PLAN-NNN/`, numbered from the notebook catalog |
+
+Inside it:
+
+| File | Purpose |
+| --- | --- |
+| `README.md` | The overview: phase order, which tasks run at the same time in each phase and on which model, the fixed contracts the tasks share, and the source SPEC. |
+| `ORCHESTRATOR.md` | The step-by-step instructions the orchestrator follows: where the work runs, phase order with quality gates, prompts for each sub-agent, the audit before merge, the git steps, and when to stop. |
+| `KICKOFF.md` | The prompt a fresh session reads to start orchestrating. |
+| `task-<name>.md` | One per task, with everything a fresh sub-agent needs: contracts, files to change, acceptance criteria, dependencies. |
+| `PROGRESS.md` | Written during execution: one entry per completed or halted phase. |
+
+## The flow
+
+1. **Before it starts.** Notebook entries GAIA no longer needs are cleared out (see [How entries are cleared](/workflow/notebook/#how-entries-are-cleared)), and Claude offers to pull when your GAIA version is behind the remote.
+2. **Find the SPEC**, if you named one. If no SPEC matches, it stops with an error instead of quietly planning without it.
+3. **Pick the planner model.** On Opus (or Fable) the planner inherits your model. Otherwise Claude asks: Opus (recommended), Fable, or your current model. The planner runs at your session's effort, so a higher `/effort` drafts a deeper plan.
+4. **Plan.** A planner sub-agent writes the folder. If the planner's context reaches the [red band](/models-and-context/token-efficiency/#context-bands), it hands off to a fresh one.
+5. **Verify.** A script checks that every required file and step is there, and that every UAT (acceptance test) in the SPEC is assigned to a task.
+6. **Plan audit.** Reviewers check the plan before anything is built from it. See [The plan audit](#the-plan-audit).
+7. **Report.** A [cost line](/models-and-context/cost/#what-you-see), then the prompt:
+
+   ```text
+   Read /absolute/path/to/plan/KICKOFF.md and execute it.
+   ```
+
+   Type `/clear` and paste it.
+
+## The plan audit
+
+The [SPEC audit](/workflow/spec/#the-spec-audit) checks what to build before a plan exists, and the [Code Audit Team](/workflow/code-audit-team/) checks the code after it is built. Neither sees the plan itself: how the work is split into tasks, which tasks run side by side, and the contracts between them. The plan audit checks exactly that, before an orchestrator with no memory of the planning builds from it. A flaw caught here costs one edit to the plan, not a failed run.
+
+### When it runs
+
+A simple plan (one or two tasks, a single phase, nothing shared between tasks) skips the audit. Any plan with tasks running side by side, several phases, or a contract shared between tasks gets it, with no question asked. If Claude cannot start sub-agents, the audit is skipped with a note, and the per-phase quality gates and the Code Audit Team remain the safety net.
+
+### The lenses
+
+Each lens is a fresh sub-agent that reads the plan and your code for itself. Like the SPEC audit's, each lens has a short code:
+
+| Lens | What it checks |
+| --- | --- |
+| (DP) Decomposition and dependency soundness | Tasks marked to run side by side that actually share state, edit the same files, or need each other's output. A phase order that ignores a real dependency. A contract two tasks read differently. A parallel task that runs a project-wide check (lint, type checks, Playwright, a dev server) that would collide with its neighbors. It looks for a way every task passes its own checks while the combined result is broken. |
+| (CG) Contract grounding | Every file path, export, type, and function signature a task names really exists in your repository and installed packages. A contract that names something that does not exist would fail only at the end, when the pieces are put together. |
+| (COV) SPEC coverage | Only for a SPEC's plan. Every UAT and success criterion is covered by some task, no task contradicts the SPEC, and no task brings back work the SPEC ruled out of scope. |
+
+There is no refutation pass, unlike the SPEC audit: these checks have a clear yes-or-no answer against the code, so there is little room for a false alarm.
+
+### What you see
+
+Critical and major findings are printed as one list headed **Plan audit**, each with its evidence and the recommended fix, followed by one question: **Accept all as recommended** or **Revise**. Minor findings are applied without asking.
+
+A finding that affects one spot, such as a wrong contract or an uncovered UAT, is fixed in the plan's files directly. A finding that the task graph itself is wrong sends the plan back to the planner with the findings, and the rewritten plan goes through the file check (step 5) again.
+
+In [auto mode](#auto-mode), no question is asked: clear-cut fixes are applied, and a finding with more than one reasonable fix is written to `## Audit notes` in the plan's `README.md` for you to read before kickoff.
+
+## Execution
+
+The orchestrator runs in the fresh session:
+
+- **Where it runs** follows your team's [isolation policy](/workflow/work-lifecycle/#3-isolate): a separate worktree by default. The branch is named `<type>/spec-<nnn>-<slug>` for a SPEC's plan or `<type>/plan-<nnn>-<slug>` otherwise, where `<type>` is the Conventional Commits type of the change. The PR Conventions check expects the pull request title's type to match.
+- **Each phase** hands its tasks to sub-agents, Sonnet by default. Sub-agents only edit files: they never commit, push, or run git commands that change the shared checkout. The orchestrator commits each phase after the Quality Gate passes. See [Who does what](/workflow/work-lifecycle/#who-does-what).
+- **A task whose context reaches the red band** hands off to a fresh agent. When one task has to hand off too often, the plan stops and asks you.
+- **The pull request** opens as a draft and goes through the [Code Audit Team](/workflow/code-audit-team/). Once every member has cleared it, the orchestrator prints a summary and the cost of the whole implementation, then asks you before it merges.
+
+### Resuming a plan
+
+Running the kickoff again on a plan that already completed phases shows each verified phase with its commit and asks:
+
+- **Resume** at the first incomplete phase
+- **Restart from Phase 1**
+- **Abandon**: stop without re-running, committing, merging, or deleting anything
+
+A plan generated before a GAIA update keeps the steps it was generated with until you regenerate it.
+
+### UAT specs
+
+[`/gaia-spec`](/workflow/spec/#uats) writes the UATs. For a plan from a SPEC, the planner routes each one to the place that will test it:
+
+| Route | When | How it is tested |
+| --- | --- | --- |
+| End-to-end | The outcome needs a route, navigation, a loader or action, a session, language detection, or mocked server data | A [Playwright](https://playwright.dev/) test, rendered before Phase 1 (below) |
+| Story | The outcome can be seen on one component given its props | An acceptance criterion in the task that owns it, tested with a [Storybook](https://storybook.js.org/) story |
+| Non-UI | Harness, script, or documentation behavior | Assigned to the phase that owns it |
+
+Each UAT routed to an end-to-end test is turned into a Playwright test under `frontend/.playwright/e2e/` **before Phase 1**. It is committed on its own and marked as expected to fail (`test.fail()`). The phase responsible for a test cannot commit until that test passes. Sub-agents are told not to change a test's assertions to make it pass, because the test is what the SPEC promised.
+
+Before the audit, the orchestrator checks that every one of these tests still tests what the SPEC says (an `uat-fidelity-judge` agent reads each one). When the code and a UAT no longer agree, the plan stops so the SPEC can be reopened, instead of quietly changing what was agreed.
+
+The SPEC is closed out after its implementation merges.
+
+Source: `.claude/skills/gaia/references/plan.md`.

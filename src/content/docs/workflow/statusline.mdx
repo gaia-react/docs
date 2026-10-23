@@ -1,0 +1,123 @@
+---
+title: Statusline
+description: What GAIA's statusline shows. The left side tracks your session (project, branch, model, and how full the context is). The right side names the maintenance commands that are due.
+---
+
+export const S = ({ c, children }) => <span style={{ color: c, fontWeight: 700 }}>{children}</span>;
+
+export const Row = ({ children }) => (
+	<pre style={{ padding: '0.75rem 1rem', overflowX: 'auto', border: '1px solid var(--sl-color-gray-5)', background: '#1a1b26' }}>
+		<code>{children}</code>
+	</pre>
+);
+
+GAIA adds a [statusline](https://code.claude.com/docs/en/statusline) to Claude Code: the row under the prompt. It has two sides, and each answers a different question:
+
+- **The left side** is about the session you are in: which project and branch, which model, and how full Claude's context is.
+- **The right side** is about the project: which GAIA commands are due, and why.
+
+Both sides share one row, the left side first and the nudges right-aligned beside it. They are shown separately below, in the colors the statusline uses.
+
+## The left side
+
+<Row><S c="#60a5fa">my-app</S> │ <S c="#4ade80">🌳 feat/login</S> │ <S c="#22d3ee">Opus 5.5 (High)</S> │ <S c="#4ade80">▓▓░░░░░░░░</S> 18%</Row>
+
+| Segment | What it shows |
+| --- | --- |
+| Project | The main checkout's folder name. A [linked worktree](/workflow/work-lifecycle/#why-gaia-works-in-worktrees) shows the same name, so you always see which project you are in. |
+| Branch | The branch the session is on. A `🌳` in front means the session is in a linked worktree, a separate copy of the repo on its own branch. |
+| Model and effort | The model, with its effort level in parentheses when one is set: `Low`, `Medium`, `High`, `XHigh`, or `Max`. |
+| Context bar | How full the context window is: ten cells, then the percentage of the window used. |
+
+### The context bar
+
+Claude cannot see how full its own context is, so the bar shows it for you. A model's answers get worse as its context fills, so knowing where you stand tells you when to [clear and resume](/models-and-context/token-efficiency/#why-so-early) before quality drops. The bar's color follows the same bands GAIA uses to decide when to ask you to clear:
+
+| Band | Bar |
+| --- | --- |
+| Green | <code style={{ background: '#1a1b26' }}><S c="#4ade80">▓░░░░░░░░░</S> 9%</code> |
+| Yellow | <code style={{ background: '#1a1b26' }}><S c="#facc15">▓▓▓░░░░░░░</S> 26%</code> |
+| Red | <code style={{ background: '#1a1b26' }}><S c="#f87171">▓▓▓░░░░░░░</S> 31%</code> |
+| 🔥 | <code style={{ background: '#1a1b26' }}><S c="#f87171">▓▓▓▓░░░░░░</S> 38% 🔥</code> |
+| 💀 | <code style={{ background: '#1a1b26' }}><S c="#f87171">▓▓▓▓▓░░░░░</S> 46% 💀</code> |
+
+The examples use a 1M-token window. Where each band starts is on [Token efficiency](/models-and-context/token-efficiency/#context-bands), and what Claude does when the context reaches one is on [Work lifecycle](/workflow/work-lifecycle/#resuming-long-work).
+
+The statusline also saves each reading, which is how GAIA [tells Claude](/models-and-context/token-efficiency/#context-bands) when the context reaches a band. Without GAIA's statusline, Claude gets no band warnings, and the [audit checkpoint](/reference/gates/#audit-checkpoint) falls back to counting rounds.
+
+### Using your own statusline
+
+If you already have a global statusline (`statusLine.command` in `~/.claude/settings.json`), [`/setup-gaia`](/getting-started/setup-gaia/#phase-statusline-left-side) asks which one draws the left side: GAIA's bar or yours. The answer applies to this machine only. The right side shows GAIA's nudges either way.
+
+If the left side cannot be drawn, the statusline shows `Claude Code` there instead.
+
+## The right side
+
+The right side names GAIA commands that have work to do, so upkeep comes to you instead of depending on you to remember it. Each one is a nudge: an emoji, the command, and a short reason in parentheses. Run the command, or ask Claude in plain language, and the nudge clears once the work is done.
+
+<Row><S c="#22d3ee">🚀 /update-gaia (2.1.0)</S> │ <S c="#facc15">📦 /update-deps (4 outdated, 1 security)</S></Row>
+
+### Nudges
+
+Nudges always appear in this order, which is also their priority when space runs out:
+
+| Nudge | Shows when |
+| --- | --- |
+| <code style={{ background: '#1a1b26' }}><S c="#f0abfc">⚙️ /setup-gaia (2 choices pending)</S></code> | A setup choice is waiting for this machine, usually after a GAIA update adds one. See [`/setup-gaia`](/getting-started/setup-gaia/). |
+| <code style={{ background: '#1a1b26' }}><S c="#22d3ee">🚀 /update-gaia (2.1.0)</S></code> | A newer GAIA release is out. See [`/update-gaia`](/maintenance/update-gaia/). |
+| <code style={{ background: '#1a1b26' }}><S c="#facc15">📦 /update-deps (4 outdated, 1 security)</S></code> | Packages are outdated or have open security advisories. See [`/update-deps`](/maintenance/update-deps/). |
+| <code style={{ background: '#1a1b26' }}><S c="#4ade80">🔎 /gaia-cleanse (12 new memories)</S></code> | Claude's memory or startup files need a review. See [`/gaia-cleanse`](/maintenance/cleanse/). |
+| <code style={{ background: '#1a1b26' }}><S c="#93c5fd">💪 /gaia-fitness (grade B+)</S></code> | Your Claude setup has something to improve, an update combined your edits with GAIA's in harness files, or your team has changed those files often since the last check. See [`/gaia-fitness`](/maintenance/fitness/#the-statusline-nudge). |
+| <code style={{ background: '#1a1b26' }}><S c="#e879f9">🔨 /gaia-codify (2 recurring patterns)</S></code> | The audit keeps finding the same kind of problem. See [`/gaia-codify`](/maintenance/codify/). |
+| <code style={{ background: '#1a1b26' }}><S c="#fca5a5">🐛 /gaia-debt (3 issues)</S></code> | Open `tech-debt` issues are waiting. See [`/gaia-debt`](/workflow/debt/). |
+| <code style={{ background: '#1a1b26' }}><S>🧹 /gaia-residue (6 residuals)</S></code> | Trade-offs accepted at merge have piled up. See [`/gaia-residue`](/maintenance/residue/). |
+| <code style={{ background: '#1a1b26' }}><S c="#67e8f9">🧠 /gaia-wiki (24 commits)</S></code> | The wiki has fallen behind the code. See [`/gaia-wiki`](/maintenance/wiki/). |
+
+Each command's page explains what triggers its nudge and what the reason text means.
+
+The `/update-gaia` nudge has three more forms:
+
+- <code style={{ background: '#1a1b26' }}><S c="#22d3ee">🚀 /update-gaia (pull 2.1.0)</S></code>: your teammates already updated GAIA on the default branch. Pull it instead of running a new update.
+- <code style={{ background: '#1a1b26' }}><S c="#22d3ee">🚀 /update-gaia (resume 2.1.0)</S></code>: you have an unfinished update of your own. Running the command picks it up.
+- <code style={{ background: '#1a1b26' }}><S c="#fde047">⌛️ GAIA 2.1.0 in progress (@teammate)</S></code>: a teammate is updating GAIA right now. There is nothing for you to run, so this form names no command.
+
+### Before setup is done
+
+Until this machine has run its setup, the right side shows one nudge and nothing else:
+
+<Row><S c="#f0abfc">⚙️ /setup-gaia (Required)</S></Row>
+
+While [`/gaia-init`](/getting-started/gaia-init/) is still setting up a new project, the right side stays empty.
+
+### In a linked worktree
+
+Maintenance commands run from the main checkout, so a linked worktree shows no nudges. The one exception is <code style={{ background: '#1a1b26' }}><S c="#f0abfc">⚙️ /setup-gaia (Required)</S></code>, which shows everywhere until setup is done.
+
+### On a narrow terminal
+
+When the nudges do not fit, they shrink one step at a time, starting with the lowest-priority one:
+
+1. The full form: <code style={{ background: '#1a1b26' }}><S c="#facc15">📦 /update-deps (4 outdated, 1 security)</S></code>
+2. A shorter reason, when the nudge has one: <code style={{ background: '#1a1b26' }}><S c="#facc15">📦 /update-deps (5)</S></code>
+3. The command alone: <code style={{ background: '#1a1b26' }}><S c="#facc15">📦 /update-deps</S></code>
+4. The emoji, with its count when there is one, in the default text color: `📦 5`
+5. Hidden, and counted in a `+N` at the end of the row
+
+A narrow row might look like this:
+
+<Row>🚀 │ 📦 5 │ 🐛 3 +1</Row>
+
+A teammate's GAIA update in progress never shrinks past <code style={{ background: '#1a1b26' }}><S c="#fde047">⌛️ GAIA 2.1.0 (@teammate)</S></code>, so you always see who is on it.
+
+## When it updates
+
+- **Every 15 seconds**, Claude Code redraws the statusline, so a resized terminal or a new context reading shows up within that time.
+- **Every 6 hours at most**, the main checkout refreshes the nudges in the background. The redraw itself never touches the network.
+
+A redraw every 15 seconds costs next to nothing. It is a local shell script, not a call to Claude, so it uses no tokens. It reads the nudges from a cached file instead of checking GitHub or your packages, and runs no `pnpm` command. The slow checks run only in the background refresh, at most once every 6 hours.
+- **When a command finishes**, it clears or refreshes its own nudge, so you are not told to run something you just ran.
+- **The `/gaia-debt` count** also refreshes after Claude files, claims, or closes an issue, and at the start of each session.
+
+## Installing it
+
+[`/gaia-init`](/getting-started/gaia-init/) adds the statusline to the project's `.claude/settings.json`. [`/setup-gaia`](/getting-started/setup-gaia/) makes its scripts executable on each machine, and warns you when the statusline Claude Code actually runs is not GAIA's, for example because a `statusLine` in `.claude/settings.local.json` overrides it.

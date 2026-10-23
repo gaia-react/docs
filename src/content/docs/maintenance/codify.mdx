@@ -1,0 +1,146 @@
+---
+title: /gaia-codify
+description: Turn a problem the Code Audit Team keeps finding into a guard (an automated check, a skill, or a rule for matching files), picking the option that adds least to Claude's context, with your approval.
+---
+
+`/gaia-codify` looks at what the [Code Audit Team](/workflow/code-audit-team/) keeps finding across merged pull requests, including what the tools its members run report (such as [React Doctor](https://github.com/millionco/react-doctor), [axe](https://github.com/dequelabs/axe-core), [Knip](https://knip.dev/), and `pnpm audit`), and proposes a guard so the problem stops coming back. For each repeat problem it recommends the lightest fix that would work (the one that adds least to what Claude reads on every task), explains it in plain language, and asks you once to accept the plan. Nothing is authored or switched on without your answer.
+
+It runs like every [maintenance command](/maintenance/#how-maintenance-commands-run): from the main checkout, on a branch of its own, ending in a pull request. Only you start it, by typing it; Claude never runs it on its own.
+
+## Why it helps
+
+Every audit round that catches the same mistake again costs review time and tokens, and the fix lives only in that one pull request. `/gaia-codify` turns a mistake that keeps coming back into something that stops it before review: a check that fails, a skill Claude loads for that kind of work, or a rule that loads only for the files it covers. The lesson then stays with the project for every teammate and every future session, without making Claude read more on unrelated work, because each rule is scoped to the files it covers and a check adds nothing to Claude's context. The reasoning is in `wiki/concepts/Policy-Memory Loop.md` in your project.
+
+## When to use it
+
+The statusline nudges you with `🔨 /gaia-codify (<reason>)`:
+
+- Before your first completed review, it counts recurring patterns: `/gaia-codify (3 recurring patterns)`.
+- After a completed review, it stays quiet until something changes, then names it: a new recurring pattern, a pattern that has grown noticeably, or a change in how findings are counted.
+
+On every `gh pr merge`, a hook posts the pull request's findings in a machine-readable form. Those posts are what the count reads. Only posts from the repository's owner, collaborators, and organization members count, so a findings post from anyone else, such as an outside commenter on a public repository, is ignored.
+
+## What counts as recurring
+
+A kind of finding (its finding class) becomes a candidate once it appears on **3 or more different merged pull requests within the last 90 days**, at any severity, and no rule from an earlier run already covers it. Findings the audit could not place in a class are counted too, and surface as their own signal when they recur.
+
+The count reads your merged pull requests through `gh`. When it cannot, the run says so ("this is not an all-clear") instead of reporting nothing.
+
+## Finding classes
+
+Every finding the Code Audit Team records carries a finding class: a fixed name for the kind of problem it is. Recurrence is counted per class, so two findings about the same kind of problem in different files count as one pattern. The lists below are the classes GAIA ships with. A member picks a class only from these lists, plus any classes its own agent definition adds, so a member you add for your own code (see [Covering new code](/workflow/code-audit-team/#covering-new-code)) can bring its own. Claude never invents a class on the fly: a finding that fits none of them is recorded as `holistic/unclassified`.
+
+### Tool findings
+
+A finding a tool reports keeps the tool's own rule id after a prefix, so any rule the tool has is a valid class.
+
+| Class | What it is |
+| --- | --- |
+| `react-doctor/<rule>` | A React Doctor rule, such as `react-doctor/no-generic-handler-names` |
+| `axe/<rule>` | An accessibility rule from axe, such as `axe/color-contrast` |
+| `knip/<issue type>` | Unused code or dependencies Knip found, such as `knip/exports` |
+| `cve/<advisory id>` | A security advisory against a dependency, such as `cve/GHSA-xxxx-xxxx-xxxx` |
+
+A tool already catches these, so `/gaia-codify` recommends making that check stop the change, or adding it to the Quality Gate, never a written rule. Knip is the exception: the Quality Gate does not run it, so its check is made blocking in the Code Audit Team or CI instead.
+
+### Problems a reviewer spots
+
+| Class | What it is |
+| --- | --- |
+| `holistic/missing-auth-check` | An entry point skips the authentication or authorization check its peers apply. |
+| `holistic/secret-exposure` | A secret reaches somewhere it must not, such as a client bundle, a log, or source control. |
+| `holistic/n-plus-one` | A query runs once per item in a list where one query would return them all. |
+| `holistic/unnecessary-rerender` | A component re-renders because an input changes identity on every render. |
+| `holistic/unhandled-promise-rejection` | A failed async call reaches no error handler. |
+| `holistic/swallowed-error` | A failure is caught or ignored, and the code carries on as if it succeeded. |
+| `holistic/over-permissive-zod` | A [Zod](https://zod.dev/) schema accepts values the code that uses it cannot handle. |
+| `holistic/business-logic-in-component` | Domain rules live in a component instead of the layer that owns them. |
+| `holistic/hardcoded-string` | A user-facing string is written inline instead of coming from the translation files. |
+| `holistic/non-null-assertion` | A `!` assertion silences [TypeScript](https://www.typescriptlang.org/) where the value can in fact be missing. |
+| `holistic/hollow-assertion` | A test or check matches more than it names, so it stays green when the thing it tests breaks. |
+| `holistic/uncoupled-restatement` | A comment or doc describes a named function, route, or setting, and the description is wrong. |
+| `holistic/stale-figure` | A count in a name or comment no longer matches what it counts. |
+| `holistic/unarmed-guard` | A check is correct but is switched on for fewer files than it should protect, so it skips the change it exists for. |
+| `holistic/fail-open-discovery` | A test or check never loads some of its input, such as a glob that misses `.tsx`, and still reports clean. |
+| `holistic/partial-cause-reporting` | An error message names one cause of a failure and stays silent on another cause with the same symptom. |
+| `holistic/dangling-reference` | A comment or doc names something that no longer exists. |
+| `holistic/drifting-duplicate` | The same schema, list, or helper exists as separate copies that can drift apart. |
+| `holistic/ambient-context-resolution` | Code reads its subject from its surroundings (the current folder, a default setting) instead of from the input it was given. |
+| `holistic/shared-state-collision` | Runs that can overlap write to the same file, cache key, or fixture. |
+| `holistic/unbounded-invocation` | A request or process has no limit, such as no timeout or no page size. |
+| `holistic/overclaimed-guarantee` | A comment promises more than the code delivers. |
+| `holistic/incomplete-enumeration` | A comment or doc presents a list as complete when it leaves members out. |
+| `holistic/repeated-round-trip` | The same value is fetched or parsed again for every item or caller, where one call would do. |
+
+### Coding rules
+
+These match GAIA's coding conventions for React and TypeScript.
+
+| Class | What it is |
+| --- | --- |
+| `rule/use-effect-derived-state` | A `useEffect` computes state that could be derived during render. |
+| `rule/use-effect-state-reset` | A `useEffect` resets state when a prop changes. |
+| `rule/unnecessary-use-callback` | A `useCallback` the React Compiler makes unnecessary. |
+| `rule/missing-effect-cleanup` | An Effect that starts something (a listener, timer, or fetch) without cleaning it up. |
+| `rule/generic-handler-name` | An event handler named for when it fires (`handleClick`) instead of what it does (`handleClickSave`). |
+| `rule/switch-statement` | A `switch` statement, where GAIA uses if/else chains or object maps. |
+| `rule/interface-declaration` | An `interface`, where GAIA uses `type`. |
+| `rule/z-enum` | A `z.enum()`, where GAIA uses `z.literal([...])`. |
+| `rule/array-generic-syntax` | `Array<string>`, where GAIA uses `string[]`. |
+| `rule/thin-route-violation` | A route module holding logic that belongs in its page or a service. |
+
+### GitHub workflows
+
+| Class | What it is |
+| --- | --- |
+| `workflow/script-injection` | Untrusted input, such as a pull request title, reaches a workflow's shell script. |
+| `workflow/unsafe-pull-request-target` | A `pull_request_target` workflow runs code from the pull request with the base repository's permissions. |
+| `workflow/unpinned-action` | A third-party action is not pinned to a commit. |
+| `workflow/broad-permissions` | A workflow or job is granted more permissions than it needs. |
+
+### Unclassified findings
+
+A finding recorded as `holistic/unclassified` is never a candidate, because there is no single kind of problem to write a guard for. When unclassified findings recur on 3 or more pull requests within 90 days, the run shows them as one extra row, marked as not a candidate, and records a suppression on this machine so the signal stays quiet until it rises noticeably. When the same kind of problem keeps landing here, the class list may be missing a class for it, or the cluster needs looking into on its own. `/gaia-codify` points this out but never adds a class itself. A class added later applies only to new findings: the unclassified ones already recorded stay unclassified until they age out of the 90-day window.
+
+## How it judges the form
+
+For each candidate, it first checks whether an existing rule, skill, hook, or Quality Gate step already covers the territory, and recommends editing that before creating anything new. Then it picks the lightest form that fits:
+
+| Pattern | Recommended form | What `/gaia-codify` does |
+|---|---|---|
+| An existing tool already catches it | Make that check stop the change instead of only warning, or add it to the Quality Gate | Edits the existing setup |
+| It can be caught by a lint rule, hook, or test | An automated check | Writes a sketch of the hook and script for you to finish. Nothing is switched on. |
+| The lesson is a procedure ("do these steps in this order") | A skill | Writes a `SKILL.md` outline for you to finish. Nothing is switched on. |
+| A judgment call no tool can catch | A written rule that loads only for matching paths | Writes the rule file under `.claude/rules/`, scoped by `paths:` to where the finding recurs |
+
+A written rule is the weakest option: it advises instead of enforcing, and Claude has to read it on every matching task. So before recommending one, it asks what quick evidence would show the rule actually changes behavior. If it can't name any, it recommends defer or decline instead.
+
+## The flow
+
+1. **Explain each candidate in plain language**: what keeps going wrong, one concrete example (the file and what was wrong there), how often as a share ("on 106 of the last 394 audited pull requests, about 1 in 4"), what the recommendation would actually do, and why.
+2. **Show the whole plan** as one table.
+3. **Ask once**:
+   - **Accept all recommendations** (recommended)
+   - **Change some**: pick rows, then choose **approve**, **decline**, **defer**, or **redirect** (a different form) for each
+   - **Stop without changes**: nothing is authored or recorded
+4. **Apply** your choice for each candidate. Approved rule edits land in the working tree on the run's own branch.
+5. **Publish** approved changes as one pull request at the end, merged only on your answer.
+
+### Decline and defer
+
+- **Decline** records, on this machine only, that you are not acting on the pattern. It comes back once the pattern has grown by at least 3 more pull requests and its share of audited pull requests has risen by at least a quarter (5/4 of the share when you declined). While either count covers fewer than 20 audited pull requests, the raw counts are compared instead of shares. The record lives in `.gaia/local/codify/` and is never shared, so a teammate still sees the nudge.
+- **Defer** records nothing of its own. The candidate still appears in the next review; the nudge stays quiet until the pattern grows or the counting changes.
+
+## Promoted rules
+
+A rule `/gaia-codify` writes carries a one-line comment after its frontmatter saying where it came from:
+
+```markdown
+<!-- gaia-harden: promoted from recurring finding_class <class>; pruned by /gaia-cleanse on obsolescence/redundancy/supersession/duplication only, never for non-recurrence -->
+```
+
+That comment is what stops the pattern from being counted again. [`/gaia-cleanse`](/maintenance/cleanse/) treats a marked rule like any other, except it never removes one because its pattern stopped showing up: a pattern that stops showing up means the rule is working.
+
+The run ends with a [cost line](/models-and-context/cost/).
+
+Source: `.claude/skills/gaia/references/codify.md`.

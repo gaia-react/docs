@@ -1,0 +1,75 @@
+---
+title: Deployment
+description: Where a GAIA app can run, how to build and start it, the Dockerfile GAIA ships as a starting point, and the environment variables the server needs.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+GAIA builds a [React Router 8](https://reactrouter.com/) app with server rendering on, so it deploys wherever React Router does. GAIA does not ship a deployment workflow or pick a host for you. Ask Claude to set up deployment for the host you choose.
+
+## Where it can run
+
+React Router isn't tied to one hosting platform. You can deploy it to:
+
+- Any Node.js server
+- Any platform that runs [Docker](https://www.docker.com/) containers, such as [AWS ECS](https://aws.amazon.com/ecs/), [Google Cloud Run](https://cloud.google.com/run), [Azure Container Apps](https://azure.microsoft.com/products/container-apps), or [Fly.io](https://fly.io/)
+- Hosts with their own React Router templates, such as [Vercel](https://vercel.com/), [Netlify](https://www.netlify.com/), and [Cloudflare](https://www.cloudflare.com/)
+
+React Router's [deployment guide](https://reactrouter.com/start/framework/deploying) covers each option.
+
+GAIA's app is built for server rendering: on every request, its root loader reads cookies and sets response headers. React Router can also build a single-page app that a static host serves. Switching takes more than turning off `ssr` in `frontend/react-router.config.ts`, so to use that mode, ask Claude to switch the app for you.
+
+## Build and start
+
+From the repository root:
+
+```bash
+pnpm build
+pnpm start
+```
+
+`pnpm start` runs React Router's production server (`react-router-serve`) on the built app. It listens on `PORT`, or on port 3000 (a random free port if 3000 is taken) when `PORT` is not set. Set `HOST` to choose the address it binds to. `NODE_ENV` defaults to `production`.
+
+## The Dockerfile
+
+GAIA ships `frontend/Dockerfile` as a starting point. Your host may need changes to it, and Claude can make them.
+
+Build it from the repository root, so the root lockfile and [pnpm](https://pnpm.io/)'s supply-chain settings apply:
+
+```bash
+docker build -t my-app -f frontend/Dockerfile .
+docker run -p 3000:3000 \
+  -e API_URL=https://api.example.com/ \
+  -e SESSION_SECRET=<a long random value> \
+  -e SITE_URL=https://example.com \
+  my-app
+```
+
+The image:
+
+- Installs dependencies from the lockfile exactly as committed, then builds the app
+- Copies only the production dependencies and the build output into a fresh Node image
+- Runs the server as the unprivileged `node` user, with `pnpm start`
+
+No `.env` file ever enters the image: `frontend/Dockerfile.dockerignore` excludes them, along with the root `.claude/` folder, the wiki, and local GAIA state.
+
+## Environment variables
+
+`frontend/.env` is for local development only. On your host, set these variables in its own environment or secrets settings. The server checks them when it starts (`frontend/app/env.server.ts`) and fails to start if a required one is missing.
+
+| Variable | Required | What it does |
+|---|---|---|
+| `API_URL` | Yes | The base URL of your backend API, used by both the server and the browser. |
+| `SESSION_SECRET` | Yes | Signs the app's cookies, such as the language and toast cookies. Use a long random value, never the `local` placeholder from `.env.example`. |
+| `SITE_URL` | Yes | Your site's public URL, including the scheme (`https://example.com`). Pages tell search engines not to index them unless the request's `Host` header matches this URL's host and port, so a preview deployment stays out of search results. If a proxy in front of the server changes the `Host` header, every page is marked this way. |
+| `PORT`, `HOST` | No | Where the server listens. |
+| `COMMIT_SHA` | No | Set when building to add the first six characters of the commit to the app's version string, so you can tell which commit a running build came from (for example, when debugging). The shipped Dockerfile doesn't pass it to the build; add an `ARG COMMIT_SHA` to use it there. |
+| `MSW_ENABLED` | No | Development only: starts the mock API. A production build never starts it, so leave it unset on your host. |
+
+<Aside type="caution">
+`API_URL`, `COMMIT_SHA`, and `MSW_ENABLED` are written into every page's HTML so the browser can use them. Never put a secret in a variable the browser receives. A new variable stays server-only until it is added to the browser allowlist in `frontend/app/env.server.ts`.
+</Aside>
+
+## Calling an API on another domain
+
+GAIA's Content Security Policy only lets the browser make requests to the site's own origin (`connect-src 'self'`). If code running in the browser calls `API_URL` and your API is on another domain, the browser blocks the request. Add the API's origin to `connect-src` in `getContentSecurityPolicy` (`frontend/app/utils/http.server.ts`). Requests made on the server, such as in loaders, are not affected.

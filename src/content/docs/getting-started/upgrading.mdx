@@ -1,0 +1,213 @@
+---
+title: Upgrading from 1.x
+description: How a GAIA 1.6.1 project moves to GAIA 2.0.0, what changes, what each teammate's machine needs afterward, and what your own code needs.
+sidebar:
+  order: 5
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+GAIA 2.0.0 moves the React app, and the Claude setup that applies only to it, into `frontend/`. The project root becomes a [pnpm](https://pnpm.io/) workspace that holds the shared setup. The 1.6.1 `/update-gaia` cannot make that move: it merges each file by its path, so it would see every app file at its old path as deleted in the new release. Instead, the v2.0.0 release includes a migration note, a step-by-step guide that Claude follows in your session.
+
+Only 1.6.1 can migrate. On an older 1.x version, update to 1.6.1 first.
+
+## Run the migration
+
+On the machine that does the migration:
+
+1. Run `claude update` so Claude Code is 2.1.287 or later. The 2.0.0 audit that merges the migration needs it. On 2.1.304 or later, the audit agents start with a smaller context and cost less.
+2. From the main copy of your 1.6.1 project (not a worktree), with no uncommitted changes, run `/update-gaia`.
+3. The 2.0.0 release notes open with a notice for 1.6.1 projects. Claude chooses **Abort** at the update question and offers to migrate instead. Choosing **Proceed** there stops with `FETCH_FAILED` and changes nothing.
+4. Say yes. Only then does Claude download `gaia-bundle-v2.0.0.tar.gz`, check it against its published `.sha256` checksum, unpack it, and follow the `.gaia/migrations/2.0.0.md` note inside it, in the same session.
+
+Nothing in the repository changes before the note's first step: no stash, commit, or branch.
+
+If you read the release notes on GitHub instead, open Claude Code in your 1.6.1 project and ask it to migrate the project to GAIA 2.0.0.
+
+### What the preflight refuses
+
+Before changing anything, the note checks your project and stops with a clear message when:
+
+- `.gaia/VERSION` is not exactly `1.6.1`
+- `frontend/` already exists
+- You are in a worktree, not your main copy of the repo
+- There are uncommitted changes (commit or discard them first, including unfinished TDD work)
+- A plan has started running (finish and merge it, or abandon it)
+- Claude Code is older than 2.1.287
+- `gh` is not logged in, or `jq`, `tar`, or `shasum` is missing
+
+Spec work that is not finished carries over: a finalized SPEC, a plan written but not started, or a `/gaia-spec` draft in progress.
+
+### How it runs
+
+- All work happens on a branch named `chore/migrate-gaia-2.0.0`. Nothing is committed on `main`.
+- The note records its progress in a gitignored file, `.gaia/local/cache/shared/migrate-2/PROGRESS.md`. A new session picks up from the step recorded there.
+- Step 7 ends in a restart: quit Claude Code and start a new session from the repository root so the 2.0.0 hooks load. The progress file picks up where it left off.
+- Every commit goes through your git hooks as they are at that point in the migration. The note never uses `--no-verify`.
+- For every file that comes from GAIA, Claude compares three versions: the 1.6.1 original, yours, and the 2.0.0 one. Your changes stay, GAIA's changes come in, and you are asked about any real conflict.
+- It never deletes an uncommitted or untracked file of yours without asking where to keep it, never opens a `.env` file (env files are moved, not read), and never copies GAIA's lockfile (`pnpm install` regenerates it).
+- It ends by opening one pull request, which merges through the 2.0.0 [Code Audit Team](/workflow/code-audit-team/). Restart Claude Code from the project before that audit runs, so the two new audit agents, `audit-rule-specialist` and `audit-refuter`, load. In a session started earlier, `code-audit-frontend` does their reviews itself and says so in its report.
+
+### What moves
+
+The note makes every 2.0.0 change to GAIA's own files, and makes or lists the changes your own code needs. In summary:
+
+- The app, its tests and configs, and the frontend-only rules, skills, and agents move under `frontend/`. Your `.env` files move to `frontend/`.
+- Route files are renamed to the flat file names `@react-router/fs-routes` expects, and component, page, and hook folders are renamed to kebab-case, your own included. Your app's URLs do not change.
+- Husky is replaced by plain git hooks in `.githooks/`.
+- spec-kit's files are removed. GAIA's own spec workflow files move to their new paths, with any edits you made.
+- SPEC numbers are no longer tracked in the committed `.gaia/specs.json` file; they come from `spec/NNN` git tags instead, and specs, plans, and research move into the gitignored `.notebook/`.
+- The GAIA CI workflows, actions, and leftover files are removed.
+- The Code Audit Team, a set of reviewers each responsible for certain files, replaces the single `code-review-audit` agent, and the new [Code Audit Team](/workflow/code-audit-team/) audits the migration's own pull request.
+- [shadcn/ui](https://ui.shadcn.com/) replaces GAIA's components, stories replace component tests, and the data layer changes (see [Your own code](#your-own-code)).
+
+### After the pull request merges
+
+Only after the merge does Claude change anything on GitHub, and it asks you before each change:
+
+- Push a `spec/NNN` starting tag so the next SPEC number continues from your highest one.
+- Remove the old `code-review-audit` required check, keeping `GAIA-Audit` and every other check.
+- Delete the GAIA CI secrets (`CLAUDE_CODE_OAUTH_TOKEN`, `ANTHROPIC_API_KEY`). Revoke the token where you created it and uninstall the Claude GitHub App yourself. Deleting the secret alone leaves the credential working.
+- Sync labels (renaming `severity:important` and `severity:suggestion` in place), close open `gaia-ci` pull requests, and delete `gaia-ci/` branches.
+
+It then asks before deleting leftover local files, sets up any existing worktrees that already have the 2.0.0 layout, and passes you to `/setup-gaia`, which records the 2.0.0 setup decisions.
+
+### Rollback
+
+Until the pull request merges, everything is on your machine and can be undone, and nothing on GitHub has changed:
+
+1. Move the env files back: `mv frontend/.env* .` (only the untracked ones the note moved).
+2. `git switch main`, then `git branch -D chore/migrate-gaia-2.0.0`.
+3. Restore the SPEC ledger and undo the notebook move, as the note's Rollback section describes.
+4. Run `pnpm install` on `main`, and confirm `git config --get core.hooksPath` prints `.husky/_`.
+5. Restart Claude Code so the 1.6.1 hooks load again.
+
+## Every other machine
+
+The note sets up only the machine that runs it. Every teammate, and every other machine you use, runs these steps once after pulling the merged migration. Run them from the root of your main copy of the repo.
+
+1. **Turn on the git hooks.** Until you do, that clone runs no pre-commit hook, and nothing tells you so.
+
+   ```bash
+   pnpm install
+   git config --get core.hooksPath
+   ```
+
+   The second command must print `.githooks`. If it does not, run `git config core.hooksPath .githooks`.
+
+2. **Node and pnpm.** Node 22.22.0 or newer, then:
+
+   ```bash
+   corepack enable pnpm
+   ```
+
+3. **Claude Code 2.1.287 or later.**
+
+   ```bash
+   claude update
+   ```
+
+4. **Install the test browser.** `pnpm install` no longer installs [Playwright](https://playwright.dev/)'s browsers.
+
+   ```bash
+   pnpm install:browsers
+   ```
+
+5. **Remove local files that are no longer used.**
+
+   ```bash
+   rm -rf .gaia/cache
+   rm -f .gaia/local/harden/declines.json
+   rm -rf .gaia/local/handoff
+   ```
+
+6. **Move specs, plans, and research into the notebook.** Until this runs, the spec and plan commands stop and print this line.
+
+   ```bash
+   bash .gaia/scripts/notebook/move.sh run
+   ```
+
+7. **Move the [React Doctor](https://github.com/millionco/react-doctor) skill under `frontend/`**, when `.claude/skills/react-doctor` exists:
+
+   ```bash
+   mkdir -p frontend/.claude/skills && mv .claude/skills/react-doctor frontend/.claude/skills/react-doctor
+   ```
+
+8. **Remove Serena**, which 2.0.0 drops. The 2.0.0 migration does both parts on the machine that runs it. On each other machine, unregister it (a not-found error means it was never registered there):
+
+   ```bash
+   claude mcp remove serena -s user
+   ```
+
+   In each clone, remove the tracked `.serena/` files, then the ignored cache that `git rm` leaves behind. `-f` is needed because Serena may have rewritten `.serena/project.yml`:
+
+   ```bash
+   git rm -q -r -f -- .serena
+   rm -rf .serena
+   ```
+
+9. **Rename abbreviated settings variables** you export in a shell profile, CI, or `.env`. `GAIA_LEDGER_LOCK_TIMEOUT_SECS`, `GAIA_LEDGER_LOCK_STALE_SECS`, and `GAIA_LEDGER_LOCK_POLL_SECS` now end in `_SECONDS`. `GAIA_SPEC_REMOTE_TIMEOUT_SECONDS`, `GAIA_SPEC_ALLOCATION_MAXIMUM_RETRIES`, `GAIA_TITLE_MAXIMUM_LENGTH`, and `GAIA_WIKI_FETCH_MINIMUM_INTERVAL_MINUTES` replace their abbreviated forms. An old name is ignored without any warning.
+
+10. **Rename an unmerged plan branch.** A branch still named `spec-<nnn>-<slug>` no longer holds its SPEC number. Rename it with a commit type in front (any type) and push it:
+
+    ```bash
+    git branch -m spec-<nnn>-<slug> feat/spec-<nnn>-<slug>
+    ```
+
+11. **Run the residue sweep once.** It lists the `.gaia/local` files that removed features left behind, each with the reason it is no longer used. Files it doesn't recognize are listed and never deleted.
+
+    ```bash
+    bash .gaia/scripts/state-registry-lib.sh residue-sweep
+    ```
+
+    Review the list, then run it again with `--apply` to delete exactly those files.
+
+12. **Run `/setup-gaia`** to record this machine's 2.0.0 choices.
+
+<Aside type="note">
+GAIA no longer enables the claude-obsidian plugin, and Python 3.11 is no longer a prerequisite. The wiki stays an Obsidian vault. If you installed the plugin only for GAIA, remove it: `claude plugin uninstall claude-obsidian@agricidaniel-claude-obsidian --scope user`. That removes it from every project on the machine.
+</Aside>
+
+## Your own code
+
+The note changes GAIA's files and lists what your own code needs. The release notes mark every such item **Action required** with the exact command. The ones most projects meet:
+
+- **shadcn/ui role tokens.** Colors come from named roles (shadcn tokens such as primary or muted) in `frontend/app/styles/theme.css`. Removed utility classes and the `primary-*` color scale map to those tokens, and GAIA's `Button`, `LinkButton`, `Toast`, form wrappers, and `react-icons` are replaced by `ui/*` components and [`lucide-react`](https://lucide.dev/).
+- **`cn`.** `cn` from the `cn` package replaces `twMerge` and `twJoin`, with `cond && 'class'` as the one conditional form.
+- **`@gaia-react/lint` 3.0.0.** New rules, a required `-- reason` on every `eslint-disable`, and an optional `...lint.reactRouter` group. `frontend/eslint.config.mjs` is your file, so you add a few `...` entries to it by hand.
+- **Stories as tests.** React Testing Library, happy-dom, and jsdom are gone. Convert component tests to stories with play functions and hook tests to `vitest-browser-react`.
+- **[Chromatic](https://www.chromatic.com/) modes.** Replace `chromatic: {viewports: [...]}` with viewports set per mode, and `excludeDark` with `modes: {dark: {disable: true}}`.
+- **msw 3.** Migrate your handlers with `npx codemod@latest run @mswjs/v3`.
+- **Data layer.** Services are [Ky](https://github.com/sindresorhus/ky) and [Zod](https://zod.dev/) modules, and `create()` defaults to camelCase. A snake_case backend passes `{isSnakeCaseEnabled: true}`.
+- **`FormError`'s `hide` prop** is now `isHidden`.
+- **Label renames.** `priority:high`, `priority:critical`, and `needs-human-review` in your own workflows or templates become `severity:major`, `severity:critical`, and `needs-human`. Find them with `git grep -n -E 'priority:(high|critical)|needs-human-review'`. `gaia labels sync --prune-deprecated` removes the old `gaia-ci` label.
+- **Custom fitness categories.** A category you added to `wiki/decisions/Claude Integration Fitness.md` no longer runs. Copy it out before the update replaces that page, and keep the check as a rule under `.claude/rules/` or as a skill.
+- **Your own React performance drive spec.** Rename `{keep: true}` to `{isRunDirectoryKept: true}`; the old name is ignored.
+- **Codify declines.** Candidates you declined in `/gaia-harden` come back once in [`/gaia-codify`](/maintenance/codify/).
+- **Templates.** GAIA no longer ships a pull request template, issue templates, or `FUNDING.yml`. Your copies stay yours; deleting `.github/ISSUE_TEMPLATE/` restores GitHub's defaults.
+- **Agent teams.** GAIA no longer turns on Claude Code's experimental agent-teams flag. Set it in your own user or local settings if you want it.
+- **React Compiler** is on by default. Run `pnpm lint` and all your tests; to turn it off, set `isReactCompilerEnabled = false` in `frontend/react-compiler.config.ts`.
+- **[Vitest](https://vitest.dev/) 5** turns on `clearMocks` by default and fails an un-awaited `.resolves` or `.rejects`, so a few of your own tests may need small fixes.
+- **Client environment allowlist.** The browser gets only the environment variables on an allowlist, so server variables stay on the server. If a story of yours reads `window.process.env`, pass the value in as a story arg instead; if a test depends on a value from your `.env`, set it in your shell or give it a default in `frontend/test/setup.ts`.
+- **Same-site redirects.** `resolveLocalRedirect` and `LocalRedirectSchema` replace `isLocalRedirect`; the migration switches GAIA's own actions.
+- **Dropped packages and pages.** `react-router-dom` is no longer used (`pnpm remove react-router-dom`). The example privacy and terms pages and `@tailwindcss/typography` no longer ship; keep the pages when the migration asks if you use them, otherwise run `pnpm -C frontend remove @tailwindcss/typography`. GAIA's branded `Header`, `Footer`, and logo no longer ship either; the migration keeps your customized copies as your own files.
+- **Removed i18n?** If your project removed i18n, delete the `LANGUAGES` import and `testIgnore` from `frontend/playwright.config.ts`, or Playwright cannot load its config.
+
+Commands you knew in 1.x have new names or are gone. See [What changed in the commands](#what-changed-in-the-commands).
+
+## What changed in the commands
+
+| 1.x | 2.0.0 |
+|---|---|
+| `/gaia-audit` | [`/gaia-cleanse`](/maintenance/cleanse/), narrowed to memory and auto-loaded files |
+| `/gaia-harden` | [`/gaia-codify`](/maintenance/codify/) |
+| `/setup-gaia-ci`, `/setup-cloned-gaia-project` | [`/setup-gaia`](/getting-started/setup-gaia/) |
+| `/gaia-handoff`, `/gaia-pickup` | Removed. Resume from the run folder's `STATE.md` or a continuation prompt. See [Work lifecycle](/workflow/work-lifecycle/#resuming-long-work). |
+| `/gaia-debt list`, `why`, `fix` | Removed. Run `/gaia-debt` with no argument to work the top of the backlog, or pass one or more issue numbers. A trailing `worktree` or `branch` picks where the work happens. |
+| `/gaia-wiki sync`, `consolidate`, `lint`, `--force` | `/gaia-wiki` takes no arguments and always runs all three. |
+| `/speckit.gaia.*` | Removed with spec-kit. |
+| `/gaia-serena-sync` | Removed with Serena. |
+| GAIA CI | Removed. Audits run locally. |
+| `code-review-audit` agent | The [Code Audit Team](/workflow/code-audit-team/) |
+
+There are no aliases. User-only commands (`/gaia-init`, `/setup-gaia`, `/gaia-fitness`, `/gaia-forensics`, `/gaia-codify`, `/gaia-residue`) no longer appear in Claude's skill listing and Claude never starts them on its own. Type them as slash commands.

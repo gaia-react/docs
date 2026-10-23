@@ -1,88 +1,69 @@
 ---
 title: CI workflows
-description: Contributor-only GitHub Actions workflows. Release, CLI tests, audit-script tests, distribution harness, forensics triage, and the on-demand automation workflows installed by /setup-gaia-ci.
+description: Contributor-only GitHub Actions workflows on the GAIA repo. Release, CLI tests, audit-script tests, shell lint, and forensics triage.
 sidebar:
   order: 5
 ---
 
-CI workflows are excluded from the end user tarball by `.gaia/release-exclude`. They run only on the GAIA template repo's clone. `chromatic.yml` and `tests.yml` ship to end users and are out of scope here. `code-review-audit.yml` is also release-excluded, but unlike the contributor-only workflows below, adopters can install it on demand with [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/); the template repo keeps it in-tree as the live pre-merge gate. The agent it runs is documented in the [agent reference](/reference/agents/).
+These workflows run only on the GAIA repo; `.gaia/release-exclude` keeps them out of the release bundle. Each workflow's `name:` starts with `GAIA: `, and a CLI test checks that it does. The workflows that ship to every project (Tests, Chromatic, PR Conventions) are documented in [Git hooks and conventions](/workflow/git-conventions/#github-workflows-that-ship).
+
+None of these workflows runs the pre-merge audit. The audit runs locally, through the [Code Audit Team](/workflow/code-audit-team/).
 
 ## release.yml
 
-Triggers on `v*.*.*` tag pushes. Builds and publishes the end user tarball.
+Triggers on `v*.*.*` tag pushes. Builds and publishes the release bundle.
 
-The job sequence:
-
-1. **Checkout** at the tag with full git history.
-2. **Derive version** from the tag ref.
-3. **Verify `.gaia/VERSION` matches the tag.** Fails the workflow if they diverge, so a stray tag cannot publish.
-4. **Extract the CHANGELOG section** for the release. Fails if the version's heading is missing.
-5. **Verify the manifest is fresh** to confirm `.gaia/manifest.json` reflects the current file set. Catches stale manifests.
-6. **Stage the release tree.** Drives the file set from `git ls-files` so untracked artifacts stay out, then filters `.gaia/release-exclude` patterns. Copies the surviving files into `/tmp/gaia-<tag>/` with `rsync`.
-7. **Bundle-time scrub** of the staging directory: `gaia:maintainer-only` blocks are stripped and leak checks run.
+1. **Checkout** at the tag with full history, and derive the version.
+2. **Verify `.gaia/VERSION` matches the tag**, so a stray tag cannot publish.
+3. **Extract the CHANGELOG section** for the release; fails when the heading is missing.
+4. **Verify the manifest is up to date** and **the wiki was scrubbed** for release.
+5. **Verify the committed CLI bundles** match a fresh build from `.gaia/cli/src`.
+6. **Stage the release tree** from `git ls-files`, minus `.gaia/release-exclude`.
+7. **Bundle-time scrub**: removes `gaia:maintainer-only` blocks and checks that no contributor-only content leaked into the shipped files.
 8. **Verify runtime dependencies** against the staged tree.
-9. **Distribution test gate** runs `.gaia/tests/distribution/run-all.sh` against an independently-staged tree (Layers 0+1+2). Halts the release if any scenario fails.
-10. **Build the tarball** as `gaia-<tag>.tar.gz`.
-11. **Create the GitHub Release** with the extracted CHANGELOG section as release notes.
+9. **Distribution test gate**: `bash .gaia/tests/distribution/run-all.sh` (Layers 0 and 1). A failure stops the release before anything publishes.
+10. **Build** `gaia-bundle-<tag>.tar.gz` and its `.sha256`. The `gaia-bundle-` prefix is deliberate. A 1.6.1 `/update-gaia` looks for `gaia-<tag>.tar.gz`, so the new name makes it fail at the download instead of misreading the new folder layout.
+11. **Compose the release body**, starting with the line that sends 1.6.1 projects to the 2.0.0 migration, then **create the GitHub Release** with both files.
 
-The pre-publish distribution gate uses the org `CLAUDE_CODE_OAUTH_TOKEN` secret. A broken release cannot publish: the gate runs before `gh release create`.
+The job holds a `contents: write` token and keeps it tight. The checkout does not save the token to git config, the CLI workspace install runs with `--ignore-scripts` so no package install script runs there, and of the later steps only **Create GitHub Release** receives the token.
 
 ## cli-tests.yml
 
-Triggers on both `push` to `main` and `pull_request` against `main`. The job is gated to `pull_request` events via a job-level `if:` condition; push events keep the required status check green on merge commits without rerunning anything. Runs the Vitest suite under `.gaia/cli/`.
+Its jobs run on pull requests to `main` and on `workflow_dispatch`. The workflow also lists pushes to `main` as a trigger, but every job skips on a push. The `workflow_dispatch` run is how you produce the required check on a commit that got no pull-request run. Three jobs:
 
-PRs that don't touch `.gaia/cli/**` or this workflow file report green without installing or running anything. The path filter is `dorny/paths-filter`.
-
-When the filter triggers, the job:
-
-1. Sets up pnpm via `pnpm/action-setup` (pinned to v6.0.5).
-2. Sets up Node from `.node-version` with pnpm cache keyed to `.gaia/cli/pnpm-lock.yaml`.
-3. Installs CLI dependencies with `--frozen-lockfile`.
-4. Runs `pnpm -C .gaia/cli typecheck`.
-5. Runs `pnpm -C .gaia/cli test --run`.
-
-The required-check posture is intentional: contributors who don't touch the CLI source see the check as required-and-green without paying the install cost.
+- **Vitest (`.gaia/cli`)** (required): for the CLI, typecheck, lint, and the Vitest tests. It also runs the bats tests for region markers, checks that the committed CLI bundles match a fresh build from source, runs the fitness lint over GAIA's own harness, and checks that the third-party skills copied into the repo (vendored skills) match the hashes recorded under `.gaia/vendor`. On a pull request, most steps run only when the change touches the files they cover; a `workflow_dispatch` run runs every step.
+- **Distribution harness** (advisory): the distribution tests that need neither Docker nor a token.
+- **Shipped-surface leak check** (advisory): builds the release tree, then checks that no shipped file names a contributor-only path and that removing the maintainer-only blocks leaves no partial marker behind.
 
 ## audit-ci-tests.yml
 
-Triggers on both `push` to `main` and `pull_request` against `main`, with the job gated to `pull_request` events via a job-level `if:` condition. Runs the bats suites for the `.github/audit/` helpers that `code-review-audit.yml` consumes: `check-trailer.sh` (the skip-logic gate) and `resolve-audit-base.sh` (the incremental-review base).
+Like `cli-tests.yml`, its jobs run on pull requests to `main` and on `workflow_dispatch`, and skip on a push to `main`. Runs GAIA's bats tests for the shipped scripts and hooks (`.gaia/scripts/tests/`, `.github/audit/tests/`, `.gaia/tests/`), split across parallel jobs (shards). It also runs the [commitlint](https://commitlint.js.org/) tests and the tests for the RED gate (the check that a test was seen failing first) that need Node or Chromium. A final `Audit CI Tests` job passes only when every shard passes, so one required check covers them all.
 
-PRs that don't touch `.github/audit/**`, this workflow file, or `.claude/hooks/lib/repo-scope.sh` report green without installing or running anything. The path filter is `dorny/paths-filter`, mirroring `cli-tests.yml`.
+Projects get these scripts as code GAIA controls and never edit, so the tests only need to catch changes made on the GAIA repo.
 
-Adopters receive the audit scripts as GAIA-controlled code they never edit, so the suite guards only maintainer changes.
+## shell-lint.yml
 
-## distribution.yml
+Triggers on pull requests to `main`. Two advisory jobs:
 
-Triggers only on `workflow_dispatch`. Used to run the `.gaia/tests/distribution/` harness on a feature branch for ad-hoc verification of harness changes themselves.
-
-The production gate against the harness lives inside `release.yml`. There is no automatic trigger on this workflow on purpose: `release.published` fires after publish (too late to gate a release), and `pull_request` is unsafe for forks.
-
-The workflow does not use `pull_request_target`. That trigger exposes secrets to fork PRs, which would let any contributor exfiltrate `CLAUDE_CODE_OAUTH_TOKEN`.
-
-The job verifies the bundled `.gaia/cli/gaia` is present and executable, then runs `bash .gaia/tests/distribution/run-all.sh` with a 15-minute timeout.
+- **Shellcheck**: runs shellcheck over every tracked `*.sh` and `*.bats` file through `.gaia/tests/shell-lint.sh`.
+- **Bash 3.2 parse**: on a macOS runner, checks that every tracked `*.sh` file parses under the `/bin/bash` 3.2 that ships with macOS, since GAIA's shell scripts must run there.
 
 ## forensics-triage.yml
 
-Triggers on issue events (`opened`, `labeled`) when the issue carries the `gaia-forensics` label. Runs autonomous Claude Code triage against the issue.
+Triggers on issues `opened` or `labeled` with `gaia-forensics`, the label [`/gaia-forensics`](/maintenance/forensics/) files with. Runs Claude Code to triage the report. It skips an issue already labeled `gaia-triaged`, then parses the report, classifies it, and checks whether the fix is in scope. For an in-scope fix it commits the fix on a new branch, runs the Quality Gate on it, and opens a draft pull request. A final step always adds the `gaia-triaged` label, however the run went.
 
-Permissions are scoped per-job: `issues: write`, `contents: write`, `pull-requests: write`, `actions: read`, `id-token: write`. Concurrency is keyed per-issue.
+The run is split into three jobs, so no job that runs the model or a model-edited file can write to GitHub:
 
-The workflow has helpers under `.github/forensics/`: scope checks, classifier prompts, fixtures, and bats tests. All of `.github/forensics/` is contributor-only and excluded from the end user tarball.
+- **`triage`** has read-only access. It runs both Claude Code steps (classify, then apply the fix) with project hooks turned off, and hands its outcome, including the fix commit, to the next jobs as an artifact.
+- **`quality-gate`** has read-only access and no secrets. It checks the fix commit's paths again with its own copy of the scope check before checking the fix out, then runs the Quality Gate with `pnpm install --ignore-scripts`, so no install script runs on the edited files.
+- **`publish`** is the only job that can write. It labels and comments on the issue and, when the gate passes, pushes the fix and opens the draft pull request. It never checks out the fix.
 
-Steps include an idempotency early-exit (skip if `gaia-triaged` is already on the issue), classification, optional apply-fix path that runs the project quality gate, and a final fallback step that ensures `gaia-triaged` lands on the issue regardless of path.
+Its helpers live in `.github/forensics/`, all contributor-only. The scope check is a security boundary: it allows a short list of paths and denies everything else, including:
 
-The workflow is on the canonical denylist: future autonomous triage runs must not modify it. The workflow's `check-scope.sh` rejects any attempt to edit any path under `.github/workflows/`. Self-modifying triage is a security boundary violation.
+- anything under `.github/workflows/`, so it cannot change its own workflow;
+- files that run on their own once the branch is checked out locally: `.claude/hooks/`, `.claude/settings.json`, `.claude/settings.local.json`, `.gaia/statusline/`, `.githooks/`, and the CLI bundles `.gaia/cli/gaia` and `.gaia/cli/gaia-maintainer`;
+- pnpm's install-time files, matched by name at any depth: `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `.npmrc`, `.pnpmfile.cjs`, and `.pnpmfile.mjs`.
 
-## On-demand automation workflows
+These matches ignore letter case, and a path with a `..` segment or a non-ASCII character is rejected outright.
 
-GAIA can install a set of automation workflows into an adopter's repository on demand. They are not committed to the template repo's `.github/workflows/`; their templates live in the CLI source at `.gaia/cli/src/automation/templates/workflows/` and are rendered into an adopter's repo by [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/).
-
-The installable set:
-
-- `gaia-ci-wiki.yml`: daily `/gaia-wiki` sync, consolidate, and lint chain
-- `gaia-ci-update-deps.yml`: weekly dependency updates
-- `gaia-ci-pnpm-audit.yml`: weekly `pnpm audit` security pass
-- `gaia-ci-stale-branches.yml`: monthly cleanup of long-merged branches
-- `code-review-audit.yml`: the pre-merge audit gate, installed unconditionally (not a cron tool)
-
-The cron workflows are generated from `.gaia/automation.json`, so which tools run is per-project. The [`/setup-gaia-ci`](/getting-started/setup-gaia-ci/) reference covers the adopter flow, tool modes, and schedules. The template repo keeps its own `code-review-audit.yml` in-tree as a live gate, so the `gaia-ci-*` cron workflows are an adopter-side surface rather than workflows that run on the GAIA template itself.
+The pull request stays a draft until a person marks it ready. Read its diff on GitHub before you run `gh pr checkout`: a local checkout runs the branch's hooks and statusline in your session, and reading first means the scope check is not the only guard on them.

@@ -1,0 +1,81 @@
+---
+title: /gaia-debt
+description: Fix the tech-debt backlog, most severe and then oldest first, one issue or a batch of related issues per run, on a fresh branch through the audit, closing the issues when it merges.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+`/gaia-debt` fixes the `tech-debt` backlog: the GitHub issues GAIA files for real problems it finds outside the change at hand, during any work. [Tech debt](/workflow/tech-debt/) covers how those issues are created. Each run fixes **one unit** of work: a single issue, or a batch of related issues. It works on its own branch, passes the same audit every feature pull request passes, and merges. The pull request carries one `Closes #N` per issue, so the merge closes them.
+
+## When to use it
+
+When open `tech-debt` issues exist, the statusline shows:
+
+```
+🐛 /gaia-debt (N issues)
+```
+
+`N` is the number of open `tech-debt` issues, not counting issues someone is already working on (`in-progress`) or issues parked for a SPEC (`debt:spec-pending`, `debt:spec-active`).
+
+## How to invoke
+
+```
+/gaia-debt
+```
+
+No argument: Claude orders the backlog and offers the top of it as a menu. When the top issue belongs to a group of related issues (the same file, or the same directory and kind of finding), the whole group is offered too.
+
+```
+/gaia-debt 142
+```
+
+One issue number fixes that issue. If it leads a group of related issues, Claude offers to fix the group with it.
+
+```
+/gaia-debt 142 157 161
+```
+
+Several numbers make your own batch, fixed together on one branch and one pull request. The batch is checked against a size limit. If it is too big, Claude offers smaller subsets or lets you go ahead anyway.
+
+Add `worktree` or `branch` (optionally after `use`) at the end to choose where the fix happens, for example `/gaia-debt 142 use branch`. Your team's [isolation policy](/workflow/work-lifecycle/#3-isolate) can still override it.
+
+Any other argument stops and shows the accepted form. An issue number that can't be fixed this way stops the run with the reason: it is not an issue in this repository (a pull request number, for example), it could not be read from GitHub, it is closed, it is not labelled `tech-debt`, it is already claimed, it is parked for a SPEC, or it is graded `severity:investigate`.
+
+## How the backlog is ordered
+
+A plain sort, with no AI judgment involved:
+
+1. **Severity**, highest first: `severity:critical`, then `severity:major`, then `severity:minor`. An issue with no severity label sorts with minor.
+2. **Age**, oldest first.
+
+Issues labelled `in-progress`, `debt:spec-pending`, or `debt:spec-active`, and issues graded `severity:investigate`, are set aside and never offered. When only `investigate` issues are left, Claude says so and lists each one's open question instead of reporting an empty backlog.
+
+Each offer also notes when an issue's cited file no longer exists (`[stale: path gone]`).
+
+## What one run does
+
+1. **Claims** every issue in the unit with the `in-progress` label as soon as you pick, so a teammate's session never starts the same issue. If a session dies mid-fix and leaves a claim behind, the next run releases it.
+2. **Re-checks each issue against your code** before creating a branch. Every `file:line` the issue cites must still contain what the issue says, and every count the fix depends on must still be right. Claude also reads each issue's comments; a newer comment that corrects the description wins. If anything doesn't match, Claude releases the claim and stops, because only you can decide whether the issue or the code is wrong. In a batch, a failing issue is dropped and the rest continue.
+3. **Checks for security issues.** On a public or internal repository, a security-sensitive issue is never fixed in a public pull request. It is set aside and its claim released, and you are told only how many there were.
+4. **Checks the size.** An issue big enough to need a design SPEC goes to [`/gaia-spec`](/workflow/spec/) instead. Claude prints what to run next and parks the issue under `debt:spec-pending` (handed off) or `debt:spec-active` (a SPEC is underway).
+5. **Creates a branch** for the fix, `debt/<n>-<slug>` (or `debt/<a>-<b>-batch`), in a worktree by default.
+6. **Fixes** every issue in the unit, runs the Quality Gate once, commits, and opens a draft pull request with one `Closes #N` per issue. The commit type is the type of the change (`fix`, `refactor`, `test`), never `debt`.
+7. **Audits and merges** without asking you again, then checks that the merge closed exactly the intended issues, and cleans up.
+
+The claim stays in place when the audit stops at its branch checkpoint, when a merge is still queued, or when a check fails, since the work is not finished. Closing the pull request without merging releases it.
+
+The run ends with a [cost line](/models-and-context/cost/).
+
+**Why claim tech-debt issues only through `/gaia-debt`:** it manages the claim, including releasing claims left behind. A claim you set by hand on a `tech-debt` issue looks abandoned, so the next run releases it.
+
+## Labels
+
+What each label means is in [Labels](/reference/labels/#tech-debt).
+
+The grades are guidance only: Claude can change a footprint after reading the code. To return a `severity:investigate` issue to the backlog, answer its question and re-grade it in one edit: `gh issue edit <n> --remove-label severity:investigate --add-label severity:<tier> --body-file <path>`, with the answer in the body.
+
+<Aside type="note">
+`/gaia-debt` fixes issues; it does not file them. See [How an issue is filed](/workflow/tech-debt/#how-an-issue-is-filed).
+</Aside>
+
+Source: `.claude/skills/gaia/references/debt.md`.

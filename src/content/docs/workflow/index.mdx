@@ -1,0 +1,83 @@
+---
+title: Working in GAIA
+description: How a normal Claude Code session works once GAIA is installed, and when to reach for each /gaia-* command.
+sidebar:
+  order: 1
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+GAIA's rules, skills, and guardrails are in place from the start of every session, so they apply to every ordinary request. You never call them yourself.
+
+They take up very little of Claude's context: about 8.4k tokens at session start, [under 1%](/models-and-context/token-efficiency/) of a 1M-token window. Most [rules](/reference/rules/) load only when Claude works on the files they cover, and a [skill](/skills/) adds just its description until it is used. Checks that must give the same answer every time, such as gates, grading, and cost, run as [deterministic scripts](/models-and-context/token-efficiency/#deterministic-scripts) instead of asking Claude.
+
+## Mostly, you just prompt as usual
+
+Working in GAIA is the same as working with any coding agent: you describe what you want, and it does the work.
+
+Ask for a component, a fix, a refactor:
+
+```
+> Add a date-range filter to the saved-search panel.
+```
+
+The code skills ([TypeScript](https://www.typescriptlang.org/), React, [Tailwind](https://tailwindcss.com/), tests) and the scaffolders (which generate new components, hooks, routes, and services) start on their own, based on what you ask for. Most sessions never touch a slash command.
+
+Notice the prompt did not ask for a test. GAIA works test-first: for a feature or a bug fix, Claude writes a test that fails, then writes the code that makes it pass. A Claude Code hook on `git commit` enforces this. It refuses to commit a new test that was never seen failing first. Some tests are exempt, such as stories and type-only tests; see the [RED gate](/reference/gates/#test-seen-failing-first-red-gate).
+
+## Every task follows one lifecycle
+
+When Claude does a task for you, with or without a command, it follows the same steps. It claims the issue if there is one, names the branch, and isolates the work so tasks running at the same time never touch each other. It commits through the [Quality Gate](/workflow/code-audit-team/#quality-gate), opens a draft pull request, and has the [Code Audit Team](/workflow/code-audit-team/) audit it. Then it merges and cleans up. Hooks block risky actions along the way. See [Work lifecycle](/workflow/work-lifecycle/) for each step, and [Git hooks and conventions](/workflow/git-conventions/) for the commit and title rules.
+
+The exception is an edit you say you will review or commit yourself: Claude leaves it uncommitted and skips all of this.
+
+## When to reach for a command
+
+The `/gaia-*` commands are for specific moments, not everyday driving:
+
+| When you're... | Reach for | Why |
+| --- | --- | --- |
+| Starting a feature whose shape isn't settled | [`/gaia-spec`](/workflow/spec/) | Pins down intent and acceptance tests, saves a SPEC, and plans it in the same session. |
+| Turning a big feature into parallel work | [`/gaia-plan`](/workflow/plan/) | Splits it into phases, defines the shared types and interfaces the phases build on, and writes a kickoff prompt you paste to start the work. |
+| Tech-debt issues have piled up | [`/gaia-debt`](/workflow/debt/) | Fixes the backlog, highest severity first, through the audit gate. |
+
+**When to skip them.** Small, clear changes do not need a spec or a plan. "Fix the timezone bug in the invoice header" is just a prompt. A spec and a plan are worth the extra time on larger work whose details are still unclear.
+
+## Resuming work
+
+Long work resumes from a small saved state. When a session's context gets heavy, well before Claude Code would compact it, GAIA has Claude save its place and ask whether to continue or clear and resume. If you choose to clear, Claude prints a continuation prompt: run `/clear`, then paste it. You can ask Claude for a continuation prompt at any time. See [Resuming long work](/workflow/work-lifecycle/#resuming-long-work).
+
+## A feature, start to finish
+
+1. **Settle what to build.** Run `/gaia-spec add saved-search filters`. It asks a few questions, confirms the intent and the acceptance tests in plain language, and saves a SPEC. Then it plans the SPEC in the same session and ends with a kickoff prompt.
+2. **Build it.** Run `/clear` and paste the kickoff prompt. The orchestrator (the session that runs the plan) works in its own worktree. It turns the SPEC's browser acceptance tests into [Playwright](https://playwright.dev/) tests that fail at first, builds each phase with sub-agents, commits each phase once it passes the Quality Gate, and opens a draft pull request.
+3. **Audit and merge.** The [Code Audit Team](/workflow/code-audit-team/) reviews the pull request, a fixer repairs what the reviewers find, and Claude posts the `GAIA-Audit` check once the review passes. Claude then asks whether to merge.
+4. **Handle the small stuff directly.** "Fix the date formatting in the invoice header" is a single prompt. Claude still claims the issue, isolates the change, and audits the pull request.
+
+You will not run every step for every task. Use as much of this process as the work needs, and just prompt Claude for the rest.
+
+[Onboarding, as you build](/getting-started/onboarding/) walks through when each of these first steps in.
+
+## Maintenance commands
+
+<Aside type="note">
+You rarely reach for these yourself, and you do not have to memorize them. Each one except `/gaia-forensics` surfaces on the [statusline](/workflow/statusline/#nudges) when it is due. Reach for `/gaia-forensics` when something in GAIA itself goes wrong.
+</Aside>
+
+| When... | Reach for | Why |
+| --- | --- | --- |
+| A new GAIA release is out | [`/update-gaia`](/maintenance/update-gaia/) | Merges the release into your project without overwriting your changes. |
+| Dependencies are stale or vulnerable | [`/update-deps`](/maintenance/update-deps/) | Resolves security advisories, then updates packages by group. |
+| Memory or auto-loaded files have drifted | [`/gaia-cleanse`](/maintenance/cleanse/) | Finds instructions that repeat the wiki, contradict it, or are out of date. |
+| The audit keeps flagging the same thing | [`/gaia-codify`](/maintenance/codify/) | Turns the recurring finding into a check, a skill, or a rule. |
+| Accepted trade-offs have piled up | [`/gaia-residue`](/maintenance/residue/) | Goes through the known issues reviewers accepted at merge and dismisses, keeps, or turns each into a tech-debt issue. |
+| The wiki has fallen behind the code | [`/gaia-wiki`](/maintenance/wiki/) | Updates the project wiki Claude reads from, merges overlapping pages, and fixes broken links and formatting. |
+| The Claude integration feels off | [`/gaia-fitness`](/maintenance/fitness/) | Lints skills, rules, commands, agents, hooks, and settings, grades them, and heals your own files. |
+| A GAIA command or hook misbehaved | [`/gaia-forensics`](/maintenance/forensics/) | Works out what went wrong and, if it is a bug, drafts a report ready to file. |
+
+## Related
+
+- [Quick Start](/) scaffolds a new project.
+- [Maintenance overview](/maintenance/) covers how the upkeep commands run.
+- [Skills overview](/skills/) lists the code skills and scaffolders that trigger from plain prompts.
+- [Gate reference](/reference/gates/) explains every check that can stop you, and how to clear it.

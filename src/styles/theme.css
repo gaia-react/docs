@@ -9,6 +9,14 @@
 	--gaia-accent: #d97757;
 	--gaia-accent-2: #c96442;
 	--gaia-accent-soft: #efa58e;
+	--gaia-secondary: #5b8a8a;
+	--gaia-secondary-2: #436c6c;
+	--gaia-secondary-soft: #8eb4b4;
+	--gaia-secondary-low: #16231f; /* dark slate-teal tint for callout backgrounds */
+	--gaia-warn: #d9a857;
+	--gaia-warn-2: #b88a3f;
+	--gaia-warn-soft: #ecc781;
+	--gaia-warn-low: #2a2010; /* dark amber tint for caution callout backgrounds */
 	--gaia-line: #3d3d3a;
 	--gaia-line-soft: #2e2e2b;
 
@@ -109,6 +117,13 @@ header.header,
 		width: 17rem;
 	}
 
+	/* The panel is position: fixed, so Starlight's width: 100% resolves
+	   against the viewport, not the column. Pin it to the column width so
+	   long TOC entries wrap instead of running off the edge. */
+	.right-sidebar {
+		width: 17rem;
+	}
+
 	[data-has-sidebar][data-has-toc] .main-pane {
 		width: calc(100% - 17rem);
 	}
@@ -125,6 +140,41 @@ header.header,
 	white-space: nowrap;
 }
 
+/* Callouts (Asides) — Starlight ships stock purple/blue accents that aren't in
+   the GAIA palette. Re-theme each variant to its palette job: tip = slate teal
+   (secondary register), note = neutral warm gray, caution = brand amber
+   (semantic warning). danger keeps Starlight's red until a GAIA danger color
+   lands. customCss is unlayered, so these win over Starlight's layered defaults
+   without a specificity fight. */
+.starlight-aside--tip {
+	--sl-color-asides-text-accent: var(--gaia-secondary-soft);
+	--sl-color-asides-border: var(--gaia-secondary);
+	background-color: var(--gaia-secondary-low);
+}
+
+/* tip is reserved for safety callouts, so swap Starlight's rocket for a
+   shield (Lucide shield-check, ISC). Starlight has no built-in shield icon. */
+.starlight-aside--tip .starlight-aside__icon {
+	background-color: currentColor;
+	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.starlight-aside--tip .starlight-aside__icon > * {
+	display: none;
+}
+
+.starlight-aside--note {
+	--sl-color-asides-text-accent: var(--gaia-ink);
+	--sl-color-asides-border: var(--gaia-muted);
+	background-color: var(--gaia-surface-raised);
+}
+
+.starlight-aside--caution {
+	--sl-color-asides-text-accent: var(--gaia-warn-soft);
+	--sl-color-asides-border: var(--gaia-warn);
+	background-color: var(--gaia-warn-low);
+}
+
 /* Right TOC: fit the inner container to its parent so long entries wrap,
    and give the right edge breathing room. Full padding shorthand to ensure
    the override sticks against the layered default. */
@@ -135,4 +185,10 @@ header.header,
 .right-sidebar-panel .sl-container {
 	width: auto;
 	max-width: 100%;
+}
+
+/* Sidebar links marked with the sidebar-child class in astro.config.mjs sit
+   indented under the page before them. */
+.sidebar-content a.sidebar-child {
+	margin-inline-start: 1rem;
 }

@@ -1,0 +1,42 @@
+---
+title: Onboarding, as you build
+description: How GAIA onboards a new project as you build. Everything is installed from the start, and rules, commit checks, the pre-merge audit, and the maintenance commands each step in the first time your work reaches them.
+---
+
+GAIA onboards you as you build. Every rule, hook, check, and command is ready to go from your first session, and you don't need to switch anything on. Each part steps in the first time your work reaches it, so every new project goes through the same sequence: first session, first commit, first pull request, first week. The last few commands appear only once your project has history for them to work from.
+
+## First session
+
+- **Rules load.** Some rules are always loaded and shape what Claude writes from the first prompt. Others apply to certain folders or file types and load only when the work touches those files. See [Rules](/reference/rules/).
+- **Skills trigger from plain prompts.** Ask for a component and `new-component` scaffolds it; edit a hook and `react-code` applies. See [Skills](/skills/).
+- **Guards are on.** Hooks block reading secrets, dangerous deletes, and commits to `main`, whether or not you skip permission prompts. See [Hooks](/reference/hooks/).
+- **The [statusline](/workflow/statusline/)** shows `⚙️ /setup-gaia` until this machine's setup is done.
+
+## First commit
+
+- **Its own branch and folder.** If the work closes an issue, Claude claims it first ([why](/reference/gates/#issue-claim)). Then it names the branch and, by default, works in its own git worktree, a separate copy of the repo on that branch ([why](/reference/gates/#worktree-path-mismatch)). Your team's isolation policy can choose a feature branch in your checkout instead. See [Work lifecycle](/workflow/work-lifecycle/).
+- **Quality Gate.** Before a commit that touches source, Claude runs the full set of checks on the `frontend/` package, and all must pass. See [Quality Gate](/workflow/code-audit-team/#quality-gate).
+- **Test seen failing first.** A new test for plain logic (utilities, parsers, hooks) must be seen failing before it passes, which proves it can catch a bug ([why](/reference/gates/#test-seen-failing-first-red-gate)).
+- **Commit hooks.** The native pre-commit hook runs typecheck, lint, and tests on staged files ([why](/reference/gates/#pre-commit-floor)), and the commit-msg hook checks the message follows Conventional Commits ([why](/reference/gates/#commit-message-format)). Neither can be skipped ([why](/reference/gates/#no-verify)).
+
+## First pull request
+
+- **Draft and title.** The pull request opens as a draft ([why](/reference/gates/#draft-pull-requests)) with a title that passes the same lint as a commit message, since a squash merge uses the title as the commit message ([why](/reference/gates/#pull-request-title)).
+- **Code Audit Team.** A set of AI reviewers, each responsible for certain files. Every reviewer whose files the change touches reviews it before it can merge ([why](/reference/gates/#merge-without-the-audit)). See [Code Audit Team](/workflow/code-audit-team/).
+- **The audit loop.** Rounds of review, fix, and re-check run in a separate agent, outside your session, until the change passes the audit.
+- **The branch checkpoint.** When your session's context reaches GAIA's [red band](/models-and-context/token-efficiency/#context-bands), or the rounds keep turning up new problems instead of settling, the loop stops and asks you whether to continue ([why](/reference/gates/#audit-checkpoint)).
+- **GAIA-Audit.** Once the audit passes, Claude posts a `GAIA-Audit` status check on the pull request. Once a repo admin has run [`/setup-gaia`](/getting-started/setup-gaia/), GitHub requires it before merging ([why](/reference/gates/#gaia-audit-required-check)).
+- **Merge**, when you ask. The merge prints the pull request's [cost](/models-and-context/cost/), posts the findings comment, and releases the issue claim.
+
+## First week
+
+- **Tech-debt issues appear.** When the audit finds a problem in code the change didn't touch, it files a `tech-debt` issue instead of fixing it there. Security findings are not filed publicly. See [Tech debt](/workflow/tech-debt/).
+- **Maintenance nudges.** The statusline starts naming maintenance commands, such as `🐛 /gaia-debt` or `📦 /update-deps`, when they are due. See [Nudges](/workflow/statusline/#nudges) and [Maintenance](/maintenance/).
+
+## Later
+
+- **[`/gaia-debt`](/workflow/debt/)** fixes the backlog, highest severity first, through the same audit.
+- **[`/gaia-residue`](/maintenance/residue/)** appears once 5 or more trade-offs that reviewers accepted at merge are at least 30 days old.
+- **[`/gaia-codify`](/maintenance/codify/)** appears once the audit has made the same kind of finding on 3 or more pull requests within 90 days, and proposes a check that stops it from happening again.
+
+Every check above, and every other one, is in the [gate reference](/reference/gates/) with what it stops, why, when it fires, and how to clear it.
