@@ -18,7 +18,7 @@ The statusline nudges you with `🔨 /gaia-codify (<reason>)`:
 - Before your first completed review, it counts recurring patterns: `/gaia-codify (3 recurring patterns)`.
 - After a completed review, it stays quiet until something changes, then names it: a new recurring pattern, a pattern that has grown noticeably, or a change in how findings are counted.
 
-On every `gh pr merge`, a hook posts the pull request's findings in a machine-readable form. Those posts are what the count reads.
+On every `gh pr merge`, a hook posts the pull request's findings in a machine-readable form. Those posts are what the count reads. Only posts from the repository's owner, collaborators, and organization members count, so a findings post from anyone else, such as an outside commenter on a public repository, is ignored.
 
 ## What counts as recurring
 

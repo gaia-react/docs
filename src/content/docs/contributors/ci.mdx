@@ -48,6 +48,20 @@ Triggers on pull requests to `main`. Two advisory jobs:
 
 ## forensics-triage.yml
 
-Triggers on issues `opened` or `labeled` with `gaia-forensics`, the label [`/gaia-forensics`](/maintenance/forensics/) files with. Runs Claude Code to triage the report. It skips an issue already labeled `gaia-triaged`, then parses the report, classifies it, and checks whether the fix is in scope. For an in-scope fix it creates a fix branch, runs the Quality Gate, and opens a draft pull request. A final step always adds the `gaia-triaged` label, however the run went.
+Triggers on issues `opened` or `labeled` with `gaia-forensics`, the label [`/gaia-forensics`](/maintenance/forensics/) files with. Runs Claude Code to triage the report. It skips an issue already labeled `gaia-triaged`, then parses the report, classifies it, and checks whether the fix is in scope. For an in-scope fix it commits the fix on a new branch, runs the Quality Gate on it, and opens a draft pull request. A final step always adds the `gaia-triaged` label, however the run went.
 
-Its helpers live in `.github/forensics/`, all contributor-only. The scope check rejects any edit under `.github/workflows/`, so triage can never change its own workflow; that is a security boundary.
+The run is split into three jobs, so no job that runs the model or a model-edited file can write to GitHub:
+
+- **`triage`** has read-only access. It runs both Claude Code steps (classify, then apply the fix) with project hooks turned off, and hands its outcome, including the fix commit, to the next jobs as an artifact.
+- **`quality-gate`** has read-only access and no secrets. It checks the fix commit's paths again with its own copy of the scope check before checking the fix out, then runs the Quality Gate with `pnpm install --ignore-scripts`, so no install script runs on the edited files.
+- **`publish`** is the only job that can write. It labels and comments on the issue and, when the gate passes, pushes the fix and opens the draft pull request. It never checks out the fix.
+
+Its helpers live in `.github/forensics/`, all contributor-only. The scope check is a security boundary: it allows a short list of paths and denies everything else, including:
+
+- anything under `.github/workflows/`, so it cannot change its own workflow;
+- files that run on their own once the branch is checked out locally: `.claude/hooks/`, `.claude/settings.json`, `.claude/settings.local.json`, `.gaia/statusline/`, `.githooks/`, and the CLI bundles `.gaia/cli/gaia` and `.gaia/cli/gaia-maintainer`;
+- pnpm's install-time files, matched by name at any depth: `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `.npmrc`, `.pnpmfile.cjs`, and `.pnpmfile.mjs`.
+
+These matches ignore letter case, and a path with a `..` segment or a non-ASCII character is rejected outright.
+
+The pull request stays a draft until a person marks it ready. Read its diff on GitHub before you run `gh pr checkout`: a local checkout runs the branch's hooks and statusline in your session, and reading first means the scope check is not the only guard on them.
