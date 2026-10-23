@@ -27,7 +27,7 @@ Notice the prompt did not ask for a test. GAIA works test-first: for a feature o
 
 ## Deterministic scripts handle what must be exact
 
-Some answers have to come out the same every time: whether a commit may land, whether a test failed before it passed, how your setup grades, what a task cost. GAIA does not ask Claude for those. It runs a deterministic script, one that follows fixed rules so the same input always gives the same result, and Claude handles the parts that need judgment.
+Some answers have to come out the same every time: whether a commit may land, whether a test failed before it passed, how your setup grades, what a task cost. GAIA does not ask Claude for those. It runs deterministic scripts that follow fixed rules so the same input always gives the same result, and Claude handles the parts that need judgment.
 
 - **Gates** are [hooks](/reference/hooks/) that allow or block a commit or a risky command by fixed rules, so Claude cannot talk its way past one. See the [gate reference](/reference/gates/).
 - **The audit** runs [React Doctor](https://github.com/millionco/react-doctor), [Knip](https://knip.dev/), and a dependency advisory check next to its reviewers, and a script checks every repair before it is kept. See the [Code Audit Team](/workflow/code-audit-team/).
