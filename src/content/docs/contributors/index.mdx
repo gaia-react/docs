@@ -1,6 +1,6 @@
 ---
 title: Contributors
-description: Reference for people working on the GAIA repo itself. Covers the parts of GAIA that the `create-gaia` bundle leaves out.
+description: Reference for people working on the GAIA repo itself. Covers setting up a clone, what happens before you open a pull request, and the parts of GAIA that the `create-gaia` bundle leaves out.
 sidebar:
   order: 1
 ---
@@ -15,33 +15,60 @@ Audience: the GAIA maintainer and any outside contributors working on GAIA itsel
 If you ran `npx create-gaia my-app` for a scaffolded project, this section is not for you. Start with the [Quick Start](/) instead.
 </Aside>
 
+## Before you open a pull request
+
+Read [CONTRIBUTING.md](https://github.com/gaia-react/gaia/blob/main/CONTRIBUTING.md) first. Outside pull requests are accepted only on issues labeled `help wanted`, and only after the maintainer assigns the issue to you. Unassigned pull requests are closed without review. The same file covers branch names, the `CHANGELOG.md` entry, and what the project will not accept.
+
+### Set up your clone
+
+GAIA is built with GAIA, so you work in the repo the same way you would in any GAIA project: through Claude, with the same rules and hooks. Fork the repo, clone your fork, open Claude in it, and ask:
+
+```text
+Set up this GAIA clone for contributing: run pnpm install so the git hooks and the CLI workspace are installed, then confirm core.hooksPath is .githooks.
+```
+
+`pnpm install` turns on the git hooks in `.githooks/` and installs the CLI's own dependencies under `.gaia/cli/`. Without the hooks, nothing runs before a commit, and nothing reports that they are missing. See [Checking a clone](/workflow/git-conventions/#checking-a-clone).
+
+Two parts of the setup are yours to run, because they install system software:
+
+- `pnpm install:browsers` installs headless Chromium and its system libraries, which can ask for your password. The test step needs it.
+- If you will touch shell scripts, install [bats-core](https://github.com/bats-core/bats-core) and a bash 5 (for example `brew install bats-core bash` on macOS). macOS ships bash 3.2, which hides failures that CI's bash 5 catches.
+
+### What runs while you work
+
+- **Before each commit**, Claude runs the [Quality Gate](/reference/gates/#quality-gate). When your change touches `.gaia/cli/`, the gate also runs the CLI's typecheck and lint.
+- **The pre-commit hook** rebuilds the committed CLI binaries whenever a commit changes CLI source. You never rebuild them by hand. See [CLI surface](/contributors/cli/#build-layout).
+- **Before the first audit on your branch**, Claude runs the verification runner, `.gaia/tests/verify-harness.sh branch`. It runs shell lint, a check that no contributor-only content leaks into the shipped files, and the bats tests your change touches. It takes several minutes. It needs a clean tree (no uncommitted changes to tracked files), so Claude commits first. The audit will not start until it passes for your latest commit, so any new commit needs a new pass. A failure that also fails on `main` is reported as already broken there, not caused by you.
+- **The audit** is the [Code Audit Team](/workflow/code-audit-team/) review, run locally by Claude. Claude resolves its findings before it merges.
+- **On every push**, the pre-push hook runs the release-bundle checks on your branch.
+
+When the verification runner fails and the reason is not obvious, ask:
+
+```text
+Explain what .gaia/tests/verify-harness.sh checks on my branch and why it failed.
+```
+
 ## Project / contributor split
 
 GAIA has two audiences: people building a project with it, and people working on GAIA itself. Two mechanisms keep contributor-only material out of the release bundle:
 
 1. **Path-level exclusion.** Files and directories listed in `.gaia/release-exclude` never enter the bundle the release workflow builds. Examples: `.claude/commands/gaia-release.md`, `.claude/commands/distribution-vet.md`, `.claude/skills/release-notes`, the two `code-audit-maintainer-*` agents, `.claude/rules/maintainers/`, `.gaia/cli/src/`, `.gaia/tests/`, `.gaia/scripts/tests/`, `.githooks/pre-push`, `wiki/entities/`, and `wiki/meta/`.
-2. **Block-level exclusion.** Content between `<!-- gaia:maintainer-only:start -->` and `<!-- gaia:maintainer-only:end -->` markers inside files that do ship. The shipped file is a subset of the source.
+2. **Block-level exclusion.** Content between `gaia:maintainer-only` start and end markers inside files that do ship. The shipped file is a subset of the source. The marker syntax depends on the file type, and markers work only in the files the release is set up to strip. See [the block convention](/contributors/wiki/#gaiamaintainer-only-block-convention).
 
-The release removes both kinds in one step, the bundle-time scrub. `.gaia/release-exclude` is the authoritative list of excluded paths, and each of its categories says why its paths are withheld.
+The release removes both kinds in one step, the bundle-time scrub: before packaging, the release copies the repo's tracked files, deletes the excluded paths and blocks from that copy, and fails if any contributor-only path is still named in what remains. `.gaia/release-exclude` is the authoritative list of excluded paths, and each of its categories says why its paths are withheld.
 
 ## What's in this section
 
 - [CI workflows](/contributors/ci/): `release.yml`, `cli-tests.yml`, `audit-ci-tests.yml`, `shell-lint.yml`, `forensics-triage.yml`.
 - [CLI surface](/contributors/cli/): `gaia` binary subcommands, the build layout, and where their source lives.
-- [`/gaia-release`](/contributors/release/): audience, scope, and what releases produce. The detailed runbook is internal to the maintainer.
+- [`/gaia-release`](/contributors/release/): who runs it, what it checks, and what a release produces.
 - [Contributor wiki content](/contributors/wiki/): `wiki/entities/`, `wiki/meta/`, and the `gaia:maintainer-only` block convention.
 
-Beyond these pages, the GAIA repo carries maintainer-only tooling that is not documented here: `/distribution-vet` (which decides whether a new file ships or is withheld), the `release-notes` skill, the two maintainer members of the Code Audit Team, and the verification runner under `.gaia/tests/`. Their source and headers are the reference.
+The repo also carries maintainer tooling that these pages do not cover in depth, because only the maintainer runs it:
 
-## Before a release
-
-`/gaia-release` starts with a preflight and stops unless:
-
-- You are on `main` with a clean working tree.
-- The wiki is current (`wiki/.state.json`). If it has drifted, run [`/gaia-wiki`](/maintenance/wiki/) and let its pull request merge first.
-- Every check the release expects to be required is required by the default branch's rules (`bash .gaia/scripts/verify-required-checks.sh`).
-
-See [Releases](/contributors/release/) for what the command does after that.
+- `/distribution-vet` decides, file by file, whether a file that would ship for the first time ships or is withheld.
+- The `release-notes` skill turns a version's CHANGELOG entries into the plain-language release notes on gaiareact.com.
+- The two maintainer members of the Code Audit Team review the CLI's TypeScript and GAIA's shell scripts with their bats tests. Claude dispatches them when your change touches those files, as it does any other member.
 
 ## Source-of-truth pointers
 

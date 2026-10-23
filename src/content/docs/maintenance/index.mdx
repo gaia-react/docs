@@ -39,7 +39,7 @@ The boundary between `/gaia-cleanse` and `/gaia-wiki` is deliberate. `/gaia-clea
 
 Every maintenance command except `/gaia-forensics` (`/update-gaia`, `/update-deps`, `/gaia-cleanse`, `/gaia-codify`, `/gaia-residue`, `/gaia-wiki`, `/gaia-fitness`) follows the same pattern:
 
-1. **It starts from the main checkout.** Inside a linked worktree it refuses and names the main checkout to run it from. The exceptions are `/update-deps` and `/update-gaia`, which also accept their own `deps/` or `update/` worktree, so a re-run continues there.
+1. **It starts from the main checkout.** Inside a linked worktree it stops and names the main checkout; open Claude Code there and run the command again. The exceptions are `/update-deps` and `/update-gaia`, which also accept their own `deps/` or `update/` worktree, so a re-run continues there.
 2. **It offers to pull first** when your checkout's GAIA version is behind the remote's.
 3. **It does its work on a branch of its own**, created just before it first changes a file: a worktree cut from the default branch by default, following your team's [isolation policy](/workflow/work-lifecycle/#3-isolate). It never writes onto the branch your checkout holds. The branch is named for the command and a timestamp, for example `deps/2026-10-20-1432`.
 4. **It commits and opens a draft pull request**, reviewed by the [Code Audit Team](/workflow/code-audit-team/). Whether it then merges on its own, asks you first, or leaves the pull request for you depends on the command: see [who merges what](/workflow/work-lifecycle/#6-merge).

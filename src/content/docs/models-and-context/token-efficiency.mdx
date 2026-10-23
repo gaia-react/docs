@@ -24,7 +24,7 @@ GAIA adds 8,365 tokens to a session before you type anything: 0.84% of the windo
 | [Agent](/reference/agents/) descriptions (9) | 739 |
 | **Total** | **8,365 (0.84%)** |
 
-The session-start text was measured in a session on a feature branch. On the default branch, the branch workflow text is left out, so the total is lower. The session-start text is added when a session starts, and again after `/clear` or compaction.
+The session-start text was measured in a session on a feature branch. On the default branch, the instructions for working on a branch are left out, so the total is lower. The session-start text is added when a session starts, and again after `/clear` or compaction.
 
 A session started from `frontend/` begins at about 11.1k tokens (1.11%). Claude Code still loads everything above, and adds `frontend/CLAUDE.md` (about 1,040) and the descriptions of the 13 frontend skills (1,676).
 
@@ -59,7 +59,7 @@ For the larger skills, a description costs 1% to 2% of the full skill. A small s
 
 ## Hooks
 
-[Hooks](/reference/hooks/) run outside the conversation. Most add nothing unless they block something, and then they add only the message they print. Two add text when you reach a point that needs it: the branch workflow text when you move onto a branch or worktree, and the checkpoint instructions when the context gets heavy (see [Context bands](#context-bands)).
+[Hooks](/reference/hooks/) run outside the conversation. Most add nothing unless they block something, and then they add only the message they print. Two add text when you reach a point that needs it: the instructions for working on a branch when you move onto a branch or worktree, and the checkpoint instructions when the context gets heavy (see [Context bands](#context-bands)).
 
 ## Deterministic scripts
 
@@ -131,9 +131,30 @@ Claude cannot see how full its own context is. Claude Code reports it only to th
 	]}
 />
 
-The red band sits at 300,000 tokens or half the window, whichever is smaller. 🔥 is 1.25 times red and 💀 is 1.5 times red. To ask even earlier, a person can lower the red band in `.gaia/local/protected/checkpoint-override.json`, for example `{"version":1,"context_checkpoint":{"ask_tokens":100000}}`. The file can only lower it, never raise it, and **Claude cannot edit it**.
+The red band sits at 300,000 tokens or half the window, whichever is smaller. 🔥 is 1.25 times red and 💀 is 1.5 times red. To ask even earlier, you can lower the red band for your machine. The setting lives in `.gaia/local/protected/checkpoint-override.json`, and **Claude cannot edit it**, so only you can set it. Run this yourself in a terminal from the root of your main copy of the repo (this example sets red at 100,000 tokens):
+
+```bash
+mkdir -p .gaia/local/protected
+echo '{"version":1,"context_checkpoint":{"ask_tokens":100000}}' > .gaia/local/protected/checkpoint-override.json
+```
+
+The file can only lower the band, never raise it.
 
 What Claude does at each band, and how to clear and pick up where you left off, is on [Resuming long work](/workflow/work-lifecycle/#resuming-long-work).
+
+### Sub-agents
+
+Long workflows hand work to sub-agents, and the bands apply to the ones that do long stretches of work. You don't see this and have nothing to do; it is here so you know why a long plan does not degrade as it goes.
+
+A sub-agent has no statusline, so a separate hook reads its context from its own transcript after each of its tool calls. It uses the same red, 🔥, and 💀 bands as your session, on the same window size. When a sub-agent reaches one:
+
+- **Red:** it stops at the next clean point, with no tool call running and no file half-edited.
+- **🔥:** it stops before starting any new piece of work.
+- **💀:** it stops right away.
+
+Before it stops, it writes a short handoff (the goal, what is done, what is next, and any half-finished work) and leaves its edits uncommitted. The workflow that started it checks the handoff and starts a fresh sub-agent with the same instructions, plus the handoff as progress notes. The handoff cannot widen the task: the new sub-agent keeps the original scope and permissions. A task can hand off twice. If it would need a third, the workflow stops and tells you, with every handoff it wrote, so you can decide how to continue.
+
+This covers the sub-agents that do long stretches of work: the planner in [`/gaia-plan`](/workflow/plan/) and each task's sub-agent when a plan is carried out. The [audit loop](/workflow/code-audit-team/#the-audit-loop) gets the same effect another way: it runs a few rounds at a time, each batch in a fresh sub-agent. Short, single-purpose sub-agents, such as reviewers, finish well inside their context and need neither.
 
 ### Why so early?
 

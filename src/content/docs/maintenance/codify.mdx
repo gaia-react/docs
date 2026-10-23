@@ -9,7 +9,7 @@ It runs like every [maintenance command](/maintenance/#how-maintenance-commands-
 
 ## Why it helps
 
-Every audit round that catches the same mistake again costs review time and tokens, and the fix lives only in that one pull request. `/gaia-codify` turns a mistake that keeps coming back into something that stops it before review: a check that fails, a skill Claude loads for that kind of work, or a rule that loads only for the files it covers. The lesson then stays with the project for every teammate and every future session, without making Claude read more on unrelated work, because each rule is scoped to the files it covers and a check adds nothing to Claude's context. The reasoning is in `wiki/concepts/Policy-Memory Loop.md` in your project.
+Every audit round that catches the same mistake again costs review time and tokens, and the fix lives only in that one pull request. `/gaia-codify` turns a mistake that keeps coming back into something that stops it before review: a check that fails, a skill Claude loads for that kind of work, or a rule that loads only for the files it covers. The lesson then stays with the project for every teammate and every future session, without making Claude read more on unrelated work, because each rule is scoped to the files it covers and a check adds nothing to Claude's context. Ask Claude why GAIA prefers a check over a written rule to hear the full reasoning.
 
 ## When to use it
 
@@ -18,7 +18,7 @@ The statusline nudges you with `🔨 /gaia-codify (<reason>)`:
 - Before your first completed review, it counts recurring patterns: `/gaia-codify (3 recurring patterns)`.
 - After a completed review, it stays quiet until something changes, then names it: a new recurring pattern, a pattern that has grown noticeably, or a change in how findings are counted.
 
-On every `gh pr merge`, a hook posts the pull request's findings in a machine-readable form. Those posts are what the count reads. Only posts from the repository's owner, collaborators, and organization members count, so a findings post from anyone else, such as an outside commenter on a public repository, is ignored.
+Each merge records the pull request's findings in a comment on it, and the count reads those comments. Only comments from the repository's owner, collaborators, and organization members count, so a findings comment from anyone else, such as an outside commenter on a public repository, is ignored.
 
 ## What counts as recurring
 
@@ -41,7 +41,7 @@ A finding a tool reports keeps the tool's own rule id after a prefix, so any rul
 | `knip/<issue type>` | Unused code or dependencies Knip found, such as `knip/exports` |
 | `cve/<advisory id>` | A security advisory against a dependency, such as `cve/GHSA-xxxx-xxxx-xxxx` |
 
-A tool already catches these, so `/gaia-codify` recommends making that check stop the change, or adding it to the Quality Gate, never a written rule. Knip is the exception: the Quality Gate does not run it, so its check is made blocking in the Code Audit Team or CI instead.
+A tool already catches these, so `/gaia-codify` recommends making that check stop the change, or adding it to the Quality Gate, never a written rule. Knip is the exception: the Quality Gate does not run it, so `/gaia-codify` recommends making the Code Audit Team's frontend reviewer or a CI check fail on that Knip finding instead of only reporting it.
 
 ### Problems a reviewer spots
 
@@ -109,8 +109,8 @@ For each candidate, it first checks whether an existing rule, skill, hook, or Qu
 | Pattern | Recommended form | What `/gaia-codify` does |
 |---|---|---|
 | An existing tool already catches it | Make that check stop the change instead of only warning, or add it to the Quality Gate | Edits the existing setup |
-| It can be caught by a lint rule, hook, or test | An automated check | Writes a sketch of the hook and script for you to finish. Nothing is switched on. |
-| The lesson is a procedure ("do these steps in this order") | A skill | Writes a `SKILL.md` outline for you to finish. Nothing is switched on. |
+| It can be caught by a lint rule, hook, or test | An automated check | Writes a sketch of the hook and script. Nothing is switched on; ask Claude to finish it and turn it on. |
+| The lesson is a procedure ("do these steps in this order") | A skill | Writes a `SKILL.md` outline. Nothing is switched on; ask Claude to finish it. |
 | A judgment call no tool can catch | A written rule that loads only for matching paths | Writes the rule file under `.claude/rules/`, scoped by `paths:` to where the finding recurs |
 
 A written rule is the weakest option: it advises instead of enforcing, and Claude has to read it on every matching task. So before recommending one, it asks what quick evidence would show the rule actually changes behavior. If it can't name any, it recommends defer or decline instead.
@@ -128,7 +128,7 @@ A written rule is the weakest option: it advises instead of enforcing, and Claud
 
 ### Decline and defer
 
-- **Decline** records, on this machine only, that you are not acting on the pattern. It comes back once the pattern has grown by at least 3 more pull requests and its share of audited pull requests has risen by at least a quarter (5/4 of the share when you declined). While either count covers fewer than 20 audited pull requests, the raw counts are compared instead of shares. The record lives in `.gaia/local/codify/` and is never shared, so a teammate still sees the nudge.
+- **Decline** records, on this machine only, that you are not acting on the pattern. It comes back only if the pattern keeps growing noticeably: at least 3 more pull requests, and a clearly larger share of audited pull requests than when you declined. The record lives in `.gaia/local/codify/` and is never shared, so a teammate still sees the nudge.
 - **Defer** records nothing of its own. The candidate still appears in the next review; the nudge stays quiet until the pattern grows or the counting changes.
 
 ## Promoted rules
@@ -139,8 +139,6 @@ A rule `/gaia-codify` writes carries a one-line comment after its frontmatter sa
 <!-- gaia-harden: promoted from recurring finding_class <class>; pruned by /gaia-cleanse on obsolescence/redundancy/supersession/duplication only, never for non-recurrence -->
 ```
 
-That comment is what stops the pattern from being counted again. [`/gaia-cleanse`](/maintenance/cleanse/) treats a marked rule like any other, except it never removes one because its pattern stopped showing up: a pattern that stops showing up means the rule is working.
+`gaia-harden` is the command's old name. Leave the comment in place: it is what stops the pattern from being counted again, and removing it makes the pattern count again. [`/gaia-cleanse`](/maintenance/cleanse/) treats a marked rule like any other, except it never removes one because its pattern stopped showing up: a pattern that stops showing up means the rule is working.
 
 The run ends with a [cost line](/models-and-context/cost/).
-
-Source: `.claude/skills/gaia/references/codify.md`.

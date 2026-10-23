@@ -27,8 +27,6 @@ Patterns and conventions for [TypeScript](https://www.typescriptlang.org/):
 
 **Example phrasing:** "type this Zod schema", "should this be a type or an interface", "add a status to this union".
 
-Source: `frontend/.claude/skills/typescript/SKILL.md`.
-
 ## Naming Conventions
 
 Descriptive names that explain themselves, in any language: TypeScript, bash, workflow YAML, Dockerfiles. It flags vague names, abbreviations, and names that just repeat the type. The always-loaded `no-abbreviations` rule holds everything Claude writes to the same standard.
@@ -36,8 +34,6 @@ Descriptive names that explain themselves, in any language: TypeScript, bash, wo
 **Triggers** when naming or renaming an identifier, variable, constant, function, parameter, environment variable, workflow job, or Dockerfile `ARG`/`ENV`, or reviewing names.
 
 **Example phrasing:** "name this hook better", "is `cfg` a good name here", "rename these env vars".
-
-Source: `.claude/skills/naming-conventions/SKILL.md`.
 
 ## React Code
 
@@ -58,15 +54,11 @@ Before adding a dependency or writing a helper from scratch, the skill tries opt
 
 **Example phrasing:** "this useEffect is firing twice", "extract this section into its own component", "wire up a Conform form for sign-up".
 
-Source: `frontend/.claude/skills/react-code/SKILL.md`.
-
 ## React Performance
 
 You point it at one specific interaction, like a button click, and it finds the component that re-renders when it shouldn't and explains what is causing the extra work. It diagnoses; it does not fix anything itself. You can also run it as `/gaia-react-perf <target>`. See [React performance](/skills/react-performance/) for the full workflow.
 
 **Triggers** only when you clearly ask about rendering: "profile renders", "measure renders", "why is X re-rendering", or "diagnose render performance". It does not trigger on a vague "feels slow" or "janky"; [React Doctor](https://github.com/millionco/react-doctor) covers those.
-
-Source: `frontend/.claude/skills/gaia-react-perf/SKILL.md`.
 
 ## Styling
 
@@ -80,8 +72,6 @@ Every color uses a shadcn role token, a color named for its job rather than its 
 
 **Example phrasing:** "this needs a hover variant", "name this color token", "let the caller override the padding".
 
-Source: `frontend/.claude/skills/tailwind/SKILL.md`.
-
 ### Skeleton Loaders
 
 Loading placeholders (skeletons) that match the real content's layout exactly. A skeleton uses the same HTML elements and font classes as the real content, plus a shared `shimmer` class; anything that is not text stays an empty `<div>`. The skill includes a 200ms delay so a fast load does not flash the skeleton on screen.
@@ -89,8 +79,6 @@ Loading placeholders (skeletons) that match the real content's layout exactly. A
 Fixed text in a skeleton that gets translated uses `t()` or `<Trans>`, the same call the real component uses, so the widths match. The skeleton's root element carries `aria-hidden`, so screen readers skip it. The region that receives the content carries `aria-busy="true"` or a visually hidden `role="status"` live region.
 
 **Triggers** when adding loading states, building skeletons for async data, handling pending route transitions, or preventing layout shift.
-
-Source: `frontend/.claude/skills/skeleton-loaders/SKILL.md`.
 
 ## Test-driven development
 
@@ -100,26 +88,24 @@ Source: `frontend/.claude/skills/skeleton-loaders/SKILL.md`.
 
 **Example phrasing:** "let's TDD this", "write a red test for the login flow".
 
-Source: `.claude/skills/tdd/SKILL.md`, `frontend/.claude/skills/tdd-react/SKILL.md`.
-
 ## Playwright CLI
 
-Microsoft's [Playwright CLI](https://github.com/microsoft/playwright-cli) skill for browser automation, copied unchanged from Microsoft's repository. It can navigate, click, type, take screenshots, manage cookies and storage, run several browser sessions in parallel, and find page elements using the references in the page snapshots it saves. It runs the globally installed `playwright-cli` command, and `/update-deps` tells you when that command is out of date.
+Microsoft's [Playwright CLI](https://github.com/microsoft/playwright-cli) skill for browser automation, copied unchanged from Microsoft's repository. It can navigate, click, type, take screenshots, manage cookies and storage, run several browser sessions in parallel, and find page elements using the references in the page snapshots it saves. It runs the `playwright-cli` command installed on your machine, which [`/setup-gaia`](/getting-started/setup-gaia/) installs once per machine, and `/update-deps` offers to upgrade it when it is out of date.
 
 **Triggers** when navigating websites, filling forms, taking screenshots, testing web applications, or extracting information from pages. You can also say "use playwright for ...".
 
-Source: `frontend/.claude/skills/playwright-cli/SKILL.md`.
-
 ## ESLint Fixes
 
-Claude usually handles [ESLint](https://eslint.org/) errors well. This skill covers specific errors where this project expects a particular fix, and autofix conflicts where one rule undoes another. If you see Claude fixing an error the wrong way (for example, turning the rule off instead of fixing the cause), ask it to improve the `eslint-fixes` skill for that error. Lint requires every `eslint-disable` comment to give a reason after `--` (`@eslint-community/eslint-comments/require-description`).
+Claude usually handles [ESLint](https://eslint.org/) errors well. This skill covers specific errors where this project expects a particular fix, and autofix conflicts where one rule undoes another. If you see Claude fixing an error the wrong way (for example, turning the rule off instead of fixing the cause), ask it to improve the skill for that error:
 
-Source: `frontend/.claude/skills/eslint-fixes/SKILL.md`.
+```text
+You fixed that lint error by turning the rule off. Update the eslint-fixes skill so it fixes <rule> properly next time.
+```
+
+Lint requires every `eslint-disable` comment to give a reason after `--` (`@eslint-community/eslint-comments/require-description`).
 
 ## Accessibility Fixes
 
 Fixes specific accessibility errors reported by [axe-core](https://github.com/dequelabs/axe-core), the accessibility checker: `color-contrast`, `label`, `image-alt`, `button-name`, `link-name`, `region`, `heading-order`, the `aria-*` rules, `tabindex`, `duplicate-id`, and others. For an error not on its list, it makes a fix and then re-runs the check to confirm. Fixes use role tokens and the `ui` controls, so they work in both light and dark themes. General guidance lives in the `accessibility` rule; this skill handles the specific fix once an error is reported.
 
 **Triggers** when an axe rule name (like `color-contrast`) appears in the output of a story test under [Vitest](https://vitest.dev/) (`addon-a11y`), the Playwright accessibility helper (`frontend/.playwright/a11y.ts`), or `code-audit-frontend`'s accessibility findings.
-
-Source: `frontend/.claude/skills/a11y-fixes/SKILL.md`.

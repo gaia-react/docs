@@ -72,16 +72,20 @@ When nothing can be priced, the price reads `cost unavailable`. A figure is neve
 
 ## What an idea cost
 
-```bash
-bash .gaia/scripts/usage.sh initiative <ref>
+Ask Claude what one piece of work cost, from its first research to its merge, including runs continued after `/clear`. You can ask about a SPEC (`SPEC-012`), a plan (`PLAN-004`), an issue (`#142`), or a research topic:
+
+```text
+What did SPEC-012 cost, from first research to merge?
 ```
 
-Adds up the cost of one piece of work (an initiative) from its first research to its merge, including runs continued after `/clear`. `<ref>` is a SPEC (`SPEC-012`), a plan (`PLAN-004`), an issue (`issue:142`), or a research folder (`research:<date>-<topic>`). Add `--line` for one line or `--box` for the box. Run `bash .gaia/scripts/usage.sh` on its own to see its other subcommands.
+```text
+Show the total cost of issue #142 as a box.
+```
 
-A branch's cost is counted toward its initiative automatically when the branch name includes it (`debt/142-...`, `fix/142-...`, a SPEC's plan branch). Otherwise link it once:
+A branch's cost is counted toward its piece of work automatically when the branch name includes it (`debt/142-...`, `fix/142-...`, a SPEC's plan branch). Otherwise ask Claude to link it once:
 
-```bash
-bash .gaia/scripts/usage.sh link branch:<branch> research:<date>-<topic>
+```text
+Count the cost of branch <branch> toward the research on <topic>.
 ```
 
 When you clear and resume a long run, the continuation prompt includes a line that connects the new session to the same run, so the cost covers every session.
@@ -95,10 +99,10 @@ Prices come from the rate table that ships with GAIA, `.gaia/scripts/token-rates
 To set your own prices, or add a model the table does not have, ask Claude to write a price override for you:
 
 ```text
-Create .gaia/local/telemetry/token-rates.override.json in the main checkout with my own token prices: <model id> at $<input> per million input tokens and $<output> per million output tokens. Use the same format as .gaia/scripts/token-rates.json.
+Use my own token prices: <model id> at $<input> per million input tokens and $<output> per million output tokens.
 ```
 
-The file looks like this:
+Claude writes them to `.gaia/local/telemetry/token-rates.override.json` in the main checkout. The file looks like this:
 
 ```json
 { "models": { "claude-opus-5-5": [ { "input": 4, "output": 20 } ] } }

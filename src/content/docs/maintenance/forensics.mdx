@@ -41,8 +41,8 @@ Forensics runs in nine read-only steps:
 3. **Diagnose.** Decides whether the failure comes from your setup (wrong Node version, a missing env var, uncommitted changes blocking a command) or is probably a bug. When the evidence points both ways, it picks your setup, since that is the more likely cause.
 4. **Redact.** Strips secrets, identity details, and machine-specific paths out of the report, then double-checks the result. If anything that still looks like a credential gets through, forensics stops instead of writing a report that could leak it.
 5. **Write.** Produces a report in a fixed format: frontmatter (the failure class, GAIA version, created date, optional issue URL) and four fixed sections: `## Symptom`, `## Classification`, `## Capture`, `## Reproduction context`.
-6. **Save.** Writes to `.gaia/local/forensics/<tree>/<timestamp>-<class>.md`, where `<tree>` identifies the checkout and the timestamp is in UTC, in the compact ISO-8601 form shown in the example below.
-7. **Act on the diagnosis.** For a setup problem, it prints the steps to fix it and stops. For a probable bug, it goes on to offer filing an issue.
+6. **Save.** Writes to `.gaia/local/forensics/<tree>/<timestamp>-<class>.md`, where `<tree>` is a folder for each copy of the repo on your machine (your main checkout and each worktree) and the timestamp is in UTC, in the compact ISO-8601 form shown in the example below.
+7. **Act on the diagnosis.** For a setup problem, it prints the steps to fix it and stops. Ask Claude to carry them out. For a probable bug, it goes on to offer filing an issue.
 8. **Offer to file.** If `gh` is installed, asks once whether to file an issue on `gaia-react/gaia` with the `gaia-forensics` label. If `gh` is not installed, prints the local report path and exits. GitHub silently drops labels from people without triage access to the GAIA repo, which is most people. If the label does not attach, forensics still files the issue and warns you the label is missing.
 9. **Confirm.** Prints a final line with the report path and (if filed) the issue URL.
 
@@ -112,7 +112,13 @@ If you say yes and `gh` is installed:
 Report: .gaia/local/forensics/<tree>/20260509T143022Z-quality-gate.md | Issue: https://github.com/gaia-react/gaia/issues/342
 ```
 
-If you say no, the report stays local and you can attach it to a manual issue later.
+If you say no, the report stays local. To file it later, ask Claude:
+
+```text
+File the forensics report at .gaia/local/forensics/<tree>/<report-file>.md on gaia-react/gaia the way /gaia-forensics files one (step 8 of .claude/skills/gaia/references/forensics.md): title "forensics: <class>, <one-line description>", label gaia-forensics, the body taken from the saved file unchanged.
+```
+
+Filing from the saved file unchanged matters: the report was already cleaned of secrets when it was saved, and GAIA's triage reads its fixed layout.
 
 ## Storage
 

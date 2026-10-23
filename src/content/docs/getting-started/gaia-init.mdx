@@ -9,7 +9,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 `/gaia-init` runs automatically during `npx create-gaia`. It renames the project to your title, sets up language support and how routes load data, removes GAIA's own branding, sets up CODEOWNERS and your environment file, registers Claude tools and plugins, verifies the build, and commits the result. You get a project that compiles, lints, and tests cleanly.
 
-`/gaia-init` runs only at the root of a project created by `npx create-gaia`, and refuses anywhere else.
+`/gaia-init` runs only at the root of a project created by `npx create-gaia`, and stops with a message anywhere else.
 
 ## The flow
 
@@ -19,7 +19,7 @@ import { Aside } from '@astrojs/starlight/components';
 2. Runs `pnpm install` in the new project.
 3. Installs [Chromium](https://www.chromium.org/), the browser the story and hook tests run in. `pnpm install` installs no browsers, so without this step the build check in step 4 fails. Init installs only Chromium, without the system libraries some Linux machines also need, so it never asks for your password. It finishes at once when Chromium is already installed.
 
-If either install fails, the run stops and shows the error with the command to retry. Fix the cause and resume (see [Resuming after a failure](#resuming-after-a-failure)). To install the browsers yourself, run `pnpm install:browsers`; it also installs the system libraries the browsers need, which on Linux asks for your `sudo` password.
+If either install fails, the run stops and shows the error with the command to retry. Fix the cause and resume (see [Resuming after a failure](#resuming-after-a-failure)). To install the browsers and the system libraries they need, run `pnpm install:browsers` yourself in a terminal. On Linux it asks for your `sudo` password, which Claude cannot type.
 
 Init does not update your dependencies. The project starts on the exact package versions GAIA's own tests ran against. When packages fall behind or have security advisories, the statusline shows [`/update-deps`](/maintenance/update-deps/), and you run it when you are ready.
 
@@ -34,12 +34,20 @@ Every question is a menu with the recommended option first. In interactive mode 
 
 - **Primary language.** The main language for your app's UI. The first option is the language you have been typing in. The second is always a different real language: English when you type in another language, otherwise your system locale's language, or Spanish. Type any other language, by name (French, Japanese) or code (`fr`, `ja`), through the menu's Other answer.
 - **Additional languages.** Keep only the primary language with translation support (i18n) still set up (recommended, so you can add languages later with no rework), add more languages now, or remove i18n entirely. Removing it is hard to undo, so pick it only if you are sure the app will only ever use one language.
-- **GitHub username for CODEOWNERS.** GAIA reads your handle from the [GitHub CLI](https://cli.github.com/) you are logged in to (`gh api user`) and offers it first. Choose **Set it later** to write a placeholder you edit before pushing, or type a different handle. If detection fails, GAIA asks you to type your handle rather than guessing.
+- **GitHub username for CODEOWNERS.** GAIA reads your handle from the [GitHub CLI](https://cli.github.com/) you are logged in to (`gh api user`) and offers it first. Choose **Set it later** to write a placeholder you replace before pushing, or type a different handle. If detection fails, GAIA asks you to type your handle rather than guessing.
 - **Project title.** Your folder name in title case (for example `my-cool-app` becomes `My Cool App`), or the folder name as it is. Type your own title through Other. The slug (the kebab-case name used in package names and paths) comes from the title, so it is never asked separately. To set both, type `Title / slug`.
 - **Backend field casing.** How your backend names JSON fields. `camelCase` (recommended) passes keys through unchanged. `snake_case` makes the services convert keys: `snake_case` in requests and responses, camelCase in your code (`create({isSnakeCaseEnabled: true})`). **Not sure** is treated as camelCase.
 - **[TanStack Query](https://tanstack.com/query/latest).** Off by default: route loaders handle data and nothing extra is installed. **Yes** installs TanStack Query and sets up its provider and [Storybook](https://storybook.js.org/) decorator.
 
-Both data answers (casing and TanStack Query) can change later with `./.gaia/cli/gaia init configure-data-layer --casing snake` or `--query true`.
+You can change either data answer later by asking Claude:
+
+```text
+My backend uses snake_case field names. Switch the data layer to convert them.
+```
+
+```text
+Turn on TanStack Query for this project.
+```
 
 The language, title, and identity questions are re-asked until you answer; GAIA never guesses them. The two data questions are asked again once, then fall back to their default.
 
@@ -61,7 +69,12 @@ If you removed i18n, it removes all of it cleanly.
 
 ### 4. Project files and build check
 
-- Creates `.github/CODEOWNERS` with your GitHub handle as the repo-wide owner. When it has no real handle, it writes the placeholder `REPLACE-WITH-YOUR-GITHUB-HANDLE` and tells you to edit it before you push. GitHub also warns about the unknown owner, so you won't miss it.
+- Creates `.github/CODEOWNERS` with your GitHub handle as the repo-wide owner. When it has no real handle, it writes the placeholder `REPLACE-WITH-YOUR-GITHUB-HANDLE` and tells you to replace it before you push. GitHub also warns about the unknown owner, so you won't miss it. Nothing later checks for the placeholder, so replace it before your first push by asking Claude:
+
+  ```text
+  Set my GitHub handle in CODEOWNERS. My handle is <your-handle>.
+  ```
+
 - Copies `frontend/.env.example` to `frontend/.env`. The app's environment file lives in the `frontend/` package; [Playwright](https://playwright.dev/) reads the same file.
 - Runs the full quality gate from the repository root, `pnpm typecheck && pnpm lint && pnpm test:ci && pnpm build` (the root scripts run the `frontend` package), and stops if anything fails. This is the same [Quality Gate](/reference/gates/#quality-gate) every later change must pass, so it proves the new project compiles, lints, and tests cleanly. It is the main reason init takes a few minutes.
 
@@ -71,14 +84,10 @@ If you removed i18n, it removes all of it cleanly.
 
 **Tools.** Installed on each machine, not tracked in the repo:
 
-- [React Doctor](https://github.com/millionco/react-doctor): `bash .gaia/scripts/install-react-doctor.sh` installs the `react-doctor` skill under `frontend/.claude/skills/`, so it only loads in sessions that work on the app.
+- [React Doctor](https://github.com/millionco/react-doctor): installs the `react-doctor` skill under `frontend/.claude/skills/`, so it only loads in sessions that work on the app.
 - [Playwright CLI](https://github.com/microsoft/playwright-cli) binary: `npm install -g @playwright/cli@latest`. The `playwright-cli` skill that ships with GAIA uses it, and [`/update-deps`](/maintenance/update-deps/) reports when it falls behind.
 
-**Plugins.**
-
-```bash
-claude plugin install typescript-lsp@claude-plugins-official
-```
+**Plugins.** The TypeScript language server plugin (`typescript-lsp`), so Claude can jump to definitions and see type errors.
 
 After installing, `/gaia-init` checks each one and reports `[ok]` or `[FAIL]` for each. A failure stops the run so you can retry before continuing.
 
@@ -86,7 +95,7 @@ After installing, `/gaia-init` checks each one and reports `[ok]` or `[FAIL]` fo
 
 `/gaia-init` applies GAIA's two team defaults without asking:
 
-- **Git isolation policy**: always use worktrees. Init leaves the setting out of `.gaia/project.json`, because an unset policy means this default. Every `/gaia-plan`, `/gaia-debt`, and ad-hoc task works in its own git worktree, so tasks run in parallel without touching each other. See [Work lifecycle](/workflow/work-lifecycle/).
+- **Git isolation policy**: always use worktrees. Every `/gaia-plan`, `/gaia-debt`, and ad-hoc task works in its own git worktree, so tasks run in parallel without touching each other. See [Work lifecycle](/workflow/work-lifecycle/).
 - **Sandbox recommendation**: not recommended, written to `.gaia/project.json`. Claude Code's sandbox works with GAIA once you allow the commands it blocks, so it is opt-in. See [Sandbox decision](/getting-started/setup-gaia/#sandbox-decision).
 
 The file is committed and shared with your team, and `/update-gaia` never overwrites it. A repo admin changes either setting later with `/setup-gaia --reconfigure`.
@@ -109,7 +118,7 @@ Then start Claude again, and run /setup-gaia. After your first push, /setup-gaia
 The statusline shows /update-deps when packages are outdated or have security advisories; run it when you are ready.
 ```
 
-If `.github/CODEOWNERS` still holds the placeholder owner, a required follow-up to edit it comes first.
+If `.github/CODEOWNERS` still holds the placeholder owner, a required follow-up to replace it comes first (see [step 4](#4-project-files-and-build-check) for the prompt).
 
 Exit Claude and relaunch from inside the project folder. New plugins and skills only load in a new session.
 
@@ -121,10 +130,10 @@ From there you are ready to build. Run `pnpm dev` to start the app locally, or a
 
 ## Resuming after a failure
 
-`/gaia-init` records its progress in `.gaia/init-state.json`. If something breaks partway through, the failing step prints an error saying what went wrong. Fix the cause and run:
+`/gaia-init` records its progress as it goes. If something breaks partway through, the failing step prints an error saying what went wrong, and init stops. Fix the cause (or ask Claude to). Claude cannot start `/gaia-init` itself, but it can run init's resume step, which picks up from the saved progress:
 
-```bash
-.gaia/cli/gaia init resume
+```text
+I fixed the problem. Run .gaia/cli/gaia init resume to finish GAIA init from the step that failed.
 ```
 
 Steps that already finished are skipped, and the rest run again with the answers you already gave.

@@ -62,14 +62,14 @@ Each entry is classified:
 - **STALE**: it points at a file, branch, or feature that no longer exists.
 - **CONFLICT**: a memory entry disagrees with the wiki, so it is changed to match the wiki.
 
-Counts, size budgets, and references to missing paths are measured by GAIA's own CLI (`gaia fitness inventory` and `gaia fitness check`). Claude judges only what a script can't.
+Counts, size budgets, and references to missing paths are measured by a script, so they come out the same every time. Claude judges only what a script can't.
 
 ### What it does not touch
 
 - **Conflicts between instruction files.** When two `CLAUDE.md` files, rules, skills, commands, or agents disagree with each other, this command does not decide between them. Run `/doctor prompt-audit` for those. An instruction file that contradicts the wiki is reported and filed as a `tech-debt` issue, never edited.
-- **Files you do not own.** It edits only your project's own files and memory, and asks you per file. A problem in a file GAIA ships is reported for [`/update-gaia`](/maintenance/update-gaia/) to fix. A problem in a third-party file is reported for its vendor. Agent memory shared across the whole machine is yours to edit by hand.
+- **Files you do not own.** It edits only your project's own files and memory, and asks you per file. A problem in a file GAIA ships is reported for [`/update-gaia`](/maintenance/update-gaia/) to fix. A problem in a third-party file is reported for its vendor. Agent memory shared across the whole machine is only reported; ask Claude directly if an entry there needs changing.
 - **The wiki's own redundancy and broken links.** Those belong to [`/gaia-wiki`](/maintenance/wiki/).
-- **Rules from [`/gaia-codify`](/maintenance/codify/).** A rule `/gaia-codify` wrote carries a `gaia-harden:` comment saying where it came from. It is treated like any other rule, except it is never removed just because the problem it targets stopped showing up. A problem that stops showing up means the rule is working.
+- **Rules from [`/gaia-codify`](/maintenance/codify/).** A rule `/gaia-codify` wrote carries a comment saying where it came from (it starts with `gaia-harden:`, the command's old name). It is treated like any other rule, except it is never removed just because the problem it targets stopped showing up. A problem that stops showing up means the rule is working.
 
 ## The flow
 
@@ -86,14 +86,9 @@ When the report proposes no changes, the run skips the verification round and th
 Running `/gaia-cleanse` researches and reports. Nothing in memory, rules, or the wiki changes until you choose Apply.
 </Aside>
 
-## Action types
+## What Apply changes
 
-| Action | What it does |
-| --- | --- |
-| `delete` | Removes a memory or rules file whose facts the wiki already has, but only if the file is unchanged since the report. |
-| `delete-entry` | Removes one block, such as one heading's section in `MEMORY.md`. The text must match exactly. |
-| `promote` | Moves durable knowledge from memory to a named wiki page, then removes or trims the source. |
-| `shrink` | Replaces text in an auto-loaded file with a link to the wiki page that covers it. The text must match exactly. |
+Apply removes files or sections the wiki already covers, moves lasting knowledge from memory to a named wiki page, and replaces text in an auto-loaded file with a link to the wiki page that covers it.
 
 Each change records what the file looked like when the report was written. If the file has changed since, that change is skipped and noted, never forced. A file with uncommitted changes is skipped before anything runs.
 
@@ -106,5 +101,3 @@ A report is `draft` until applied, then `applied` or `applied-partial` (some cha
 Memory edits live outside the repository under `~/.claude/` and are never committed. A run that only changed memory opens no pull request.
 
 The run ends with a [cost line](/models-and-context/cost/).
-
-Source: `.claude/skills/gaia/references/cleanse.md`.

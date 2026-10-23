@@ -70,7 +70,7 @@ Inside it:
 1. **Before it starts.** Notebook entries GAIA no longer needs are cleared out (see [How entries are cleared](/workflow/notebook/#how-entries-are-cleared)), and Claude offers to pull when your GAIA version is behind the remote.
 2. **Find the SPEC**, if you named one. If no SPEC matches, it stops with an error instead of quietly planning without it.
 3. **Pick the planner model.** On Opus (or Fable) the planner inherits your model. Otherwise Claude asks: Opus (recommended), Fable, or your current model. The planner runs at your session's effort, so a higher `/effort` drafts a deeper plan.
-4. **Plan.** A planner sub-agent writes the folder. If the planner's context reaches the [red band](/models-and-context/token-efficiency/#context-bands), it hands off to a fresh one.
+4. **Plan.** A planner sub-agent writes the folder. If the planner's context reaches the [red band](/models-and-context/token-efficiency/#context-bands), it hands off to a fresh one on its own ([how sub-agents hand off](/models-and-context/token-efficiency/#sub-agents)).
 5. **Verify.** A script checks that every required file and step is there, and that every UAT (acceptance test) in the SPEC is assigned to a task.
 6. **Plan audit.** Reviewers check the plan before anything is built from it. See [The plan audit](#the-plan-audit).
 7. **Report.** A [cost line](/models-and-context/cost/#what-you-see), then the prompt:
@@ -115,7 +115,7 @@ The orchestrator runs in the fresh session:
 
 - **Where it runs** follows your team's [isolation policy](/workflow/work-lifecycle/#3-isolate): a separate worktree by default. The branch is named `<type>/spec-<nnn>-<slug>` for a SPEC's plan or `<type>/plan-<nnn>-<slug>` otherwise, where `<type>` is the Conventional Commits type of the change. The PR Conventions check expects the pull request title's type to match.
 - **Each phase** hands its tasks to sub-agents, Sonnet by default. Sub-agents only edit files: they never commit, push, or run git commands that change the shared checkout. The orchestrator commits each phase after the Quality Gate passes. See [Who does what](/workflow/work-lifecycle/#who-does-what).
-- **A task whose context reaches the red band** hands off to a fresh agent. When one task has to hand off too often, the plan stops and asks you.
+- **A task whose context reaches the red band** hands off to a fresh sub-agent on its own ([how](/models-and-context/token-efficiency/#sub-agents)). A task that would need a third handoff stops the plan and tells you.
 - **The pull request** opens as a draft and goes through the [Code Audit Team](/workflow/code-audit-team/). Once every member has cleared it, the orchestrator prints a summary and the cost of the whole implementation, then asks you before it merges.
 
 ### Resuming a plan
@@ -143,5 +143,3 @@ Each UAT routed to an end-to-end test is turned into a Playwright test under `fr
 Before the audit, the orchestrator checks that every one of these tests still tests what the SPEC says (an `uat-fidelity-judge` agent reads each one). When the code and a UAT no longer agree, the plan stops so the SPEC can be reopened, instead of quietly changing what was agreed.
 
 The SPEC is closed out after its implementation merges.
-
-Source: `.claude/skills/gaia/references/plan.md`.

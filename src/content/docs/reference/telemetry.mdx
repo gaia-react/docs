@@ -41,7 +41,13 @@ The ping is a single request to `telemetry.gaiareact.com`. GAIA waits at most tw
 
 ## Turning it off
 
-Set this variable in your shell profile:
+Set `GAIA_TELEMETRY_PING_DISABLE` to `1`. Ask Claude to add it to the `env` block of `.claude/settings.local.json` (your machine only, not committed), then restart Claude Code:
+
+```text
+Set GAIA_TELEMETRY_PING_DISABLE to 1 in the env block of .claude/settings.local.json.
+```
+
+That covers this project. To cover every project on your machine, including a new one before `/gaia-init` runs, export it in your shell profile instead, then open a new terminal and restart Claude Code:
 
 ```bash
 export GAIA_TELEMETRY_PING_DISABLE=1

@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-These skills create new files in the React app that follow the project's conventions. They run GAIA's bundled `gaia scaffold` command for you, so you don't need to remember its flags: describe what you want, and the skill asks for anything missing. Each one runs the command from the repository root (`./.gaia/cli/gaia scaffold ...`) and writes into the `frontend/` package. Paths below are relative to `frontend/`.
+These skills create new files in the React app that follow the project's conventions. They run GAIA's scaffolding command for you, so you don't need to remember its options: describe what you want, and the skill asks for anything missing. The files land in the `frontend/` package, and paths below are relative to `frontend/`.
 
 Files and folders under `app/components`, `app/pages`, and `app/hooks` are kebab-case (lowercase words joined by hyphens, like `price-card`), and `@gaia-react/lint` enforces it.
 
@@ -19,9 +19,7 @@ It first checks whether [shadcn/ui](https://ui.shadcn.com/) already offers the c
 
 **Example phrasing:** "create a price-card component", "scaffold a user-avatar with a name and url prop".
 
-Underlying CLI: `gaia scaffold component <name> [--parent <dir>] [--props "a:string,b:number"] [--json]`. `--props` takes comma-separated `name:type` pairs, and types that contain commas (`Record<string, unknown>`, tuples, function types) work too. `app/components/ui` is refused as a parent.
-
-Source: `frontend/.claude/skills/new-component/SKILL.md`.
+Props can use most TypeScript types, including ones that contain commas, such as `Record<string, unknown>`, function types, and tuples. A component cannot be created inside `app/components/ui`, which holds only shadcn/ui files.
 
 ## New Hook
 
@@ -33,23 +31,19 @@ Creates a custom React hook, `app/hooks/use-<name>.ts` (named export `useName`),
 
 **Example phrasing:** "make a useCountdown hook", "extract this into a useFormSubmission hook".
 
-Underlying CLI: `gaia scaffold hook <useFoo> [--params "a:string,b:number"] [--returns "ReturnType"] [--json]`.
-
-Source: `frontend/.claude/skills/new-hook/SKILL.md`.
-
 ## New Route
 
 Creates a route file, `app/routes/<group>.<name>.tsx` (named with the flat file convention of `@react-router/fs-routes`), and its page, `app/pages/<name>/page.tsx`, with `tests/page.stories.tsx`. The story is the page's test. The route file stays small (`loader`, `action`, `meta`, and a one-line default export); the UI lives in the page.
 
-When you connect it to a service, it writes everything from loading the data to showing it on the page, in one of three ways:
+When you connect it to a service, it writes everything from loading the data to showing it on the page. Ask for the data to load in one of three ways:
 
-| `--data` | What it writes |
+| Ask for the data to load | What it writes |
 |---|---|
-| `server` | a server `loader` the page reads with `useLoaderData` |
-| `client` | a `clientLoader` and a `HydrateFallback` |
-| `query` | a `clientLoader` that loads the data into the [TanStack Query](https://tanstack.com/query/latest) cache, and a page that reads it with `useSuspenseQuery` (needs Query installed) |
+| on the server | a server `loader` the page reads with `useLoaderData` |
+| in the browser | a `clientLoader` and a `HydrateFallback` |
+| through TanStack Query | a `clientLoader` that loads the data into the [TanStack Query](https://tanstack.com/query/latest) cache, and a page that reads it with `useSuspenseQuery` (needs Query installed) |
 
-`--shape list` writes `<group>.<name>.tsx`; `--shape detail` writes `<group>.<name>_.$id.tsx`. The page story gets its data from [MSW](https://mswjs.io/) mocks.
+Ask for a list page or a detail page. A list page is `<group>.<name>.tsx`, and a detail page is `<group>.<name>_.$id.tsx`, which takes an id from the URL. The page story gets its data from [MSW](https://mswjs.io/) mocks. To see the files a route would create without writing them, ask Claude to show them first.
 
 **Confirms:** name (kebab-case), group (`_public` or `_session`), and the data, action, and i18n options.
 
@@ -57,11 +51,7 @@ When you connect it to a service, it writes everything from loading the data to 
 
 **Example phrasing:** "add a /pricing page in _public", "scaffold a projects list page in _session backed by the projects service".
 
-Underlying CLI: `gaia scaffold route <name> --group <_public|_session> [--data <server|client|query> --service <name> --shape <list|detail>] [--layer <folder>] [--loader] [--action] [--i18n] [--dry-run] [--json]`.
-
-`--dry-run` prints the files it would write without writing them. `--loader` (a loader for the page title and meta tags) cannot be combined with `--data`. With `--action` and `--data`, it writes a create action (list) or an update action (detail), validated by the service's input schema. With `--i18n`, it adds the locale file to the locale barrel (the index file that re-exports the locale files); if the barrel is missing, the command stops with an error that says how to fix it.
-
-Source: `frontend/.claude/skills/new-route/SKILL.md`.
+A route that is not connected to a service can still get a small `loader` for the page title and meta tags, and an empty `action` to fill in. If you ask for an action on a connected route, it writes a create action for a list page or an update action for a detail page, checked against the service's input schema. With translations, it adds the page's locale file to the locale barrel (the index file that re-exports the locale files); if the barrel is missing, the scaffold stops with an error that says how to fix it.
 
 ## New Service
 
@@ -73,8 +63,6 @@ Creates an API service in your API's folder under `app/services/` (shipped as `g
 
 **Example phrasing:** "add a projects service with get and post", "wire up CRUD for tasks with mocks".
 
-Underlying CLI: `gaia scaffold service <name> --endpoints "get,post,put,delete" --schema "id:string,name:string,status:enum(active,archived)" [--layer <folder>] [--mocks] [--json]`. Schema types are `string`, `number`, `boolean`, `datetime`, and `enum(a,b,...)`; add `?` to make a field optional. `--queries-only` adds `queries.ts` to an existing service.
+Schema fields can be text, numbers, true/false values, dates with times, or one of a fixed set of values, and any field can be optional. For example: "a tasks service with get and post, where a task has an id, a title, an optional due date, and a status of open or done". To add `queries.ts` to a service you already have, ask for the Query options for that service.
 
-The skill does not connect the service to a page or hook, so you decide where it belongs. [New Route](#new-route) with `--data` does that connection for a route.
-
-Source: `frontend/.claude/skills/new-service/SKILL.md`.
+The skill does not connect the service to a page or hook, so you decide where it belongs. [New Route](#new-route), connected to the service, does that for a route.

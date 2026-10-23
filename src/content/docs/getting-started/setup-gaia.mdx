@@ -11,7 +11,7 @@ sidebar:
 - **The GitHub repository**: create one, use one you already have, or set one up yourself. Private by default. When you are a repo admin, it also protects the default branch, makes `GAIA-Audit` a required check, and offers squash-only merges.
 - **Team settings** in `.gaia/project.json`: the git isolation policy and the sandbox recommendation. Both come with a default, so a plain run records the default and asks nothing.
 
-It is safe for **any developer** to run at **any time**. You start it by typing it; Claude never starts it on its own. Run it from your main copy of the repo. Inside a worktree it refuses and tells you where the main copy is.
+It is safe for **any developer** to run at **any time**. You start it by typing it; Claude never starts it on its own. Run it from your main copy of the repo. Inside a worktree it stops and names the main copy; open Claude Code there and run it again.
 
 ## When to use this
 
@@ -29,8 +29,8 @@ The command works out which situation your clone is in (a new project with no Gi
 
 Three checks run every time:
 
-- **Worktree links.** `bash .gaia/scripts/link-worktree.sh` checks the links a git worktree needs to the main copy's shared folders. In your main copy it does nothing. If it prints a `failed:` line (for example, Windows refused to create a symlink), setup stops and shows that line. Fix the cause and run `/setup-gaia` again.
-- **[pnpm](https://pnpm.io/), node_modules, and Chromium.** If `corepack` is available, pnpm is enabled at the pinned version; otherwise it is installed globally with npm. `pnpm install` runs when `node_modules/` is missing. Then setup installs [Chromium](https://www.chromium.org/), the browser the story and hook tests run in, so a fresh clone's first test run and first commit pass. It finishes at once when Chromium is already installed. If it fails, setup stops and shows the command to retry. To install the browsers yourself, run `pnpm install:browsers`.
+- **Worktree links.** Checks that this copy of the repo can share GAIA's local state with [worktrees](/workflow/work-lifecycle/). If that fails (for example, Windows refuses to create a symlink until Developer Mode is on), setup stops and shows why. Fix the cause and run `/setup-gaia` again.
+- **[pnpm](https://pnpm.io/), node_modules, and Chromium.** If `corepack` is available, pnpm is enabled at the pinned version; otherwise it is installed globally with npm. `pnpm install` runs when `node_modules/` is missing. Then setup installs [Chromium](https://www.chromium.org/), the browser the story and hook tests run in, so a fresh clone's first test run and first commit pass. It finishes at once when Chromium is already installed. If it fails, setup stops and shows the command to retry. To install the browsers and the system libraries they need, run `pnpm install:browsers` yourself in a terminal; on Linux it asks for your `sudo` password, which Claude cannot type.
 - **GitHub CLI check (warning only).** If `gh` is missing or not logged in, you get a warning and setup continues. The pull request merge workflow, `/gaia-plan`, and `/gaia-forensics` rely on `gh`, so install it from [cli.github.com](https://cli.github.com/) and run `gh auth login` when you can.
 
 ## Phase: per-machine setup
@@ -41,16 +41,12 @@ Skipped if this clone already finished its machine setup (a new project finishes
 
 Two outside tools, the same as step 5 of [`/gaia-init`](/getting-started/gaia-init/#5-claude-tooling):
 
-- **[React Doctor](https://github.com/millionco/react-doctor)** skill, installed under `frontend/.claude/skills/` by `bash .gaia/scripts/install-react-doctor.sh`.
+- **[React Doctor](https://github.com/millionco/react-doctor)** skill, installed under `frontend/.claude/skills/`.
 - **Playwright CLI** binary, installed globally.
 
 ### Install Plugins
 
-```bash
-claude plugin install typescript-lsp@claude-plugins-official
-```
-
-A plugin that is already installed is left as it is.
+The TypeScript language server plugin (`typescript-lsp`), so Claude can jump to definitions and see type errors. A plugin that is already installed is left as it is.
 
 ### Automatic steps
 
@@ -88,7 +84,7 @@ Applied after you create or pick a repo, and only when you are a repo admin and 
 - **`delete_branch_on_merge`**, so GitHub deletes each pull request's branch when it merges, however it was merged. Applied without asking on a repo this run created; on an existing repo, setup asks.
 - **[Dependabot](https://docs.github.com/en/code-security/dependabot) settings**: security alerts on, Dependabot's own security-fix pull requests off. [`/update-deps`](/maintenance/update-deps/) reads the alerts and fixes vulnerable packages itself, then tests the fix through the quality gate. If you already have a Dependabot npm entry or a Renovate config, setup first warns that you may get duplicate pull requests; it never edits either file.
 
-If one of these settings fails (403 if you are not an admin, 404 if there is no protection rule), setup tells you what someone with admin access needs to run or change, and continues. For `GAIA-Audit` it prints the `gh api` command; for the Dependabot settings it prints the commands to run.
+If one of these settings fails (403 if you are not an admin, 404 if there is no protection rule), setup tells you what someone with admin access needs to run or change, and continues. For `GAIA-Audit` it prints the `gh api` command; for the Dependabot settings it prints the commands to run. Send those to an admin, or have the admin run `/setup-gaia` themselves.
 
 ## Phase: team settings
 
@@ -109,7 +105,7 @@ When you are a repo admin and merges are not already squash-only, setup turns of
 
 ## Phase: labels
 
-`gaia labels sync` creates and renames GitHub labels to match GAIA's list of labels. It reports colors that differ from GAIA's without overwriting yours. See [Labels](/reference/labels/). This step never stops setup: if your token can't write labels, you get the `gh label` commands to run yourself, and setup continues.
+Setup creates and renames GitHub labels to match GAIA's list of labels. It reports colors that differ from GAIA's without overwriting yours. See [Labels](/reference/labels/). This step never stops setup: if your token can't write labels, you get the `gh label` commands to run yourself, and setup continues. Every `/setup-gaia` run syncs labels again, so a later run by someone with write access also fixes them.
 
 ## Phase: statusline left side
 
@@ -117,22 +113,22 @@ If you have your own global statusline in `~/.claude/settings.json`, setup asks 
 
 On every run, setup also warns when Claude Code is not running GAIA's statusline script. Without it you get no GAIA nudges, and the audit loop cannot see how full your context is.
 
-## Phase: owed setup features
+## Phase: new setup steps from later releases
 
-A later GAIA release can add a new setup step. `/setup-gaia` runs any step listed in `.gaia/setup-features.json` that has no recorded decision yet, so a project that finished setup earlier still picks up new steps.
+A later GAIA release can add a setup step. `/setup-gaia` runs any new step this machine has not answered yet, and any new team step when a repo admin runs it, so you never have to set up again from scratch.
 
 ## Finish
 
-Project decisions recorded this run (`setup_decisions` in `.gaia/project.json`) are committed and pushed to the default branch as `chore(gaia): record setup decisions`, so they reach your team. This machine's setup is marked done. Then the command prints one of two closing lines:
+When a repo admin with `gh` logged in runs setup on the default branch, the team-wide answers from this run are committed and pushed to that branch as `chore(gaia): record setup decisions`, so they reach your team. On any other branch, or for anyone who is not an admin, team answers are not recorded; they stay owed until an admin runs `/setup-gaia` on the default branch. This machine's setup is marked done. Then the command prints one of two closing lines:
 
 - `You're all set: your GAIA project is ready.` when nothing this machine can do is left.
-- `Setup isn't finished: these project settings are still owed: ...` naming them, when a GitHub step was refused or skipped. Fix the cause and re-run.
+- `Setup isn't finished: these project settings are still owed: ...` naming the team settings still to apply, when a GitHub step was refused or skipped. Fix the cause and re-run.
 
 Restart Claude Code so the new plugins and skills load.
 
 ## Reconfiguring
 
-```sh
+```text
 /setup-gaia --reconfigure
 ```
 

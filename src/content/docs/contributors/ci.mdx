@@ -21,7 +21,7 @@ Triggers on `v*.*.*` tag pushes. Builds and publishes the release bundle.
 6. **Stage the release tree** from `git ls-files`, minus `.gaia/release-exclude`.
 7. **Bundle-time scrub**: removes `gaia:maintainer-only` blocks and checks that no contributor-only content leaked into the shipped files.
 8. **Verify runtime dependencies** against the staged tree.
-9. **Distribution test gate**: `bash .gaia/tests/distribution/run-all.sh` (Layers 0 and 1). A failure stops the release before anything publishes.
+9. **Distribution test gate**: runs the distribution tests against the staged tree. They check that the expected files are present, that the maintainer-only blocks were stripped cleanly, that the tree unpacks and installs with only Node and the base system tools on the path, and that the bundled `gaia` CLI still runs key project flows against it (for example `gaia init strip-branding`). A failure stops the release before anything publishes.
 10. **Build** `gaia-bundle-<tag>.tar.gz` and its `.sha256`. The `gaia-bundle-` prefix is deliberate. A 1.6.1 `/update-gaia` looks for `gaia-<tag>.tar.gz`, so the new name makes it fail at the download instead of misreading the new folder layout.
 11. **Compose the release body**, starting with the line that sends 1.6.1 projects to the 2.0.0 migration, then **create the GitHub Release** with both files.
 
@@ -29,15 +29,21 @@ The job holds a `contents: write` token and keeps it tight. The checkout does no
 
 ## cli-tests.yml
 
-Its jobs run on pull requests to `main` and on `workflow_dispatch`. The workflow also lists pushes to `main` as a trigger, but every job skips on a push. The `workflow_dispatch` run is how you produce the required check on a commit that got no pull-request run. Three jobs:
+Its jobs run on pull requests to `main` and on `workflow_dispatch` (a run started by hand). The workflow also lists pushes to `main` as a trigger, but every job skips on a push. Three jobs:
 
-- **Vitest (`.gaia/cli`)** (required): for the CLI, typecheck, lint, and the Vitest tests. It also runs the bats tests for region markers, checks that the committed CLI bundles match a fresh build from source, runs the fitness lint over GAIA's own harness, and checks that the third-party skills copied into the repo (vendored skills) match the hashes recorded under `.gaia/vendor`. On a pull request, most steps run only when the change touches the files they cover; a `workflow_dispatch` run runs every step.
+- **Vitest (`.gaia/cli`)** (required): for the CLI, typecheck, lint, and the Vitest tests. It also runs the bats tests that check GAIA's readers of [generated-region](/contributors/cli/#generated-regions) markers agree with each other, checks that the committed CLI bundles match a fresh build from source, runs the [`/gaia-fitness`](/maintenance/fitness/) linter over GAIA's own rules, skills, and other Claude files, and checks that the third-party skills copied into the repo (vendored skills) match the hashes recorded under `.gaia/vendor`. On a pull request, most steps run only when the change touches the files they cover; a `workflow_dispatch` run runs every step.
 - **Distribution harness** (advisory): the distribution tests that need neither Docker nor a token.
 - **Shipped-surface leak check** (advisory): builds the release tree, then checks that no shipped file names a contributor-only path and that removing the maintainer-only blocks leaves no partial marker behind.
 
+A commit pushed by a GitHub Actions bot, using the workflow's own token, starts no pull-request run. The required `Vitest (.gaia/cli)` check then never appears, and the merge stays blocked. The fix is to start the workflow by hand, which takes write access to the GAIA repo. An outside contributor on a fork cannot, so mention it on the pull request instead. With write access, ask:
+
+```text
+The required Vitest (.gaia/cli) check is missing on PR #<N>. Start the GAIA: CLI Tests workflow on its branch with workflow_dispatch and wait for it to report.
+```
+
 ## audit-ci-tests.yml
 
-Like `cli-tests.yml`, its jobs run on pull requests to `main` and on `workflow_dispatch`, and skip on a push to `main`. Runs GAIA's bats tests for the shipped scripts and hooks (`.gaia/scripts/tests/`, `.github/audit/tests/`, `.gaia/tests/`), split across parallel jobs (shards). It also runs the [commitlint](https://commitlint.js.org/) tests and the tests for the RED gate (the check that a test was seen failing first) that need Node or Chromium. A final `Audit CI Tests` job passes only when every shard passes, so one required check covers them all.
+Like `cli-tests.yml`, its jobs run on pull requests to `main` and on `workflow_dispatch`, and skip on a push to `main`. Runs GAIA's bats tests for the shipped scripts and hooks (`.gaia/scripts/tests/`, `.github/audit/tests/`, `.gaia/tests/`), split across parallel jobs (shards). It also runs the [commitlint](https://commitlint.js.org/) tests and the tests for the RED gate (the check that a test was seen failing first) that need Node or Chromium. A final `Audit CI Tests` job passes only when every shard passes, so one required check covers them all. A bot-pushed commit leaves that check missing in the same way as `Vitest (.gaia/cli)`, and the same by-hand run fixes it.
 
 Projects get these scripts as code GAIA controls and never edit, so the tests only need to catch changes made on the GAIA repo.
 
@@ -50,7 +56,7 @@ Triggers on pull requests to `main`. Two advisory jobs:
 
 ## forensics-triage.yml
 
-Triggers on issues `opened` or `labeled` with `gaia-forensics`, the label [`/gaia-forensics`](/maintenance/forensics/) files with. Runs Claude Code to triage the report. It skips an issue already labeled `gaia-triaged`, then parses the report, classifies it, and checks whether the fix is in scope. For an in-scope fix it commits the fix on a new branch, runs the Quality Gate on it, and opens a draft pull request. A final step always adds the `gaia-triaged` label, however the run went.
+Triggers on issues `opened` or `labeled` with `gaia-forensics`, the label [`/gaia-forensics`](/maintenance/forensics/) files with. Runs Claude Code to triage the report. It skips an issue already labeled `gaia-triaged`, then parses the report, classifies it, and checks whether the fix is in scope. For an in-scope fix it commits the fix on a new branch, runs the [Quality Gate](/reference/gates/#quality-gate) on it, and opens a draft pull request. A final step always adds the `gaia-triaged` label, however the run went.
 
 The run is split into three jobs, so no job that runs the model or a model-edited file can write to GitHub:
 
@@ -66,4 +72,8 @@ Its helpers live in `.github/forensics/`, all contributor-only. The scope check 
 
 These matches ignore letter case, and a path with a `..` segment or a non-ASCII character is rejected outright.
 
-The pull request stays a draft until a person marks it ready. Read its diff on GitHub before you run `gh pr checkout`: a local checkout runs the branch's hooks and statusline in your session, and reading first means the scope check is not the only guard on them.
+The pull request stays a draft until you mark it ready. Read its diff before you check the branch out. A local checkout runs the branch's hooks and statusline in your session, and reading first means the scope check is not the only guard on them. Claude can show you the diff without checking anything out:
+
+```text
+Show me the diff of draft PR #<N> with gh pr diff, without checking the branch out. Flag any change under .claude/hooks/, .claude/settings*.json, .gaia/statusline/, .githooks/, or to package.json, pnpm files, or .npmrc.
+```

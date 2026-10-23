@@ -21,7 +21,7 @@ GAIA's app is built for server rendering: on every request, its root loader read
 
 ## Build and start
 
-From the repository root:
+From the repository root, or ask Claude to build and start the production server:
 
 ```bash
 pnpm build
@@ -63,13 +63,21 @@ No `.env` file ever enters the image: `frontend/Dockerfile.dockerignore` exclude
 | `SESSION_SECRET` | Yes | Signs the app's cookies, such as the language and toast cookies. Use a long random value, never the `local` placeholder from `.env.example`. |
 | `SITE_URL` | Yes | Your site's public URL, including the scheme (`https://example.com`). Pages tell search engines not to index them unless the request's `Host` header matches this URL's host and port, so a preview deployment stays out of search results. If a proxy in front of the server changes the `Host` header, every page is marked this way. |
 | `PORT`, `HOST` | No | Where the server listens. |
-| `COMMIT_SHA` | No | Set when building to add the first six characters of the commit to the app's version string, so you can tell which commit a running build came from (for example, when debugging). The shipped Dockerfile doesn't pass it to the build; add an `ARG COMMIT_SHA` to use it there. |
+| `COMMIT_SHA` | No | Set when building to add the first six characters of the commit to the app's version string, so you can tell which commit a running build came from (for example, when debugging). The shipped Dockerfile doesn't pass it to the build. To include it in Docker builds, ask Claude: "Pass COMMIT_SHA into the Docker build so the app's version string shows the commit." |
 | `MSW_ENABLED` | No | Development only: starts the mock API. A production build never starts it, so leave it unset on your host. |
 
 <Aside type="caution">
-`API_URL`, `COMMIT_SHA`, and `MSW_ENABLED` are written into every page's HTML so the browser can use them. Never put a secret in a variable the browser receives. A new variable stays server-only until it is added to the browser allowlist in `frontend/app/env.server.ts`.
+`API_URL`, `COMMIT_SHA`, and `MSW_ENABLED` are written into every page's HTML so the browser can use them. Never put a secret in a variable the browser receives. A new variable stays on the server unless you ask Claude to expose it to the browser. Only do that for values that are safe for anyone to see:
+
+```text
+Make the <VARIABLE_NAME> environment variable available in the browser.
+```
 </Aside>
 
 ## Calling an API on another domain
 
-GAIA's Content Security Policy only lets the browser make requests to the site's own origin (`connect-src 'self'`). If code running in the browser calls `API_URL` and your API is on another domain, the browser blocks the request. Add the API's origin to `connect-src` in `getContentSecurityPolicy` (`frontend/app/utils/http.server.ts`). Requests made on the server, such as in loaders, are not affected.
+GAIA's Content Security Policy only lets the browser make requests to the site's own origin (`connect-src 'self'`). If code running in the browser calls `API_URL` and your API is on another domain, the browser blocks the request. Requests made on the server, such as in loaders, are not affected. To let the browser call your API, ask Claude to add its origin to the policy:
+
+```text
+My API is at <your API origin, such as https://api.example.com>. Allow the browser to call it in the Content Security Policy.
+```

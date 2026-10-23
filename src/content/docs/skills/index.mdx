@@ -33,7 +33,9 @@ A [skill](https://code.claude.com/docs/en/skills) is a folder of instructions th
 | [`update-deps`](/maintenance/update-deps/) | Dependency and security updates, also `/update-deps` |
 | [`update-gaia`](/maintenance/update-gaia/) | GAIA release updates, also `/update-gaia` |
 
-[React Doctor](https://github.com/millionco/react-doctor) is installed on each machine separately, at `frontend/.claude/skills/react-doctor`, and is gitignored. GAIA's workflow commands (`/gaia-spec`, `/gaia-plan`, and the rest) read their instructions from `.claude/skills/gaia/references/`. That folder is not a skill you can call with a slash command.
+[React Doctor](https://github.com/millionco/react-doctor) is installed on each machine separately, at `frontend/.claude/skills/react-doctor`, and is gitignored.
+
+GAIA's workflow commands (`/gaia-spec`, `/gaia-plan`, and the rest) are slash commands, not skills. There is no `/gaia` skill to call.
 
 ## How triggering works
 
@@ -41,12 +43,18 @@ Each `SKILL.md` has a `description:` field listing the phrasings and situations 
 
 `/gaia-wiki`, `/update-deps`, and `/update-gaia` are skills, so asking in plain language triggers them too. They also appear in the [statusline](/workflow/statusline/#nudges) (`🧠`, `📦`, `🚀`) when they have work to do.
 
-Some commands are user-only: `/gaia-init`, `/setup-gaia`, `/gaia-fitness`, `/gaia-forensics`, `/gaia-codify`, and `/gaia-residue`. They set `disable-model-invocation`, so Claude never starts them on its own and they do not appear in its list of skills. Type them yourself as slash commands.
+Some commands are user-only: `/gaia-init`, `/setup-gaia`, `/gaia-fitness`, `/gaia-forensics`, `/gaia-codify`, and `/gaia-residue`. Each one is marked so that Claude never starts it, on its own or because you asked in plain language, and it does not appear in Claude's list of skills. Type them yourself as slash commands.
 
 ## Questions are menus
 
-When a GAIA skill or command needs you to choose, it shows a menu (`AskUserQuestion`) with the recommended option first. The shipped `user-questions` rule holds the skills you write to the same standard. A separate rule, `context-discipline`, prints any prompt or command meant for you to paste in a fenced code block.
+When a GAIA skill or command needs you to choose, it shows a menu (`AskUserQuestion`) with the recommended option first. The shipped `user-questions` rule holds the skills you write to the same standard. A separate rule, `fenced-copy-paste-blocks`, puts any prompt or command meant for you to paste in its own fenced code block, so Claude Code shows it with a copy button.
 
 ## Adding your own
 
-Add a folder under `.claude/skills/<name>/` (or `frontend/.claude/skills/<name>/` for a skill only the app needs) with a `SKILL.md`. Its frontmatter sets `name` and `description`, and optionally `model:` to always run the skill on a particular model. Claude picks it up in the next session. [`/gaia-fitness`](/maintenance/fitness/) lints it.
+Ask Claude to write the skill for you:
+
+```text
+Create a skill that <what it should help with>. It applies to <the whole repository | only the frontend app>. Write a description that names the phrasings that should trigger it.
+```
+
+A skill for the whole repository goes in `.claude/skills/<name>/`, and one only the app needs goes in `frontend/.claude/skills/<name>/`. To always run the skill on a particular model, say which one in the same request. Claude picks up the new skill in the next session, and [`/gaia-fitness`](/maintenance/fitness/) checks it.

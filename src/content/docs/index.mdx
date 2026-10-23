@@ -42,7 +42,7 @@ If auto mode is not available to you (your organization turned it off, or your m
 
 The mode applies to that one run only. Nothing stores it. When `/gaia-init` finishes, it tells you to exit Claude and relaunch, because the new skills and plugins load only in a fresh session. Relaunch with plain `claude` to approve actions as they happen, or `claude --permission-mode auto` to skip routine prompts.
 
-Either way, GAIA's guardrails stay on. They are hooks that check every action Claude takes, not permission prompts, so a mode that skips prompts doesn't turn them off. Every new project comes with hooks that block actions like:
+Either way, GAIA's guardrails stay on. They are hooks that check every action Claude takes, not permission prompts, so a mode that skips prompts doesn't turn them off. Every new project comes with hooks that keep Claude from risky actions, such as:
 
 - Committing or pushing directly to `main`, or force-pushing it
 - `rm -rf` on dangerous targets (`/`, `~`, `.git`, `.claude`, `node_modules`, the repo root)
@@ -51,7 +51,7 @@ Either way, GAIA's guardrails stay on. They are hooks that check every action Cl
 - Opening a pull request that is not a draft, or whose title is not a Conventional Commit
 - Merging a pull request the [Code Audit Team](/workflow/code-audit-team/) has not cleared
 
-These hold in every permission mode. See the [hooks reference](/reference/hooks/) for the full set, and the [gate reference](/reference/gates/) for why each one exists.
+When one fires, Claude takes the allowed route, for example a feature branch instead of `main`, and carries on; there is nothing for you to do. The hooks act on Claude's actions only, so a command you run yourself in a terminal never meets them. They hold in every permission mode. See the [hooks reference](/reference/hooks/) for the full set, and the [gate reference](/reference/gates/) for why each one exists.
 
 ## Cloning an existing GAIA project
 

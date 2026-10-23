@@ -124,7 +124,7 @@ GAIA does not run everything on one model. Your session's model handles the conv
 
 ## How GAIA picks a model
 
-Every choice follows one table, kept in your project at `wiki/concepts/Workflow Doctrine.md`. GAIA ranks models by how well they fit the work: how much reasoning it needs, and how closely the model has to stick to its instructions. Price decides only between two models that fit equally well.
+Every choice follows one table that Claude reads from your project wiki (ask Claude to show it to you). GAIA ranks models by how well they fit the work: how much reasoning it needs, and how closely the model has to stick to its instructions. Price decides only between two models that fit equally well.
 
 | Kind of work | Model | Why it fits |
 |---|---|---|
@@ -145,7 +145,7 @@ Some steps never leave your session, whatever kind of work they are: a step that
 
 ### Effort
 
-GAIA never sets effort. Every sub-agent runs at your session's `/effort` level, the same as work your session does itself, so a low-effort session reviews at low and a high-effort one at high. `CLAUDE_CODE_EFFORT_LEVEL` overrides the level on a machine. GAIA chooses the model. You choose the effort.
+GAIA never sets effort. Every sub-agent runs at your session's `/effort` level, the same as work your session does itself, so a low-effort session reviews at low and a high-effort one at high. The `CLAUDE_CODE_EFFORT_LEVEL` environment variable overrides the level on a machine. Set it in your shell profile, then restart Claude Code. GAIA chooses the model. You choose the effort.
 
 ## Model at each step
 

@@ -62,7 +62,11 @@ Because it sits at the top level of your project, its files are easy to find whe
 Nothing else lives in the notebook.
 
 <Aside type="caution">
-Do not delete or hand-edit `catalog.json`. It records where each SPEC draft stands (so `/gaia-spec` can resume one) and this machine's share of SPEC numbering, and no other copy of either exists. If the file is present but unreadable, every GAIA command that writes to the notebook stops without changing anything.
+Do not delete or hand-edit `catalog.json`. It records where each SPEC draft stands (so `/gaia-spec` can resume one) and this machine's share of SPEC numbering, and no other copy of either exists. If the file is present but unreadable, every GAIA command that writes to the notebook stops without changing anything. To recover, ask Claude:
+
+```text
+GAIA says .notebook/catalog.json is unreadable. Find out why and repair it without losing any SPEC drafts or numbering.
+```
 </Aside>
 
 ## How entries are cleared
@@ -75,7 +79,12 @@ GAIA clears out entries it no longer needs, the way you would tear out pages you
 
 <Flowchart {...clearing} />
 
-To change the 30-day window, set these environment variables:
+To change the 30-day window, set these environment variables. Ask Claude to add one to the `env` block of `.claude/settings.local.json` (your machine only, not committed), then restart Claude Code. You can export it in your shell profile instead; restart Claude Code either way.
+
+```text
+Set GAIA_SPEC_RETENTION_DAYS to 60 in the env block of .claude/settings.local.json.
+```
+
 
 | Variable | Applies to | Default |
 | --- | --- | --- |
@@ -87,23 +96,23 @@ To change the 30-day window, set these environment variables:
 A notebook is personal. Yours is on your machine, and your teammate's is on theirs. GAIA does not sync them.
 
 - **It is working material, not the record.** What your team needs to see reaches them through the code, the pull request, and any wiki pages the summary was promoted into. Everything else is your scratch work.
-- **Its entries do not outlive the work.** Folders are deleted after the work merges, so a link to one from a committed file, a commit message, or a pull request would stop working. GAIA refuses those references. See [Notebook references stay out of shared history](#notebook-references-stay-out-of-shared-history).
+- **Its entries do not outlive the work.** Folders are deleted after the work merges, so a link to one from a committed file, a commit message, or a pull request would stop working. GAIA keeps those references out, and Claude writes what they stood for instead. See [Notebook references stay out of shared history](#notebook-references-stay-out-of-shared-history).
 - **Numbers do not travel.** Plan numbers come from your own catalog, so your `PLAN-003` and a teammate's `PLAN-003` are different plans. SPEC numbers are reserved by pushing a `spec/NNN` tag to your remote, so two people never get the same number. With no remote, numbering comes from your own catalog. If the remote refuses the tag, GAIA warns you and does the same. Either way, the SPEC itself stays in the notebook of whoever wrote it.
 
 If something in your notebook should reach your team, put it somewhere tracked, such as the wiki or a rule in `.claude/rules/`.
 
 ## Notebook references stay out of shared history
 
-A SPEC, UAT, or plan number (such as `SPEC-012`) or a path to a specific notebook entry means nothing to anyone else: it names a document that exists only on one machine, and only until it is cleared. GAIA blocks these references in the places your team reads most:
+A SPEC, UAT, or plan number (such as `SPEC-012`; a UAT is an acceptance test written into a SPEC) or a path to a specific notebook entry means nothing to anyone else: it names a document that exists only on one machine, and only until it is cleared. GAIA catches these references in the places your team reads most, and Claude rewrites the text before it lands:
 
-| Where | What blocks it |
+| Where | What catches it |
 | --- | --- |
 | Commit messages | The `commit-msg` git hook |
 | Lines a commit adds | The `pre-commit` git hook. It reads prose files in full, and code only in comments that take up a whole line. It skips test files and fixtures. |
 | Pull request and issue titles and bodies | A Claude Code hook on `gh pr create`, `gh pr edit`, `gh issue create`, and `gh issue edit` |
 | [Playwright](https://playwright.dev/) tests | A scan of `frontend/.playwright/` while a plan runs, covering file names, test titles, and comments |
 
-Paths to a specific run folder under `.gaia/local/runs/` (GAIA's machine-local state) are blocked too. Comments on pull requests and issues are not checked. Placeholders such as `SPEC-NNN` pass, and so do plain issue and pull request numbers such as `#142`. When a commit or pull request is refused, the message names the text it matched. Describe what the work does instead of pointing at the document behind it. Each check is listed in the [gate reference](/reference/gates/#machine-local-references).
+Paths to a specific run folder under `.gaia/local/runs/` (GAIA's machine-local state) are caught too. Comments on pull requests and issues are not checked. Placeholders such as `SPEC-NNN` pass, and so do plain issue and pull request numbers such as `#142`. When a check catches one, it names the text it matched, and Claude rewrites it to describe what the work does instead of pointing at the document behind it. If you commit by hand and hit it, do the same, or ask Claude to reword the message. Each check is listed in the [gate reference](/reference/gates/#machine-local-references).
 
 The [`working-doc-ids`](/reference/rules/) rule also asks Claude to keep these numbers out of code and prose it writes, and to leave out references a pattern cannot reliably catch, such as the ids a plan gives its own findings.
 

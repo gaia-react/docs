@@ -75,7 +75,7 @@ The audit only files problems in files it opened to review the change, such as a
 Not every finding outside the change becomes an issue. Two kinds are recorded in the pull request's description instead, so the backlog does not fill with debt the change itself is about to touch again:
 
 - **Accepted residuals**, under `## Accepted residuals (recorded, not fixed)`: findings in the change's own scope that a reviewer accepted as a known trade-off instead of fixing.
-- **Waived findings**, under `## Out-of-scope machinery findings (recorded, not filed)`: a non-security finding in GAIA's own audit machinery, or in a file the pull request already changes. Filing these would only re-surface the same finding on the next pull request that touches the file. A finding the change itself caused is never waived, and neither is one the change points to in a comment as "handled elsewhere".
+- **Waived findings**, under `## Out-of-scope machinery findings (recorded, not filed)`: a non-security finding in GAIA's own audit files (the scripts, hooks, and reviewer instructions that run the audit), or in a file the pull request already changes. Filing these would only re-surface the same finding on the next pull request that touches the file. A finding the change itself caused is never waived, and neither is one the change points to in a comment as "handled elsewhere".
 
 Both are **residue**. Each entry carries a key, so the same finding is not recorded twice. Once a residual is 30 days old, [`/gaia-residue`](/maintenance/residue/) asks you to dismiss it, keep it for later, or promote it to a `tech-debt` issue.
 
@@ -85,7 +85,7 @@ A review that files every finding it sees quickly buries the backlog. The next p
 
 Waiving and recording keep the backlog small enough to work through:
 
-- **The backlog holds only fixable work.** A finding in a file the pull request already changes, or in GAIA's own audit machinery, would come back on the next pull request that touches it. Waiving it breaks that loop instead of filing the same problem over and over.
+- **The backlog holds only fixable work.** A finding in a file the pull request already changes, or in GAIA's own audit files, would come back on the next pull request that touches it. Waiving it breaks that loop instead of filing the same problem over and over.
 - **Each review stays about its change.** Trade-offs inside the change are accepted with a reason instead of filed, so the review does not stall on a judgment call the author already made.
 - **Nothing is lost.** Every waived or accepted finding is written into the pull request with a key. After 30 days, `/gaia-residue` puts each one back in front of you to dismiss, keep, or promote to an issue, so a trade-off that turned out to matter still gets fixed.
 
@@ -93,9 +93,9 @@ Waiving and recording keep the backlog small enough to work through:
 
 Every source files through the same `file-tech-debt` skill. You can trigger it yourself by asking Claude to file something as tech debt. It:
 
-- **Prevents duplicates.** Each issue carries a key naming the kind of finding, the file, and the line (`<!-- gaia-debt-key: v1 class=... path=... line=... -->`). A finding that already has an open issue, or one closed as not planned or labelled `wontfix`, is not filed again.
+- **Prevents duplicates.** Each issue carries a hidden key naming the kind of finding, the file, and the line. A finding that already has an open issue, or one closed as not planned or labelled `wontfix`, is not filed again.
 - **Labels the issue** with `tech-debt`, a severity, and a footprint (how much code the fix touches), plus a difficulty when the filer read the cited code. See [Labels](/reference/labels/#tech-debt).
-- **Checks the issue before creating it.** The labels and key are checked first, and a badly formed issue is refused instead of being left for `/gaia-debt` to trip over later.
+- **Checks the issue before creating it.** The labels and key are checked first. If they are badly formed, Claude corrects them before the issue is created, instead of leaving it for `/gaia-debt` to trip over later.
 - **Writes a self-contained body**: the file and line, what goes wrong, and a suggested fix.
 
 When GitHub has a temporary problem (a timeout or a rate limit), the finding is kept and retried on the next audit round. When there is no issue tracker to file to (no GitHub repository, `gh` not signed in, Issues turned off, or no write access), nothing is filed, and the run reports it.
@@ -110,12 +110,10 @@ An issue filed while the repository is private becomes public if you later make 
 
 ## Investigate issues
 
-When a finding's severity cannot be judged yet, it is filed as `severity:investigate`. The issue must state the open question and what would settle it. At most three can be open at once. `/gaia-debt` never offers an `investigate` issue until it has a real severity. To re-grade one, see [`/gaia-debt`](/workflow/debt/#labels).
+When a finding's severity cannot be judged yet, it is filed as `severity:investigate`. The issue must state the open question and what would settle it. At most three can be open at once. When three are already open, Claude grades a new finding itself from the code instead of filing a fourth. `/gaia-debt` never offers an `investigate` issue until it has a real severity. To re-grade one, see [`/gaia-debt`](/workflow/debt/#labels).
 
 ## Working through the debt
 
 - When `tech-debt` issues are open, the statusline shows `🐛 /gaia-debt (N issues)`. Run [`/gaia-debt`](/workflow/debt/) to fix the most severe, oldest issues first, one issue or a batch of related ones per run.
 - When 5 or more residuals are 30 days old, the statusline shows `🧹 /gaia-residue (N residuals)`. Run [`/gaia-residue`](/maintenance/residue/) to decide each one.
 - When the same kind of finding keeps coming back, [`/gaia-codify`](/maintenance/codify/) proposes a guard so it stops recurring.
-
-Source: `.claude/skills/file-tech-debt/SKILL.md`, `wiki/concepts/Audit Disposition and Debt Fix.md`.

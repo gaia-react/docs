@@ -23,11 +23,11 @@ Ask for a component, a fix, a refactor:
 
 The code skills ([TypeScript](https://www.typescriptlang.org/), React, [Tailwind](https://tailwindcss.com/), tests) and the scaffolders (which generate new components, hooks, routes, and services) start on their own, based on what you ask for. Most sessions never touch a slash command.
 
-Notice the prompt did not ask for a test. GAIA works test-first: for a feature or a bug fix, Claude writes a test that fails, then writes the code that makes it pass. A Claude Code hook on `git commit` enforces this. It refuses to commit a new test that was never seen failing first. Some tests are exempt, such as stories and type-only tests; see the [RED gate](/reference/gates/#test-seen-failing-first-red-gate).
+Notice the prompt did not ask for a test. GAIA works test-first: for a feature or a bug fix, Claude writes a test that fails, then writes the code that makes it pass. A Claude Code hook on `git commit` enforces this: if Claude tries to commit a new test that was never seen failing, the hook sends it back, and Claude runs the test and watches it fail before the change that makes it pass, then commits. Nothing for you to do. Some tests are exempt, such as stories and type-only tests; see the [RED gate](/reference/gates/#test-seen-failing-first-red-gate).
 
 ## Every task follows one lifecycle
 
-When Claude does a task for you, with or without a command, it follows the same steps. It claims the issue if there is one, names the branch, and isolates the work so tasks running at the same time never touch each other. It commits through the [Quality Gate](/workflow/code-audit-team/#quality-gate), opens a draft pull request, and has the [Code Audit Team](/workflow/code-audit-team/) audit it. Then it merges and cleans up. Hooks block risky actions along the way. See [Work lifecycle](/workflow/work-lifecycle/) for each step, and [Git hooks and conventions](/workflow/git-conventions/) for the commit and title rules.
+When Claude does a task for you, with or without a command, it follows the same steps. It claims the issue if there is one, names the branch, and isolates the work so tasks running at the same time never touch each other. It commits through the [Quality Gate](/workflow/code-audit-team/#quality-gate), opens a draft pull request, and has the [Code Audit Team](/workflow/code-audit-team/) audit it. Then it merges and cleans up. Hooks steer Claude away from risky actions along the way. See [Work lifecycle](/workflow/work-lifecycle/) for each step, and [Git hooks and conventions](/workflow/git-conventions/) for the commit and title rules.
 
 The exception is an edit you say you will review or commit yourself: Claude leaves it uncommitted and skips all of this.
 
@@ -80,4 +80,4 @@ You rarely reach for these yourself, and you do not have to memorize them. Each 
 - [Quick Start](/) scaffolds a new project.
 - [Maintenance overview](/maintenance/) covers how the upkeep commands run.
 - [Skills overview](/skills/) lists the code skills and scaffolders that trigger from plain prompts.
-- [Gate reference](/reference/gates/) explains every check that can stop you, and how to clear it.
+- [Gate reference](/reference/gates/) explains every check, what Claude does when one fires, and the few that need you.

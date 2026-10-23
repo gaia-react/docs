@@ -99,6 +99,35 @@ grep -rnE '^#{1,3} .*\b(agentic|agents?|subagents?)\b' src/content/docs/
 
 Buzzword posture: fluency-signal in body copy where accurate, NOT in H1/H2/H3 headers. Exception: `agentic-design` deep-dive surface (URL itself is the SEO landing).
 
+### 11. Hand-work and terminal commands on reader pages
+
+Readers work by asking Claude. A page should give a Claude prompt (a ` ```text ` block), not a terminal command, whenever Claude can do the job, and should never tell the reader to do by hand what Claude does or can do. See "Prompts over terminal commands" in `CLAUDE.md` for the allowed exceptions.
+
+```sh
+# Terminal blocks: each needs a stated reason the reader runs it themselves.
+grep -rnE '^```(bash|sh|shell|zsh|console)' src/content/docs/
+# Inline script and CLI invocations in prose.
+grep -rnE '`(bash |\./)?\.gaia/(scripts|cli)/|`bash \.claude/' src/content/docs/
+# Hand-off phrasing.
+grep -rniE 'by hand|nothing runs it|run it yourself|you run (it|this|them)|edit (it|the file) by hand|no command writes it' src/content/docs/
+```
+
+- **category-A**: hand-off phrasing ("nothing runs it for you", "run it by hand", "edit the file by hand") where Claude can do the step, and any script path under `.gaia/scripts/` or `.claude/hooks/` shown as something the reader runs.
+- **advisory**: every other terminal block. Pass it only when the surrounding sentence says why the reader runs it outside Claude (one of the `CLAUDE.md` exceptions).
+- Guard framing (advisory, read each hit): a guard described only as stopping something reads as work for the reader. Each hit should say what Claude does about it, or say plainly that this guard is the reader's to clear (rule 4 in `CLAUDE.md`).
+
+  ```sh
+  grep -rniE '\b(is|are|gets?|will be) (refused|blocked|denied|rejected)\b|\b(refuses|blocks|denies|rejects|halts)\b' src/content/docs/
+  ```
+
+- Reader as a third party (advisory, read each hit): where the sentence means the reader, write "you" (rule 5 in `CLAUDE.md`).
+
+  ```sh
+  grep -rniE '\b(a|the|any) (person|human|user)\b|\bsomeone\b|\bpeople\b' src/content/docs/
+  ```
+
+- Also read for undefined shorthand: a config key, file, script, or internal term a reader meets with no plain explanation on that page or a link to the page that explains it. Grep cannot find these; flag them advisory.
+
 ## Report format
 
 Output a single grouped report:

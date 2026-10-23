@@ -98,6 +98,19 @@ Studio's `VOICE.md` covers marketing, docs, and in-app strings together. For doc
 - **Code blocks are honest.** Examples should run. If a snippet won't work as written, it doesn't belong.
 - **No "we" / "our team."** Either declarative ("GAIA installs…") or second-person instructional ("Run `pnpm install`…"). "Built by Steven Sacks" stays in marketing surfaces, not docs.
 
+## Prompts over terminal commands (load-bearing)
+
+Readers work by asking Claude. They never read GAIA's source or scripts. Every page holds to three rules:
+
+1. **Define every term the reader meets.** A config key, file, script name, or internal mechanism gets an everyday explanation the first time a page uses it, or a link to the page that owns it. If the reader does not need it to act, cut it. Example of the failure: "a file that is not listed under `unowned:`" with no word on what `unowned:` is.
+2. **Give a Claude prompt, not a terminal command, whenever Claude can do the job.** Write it as a ` ```text ` block the reader pastes, with placeholders in `<angle brackets>`. A terminal command stays only when it must run outside Claude: `npx create-gaia`, `claude update`, `/clear`, a typed slash command, a typed grant line (`audit-grant`, `audit-accept`), an env var set before launching Claude, a step that asks for a sudo password, or something Claude is blocked from by design (`.env` secrets, `.gaia/local/protected/`, `git reset --hard`). The sentence says why the reader runs it themselves.
+3. **Never hand the reader work Claude does or should do.** If GAIA already has Claude do it, say so ("Claude runs the roster check after the change"). If nothing does yet, describe current behavior honestly, give a prompt, and route the product gap to `gaia/` as an issue. Never write "nothing runs it for you, run it by hand" as the end state. Never claim automation that does not exist.
+
+4. **Frame guards as steering for Claude, not work for the reader.** Most hooks and checks exist to keep Claude on the right path: the refusal reaches Claude, which does it the right way or fixes it and retries. Lead with that ("Claude shortens the title and tries again; nothing for you to do"), then say why the guard exists if it helps. Words like refused, blocked, denied, rejected, or halted, left on their own, read as extra work for the reader. Only a few guards actually stop for the reader (a human-only grant, a credential or password, an approval prompt, something Claude is forbidden from by design); say plainly that those are the reader's and what to do.
+5. **Call the reader "you".** When the point is "you, not Claude", write "you" ("Only you can answer"), not "a person", "a human", "someone", or "the user". Keep a third party only when it really is someone else (a teammate already working on an issue, a repo admin, a reviewer).
+
+User-only commands (`disable-model-invocation`) cannot be started by asking in plain language; pages say the reader types them. No `Source: .claude/...` footers pointing readers at workflow source. The `voice-check` skill (check 11) flags violations.
+
 ## Writing discipline for adjacent surfaces
 
 Some adopter-facing commands and wiki pages internally reference mechanisms that are listed in `docs/.claude/audit/do-not-document.yml`. When a docs page covers one of these surfaces, the page must describe what the user sees and does without naming the deferred / obscured mechanism behind it.
