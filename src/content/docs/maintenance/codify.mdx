@@ -28,7 +28,7 @@ The count reads your merged pull requests through `gh`. When it cannot, the run 
 
 ## Finding classes
 
-Every finding the Code Audit Team records carries a finding class: a fixed name for the kind of problem it is. Recurrence is counted per class, so two findings about the same kind of problem in different files count as one pattern. The lists below are the classes GAIA ships with. A member picks a class only from these lists, plus any classes its own agent definition adds, so a member you add for your own code (see [Covering new code](/workflow/code-audit-team/#covering-new-code)) can bring its own. Claude never invents a class on the fly: a finding that fits none of them is recorded as `holistic/unclassified`.
+Every finding the Code Audit Team records carries a finding class: a fixed name for the kind of problem it is. Recurrence is counted per class, so two findings about the same kind of problem in different files count as one pattern. The lists below are the classes GAIA ships with. A member picks a class only from these lists, plus the classes your project registers (see [Your own finding classes](#your-own-finding-classes)). Claude never invents a class on the fly: a finding that fits none of them is recorded as `holistic/unclassified`.
 
 ### Tool findings
 
@@ -98,9 +98,22 @@ These match GAIA's coding conventions for React and TypeScript.
 | `workflow/unpinned-action` | A third-party action is not pinned to a commit. |
 | `workflow/broad-permissions` | A workflow or job is granted more permissions than it needs. |
 
+### Your own finding classes
+
+A member you add for your own code (see [Adding a member](/workflow/code-audit-team/#adding-a-member)) may need classes of its own. Your project registers them in `.gaia/finding-classes.json`, which ships empty and is yours: `/update-gaia` never merges or overwrites it. It holds two lists, and both must stay in the file even when one is empty, or the file is read as empty:
+
+- **`classes`**: new kinds of problem, each named `<prefix>/<slug>` in lowercase words joined by hyphens, such as `api/missing-rate-limit`. The member's agent file names them as its own.
+- **`oracle_prefixes`**: the prefix of a check tool of your own, such as `ruff`. Any finding id after that prefix is accepted as it is, the way GAIA accepts `axe/<rule>`.
+
+`/gaia-codify` counts a registered class like a built-in one, and `file-tech-debt` files its findings instead of setting them aside as malformed. Register a class before the member uses it: a class in no list is counted as unclassified. Keep each class a real kind of problem the member can assign the same way every time, not a label for "somewhere in this member's files". Ask Claude:
+
+```text
+Register the finding classes my <member> audit member reports in .gaia/finding-classes.json, and name them in its agent file.
+```
+
 ### Unclassified findings
 
-A finding recorded as `holistic/unclassified` is never a candidate, because there is no single kind of problem to write a guard for. When unclassified findings recur on 3 or more pull requests within 90 days, the run shows them as one extra row, marked as not a candidate, and records a suppression on this machine so the signal stays quiet until it rises noticeably. When the same kind of problem keeps landing here, the class list may be missing a class for it, or the cluster needs looking into on its own. `/gaia-codify` points this out but never adds a class itself. A class added later applies only to new findings: the unclassified ones already recorded stay unclassified until they age out of the 90-day window.
+A finding recorded as `holistic/unclassified`, or with a class no list registers, is never a candidate, because there is no single kind of problem to write a guard for. When unclassified findings recur on 3 or more pull requests within 90 days, the run shows them as one extra row, marked as not a candidate, and records a suppression on this machine so the signal stays quiet until it rises noticeably. When the same kind of problem keeps landing here, the class list may be missing a class for it, or the cluster needs looking into on its own. `/gaia-codify` points this out but never adds a class itself. Registering a class later also counts findings that already recorded that exact class. Findings recorded as `holistic/unclassified` stay unclassified until they age out of the 90-day window.
 
 ## How it judges the form
 

@@ -74,6 +74,7 @@ Every file the merge overwrites or deletes is backed up first, under `.gaia-back
 - **Files GAIA does not ship.** Anything not listed in `.gaia/manifest.json` is yours.
 - **`wiki/log.md`, `.gaia/VERSION`, `.gaia/manifest.json` and `.gaia/update-decisions.json`.** The update writes the last three itself.
 - **`.gaia/packages.json`**, the list of packages in your workspace. It is yours from the start.
+- **`.gaia/finding-classes.json`**, your project's own [audit finding classes](/maintenance/codify/#your-own-finding-classes). It ships empty and is yours from the start.
 - **Your design system, once it is established.** After you settle your project's design (the `Design System` wiki page is marked established), that page and `frontend/.claude/rules/design-baseline.md` become yours, and later updates skip both.
 - **`frontend/.claude/settings.json`.** It is never merged. GAIA rebuilds it from the root `.claude/settings.json` plus `frontend/.claude/settings.overlay.json`, so put frontend-only settings in the overlay.
 

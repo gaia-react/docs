@@ -105,40 +105,34 @@ Until you do one of these, the new files are not skipped. A file no member cover
 Claude follows the steps on your project's wiki page `wiki/concepts/Registering a Code Audit Team Member.md`. To add a member, give Claude a prompt like this one, with your own folder and stack:
 
 ```text
-Add a Code Audit Team member for the Python API in backend/. Follow every step of the wiki page "Registering a Code Audit Team Member": name it code-audit-python, write its agent file with review guidance for Python and FastAPI, add its roster entry in .gaia/audit-ci.yml covering backend/**, write its file patterns into the agent file, and add the agent file to the audit machinery list. Then run the roster check, repair or declare everything it reports, and show me the result.
+Add a Code Audit Team member for the Python API in backend/. Follow the wiki page "Registering a Code Audit Team Member": start from a copy of the workflows member, name it code-audit-python, write its review guidance for Python and FastAPI, add its roster entry in .gaia/audit-ci.yml covering backend/**, register any finding classes it needs, then run the roster check and repair everything it reports.
 ```
 
-The prompt names each step because nothing checks two of them, so a missed one goes unnoticed. What each step is for:
+What each step is for:
 
-- **The name starts with `code-audit-`.** The audit loop's [round limit](#the-branch-checkpoint) applies only to reviewers named that way. Nothing checks the name.
+- **Start from a copy of the workflows member.** `code-audit-github-workflows` is the smallest member that ships, and its file already has every section a member needs. Claude rewrites what it reviews for and keeps the rest.
+- **The name starts with `code-audit-`.** The audit loop's [round limit](#the-branch-checkpoint) applies only to reviewers named that way, and the name is also what registers the agent file as part of the audit machinery ([Per-member clearance](#per-member-clearance)). With that name, a later edit to the member's own instructions sends every member the pull request involves back to review, instead of keeping their earlier approvals. The roster check reports a member without the prefix.
 - **The agent file carries a copy of the member's file patterns.** The roster decides which files a member is sent, and the member reads its own copy to know which of the changed files are its to review. GAIA generates that copy from the roster, and the roster check reports when the two disagree.
-- **The agent file is added to the audit machinery list.** That list names the files that decide how the audit runs ([Per-member clearance](#per-member-clearance)). Without the entry, a later edit to the new member's instructions, on a branch that also changes the member's files, would keep the member's earlier approval instead of sending it back to review. Nothing checks this step either.
+- **Finding classes.** A member that reports kinds of problem GAIA's lists do not have registers them in `.gaia/finding-classes.json`, so [`/gaia-codify`](/maintenance/codify/#your-own-finding-classes) can count them.
 
 ### The roster check
 
-The roster check compares the roster with the files in your repository, and also checks that the [light review](#light-review) settings in `.gaia/audit-ci.yml` are valid. No hook or commit check runs it, so Claude runs it when a prompt asks, as the one above does. It reports:
+The roster check compares the roster with the files in your repository, and also checks that the [light review](#light-review) settings in `.gaia/audit-ci.yml` are valid. The pre-commit hook runs it whenever a commit stages `.gaia/audit-ci.yml`, a member's agent file, or the audit machinery list, so a broken roster cannot be committed; Claude repairs what it reports and commits again. It reports:
 
 - A tracked file that no member covers and that is not on the `unowned:` list.
 - A pattern, in the roster or in the `unowned:` list, that matches no file.
 - A member whose copy of its file patterns no longer matches the roster. Claude regenerates the copy and runs the check again.
+- A member whose name does not start with `code-audit-`, or whose agent file is not registered as audit machinery.
 
 The `unowned:` list in `.gaia/audit-ci.yml` holds paths you have decided no member needs to review, such as root Markdown files or images. Only the roster check reads it, to tell a deliberate gap from a forgotten one. Listing a path there does not skip review. A file no member covers still goes to `code-audit-frontend`.
 
-To check the roster on its own, after any change to it:
+GAIA's own folders, `.claude/`, `.gaia/`, `.githooks/`, and `.github/audit/`, need no entry: the roster check does not report a file there that no member covers, including one you added yourself, such as your own hook or rule. To have such a file reviewed, add its pattern to one of your members.
+
+To check the roster on its own, ask:
 
 ```text
 Run the Code Audit Team roster check, repair any member whose file patterns no longer match the roster, and explain anything left in plain language.
 ```
-
-<Aside type="caution" title="The first roster check reports GAIA's own files">
-On a new GAIA 2.0.1 project the roster check fails before you change anything. It reports every file under `.claude/`, `.gaia/`, `.githooks/`, and `.github/audit/` as covered by no member, because the members that review those files in GAIA's own repository do not ship. It also reports six `unowned:` entries that match no file in a new project: `LICENSE`, `docs/**`, `.github/FUNDING.yml`, `.github/ISSUE_TEMPLATE/**`, `.github/pull_request_template.md`, and `.gaia/audit-residual-dismissals.jsonl` (which [`/gaia-residue`](/maintenance/residue/) creates the first time you dismiss a residual). These findings are not caused by your change. Clear them once:
-
-```text
-The roster check reports GAIA's own .claude, .gaia, .githooks and .github/audit files as unowned, and unowned: entries that match no file. Add those four folders to the unowned: list in .gaia/audit-ci.yml, remove the entries that match nothing, then run the check again until it is clean.
-```
-
-After that, the roster check comes back clean. Once `.gaia/**` is on the list, it covers the residual dismissal file too. If you later add a `LICENSE` file or a `docs/` folder, the roster check reports it as unowned; add its entry back then.
-</Aside>
 
 If `.gaia/audit-ci.yml` has no `auditors:` block, the audit stops rather than fall back to a built-in list, and the message tells Claude to restore the block from the GAIA template. If you had added members of your own, check that they came back, or ask:
 

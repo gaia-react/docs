@@ -65,7 +65,7 @@ The rest of this page lists every gate: what it stops, why, when it runs, who ac
 
 ### Pre-commit floor
 
-- **Stops:** a commit whose staged files fail typecheck, [lint-staged](https://github.com/lint-staged/lint-staged), or their tests. It also stops a commit when the package registry cannot be read, or when GAIA's generated settings no longer match what they should be.
+- **Stops:** a commit whose staged files fail typecheck, [lint-staged](https://github.com/lint-staged/lint-staged), or their tests. It also stops a commit when the package registry cannot be read, when GAIA's generated settings no longer match what they should be, or when a commit that changes the Code Audit Team roster or a member's agent file fails the [roster check](/workflow/code-audit-team/#the-roster-check).
 - **Why:** it is the fixed, scripted check that keeps code failing typecheck, lint, or its own tests out of history, no matter what the Claude session decided.
 - **When:** at `git commit`, through the native git hook `.githooks/pre-commit`.
 - **Who acts:** Claude, and you only when you commit by hand.
@@ -434,7 +434,7 @@ When you turn on Claude Code's [sandbox](/getting-started/setup-gaia/#sandbox-de
   .gaia/audit-ci.yml has lost its auditors: block. Restore it from the GAIA release this project is on, keeping any members I added.
   ```
 
-Gaps in coverage do not stop the audit: a file no member covers goes to `code-audit-frontend`, the default member. After you change the roster, have Claude run the roster check, which reports files no member covers and patterns that match no file. See [Covering new code](/workflow/code-audit-team/#covering-new-code).
+Gaps in coverage do not stop the audit: a file no member covers goes to `code-audit-frontend`, the default member. A commit that changes the roster runs the roster check, which reports files no member covers and patterns that match no file, and Claude repairs what it finds. See [Covering new code](/workflow/code-audit-team/#covering-new-code).
 
 ### eslint-disable reason
 

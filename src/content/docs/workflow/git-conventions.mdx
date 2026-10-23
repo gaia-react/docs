@@ -15,7 +15,7 @@ The hooks live in `.githooks/`. Git finds them through its `core.hooksPath` sett
 
 | Hook | What it runs |
 |---|---|
-| `pre-commit` | For each package that has staged files: typecheck, [lint-staged](https://github.com/lint-staged/lint-staged) ([ESLint](https://eslint.org/), [Prettier](https://prettier.io/), and [Stylelint](https://stylelint.io/) on the staged files), and the tests for the staged files. When GAIA's generated settings file no longer matches its sources, it stops the commit and names the regenerate step. Claude fixes what fails and commits again. |
+| `pre-commit` | For each package that has staged files: typecheck, [lint-staged](https://github.com/lint-staged/lint-staged) ([ESLint](https://eslint.org/), [Prettier](https://prettier.io/), and [Stylelint](https://stylelint.io/) on the staged files), and the tests for the staged files. When GAIA's generated settings file no longer matches its sources, it stops the commit and names the regenerate step. When the commit changes the Code Audit Team roster or a member's agent file, it runs the [roster check](/workflow/code-audit-team/#the-roster-check). Claude fixes what fails and commits again. |
 | `commit-msg` | Checks the message with [commitlint](https://commitlint.js.org/) against `commitlint.config.mjs`. A message that does not follow Conventional Commits is refused, and so is any commit when commitlint cannot run. Claude reads the refusal, rewrites the message, and commits again. |
 
 Both hooks also run when you commit by hand in your own terminal. Then the failure is yours to see: the hook prints what failed, and you can ask Claude to fix it and commit.
