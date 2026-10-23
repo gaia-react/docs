@@ -43,6 +43,7 @@ export default defineConfig({
 		'/commands/handoff-pickup': '/workflow/work-lifecycle/#resuming-long-work',
 		'/getting-started/setup-gaia-ci': '/getting-started/setup-gaia/',
 		'/getting-started/setup-cloned-gaia-project': '/getting-started/setup-gaia/',
+		'/reference/token-efficiency': '/workflow/token-efficiency/',
 		'/contributors/health-audit': '/contributors/#before-a-release',
 	},
 	integrations: [
@@ -125,6 +126,7 @@ export default defineConfig({
 					items: [
 						{ label: 'Overview', slug: 'workflow' },
 						{ label: 'Work lifecycle', slug: 'workflow/work-lifecycle' },
+						{ label: 'Token efficiency', slug: 'workflow/token-efficiency' },
 						{ label: 'Notebook', slug: 'workflow/notebook' },
 						{ label: 'Statusline', slug: 'workflow/statusline' },
 						{ label: 'Test-driven development', slug: 'workflow/tdd' },
@@ -167,7 +169,6 @@ export default defineConfig({
 						{ label: 'Rules', slug: 'reference/rules' },
 						{ label: 'Agents', slug: 'reference/agents' },
 						{ label: 'Cost and usage ledger', slug: 'reference/cost' },
-						{ label: 'Token efficiency', slug: 'reference/token-efficiency' },
 						{ label: 'Labels', slug: 'reference/labels' },
 						{ label: 'Telemetry', slug: 'reference/telemetry' },
 						{ label: '.gaia folder', slug: 'reference/gaia-folder' },

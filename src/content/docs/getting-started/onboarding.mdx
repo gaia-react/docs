@@ -24,7 +24,7 @@ GAIA onboards you as you build. Every rule, hook, check, and command is ready to
 - **Draft and title.** The pull request opens as a draft ([why](/reference/gates/#draft-pull-requests)) with a title that passes the same lint as a commit message, since a squash merge uses the title as the commit message ([why](/reference/gates/#pull-request-title)).
 - **Code Audit Team.** A set of AI reviewers, each responsible for certain files. Every reviewer whose files the change touches reviews it before it can merge ([why](/reference/gates/#merge-without-the-audit)). See [Code Audit Team](/workflow/code-audit-team/).
 - **The audit loop.** Rounds of review, fix, and re-check run in a separate agent, outside your session, until the change passes the audit.
-- **The branch checkpoint.** When your session's context reaches GAIA's [red band](/workflow/work-lifecycle/#context-bands), or the rounds keep turning up new problems instead of settling, the loop stops and asks you whether to continue ([why](/reference/gates/#audit-checkpoint)).
+- **The branch checkpoint.** When your session's context reaches GAIA's [red band](/workflow/token-efficiency/#context-bands), or the rounds keep turning up new problems instead of settling, the loop stops and asks you whether to continue ([why](/reference/gates/#audit-checkpoint)).
 - **GAIA-Audit.** Once the audit passes, Claude posts a `GAIA-Audit` status check on the pull request. Once a repo admin has run [`/setup-gaia`](/getting-started/setup-gaia/), GitHub requires it before merging ([why](/reference/gates/#gaia-audit-required-check)).
 - **Merge**, when you ask. The merge prints the pull request's [cost](/reference/cost/), posts the findings comment, and releases the issue claim.
 
