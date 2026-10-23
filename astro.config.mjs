@@ -82,7 +82,7 @@ export default defineConfig({
 				llmsTxt({
 					projectName: 'GAIA',
 					description:
-						'GAIA is a harness for Claude Code, shipped as a React project. Its slash commands, skills, hooks, rules, agents, commit gates, and pre-merge audit give Claude structure and focus when working in the codebase. Scaffold a project with `npx create-gaia my-app`. This documentation covers installing GAIA, upgrading from 1.x, and using its commands, skills, gates, and supporting machinery.',
+						'GAIA is a harness for Claude Code, shipped as a monorepo with a React frontend. Its slash commands, skills, hooks, rules, agents, commit gates, and pre-merge audit give Claude structure and focus when working in the codebase. Scaffold a project with `npx create-gaia my-app`. This documentation covers installing GAIA, upgrading from 1.x, and using its commands, skills, gates, and supporting machinery.',
 					details: [
 						'GAIA has two audiences.',
 						'',
