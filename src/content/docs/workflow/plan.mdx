@@ -39,7 +39,7 @@ With no description at all, `/gaia-plan` asks for one.
 
 Auto mode is for runs nobody is watching. It changes two steps, and every other step runs the same:
 
-- **Planner model.** Normally, on a model other than Opus or Fable, Claude asks which model the planner should use. In auto mode Claude does not ask: on another model the planner uses Opus, and on Opus or Fable it keeps your model.
+- **Planner model.** Normally, on a model other than Opus or Fable, Claude asks which model the planner should use. In auto mode Claude does not ask: on another model the planner uses Opus, and on Opus (or Fable) it keeps your model.
 - **Plan audit review.** Normally, critical and major findings come to you as one list to accept or revise. In auto mode, clear-cut fixes are applied without asking. A finding with more than one reasonable fix is left unapplied and written to an `## Audit notes` section in the plan's `README.md`.
 
 A description is required. A description whose first word is "auto" is always read as auto mode, so reword one that starts with that word.
@@ -73,7 +73,7 @@ Inside it:
 4. **Plan.** A planner sub-agent writes the folder. If the planner's context reaches the [red band](/models-and-context/token-efficiency/#context-bands), it hands off to a fresh one.
 5. **Verify.** A script checks that every required file and step is there, and that every UAT (acceptance test) in the SPEC is assigned to a task.
 6. **Plan audit.** Reviewers check the plan before anything is built from it. See [The plan audit](#the-plan-audit).
-7. **Report.** A cost line (or, for a SPEC's plan, a box covering the spec and the plan), then the prompt:
+7. **Report.** A [cost line](/models-and-context/cost/#what-you-see), then the prompt:
 
    ```text
    Read /absolute/path/to/plan/KICKOFF.md and execute it.
