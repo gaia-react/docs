@@ -88,4 +88,12 @@ Ask Claude to write and register the hook for you. When Claude works in `.claude
 Add a Claude Code hook that <what it should do, and when>. Register it so it works from every folder, and regenerate the frontend settings.
 ```
 
+Claude tests a new hook with a sample call it should refuse and one it should allow, so you know it can fail.
+
+To turn off or replace one of GAIA's hooks, ask Claude. It first names what the hook protects and confirms which call you want it to stop refusing. It then removes the hook's entry from `.claude/settings.json` and leaves the script in place, since an update would only restore a deleted script. A replacement goes in as a hook of your own, never as an edit to GAIA's script. Claude regenerates the frontend settings and checks that the call now passes:
+
+```text
+Turn off GAIA's <hook name> hook. Tell me what it protects first.
+```
+
 The `file-placement` rule's hook-rooting check (it confirms each registered hook can find its script whatever folder the session is in) covers hooks registered in `.claude/settings.json` only. A hook you add to `.claude/settings.local.json` is not checked.

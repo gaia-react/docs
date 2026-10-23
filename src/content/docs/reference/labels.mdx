@@ -15,7 +15,7 @@ GAIA's labels give every issue the same few facts: what kind of work it is, how 
 Sync GAIA's GitHub labels. Show me what would change first.
 ```
 
-To replace your own label colors with GAIA's, say so in the same request. If your GitHub account is not allowed to edit labels, the sync prints the `gh label` commands instead, for someone who has that permission, such as a repository admin, to run.
+To replace your own label colors with GAIA's, say so in the same request. A label of your own that GAIA does not define is left in place: the sync reports it and never removes it. To create one, ask Claude. It adds the label on GitHub and leaves `.gaia/labels.json` as GAIA's list, so updates never merge against it. If your GitHub account is not allowed to edit labels, the sync prints the `gh label` commands instead, for someone who has that permission, such as a repository admin, to run.
 
 ## Tech debt
 
