@@ -19,7 +19,7 @@ Be a partner, not a cheerleader: flag flawed ideas, challenge assumptions, ask h
 GAIA has two audiences and the docs must keep them strictly separate:
 
 - **Adopters**: people who ran `npx create-gaia my-app` and got a scaffolded project. They have only what shipped in the release tarball. They never run `/gaia-release`, never edit the CLI source, never see `.gaia/cli/health/`.
-- **Contributors**: people working on the GAIA template repo itself, including the core maintainer (Steven) and any outside contributors. They have the full source, run releases, build the bundled CLI, run health audits, and have access to the full command and tooling surface.
+- **Contributors**: people working on the GAIA source repo itself, including the core maintainer (Steven) and any outside contributors. They have the full source, run releases, build the bundled CLI, run health audits, and have access to the full command and tooling surface.
 
 **Public-facing term is "Contributors."** Internal source uses "maintainer-only" as a literal identifier (`gaia:maintainer-only` markers, `.gaia/release-exclude` comment text); keep that exact phrase when citing those mechanisms, but every user-facing surface (sidebar, URLs, page titles, prose) says "Contributors."
 
@@ -40,7 +40,7 @@ GAIA has two audiences and the docs must keep them strictly separate:
 
 **The inverse rule (softer):** a contributor docs page should not duplicate what's already in the adopter docs. Cross-link instead.
 
-## GAIA's actual surface (verified against gaia `a58b8036` (v2.1.0 tag), 2026-10-24, GAIA 2.1.0; volatile, re-check before publishing)
+## GAIA's actual surface (verified against gaia `4ef5660c` (v2.1.1 tag), 2026-10-24, GAIA 2.1.1; volatile, re-check before publishing)
 
 GAIA 2.0.0 is a pnpm workspace: the shared harness at the root (`.claude/`, `.gaia/`, `.githooks/`, `.github/`, `wiki/`, root `CLAUDE.md`) and the React app plus its frontend-only harness in `frontend/` (`frontend/app/`, `frontend/.claude/{rules,skills,agents}`, `frontend/CLAUDE.md`). Every 1.x `app/...` path is now `frontend/app/...`. Releases ship as `gaia-bundle-<tag>.tar.gz` with a `.sha256`.
 

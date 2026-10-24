@@ -113,6 +113,8 @@ echo "contributor-only step"
 
 The wrong form breaks the file or ships the block. An HTML comment is a syntax error in a shell script, and a `#` marker in a Markdown file is not stripped.
 
+Put each marker on a line of its own; indenting it is fine. The scrub drops the whole line a marker sits on, so any other text on that line would vanish from the release without a word. The release build therefore refuses a marker line that carries other text, just as it refuses a start marker without an end or an end without a start.
+
 The shipped file is a subset of the source: the scrub removes the markers and everything between them before the tarball is built. The literal phrase is `maintainer-only`; this is the on-disk identifier and matches the comment text in `.gaia/release-exclude`. Public-facing references in the docs site use "Contributors."
 
 ### Where blocks work
