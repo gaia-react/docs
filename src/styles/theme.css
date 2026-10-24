@@ -1,4 +1,4 @@
-/* GAIA palette — mirrors website/src/styles.css @theme tokens. */
+/* GAIA palette: mirrors website/src/styles.css @theme tokens. */
 :root {
 	--gaia-canvas: #141413;
 	--gaia-surface: #1f1e1d;
@@ -25,7 +25,7 @@
 	--gaia-font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-/* Force dark scheme — website is dark-only, docs should match. */
+/* Force dark scheme: website is dark-only, docs should match. */
 :root {
 	color-scheme: dark;
 }
@@ -73,7 +73,7 @@
 	}
 }
 
-/* Display font for headings — matches website. */
+/* Display font for headings: matches website. */
 h1,
 h2,
 h3 {
@@ -90,14 +90,14 @@ body {
 	font-family: var(--gaia-font-body);
 }
 
-/* Header backdrop blur — mirror website's translucent bar. */
+/* Header backdrop blur: mirror website's translucent bar. */
 .header {
 	backdrop-filter: blur(12px);
 	-webkit-backdrop-filter: blur(12px);
 	background-color: rgba(20, 20, 19, 0.85);
 }
 
-/* Zero Starlight's outer header padding — padding lives on the inner container instead,
+/* Zero Starlight's outer header padding: padding lives on the inner container instead,
    so max-width centering + explicit padding both stack toward the correct left offset. */
 header.header {
 	--sl-nav-pad-x: 0;
@@ -134,13 +134,13 @@ header.header,
 	max-width: none;
 }
 
-/* Keep inline code in table cells on one line — command names like
+/* Keep inline code in table cells on one line: command names like
    `/gaia-wiki sync` should never break across the space. */
 .sl-markdown-content table code {
 	white-space: nowrap;
 }
 
-/* Callouts (Asides) — Starlight ships stock purple/blue accents that aren't in
+/* Callouts (Asides): Starlight ships stock purple/blue accents that aren't in
    the GAIA palette. Re-theme each variant to its palette job: tip = slate teal
    (secondary register), note = neutral warm gray, caution = brand amber
    (semantic warning). danger keeps Starlight's red until a GAIA danger color
