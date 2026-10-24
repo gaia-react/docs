@@ -134,7 +134,7 @@ To check the roster on its own, ask:
 Run the Code Audit Team roster check, repair any member whose file patterns no longer match the roster, and explain anything left in plain language.
 ```
 
-If `.gaia/audit-ci.yml` has no `auditors:` block, the audit stops rather than fall back to a built-in list, and the message tells Claude to restore the block from the GAIA template. If you had added members of your own, check that they came back, or ask:
+If `.gaia/audit-ci.yml` has no `auditors:` block, the audit stops rather than fall back to a built-in list, and the message tells Claude to restore the block from the copy GAIA ships. If you had added members of your own, check that they came back, or ask:
 
 ```text
 .gaia/audit-ci.yml has lost its auditors: block. Restore it from the GAIA release this project is on, keeping any members I added.

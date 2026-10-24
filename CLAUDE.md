@@ -40,7 +40,7 @@ GAIA has two audiences and the docs must keep them strictly separate:
 
 **The inverse rule (softer):** a contributor docs page should not duplicate what's already in the adopter docs. Cross-link instead.
 
-## GAIA's actual surface (verified against gaia `044b970a` (v2.0.0 tag), 2026-10-23, GAIA 2.0.0; volatile, re-check before publishing)
+## GAIA's actual surface (verified against gaia `a58b8036` (v2.1.0 tag), 2026-10-24, GAIA 2.1.0; volatile, re-check before publishing)
 
 GAIA 2.0.0 is a pnpm workspace: the shared harness at the root (`.claude/`, `.gaia/`, `.githooks/`, `.github/`, `wiki/`, root `CLAUDE.md`) and the React app plus its frontend-only harness in `frontend/` (`frontend/app/`, `frontend/.claude/{rules,skills,agents}`, `frontend/CLAUDE.md`). Every 1.x `app/...` path is now `frontend/app/...`. Releases ship as `gaia-bundle-<tag>.tar.gz` with a `.sha256`.
 
@@ -52,7 +52,7 @@ GAIA 2.0.0 is a pnpm workspace: the shared harness at the root (`.claude/`, `.ga
 
 User-only commands set `disable-model-invocation` (`/gaia-init`, `/setup-gaia`, `/gaia-fitness`, `/gaia-forensics`, `/gaia-codify`, `/gaia-residue`). `/health-audit`, `/gaia-handoff` and `/gaia-pickup` are removed.
 
-**Layer 2: skills.** Root `gaia/.claude/skills/*/SKILL.md`: `gaia-wiki`, `update-deps`, `update-gaia` (skill-backed slash commands), `file-tech-debt`, `naming-conventions`, `tdd`, plus the `gaia/` references folder (no slash entry). Frontend `gaia/frontend/.claude/skills/`: `a11y-fixes`, `eslint-fixes`, `gaia-react-perf`, `new-component`, `new-hook`, `new-route`, `new-service`, `playwright-cli`, `react-code`, `skeleton-loaders`, `tailwind`, `tdd-react`, `typescript`. `react-doctor` installs per machine under `frontend/.claude/skills/` (gitignored). Contributor-only: the `release-notes` skill.
+**Layer 2: skills.** Root `gaia/.claude/skills/*/SKILL.md`: `gaia-wiki`, `update-deps`, `update-gaia` (skill-backed slash commands), `file-tech-debt`, `naming-conventions`, `tdd`, plus the `gaia/` references folder (no slash entry). Frontend `gaia/frontend/.claude/skills/`: `a11y-fixes`, `eslint-fixes`, `gaia-react-perf`, `new-component`, `new-hook`, `new-route`, `new-service`, `playwright-cli`, `react-code`, `skeleton-loaders`, `tailwind`, `tdd-react`, `typescript`. `react-doctor` installs per machine under `frontend/.claude/skills/` (gitignored). Frontend runbooks Claude follows on request live in `gaia/frontend/.claude/instructions/` (`add-locale.md`, `remove-i18n.md`; both are deleted when i18n is removed). Contributor-only: the `release-notes` skill.
 
 **Layer 3: workflow references** at `gaia/.claude/skills/gaia/references/`: `spec.md` (+`spec/`), `plan.md` (+`plan/`), `fitness.md`, `cleanse.md` (+`cleanse/`), `codify.md`, `debt.md` (+`debt/`), `residue.md`, `forensics.md` (+`forensics/`), `wiki.md` (+`wiki/`), `setup/`, `isolation.md`, `work-lifecycle.md`, `cost-record.md`. Contributor-only blocks inside them are marked `gaia:maintainer-only`.
 
