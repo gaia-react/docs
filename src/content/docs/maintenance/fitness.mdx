@@ -44,7 +44,7 @@ A run clears the blended-files and harness-commits reasons and refreshes the nud
 | Category | What its rules check |
 | --- | --- |
 | `authoring` | How skills, commands, and agents are written: a description that says what the file does and when to use it, in the third person; files under 500 lines; a table of contents on long files; links that resolve; reference files that something links to; no Windows-style paths. |
-| `claudemd` | Your `CLAUDE.md` files: a root `CLAUDE.md` exists, each file stays within its size budget, `@` imports and paths resolve, and no path names a folder on one person's machine (such as `/Users/<name>/`). |
+| `CLAUDE.md` | Your `CLAUDE.md` files (rule ids start `claudemd.`): a root `CLAUDE.md` exists, each file stays within its size budget, `@` imports and paths resolve, and no path names a folder on one person's machine (such as `/Users/<name>/`). |
 | `frontmatter` | The block at the top of each skill, command, and agent: it parses, has a valid `name` and a non-empty `description` within the length limits, and no two share a name. |
 | `hooks` | Hooks registered in your settings: each uses an event Claude Code knows, and each names a script that exists and can run, by a path that works from any folder. |
 | `memory` | Memory files that name a path in the project that no longer exists. Counted in the inventory, but not graded and not shown on the card. |
@@ -86,7 +86,7 @@ The report starts with a report card: one row per category, with the count of fi
 | GAIA FITNESS                                                   OVERALL   B+  |
 +------------------------------------------------------------------------------+
 | authoring                                            1 warning, 2 info   B+  |
-| claudemd                                                                 A+  |
+| CLAUDE.md                                                                A+  |
 | frontmatter                                                              A+  |
 | hooks                                                                    n/a |
 | prompt                                                                   A+  |
