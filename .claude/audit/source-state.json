@@ -198,6 +198,25 @@
       "excluded_from_docs": false
     },
     {
+      "kind": "audit-config",
+      "path": ".gaia/audit-ci.yml",
+      "name": "audit-ci.yml",
+      "description": ".gaia/audit-ci.yml: the Code Audit Team roster.",
+      "audience": "mixed",
+      "marker_blocks": [
+        [
+          152,
+          338
+        ],
+        [
+          383,
+          468
+        ]
+      ],
+      "content_hash": "bc5009d747cfbd1c42abce204872857f37d023b1793ef25ff6d4da0b87d34b45",
+      "excluded_from_docs": false
+    },
+    {
       "kind": "cli-subcommand",
       "path": ".gaia/cli/src/codify/ledger.ts",
       "name": "gaia codify-ledger list",

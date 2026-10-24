@@ -39,7 +39,12 @@ SURFACE_DIRS = (
     '.claude/commands/', '.claude/skills/', '.claude/hooks/', '.claude/rules/', '.claude/agents/',
     '.claude/doctrine/', 'frontend/.claude/skills/', 'frontend/.claude/rules/', 'frontend/.claude/agents/',
     'frontend/.claude/instructions/', '.github/workflows/', '.githooks/', 'wiki/',
+    '.gaia/scripts/', '.gaia/statusline/', '.gaia/audit-ci.yml',
 )
+# The router tables CLI modules hand to lookupOwn(...) or handlers:. lookupOwn is
+# a generic own-property lookup, so any other table it reads is a value table.
+ROUTER_TABLES = ('SUBCOMMAND_HANDLERS', 'ACTIONS')
+ROUTER_SIGNAL = re.compile(r"lookupOwn\((?:%s)\b|handlers:|\b(?:sub|subcommand|action) === '" % '|'.join(ROUTER_TABLES))
 # Installed per machine and gitignored, so never in the committed tree.
 PER_MACHINE = ('frontend/.claude/skills/react-doctor',)
 ANY_MARKER = re.compile(r'^\s*(?:<!--|#)\s*gaia:maintainer-only:(start|end)\b')
@@ -98,9 +103,9 @@ def first_prose(body):
     return next((l.strip() for l in body if l.strip() and not l.strip().startswith('#')), None)
 
 
-def comment_description(text):
-    """First comment line after the shebang, skipping shellcheck directives."""
-    for line in text.splitlines()[1:]:
+def comment_description(text, shebang=True):
+    """First comment line (after the shebang, if any), skipping shellcheck directives."""
+    for line in text.splitlines()[1 if shebang else 0:]:
         stripped = line.strip()
         if not stripped.startswith('#'):
             if stripped:
@@ -184,6 +189,7 @@ class Survey:
         self.root = root
         self.items = []
         self.ambiguities = []
+        self.unwalked_mixed = []
         self.exclude = self._load_exclude()
         self.scrub = self._load_scrub()
         self.do_not_document = self._load_do_not_document()
@@ -209,7 +215,14 @@ class Survey:
                 continue
             if any(ch in stripped for ch in '*?['):
                 self.ambiguities.append(f'release-exclude line {number} is a glob ({stripped}); the release CLI rejects globs')
-            patterns.append((stripped.strip('/'), number))
+            if line.rstrip('\r') != stripped:
+                self.ambiguities.append(f'release-exclude line {number} is indented; the release CLI rejects it')
+            if stripped.startswith('/') or stripped.endswith('/'):
+                # Kept literal: the compiled ^<path>(/|$) then matches no file.
+                self.ambiguities.append(
+                    f'release-exclude line {number} ({stripped}) has a leading or trailing /; '
+                    'the release CLI compiles it literally, so it excludes nothing')
+            patterns.append((stripped, number))
         return patterns
 
     def _load_scrub(self):
@@ -273,17 +286,18 @@ class Survey:
                 prefix = pattern.rstrip('/')
                 if fnmatch.fnmatchcase(path, pattern) or path == prefix or path.startswith(prefix + '/'):
                     return reason
-            elif fnmatch.fnmatchcase(name, pattern) or fnmatch.fnmatchcase(name, '*' + pattern):
+            elif fnmatch.fnmatchcase(name, '*' + pattern + '*'):
                 return reason
         return None
 
     def marker_blocks(self, path, text):
         """Blocks the release scrub strips from this file, plus ambiguities for markers it would ship."""
         lines = text.split('\n')
-        blocks = []
+        blocks, covered = [], False
         for regexes, start, end in self.scrub:
             if not any(r.match(path) for r in regexes):
                 continue
+            covered = True
             # Mirrors gaia's release/marker-strip.ts: a marker counts wherever it
             # appears on a line, and the scrub drops the whole marker line.
             open_at = None
@@ -303,8 +317,10 @@ class Survey:
                 elif open_at is None and has_end:
                     self.ambiguities.append(f'{path}:{number}: maintainer-only end with no start')
             if open_at is not None:
-                self.ambiguities.append(f'{path}:{open_at}: maintainer-only start never closed')
-        if not blocks:
+                # marker-strip.ts strips an unclosed block to the end of the file.
+                blocks.append([open_at, len(lines_of(text))])
+                self.ambiguities.append(f'{path}:{open_at}: maintainer-only start never closed; the scrub strips to EOF')
+        if not covered:
             stray = [n for n, line in enumerate(lines, 1) if ANY_MARKER.match(line)]
             if stray:
                 self.ambiguities.append(
@@ -332,6 +348,7 @@ class Survey:
         self.walk_references()
         self.walk_cli()
         self.walk_machinery()
+        self.sweep_unwalked()
         self.items.sort(key=lambda r: (r['kind'], r['name'], r['path']))
         return self.items
 
@@ -373,7 +390,8 @@ class Survey:
         return None
 
     def routes(self, module, text):
-        """(sub, child module or None) pairs a router module dispatches to."""
+        """(sub, child module or None) pairs a router module dispatches to, or None
+        when the module has a router table but no key could be parsed from it."""
         imports = {}
         for names, spec in re.findall(r"import\s*\{([^}]*)\}\s*from\s*'(\.[^']+)'", text):
             for name in names.split(','):
@@ -381,13 +399,25 @@ class Survey:
                 if parts[0]:
                     imports[parts[-1].strip()] = spec
         pairs = []
-        tables = sorted(set(re.findall(r'lookupOwn\((\w+),', text)) | set(re.findall(r'handlers:\s*(\w+)', text)))
+        tables = set()
+        for table in re.findall(r'lookupOwn\((\w+),\s*(\w+)', text):
+            if table[0] in ROUTER_TABLES:
+                tables.add(table[0])
+            elif table[1] in ('sub', 'subcommand', 'action'):
+                self.ambiguities.append(
+                    f'{module}: lookupOwn({table[0]}, {table[1]}) reads a table not named in ROUTER_TABLES; not walked')
+        tables |= set(re.findall(r'handlers:\s*(\w+)', text))
+        tables = sorted(tables)
         for table in tables:
             body = re.search(r'const ' + table + r'\b.*?=\s*\{(.*?)\n\};', text, re.S)
             if body is None:
                 self.ambiguities.append(f'{module}: router table {table} not found')
                 continue
-            for sub, handler in re.findall(r"^\s+'?([a-z][a-z0-9-]*)'?(?::\s*(\w+))?,$", body.group(1), re.M):
+            keys = re.findall(r"^\s+'?([a-z][a-z0-9-]*)'?(?::\s*(\w+))?,$", body.group(1), re.M)
+            if not keys:
+                self.ambiguities.append(f'{module}: router table {table} has no parsed keys; namespace not walked')
+                return None
+            for sub, handler in keys:
                 pairs.append((sub, handler or sub))
         if not tables:
             pairs = re.findall(r"\b(?:sub|subcommand|action) === '([a-z][a-z0-9-]*)'\)\s*(?:return\s+(?:await\s+)?(\w+)\()?", text)
@@ -399,7 +429,7 @@ class Survey:
 
     def add_cli(self, module, words, depth):
         text = self.read(module)
-        subs = self.routes(module, text)
+        subs = self.routes(module, text) or []
         help = help_text(text)
         for sub, child in subs:
             own = f'{os.path.dirname(module)}/{sub}.ts'
@@ -408,7 +438,7 @@ class Survey:
             self.add('cli-subcommand', path, name, help_entry(help, sub), self.read(path))
             if path != module and depth < MAX_CLI_DEPTH:
                 child_text = self.read(path)
-                if re.search(r"lookupOwn\(|handlers:|\b(?:sub|subcommand|action) === '", child_text):
+                if ROUTER_SIGNAL.search(child_text):
                     self.add_cli(path, words + [sub], depth + 1)
         return bool(subs)
 
@@ -424,6 +454,8 @@ class Survey:
                 continue
             text = self.read(module)
             routed = self.routes(module, text)
+            if routed is None:
+                continue
             if not routed:
                 description = help_summary(help_text(text)) or help_entry(top_help, namespace)
                 self.add('cli-subcommand', module, f'gaia {namespace}', description, text)
@@ -437,7 +469,9 @@ class Survey:
                 record.pop('marker_blocks', None)
 
     def walk_machinery(self):
-        for path in self.files('.claude/hooks/*.sh'):
+        for path in self.files('.claude/hooks/**/*.sh'):
+            if path.startswith('.claude/hooks/lib/'):
+                continue
             text = self.read(path)
             self.add('hook', path, os.path.basename(path), comment_description(text), text)
         for path in self.files('.claude/hooks/lib/*'):
@@ -478,6 +512,9 @@ class Survey:
                 frontmatter, body = split_frontmatter(text)
                 description = frontmatter_field(frontmatter, 'description') or first_h1(body)
                 self.add(kind, path, os.path.basename(path)[:-3], description, text)
+        if self.exists('.gaia/audit-ci.yml'):
+            text = self.read('.gaia/audit-ci.yml')
+            self.add('audit-config', '.gaia/audit-ci.yml', 'audit-ci.yml', comment_description(text, shebang=False), text)
         for path in self.files('.github/workflows/*.yml'):
             text = self.read(path)
             match = re.search(r'^name:\s*(.+)$', text, re.M)
@@ -488,6 +525,23 @@ class Survey:
             text = self.read(path)
             frontmatter, body = split_frontmatter(text)
             self.add('wiki-page', path, path, frontmatter_field(frontmatter, 'description') or first_h1(body), text)
+
+    def sweep_unwalked(self):
+        """Shipped files outside the walked layers that the scrub strips blocks from.
+
+        Reported, not recorded: the snapshot tracks the documented layers only.
+        """
+        walked = {r['path'] for r in self.items}
+        tree = sorted(os.path.relpath(os.path.join(d, f), self.root)
+                      for d, _, names in os.walk(self.root) for f in names)
+        for path in tree:
+            if path in walked or self.exclude_line(path):
+                continue
+            if not any(r.match(path) for regexes, _, _ in self.scrub for r in regexes):
+                continue
+            blocks = self.marker_blocks(path, self.read(path))
+            if blocks:
+                self.unwalked_mixed.append((path, blocks))
 
 
 def export_tree(gaia, ref, target):
@@ -532,6 +586,14 @@ def drift(previous, current):
 
 def backtick_spans(text):
     return re.findall(r'`([^`\n]+)`', text)
+
+
+def named_as_code(name, spans):
+    """A rule or skill name counts as named only in code form: names like routes,
+    ports or typescript are ordinary words, so a prose match proves nothing."""
+    forms = {name, '/' + name, name + '.md', 'frontend:' + name}
+    return any(span in forms or span.endswith(('/' + name + '.md', '/' + name + '/SKILL.md', '/' + name + '/', '/' + name))
+               for span in spans)
 
 
 def word_in(needle, haystack):
@@ -579,6 +641,7 @@ def walk_docs(tree, items, previous):
                         orphans.append(f'{page}:{number} references path {path}')
 
     adopter_text = '\n'.join(text for page, text in pages.items() if not page.startswith(CONTRIBUTOR_PAGES))
+    adopter_spans = {span.strip() for span in backtick_spans(adopter_text)}
     undocumented, cli_unnamed = [], 0
     for record in items:
         if record['audience'] == 'contributor' or record['excluded_from_docs']:
@@ -590,9 +653,11 @@ def walk_docs(tree, items, previous):
             if not word_in(record['name'], adopter_text):
                 cli_unnamed += 1
             continue
-        if record['kind'] == 'rule':
-            needle = record['name'].split(':')[-1]
-        elif record['kind'] in ('command', 'skill', 'agent', 'instruction'):
+        if record['kind'] in ('rule', 'skill'):
+            if not named_as_code(record['name'].split(':')[-1], adopter_spans):
+                undocumented.append(record)
+            continue
+        if record['kind'] in ('command', 'agent', 'instruction'):
             needle = record['name']
         else:
             needle = os.path.basename(record['path']).rsplit('.', 1)[0]
@@ -678,6 +743,8 @@ def print_report(survey, gaia, sha, groups, orphans, undocumented, cli_unnamed, 
         unnamed.append(f'- cli-subcommand: {cli_unnamed} not named on any adopter page (Claude runs these; '
                        'pages name one only where the reader needs it)')
     section('UNDOCUMENTED (adopter source items no adopter page names)', unnamed)
+    section('UNWALKED MIXED (shipped files outside the walked layers; the scrub strips these blocks)',
+            [f'- {path}: gaia:maintainer-only blocks at {blocks}' for path, blocks in survey.unwalked_mixed])
     section('ambiguities (unresolved during survey)', [f'- {a}' for a in sorted(set(survey.ambiguities))])
     print('\n'.join(out))
 
@@ -692,6 +759,7 @@ def write_snapshot(items, sha):
         with os.fdopen(handle, 'w', encoding='utf-8') as out:
             json.dump(snapshot, out, indent=2, ensure_ascii=False)
             out.write('\n')
+        os.chmod(temp, 0o644)  # mkstemp creates 0600; keep the committed file's mode
         os.replace(temp, SNAPSHOT)
     except BaseException:
         os.unlink(temp)

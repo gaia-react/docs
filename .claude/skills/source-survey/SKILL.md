@@ -51,11 +51,11 @@ The steps below are the contract the script implements. When you change one, cha
 
 ### Step 1: Load the exclusion mechanisms
 
-**release-exclude.** Read `.gaia/release-exclude`. Skip comments (`#`) and blank lines. Each remaining line is a literal path relative to the gaia root, matching that path and everything under it: the release CLI compiles each line to `^<path>(/|$)` and rejects globs. A line with a glob character is reported under ambiguities. Cache the set as `RELEASE_EXCLUDE`.
+**release-exclude.** Read `.gaia/release-exclude`. Skip comments (`#`) and blank lines. Each remaining line is a literal path relative to the gaia root, matching that path and everything under it: the release CLI compiles each line to `^<path>(/|$)` and rejects globs. A line with a glob character, an indented line, or a line with a leading or trailing `/` is reported under ambiguities. The last is kept literal, never normalized: the compiled `^dir/(/|$)` matches no file, so the line excludes nothing. Cache the set as `RELEASE_EXCLUDE`.
 
 **release-scrub.** Read `.gaia/release-scrub.yml`. Keep each `marker-strip` transform: its `paths` globs (`**/` spans any directories, `*` stays inside one segment), its `start` marker and its `end` marker. Cache them as `SCRUB`. A missing file or an incomplete transform is an ambiguity.
 
-**do-not-document.** Read `.claude/audit/do-not-document.yml`. Each entry has `path` or `name`, plus `reason`. A `path` entry matches as a glob or as a prefix (the path itself or anything under it). A `name` entry matches as a glob anywhere in the name (`_internal-*` matches `gaia foo _internal-bar`). Cache the list as `DO_NOT_DOCUMENT`.
+**do-not-document.** Read `.claude/audit/do-not-document.yml`. Each entry has `path` or `name`, plus `reason`. A `path` entry matches as a glob or as a prefix (the path itself or anything under it). A `name` entry matches as a glob anywhere in the name (`_internal-*` matches `gaia foo _internal-bar`). The CLI walk only captures keys that start with a lowercase letter, so an `_internal-*` subcommand never becomes a record at all; the name entry is a second safeguard, and EXCLUDED stays empty for it. Cache the list as `DO_NOT_DOCUMENT`.
 
 ### Step 2: Walk the surface layers
 
@@ -63,7 +63,7 @@ Walk the layers below, sorted by path. For each item, capture a record:
 
 ```
 {
-  "kind":          "command | skill | skill-file | reference | cli-subcommand | hook | hook-lib | githook | rule | agent | doctrine | instruction | workflow | wiki-page",
+  "kind":          "command | skill | skill-file | reference | cli-subcommand | hook | hook-lib | githook | rule | agent | doctrine | instruction | audit-config | workflow | wiki-page",
   "path":          "<path relative to gaia/>",
   "name":          "<canonical name; see per-layer rules>",
   "description":   "<one line, or null>",
@@ -77,14 +77,16 @@ Walk the layers below, sorted by path. For each item, capture a record:
 Audience per item:
 
 1. If the path matches `RELEASE_EXCLUDE`, audience is `contributor`. Done.
-2. Else, for each `SCRUB` transform whose `paths` match the file, find its blocks the way gaia's `release/marker-strip.ts` does: a line containing the start marker opens a block, a line containing the end marker closes it, a line containing both is a one-line block. If any block is found, audience is `mixed`; record each block's start and end line.
+2. Else, for each `SCRUB` transform whose `paths` match the file, find its blocks the way gaia's `release/marker-strip.ts` does: a line containing the start marker opens a block, a line containing the end marker closes it, a line containing both is a one-line block, and a start never closed runs to the last line of the file (the scrub strips to EOF). If any block is found, audience is `mixed`; record each block's start and end line.
 3. Else audience is `adopter`.
 
 Ambiguities from this step, each a likely gaia bug worth raising:
 
 - A marker line that also carries other text: the scrub drops that text with the marker.
 - An end with no start, or a start never closed.
-- A whole-line marker in a file no `SCRUB` transform covers: the block ships verbatim to adopters.
+- A whole-line marker in a file no `SCRUB` transform covers: the block ships verbatim to adopters. Reported only when no transform covers the file, never when a covering transform simply found no block.
+
+After the layers, sweep every other file in the tree that is not release-excluded and that a `SCRUB` transform covers (the 2.1.0 tree has 13 `.gaia/scripts/*.sh`, `.gaia/statusline/gaia-statusline-right.sh` and `.prettierignore`). Each one with blocks is listed under UNWALKED MIXED with its block ranges. These are reported, not recorded: the snapshot tracks the documented layers only, and the list shows when a cited file grows maintainer-only content.
 
 Set `excluded_from_docs` when the item matches `DO_NOT_DOCUMENT`.
 
@@ -110,9 +112,10 @@ Set `excluded_from_docs` when the item matches `DO_NOT_DOCUMENT`.
 The binary `.gaia/cli/gaia` ships; its source `.gaia/cli/src/` is contributor-only. The subcommand surface is parsed from the routers, never copied from a list:
 
 - **Top level:** `src/index.ts`. Its router table is the object passed as `handlers:` to `createSubcommandRouter` or to `lookupOwn(...)`. Each key is a namespace; its handler's relative import names the namespace's module (`fitness/index.ts`, `codify/ledger.ts`, `residue/tally.ts`).
-- **A module routes subcommands** when it passes a table to `lookupOwn(...)` or `handlers:` (keys and shorthand keys both count), or failing that has `sub|subcommand|action === '<name>') return <handler>(` branches. A `=== '<name>') {` branch handled inline routes to the same module.
+- **A module routes subcommands** when it passes a `SUBCOMMAND_HANDLERS` or `ACTIONS` table to `lookupOwn(...)`, or any table to `handlers:` (keys and shorthand keys both count), or failing that has `sub|subcommand|action === '<name>') return <handler>(` branches. A `=== '<name>') {` branch handled inline routes to the same module.
+- `lookupOwn` is a generic own-property lookup, also used for value tables (`ZOD_TYPE_BUILDERS`, `VALUE_FLAGS`, `PLATFORM_LABELS`), so no other table name counts as a router. A `lookupOwn(<OTHER>, sub|subcommand|action)` call is an ambiguity, so a renamed router table is caught rather than skipped.
 - **Nested groups:** a subcommand whose own module routes again is walked the same way, up to three words deep (`gaia wiki chain begin`, `gaia codify-ledger snapshot record`).
-- **A namespace whose module routes nothing** is one record, `gaia <ns>`.
+- **A namespace whose module routes nothing** is one record, `gaia <ns>`. A module whose router table yields no parsed keys (arrow-function entries, say) is not that case: it is an ambiguity and the namespace is not recorded, so it never collapses to `gaia <ns>`.
 - The release namespace lives only in the contributor-only `.gaia/cli/gaia-maintainer` binary. Do not capture it: its subcommand list is obscured per `DO_NOT_DOCUMENT`.
 
 Per record:
@@ -125,13 +128,14 @@ Per record:
 
 #### Layer 5: supporting machinery
 
-- **Hooks:** `.claude/hooks/*.sh` → `kind = "hook"`, `name` = filename, `description` = first comment line after the shebang that is not a `shellcheck` directive.
+- **Hooks:** `.claude/hooks/**/*.sh` outside `lib/` → `kind = "hook"`, `name` = filename, `description` = first comment line after the shebang that is not a `shellcheck` directive.
 - **Hook libraries:** `.claude/hooks/lib/*` → `kind = "hook-lib"`, `name` = filename, `description` = frontmatter `description` or H1 for `.md`, first comment line otherwise.
 - **Git hooks:** `.githooks/*` → `kind = "githook"`, `name` = filename, `description` = first comment line. `pre-push` is contributor-only.
 - **Rules:** `.claude/rules/*.md`, `.claude/rules/maintainers/*.md` (contributor-only) and `frontend/.claude/rules/*.md` → `kind = "rule"`, `name` = basename for root rules, `maintainers/<basename>`, or `frontend:<basename>` (`frontend:i18n`); `description` = frontmatter `description` or H1.
 - **Agents:** `.claude/agents/*.md` → `kind = "agent"`, `name` = frontmatter `name`, `description` = frontmatter `description`. Plus the frontend auditor's extension files, `frontend/.claude/agents/code-audit-frontend/*.md`, as `code-audit-frontend/<basename>`.
 - **Doctrine:** `.claude/doctrine/*.md` (injected by hooks) → `kind = "doctrine"`, `name` = basename.
 - **Instructions:** `frontend/.claude/instructions/*.md` (runbooks Claude follows on request) → `kind = "instruction"`, `name` = basename.
+- **Audit config:** `.gaia/audit-ci.yml` (the Code Audit Team roster, cited by adopter pages) → `kind = "audit-config"`, `name` = `audit-ci.yml`, `description` = first comment line.
 - **CI workflows:** `.github/workflows/*.yml` → `kind = "workflow"`, `name` = filename, `description` = top-level `name:`.
 - **Wiki pages:** `wiki/**/*.md` minus `wiki/.obsidian/` → `kind = "wiki-page"`, `name` = the full `wiki/...` path (the snapshot keys on it, so any other form turns every page into a false NEW + REMOVED pair), `description` = frontmatter `description`, else H1.
 
@@ -146,7 +150,7 @@ Read every `.md` and `.mdx` under `src/content/docs/`. Pages under `contributors
 - **Slash commands:** a span whose first token is `/<name>`. It is an orphan when it is not a current command or skill but was one in the previous snapshot, or carries a GAIA prefix (`/gaia-`, `/setup-`, `/update-`, `/speckit.`). Claude Code built-ins (`/clear`) never match.
 - **Skills:** a span that is exactly a skill name from the previous snapshot that no longer exists.
 - **CLI:** a span starting `gaia <ns> [<sub>]` whose namespace, or subcommand under a routed namespace, does not exist.
-- **Source paths:** a span under a surface folder (`.claude/{commands,skills,hooks,rules,agents,doctrine}/`, the matching `frontend/.claude/` folders, `.github/workflows/`, `.githooks/`, `wiki/`) that is missing from the tree. Any other missing path is a file the adopter's project creates at run time (`.gaia/local/*`, `settings.local.json`), and the per-machine `react-doctor` skill is skipped.
+- **Source paths:** a span under a surface folder (`.claude/{commands,skills,hooks,rules,agents,doctrine}/`, the matching `frontend/.claude/` folders, `.github/workflows/`, `.githooks/`, `wiki/`, `.gaia/scripts/`, `.gaia/statusline/`, `.gaia/audit-ci.yml`) that is missing from the tree. Any other missing path is a file the adopter's project creates at run time (`.gaia/local/*`, `settings.local.json`), and the per-machine `react-doctor` skill is skipped.
 
 ### Step 5: Load the previous snapshot
 
@@ -178,7 +182,7 @@ Match current items to previous items by `(kind, name, path)`:
 Cross-reference docs:
 
 - **DOC-ORPHAN:** every Step 4 hit.
-- **UNDOCUMENTED:** an adopter or mixed item that no adopter page names as a whole word. Wiki pages, references, skill files, hook libraries, doctrine and the `code-audit-frontend/*` extension files are reached through their command, the wiki or their parent, so they are never flagged. CLI subcommands collapse to one count line: Claude runs them, and pages name one only where the reader needs it.
+- **UNDOCUMENTED:** an adopter or mixed item that no adopter page names as a whole word. Rules and skills count as named only in code form, a backtick span that is the name, `/<name>`, `<name>.md`, `frontend:<name>` or a path ending in it: names like `routes`, `ports`, `tdd` or `typescript` are ordinary words, so a prose match proves nothing. Wiki pages, references, skill files, hook libraries, doctrine and the `code-audit-frontend/*` extension files are reached through their command, the wiki or their parent, so they are never flagged. CLI subcommands collapse to one count line: Claude runs them, and pages name one only where the reader needs it.
 
 Known noise, not a docs bug: `getting-started/upgrading.mdx` names retired 1.x commands in its "What changed in the commands" table, so they show as DOC-ORPHAN on every run.
 
@@ -231,6 +235,9 @@ hash rule: sha256 of the whole file
 - <kind> <name> at <path>
 - cli-subcommand: <n> not named on any adopter page (...)
 
+## UNWALKED MIXED (shipped files outside the walked layers; the scrub strips these blocks)
+- <path>: gaia:maintainer-only blocks at <ranges>
+
 ## ambiguities (unresolved during survey)
 - <one line>
 ```
@@ -239,7 +246,7 @@ hash rule: sha256 of the whole file
 
 ### Step 8: Write the snapshot
 
-`--write` replaces the snapshot atomically (temp file, then rename) and prints `snapshot written: N items -> .claude/audit/source-state.json (gaia <sha>)`. Never print the JSON to chat.
+`--write` replaces the snapshot atomically (temp file set to mode 0644, then rename) and prints `snapshot written: N items -> .claude/audit/source-state.json (gaia <sha>)`. Never print the JSON to chat.
 
 ### Step 9: Tell the user
 
