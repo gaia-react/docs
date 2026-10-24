@@ -51,9 +51,18 @@ export default defineConfig({
 			description: 'Documentation for GAIA. Order and focus for Claude Code.',
 			customCss: ['./src/styles/theme.css'],
 			// Claude prompts are ```text blocks; wrap them instead of scrolling sideways.
+			// The site is dark-only, so code blocks use the dark theme alone; with
+			// the light theme too, a light-mode browser got white code blocks.
 			expressiveCode: {
+				themes: ['starlight-dark'],
 				defaultProps: {
 					overridesByLang: { text: { wrap: true } },
+				},
+				// A solid border sets code apart from note callouts, which have a left
+				// stripe only. The background lives in theme.css: Starlight's per-theme
+				// frame colors win over a frames override here.
+				styleOverrides: {
+					borderColor: 'var(--gaia-line)',
 				},
 			},
 			// Same icon and social card as gaiareact.com (copied from website/public/).
