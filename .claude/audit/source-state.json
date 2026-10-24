@@ -1,7 +1,7 @@
 {
   "version": 1,
   "captured_at": "2026-10-24",
-  "gaia_commit": "a58b8036",
+  "gaia_commit": "a58b80366f14ce9f6bbca1fb27aea484262bf442",
   "items": [
     {
       "kind": "agent",
@@ -237,7 +237,7 @@
       "kind": "cli-subcommand",
       "path": ".gaia/cli/src/codify/tally.ts",
       "name": "gaia codify-tally",
-      "description": "",
+      "description": null,
       "audience": "adopter",
       "content_hash": "ea923e8e49bfd47a4972979ee61ff350eee32ad52e221fcfc29d52899b4026cd",
       "excluded_from_docs": false

@@ -1,6 +1,6 @@
 ---
 name: source-survey
-description: Walk the GAIA source repo and report what is new, changed, removed, or excluded relative to the last snapshot in .claude/audit/source-state.json. Run BEFORE writing or updating any docs page, when the user asks "what's new in gaia", "what changed since the last docs pass", "source survey", "what do we still need to document", or whenever the docs site may have drifted from gaia/. Outputs a structured drift report grouped by NEW / CHANGED / REMOVED / EXCLUDED / AUDIENCE-CHANGED / VERIFIED, with each item classified by audience (adopter / contributor / mixed). Idempotent. Does not auto-update the snapshot; suggests a commit.
+description: Walk the GAIA source repo and report what is new, changed, removed, or excluded relative to the last snapshot in .claude/audit/source-state.json. Run BEFORE writing or updating any docs page, when the user asks "what's new in gaia", "what changed since the last docs pass", "source survey", "what do we still need to document", or whenever the docs site may have drifted from gaia/. Outputs a structured drift report grouped by NEW / CHANGED / REMOVED / EXCLUDED / AUDIENCE-CHANGED / VERIFIED, with each item classified by audience (adopter / contributor / mixed). Idempotent. Runs survey.py; writes the snapshot but never commits it.
 ---
 
 # source-survey
@@ -27,8 +27,24 @@ This skill does not write docs. It reports drift so the user can decide what to 
 ## Outputs
 
 - A structured markdown report printed to the conversation.
-- A structured markdown report printed to the conversation.
-- The updated snapshot written directly to `~/Development/gaia-react/docs/.claude/audit/source-state.json` via script or Write tool. Never print the JSON to chat.
+- The updated snapshot written directly to `~/Development/gaia-react/docs/.claude/audit/source-state.json`. Never print the JSON to chat.
+
+## Run it
+
+`survey.py` in this folder implements Steps 1 to 8. Run it from the docs repo root; never hand-walk the tree or hand-edit the snapshot.
+
+```sh
+python3 -I .claude/skills/source-survey/survey.py --ref <gaia ref> --write
+```
+
+- `--ref`: the gaia commit, tag, or branch to survey (default `HEAD` of the gaia checkout). Use the release tag for a release snapshot (`--ref v2.1.0`).
+- `--write`: replace the snapshot after printing the report. Leave it off for a dry look; the report is the same either way, because drift is computed against the snapshot on disk before anything is written.
+- `--gaia <path>`: the gaia checkout (default: `gaia/` next to this docs repo).
+- `--verbose`: list every VERIFIED item.
+
+The script reads the committed tree at `--ref` through `git archive`, so uncommitted or untracked files in the gaia checkout never reach a snapshot, and `gaia_commit` is the full SHA of that ref. Relay the report to the user with your read on it: which hits need a docs change, which are expected noise (Step 6 lists the known kinds).
+
+The steps below are the contract the script implements. When you change one, change the script in the same commit, rerun it at the snapshot's own `gaia_commit`, and confirm VERIFIED covers every item before you trust the change.
 
 ## Procedure
 
@@ -64,7 +80,7 @@ Walk all five layers below. For each item, capture a record:
 Audience determination per item:
 
 1. If the item's path matches `RELEASE_EXCLUDE`, audience is `contributor`. Done.
-2. Else if the file (when text) contains a `<!-- gaia:maintainer-only:start -->` marker, audience is `mixed`. Capture each marker block's start and end line numbers.
+2. Else if the file (when text) has a whole-line marker, `<!-- gaia:maintainer-only:start -->` in markdown or `# gaia:maintainer-only:start` in shell and YAML, audience is `mixed`. Capture each marker block's start and end line numbers. A marker quoted inside backticks in prose is not a marker.
 3. Else audience is `adopter`.
 
 Also tag each item with an `excluded_from_docs: true | false` flag. Set true if the item matches any entry in `DO_NOT_DOCUMENT`.
@@ -105,15 +121,15 @@ The binary `gaia/.gaia/cli/gaia` ships. The source `gaia/.gaia/cli/src/` is cont
 The subcommand surface is parsed from the routers:
 
 - Top-level: `gaia/.gaia/cli/src/index.ts`: read the `SUBCOMMAND_HANDLERS` keys. Never copy a list from this file; re-derive it every run (at gaia 2.1.0 it held `codify-ledger`, `codify-tally`, `fitness`, `init`, `labels`, `packages`, `ping`, `react-perf`, `residue-*`, `sandbox`, `scaffold`, `setup`, `update`, `update-deps`, `wiki`).
-- Per-namespace: read each `gaia/.gaia/cli/src/<ns>/index.ts` for its handler keys. Capture only routed subcommands, not library helpers that sit in the same folder.
+- Per-namespace: read the module each top-level handler is imported from (usually `<ns>/index.ts`; `codify-ledger` is `codify/ledger.ts`) for its own `SUBCOMMAND_HANDLERS` keys, or failing that its `sub === '<name>'` branches. Capture only routed subcommands, not library helpers that sit in the same folder. A handler with no subcommands is one record, `gaia <ns>`.
 - The release namespace lives only in the contributor-only `.gaia/cli/gaia-maintainer` binary. Do not capture it: its subcommand list is obscured per `DO_NOT_DOCUMENT`.
 
 For each subcommand, capture:
 
 - `kind = "cli-subcommand"`
 - `name` = `gaia <ns> <sub>` or `gaia <ns> <group> <sub>` for nested groups (e.g., `gaia wiki state-init`)
-- `path` = the corresponding `<ns>/<sub>.ts` file under `.gaia/cli/src/` if present; else `<ns>/index.ts`
-- `description` = the line from the `HELP_TEXT` block in the namespace's `index.ts` matching this subcommand (best-effort grep)
+- `path` = the subcommand's own `<sub>.ts` file next to the routing module if present; else the routing module
+- `description` = the rest of that namespace's line in the top-level `HELP_TEXT` block of `src/index.ts`, or null when the line has nothing after the name
 - `audience` per the rules above (note: source files are all under `.gaia/cli/src/` which is `RELEASE_EXCLUDE`d, but the *behavior* ships in the binary; treat the audience field as the **invocation audience**: i.e., who can run the command: not the source-shipping audience)
 
 Mark any name containing `_internal-` as `excluded_from_docs: true` per `DO_NOT_DOCUMENT`.
@@ -150,7 +166,7 @@ Find every `.md` and `.mdx` under `~/Development/gaia-react/docs/src/content/doc
 
 - Slash commands: `/[a-z][a-z0-9-]*` and `/gaia [a-z-]+( [a-z-]+)?`
 - Skill names: backtick-wrapped tokens that match a known top-level skill name.
-- Source paths: backtick-wrapped tokens beginning with `gaia/`, `.claude/`, `.gaia/`, `frontend/`, or `wiki/`.
+- Source paths: backtick-wrapped tokens beginning with `.claude/`, `.gaia/`, `frontend/`, `wiki/`, `.githooks/` or `.github/`. Only a path under a surface folder (commands, skills, hooks, rules, agents, workflows, githooks, wiki) can be an orphan; any other missing path is a file the adopter's project creates at run time (`.gaia/local/*`, `settings.local.json`). The per-machine `react-doctor` skill is never in the tree, so it is skipped.
 - CLI invocations: `gaia <subcommand>` patterns inside fenced code blocks or backticks.
 
 Build a set `DOCUMENTED` of `(kind, name)` tuples that the docs reference. Best-effort is fine; do not block on parser perfection.
@@ -188,7 +204,9 @@ Match current items to previous items by the composite key `(kind, name, path)`.
 Cross-reference docs:
 
 - For each item in `DOCUMENTED` that has no matching current source record, mark it as a **DOC-ORPHAN** (documented but no longer in source).
-- For each adopter-audience source item NOT in `DOCUMENTED` and NOT in `DO_NOT_DOCUMENT`, flag as **UNDOCUMENTED** (this overlaps with NEW for first-run snapshots: keep them separate categories so the meaning is explicit).
+- For each adopter-audience source item NOT in `DOCUMENTED` and NOT in `DO_NOT_DOCUMENT`, flag as **UNDOCUMENTED** (this overlaps with NEW for first-run snapshots: keep them separate categories so the meaning is explicit). Wiki pages, workflow references and the `code-audit-frontend/*` extension files are reached through their command, the wiki or the parent auditor, so they are never flagged. CLI subcommands collapse to one count line: Claude runs them, and pages name one only where the reader needs it.
+
+Known noise, not a docs bug: `getting-started/upgrading.mdx` names retired 1.x commands in its "What changed in the commands" table, so they show as DOC-ORPHAN on every run.
 
 ### Step 7: Print the report
 
@@ -264,7 +282,7 @@ hash rule: frontmatter + first 40 body lines (sha256)
 
 ### Step 8: Write the snapshot to disk
 
-Write the updated snapshot JSON directly to `~/Development/gaia-react/docs/.claude/audit/source-state.json`. Do NOT print the JSON to chat. Use a script (bash/python) or the Write tool. Confirm to the user with a single line: `snapshot written: N items → docs/.claude/audit/source-state.json`
+`--write` replaces `~/Development/gaia-react/docs/.claude/audit/source-state.json` and prints `snapshot written: N items -> .claude/audit/source-state.json (gaia <sha>)`. Do NOT print the JSON to chat.
 
 ### Step 9: Tell the user it's done
 
@@ -293,7 +311,7 @@ End with one line confirming the file was written and the gaia commit it was cap
 - `gaia/.claude/skills/<name>/` may contain files other than `SKILL.md` (e.g., `references/`, supporting markdown). Only `SKILL.md` is the surface record at Layer 2.
 - The `gaia` binary CLI source is excluded from the adopter tarball, but the binary itself ships. Source-survey reports CLI subcommands by their *invocation* audience (who can run the command) and notes when the consumer of a subcommand is contributor-only (e.g., `release` subcommands).
 - `gaia/wiki/.obsidian/` is not surface; skip it.
-- Files inside a `<!-- gaia:maintainer-only:start --> ... <!-- gaia:maintainer-only:end -->` block are not stripped from the file on disk; they are stripped only at release time by `gaia release scrub`. Source-survey must read both halves to compute `audience: mixed`.
+- Files inside a `gaia:maintainer-only` block (either marker form) are not stripped from the file on disk; they are stripped only at release time by `gaia release scrub`. Source-survey must read both halves to compute `audience: mixed`.
 
 ## Reading list
 
