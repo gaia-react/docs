@@ -18,11 +18,11 @@ This skill does not write docs. It reports drift so the user can decide what to 
 
 ## Inputs
 
-- `~/Development/gaia-react/gaia/` — the GAIA source tree. Read-only.
-- `~/Development/gaia-react/gaia/.gaia/release-exclude` — path-level adopter/contributor split.
-- `~/Development/gaia-react/docs/.claude/audit/source-state.json` — last snapshot. May be empty `{}` on first run.
-- `~/Development/gaia-react/docs/.claude/audit/do-not-document.yml` — obscurity-by-design exclusions.
-- `~/Development/gaia-react/docs/src/content/docs/` — the docs tree. Walked to compute "documented but not in source" cases.
+- `~/Development/gaia-react/gaia/`: the GAIA source tree. Read-only.
+- `~/Development/gaia-react/gaia/.gaia/release-exclude`: path-level adopter/contributor split.
+- `~/Development/gaia-react/docs/.claude/audit/source-state.json`: last snapshot. May be empty `{}` on first run.
+- `~/Development/gaia-react/docs/.claude/audit/do-not-document.yml`: obscurity-by-design exclusions.
+- `~/Development/gaia-react/docs/src/content/docs/`: the docs tree. Walked to compute "documented but not in source" cases.
 
 ## Outputs
 
@@ -32,7 +32,7 @@ This skill does not write docs. It reports drift so the user can decide what to 
 
 ## Procedure
 
-### Step 1 — Load the exclusion mechanisms
+### Step 1: Load the exclusion mechanisms
 
 Read `~/Development/gaia-react/gaia/.gaia/release-exclude`. Strip comments (`#`) and blank lines. The remaining lines are tar-style exclude patterns that must be converted to a regex set. Conversion rules:
 
@@ -45,13 +45,13 @@ Cache the resulting pattern set as `RELEASE_EXCLUDE`.
 
 Read `~/Development/gaia-react/docs/.claude/audit/do-not-document.yml`. Cache the `exclusions` list as `DO_NOT_DOCUMENT`. Each entry has `path` (glob) or `name` (substring or glob), plus `reason`.
 
-### Step 2 — Walk the surface layers
+### Step 2: Walk the surface layers
 
-Walk all six layers below. For each item, capture a record:
+Walk all five layers below. For each item, capture a record:
 
 ```
 {
-  "kind":         "command | skill | sub-route | spec-kit-cmd | cli-subcommand | hook | rule | agent | workflow | wiki-page",
+  "kind":         "command | skill | reference | cli-subcommand | hook | githook | rule | agent | workflow | wiki-page",
   "path":         "<path relative to gaia/>",
   "name":         "<canonical name; see per-layer rules>",
   "description":  "<one-line description if applicable, else null>",
@@ -69,96 +69,67 @@ Audience determination per item:
 
 Also tag each item with an `excluded_from_docs: true | false` flag. Set true if the item matches any entry in `DO_NOT_DOCUMENT`.
 
-#### Layer 1 — top-level slash commands
+#### Layer 1: top-level slash commands
 
 Path: `gaia/.claude/commands/*.md`. For each file:
 
 - `kind = "command"`
 - `name` = frontmatter `name`, falling back to filename without `.md`
 - `description` = frontmatter `description`
-- Path-level audience via `RELEASE_EXCLUDE` (e.g., `gaia-release.md` and `health-audit.md` are excluded → contributor).
+- Path-level audience via `RELEASE_EXCLUDE` (e.g., `gaia-release.md` and `distribution-vet.md` are excluded → contributor). The `name` carries the leading slash (`/gaia-spec`).
 
-#### Layer 2 — top-level skills
+#### Layer 2: skills
 
-Path: `gaia/.claude/skills/*/SKILL.md` (one folder per skill, except `gaia/` whose sub-routes are Layer 3).
+Paths: `gaia/.claude/skills/*/SKILL.md` (root harness) and `gaia/frontend/.claude/skills/*/SKILL.md` (frontend harness). Skip `react-doctor`: it installs per machine and is gitignored. `gaia/.claude/skills/gaia/` has no `SKILL.md`; its `references/` folder is Layer 3.
 
 - `kind = "skill"`
 - `name` = frontmatter `name`
+- `path` = path relative to `gaia/`, so frontend skills start `frontend/.claude/skills/`
 - `description` = frontmatter `description` (which holds trigger phrases)
 
-The `gaia` skill itself is captured as one Layer 2 item (the router). Its sub-routes are captured as Layer 3.
+#### Layer 3: workflow references
 
-#### Layer 3 — `/gaia` skill sub-routes
-
-Paths:
-
-- `gaia/.claude/skills/gaia/references/*.md` → invoked as `/gaia <basename-without-md>`
-- `gaia/.claude/skills/gaia/references/wiki/*.md` → invoked as `/gaia wiki <basename-without-md>`
-
-Skip the `references/forensics/` and `references/wiki/` *folders* themselves (the .md files inside are the surface; folder-level subfolders without a sibling .md are sub-namespaces).
+Path: `gaia/.claude/skills/gaia/references/**/*.md`. These are the workflows behind the `/gaia-*` slash commands (Layer 1). They are not invoked by name, so docs cite them through their command, never as `/gaia <sub>` (the 1.x form).
 
 For each:
 
-- `kind = "sub-route"`
-- `name` = `/gaia <basename>` for top-level; `/gaia wiki <basename>` for the `wiki/` subfolder
+- `kind = "reference"`
+- `name` = path under `references/` without `.md` (`spec`, `cleanse/apply`, `setup/per-machine`)
 - `description` = first line of the file body that isn't frontmatter or a heading-only line (best-effort; falls back to the H1)
-- All adopter unless `RELEASE_EXCLUDE` says otherwise.
+- Audience per Step 2; several are `mixed`.
 
-#### Layer 4 — spec-kit extension commands
-
-Authoritative source: `gaia/.specify/extensions/gaia/extension.yml`. The `provides.commands[]` array is the canonical name list. Use the `name` field from that yaml verbatim (e.g., `speckit.gaia.spec`). The frontmatter `name:` in the underlying `.md` files uses hyphenated form (`speckit-gaia-spec`) which is a spec-kit registration artifact — prefer the dotted form from `extension.yml` for the `name` field.
-
-For each entry:
-
-- `kind = "spec-kit-cmd"`
-- `name` = the dotted form from `extension.yml`
-- `path` = `.specify/extensions/gaia/<file>` (file pulled from yaml)
-- `description` = `description` from yaml entry; fall back to the file's frontmatter description
-- All adopter unless `RELEASE_EXCLUDE` says otherwise.
-
-If `extension.yml` and the on-disk `.md` set diverge (e.g., a yaml entry references a missing file, or vice versa), record the divergence as a separate ambiguity item rather than fabricating data.
-
-#### Layer 5 — bundled CLI
+#### Layer 4: bundled CLI
 
 The binary `gaia/.gaia/cli/gaia` ships. The source `gaia/.gaia/cli/src/` is contributor-only.
 
 The subcommand surface is parsed from the routers:
 
-- Top-level: `gaia/.gaia/cli/src/index.ts` — read `SUBCOMMAND_HANDLERS` keys: `init`, `mentorship`, `release`, `scaffold`, `setup`, `telemetry`, `update`, `wiki`. Plus the special-cased `_internal-fetch-coaching` (always treat as obscured per `DO_NOT_DOCUMENT`).
-- Per-namespace: read each `gaia/.gaia/cli/src/<ns>/index.ts` for its handler keys.
-
-Per-namespace specifics (parse from the corresponding `index.ts`):
-
-- `mentorship`: `enable`, `disable`, `purge`, `status`; `analytics` group with `enable | disable | dry-run`; `_internal-assert-memory-rules`, `_internal-provision-dirs`, `_internal-write-config` (all `_internal-*` are excluded by `DO_NOT_DOCUMENT`).
-- `release`: `preflight`, `bump`, `changelog`, `scrub-wiki`, `manifest`, `scrub`, `runtime-deps`, `commit-and-tag`. `release-exclude` does NOT exclude these from the binary (the binary ships), but `scrub`, `runtime-deps`, and the rest of `release` are functionally maintainer-only because `/gaia-release` (the consumer) is contributor-only. Mark `audience: adopter` (the binary surface ships) and add a note `consumer_audience: contributor` for the release subcommands so a future docs author can decide.
-- `wiki`: `state`, `commit-classify`, `state-init`, `state-bump`, `log-prepend`, `page-index`, `orphans`, `near-collisions`, `dead-paths`; plus `sync` group with `land`. All adopter.
-- `scaffold`: `component`, `hook`, `route`, `service`. Adopter.
-- `update`: `merge`. Adopter.
-- `setup`: `status`, `mark-step`, `finalize`, `link-worktree`. Adopter.
-- `telemetry`: parse the `if (subcommand === '...')` lines from `gaia/.gaia/cli/src/telemetry/index.ts`. As of 2026-05-08 these are `emit`, `compute-profile`, `parse-stdin`. The directory also contains `parse-trailer.ts`, but it is a library helper not a routed subcommand; do not capture it as a `cli-subcommand`. Always re-derive from `index.ts` rather than the directory listing. Adopter audience.
-- `init`: `strip-branding`, `configure-i18n`, `rename`, `wire-statusline`, `finalize`, `resume`. Adopter.
+- Top-level: `gaia/.gaia/cli/src/index.ts`: read the `SUBCOMMAND_HANDLERS` keys. Never copy a list from this file; re-derive it every run (at gaia 2.1.0 it held `codify-ledger`, `codify-tally`, `fitness`, `init`, `labels`, `packages`, `ping`, `react-perf`, `residue-*`, `sandbox`, `scaffold`, `setup`, `update`, `update-deps`, `wiki`).
+- Per-namespace: read each `gaia/.gaia/cli/src/<ns>/index.ts` for its handler keys. Capture only routed subcommands, not library helpers that sit in the same folder.
+- The release namespace lives only in the contributor-only `.gaia/cli/gaia-maintainer` binary. Do not capture it: its subcommand list is obscured per `DO_NOT_DOCUMENT`.
 
 For each subcommand, capture:
 
 - `kind = "cli-subcommand"`
-- `name` = `gaia <ns> <sub>` or `gaia <ns> <group> <sub>` for nested groups (e.g., `gaia mentorship analytics enable`)
+- `name` = `gaia <ns> <sub>` or `gaia <ns> <group> <sub>` for nested groups (e.g., `gaia wiki state-init`)
 - `path` = the corresponding `<ns>/<sub>.ts` file under `.gaia/cli/src/` if present; else `<ns>/index.ts`
 - `description` = the line from the `HELP_TEXT` block in the namespace's `index.ts` matching this subcommand (best-effort grep)
-- `audience` per the rules above (note: source files are all under `.gaia/cli/src/` which is `RELEASE_EXCLUDE`d, but the *behavior* ships in the binary; treat the audience field as the **invocation audience** — i.e., who can run the command — not the source-shipping audience)
+- `audience` per the rules above (note: source files are all under `.gaia/cli/src/` which is `RELEASE_EXCLUDE`d, but the *behavior* ships in the binary; treat the audience field as the **invocation audience**: i.e., who can run the command: not the source-shipping audience)
 
 Mark any name containing `_internal-` as `excluded_from_docs: true` per `DO_NOT_DOCUMENT`.
 
-#### Layer 6 — supporting machinery
+#### Layer 5: supporting machinery
 
 Walk these globs and capture each file:
 
 - Hooks: `gaia/.claude/hooks/*.sh` → `kind = "hook"`, `name` = filename. `description` = first non-shebang comment line if present, else null.
-- Rules: `gaia/.claude/rules/*.md` → `kind = "rule"`, `name` = basename without `.md`, `description` = frontmatter `description` or H1. Plus `gaia/.claude/rules/_internal/*.md` (currently empty by convention — list as zero items if absent, do not error).
-- Agents: `gaia/.claude/agents/*.md` → `kind = "agent"`, `name` = frontmatter `name`, `description` = frontmatter `description`.
+- Git hooks: `gaia/.githooks/*` → `kind = "githook"`, `name` = filename (`pre-push` is contributor-only).
+- Rules: `gaia/.claude/rules/*.md`, `gaia/.claude/rules/maintainers/*.md` (contributor-only) and `gaia/frontend/.claude/rules/*.md` → `kind = "rule"`, `name` = basename without `.md` for root rules, `maintainers/<basename>` for the maintainer folder, `frontend:<basename>` for frontend rules (`frontend:i18n`), `description` = frontmatter `description` or H1.
+- Agents: `gaia/.claude/agents/*.md` → `kind = "agent"`, `name` = frontmatter `name`, `description` = frontmatter `description`. Plus the frontend auditor's extension files, `gaia/frontend/.claude/agents/code-audit-frontend/*.md`, with `name` = `code-audit-frontend/<basename>`.
 - CI workflows: `gaia/.github/workflows/*.yml` → `kind = "workflow"`, `name` = filename, `description` = top-level `name:` field in the yaml.
-- Wiki pages: `gaia/wiki/**/*.md` → `kind = "wiki-page"`, `name` = relative path under `wiki/`, `description` = frontmatter `description` if present, else H1.
+- Wiki pages: `gaia/wiki/**/*.md` → `kind = "wiki-page"`, `name` = `path` (the full `wiki/...` form, e.g. `wiki/concepts/Forensics.md`; the snapshot keys on it, so any other form turns every page into a false NEW + REMOVED pair), `description` = frontmatter `description` if present, else H1.
 
-### Step 3 — Compute content hash deterministically
+### Step 3: Compute content hash deterministically
 
 Per record, the `content_hash` must be reproducible:
 
@@ -173,21 +144,20 @@ For files with no frontmatter (hooks, workflows, ts), hash the full file if unde
 
 For `cli-subcommand` records that map to a directory rather than a file, hash the namespace `index.ts` instead.
 
-### Step 4 — Walk the docs side
+### Step 4: Walk the docs side
 
 Find every `.md` and `.mdx` under `~/Development/gaia-react/docs/src/content/docs/`. For each file, extract referenced GAIA things via best-effort regex:
 
 - Slash commands: `/[a-z][a-z0-9-]*` and `/gaia [a-z-]+( [a-z-]+)?`
 - Skill names: backtick-wrapped tokens that match a known top-level skill name.
-- Source paths: backtick-wrapped tokens beginning with `gaia/`, `.claude/`, `.gaia/`, `.specify/`, or `wiki/`.
-- Spec-kit commands: `/speckit.gaia.<name>` or `speckit.gaia.<name>`.
+- Source paths: backtick-wrapped tokens beginning with `gaia/`, `.claude/`, `.gaia/`, `frontend/`, or `wiki/`.
 - CLI invocations: `gaia <subcommand>` patterns inside fenced code blocks or backticks.
 
 Build a set `DOCUMENTED` of `(kind, name)` tuples that the docs reference. Best-effort is fine; do not block on parser perfection.
 
-### Step 5 — Load the previous snapshot
+### Step 5: Load the previous snapshot
 
-Read `~/Development/gaia-react/docs/.claude/audit/source-state.json`. If it does not exist or is empty / `{}`, treat the previous state as no items — every current item will report as NEW.
+Read `~/Development/gaia-react/docs/.claude/audit/source-state.json`. If it does not exist or is empty / `{}`, treat the previous state as no items: every current item will report as NEW.
 
 The snapshot schema:
 
@@ -204,28 +174,28 @@ The snapshot schema:
 }
 ```
 
-### Step 6 — Compute drift
+### Step 6: Compute drift
 
 Match current items to previous items by the composite key `(kind, name, path)`. For each match, classify:
 
-- **VERIFIED** — both records exist; `content_hash`, `description`, and `audience` all match.
-- **CHANGED** — both records exist; `content_hash` or `description` differs; `audience` unchanged.
-- **AUDIENCE-CHANGED** — both records exist; `audience` differs (e.g., adopter → contributor or contributor → adopter or anything → mixed). High-priority signal.
-- **NEW** — current record exists, no matching previous record, AND not in `DO_NOT_DOCUMENT`.
-- **REMOVED** — previous record exists, no matching current record. (If it is in `DO_NOT_DOCUMENT`, still report as REMOVED — removing an excluded item is normal but worth surfacing.)
-- **EXCLUDED** — current record exists AND matches `DO_NOT_DOCUMENT`. Always categorize EXCLUDED items here regardless of whether they are NEW / CHANGED / VERIFIED. The point of this category is "we know we are deliberately ignoring this".
+- **VERIFIED**: both records exist; `content_hash`, `description`, and `audience` all match.
+- **CHANGED**: both records exist; `content_hash` or `description` differs; `audience` unchanged.
+- **AUDIENCE-CHANGED**: both records exist; `audience` differs (e.g., adopter → contributor or contributor → adopter or anything → mixed). High-priority signal.
+- **NEW**: current record exists, no matching previous record, AND not in `DO_NOT_DOCUMENT`.
+- **REMOVED**: previous record exists, no matching current record. (If it is in `DO_NOT_DOCUMENT`, still report as REMOVED: removing an excluded item is normal but worth surfacing.)
+- **EXCLUDED**: current record exists AND matches `DO_NOT_DOCUMENT`. Always categorize EXCLUDED items here regardless of whether they are NEW / CHANGED / VERIFIED. The point of this category is "we know we are deliberately ignoring this".
 
 Cross-reference docs:
 
 - For each item in `DOCUMENTED` that has no matching current source record, mark it as a **DOC-ORPHAN** (documented but no longer in source).
-- For each adopter-audience source item NOT in `DOCUMENTED` and NOT in `DO_NOT_DOCUMENT`, flag as **UNDOCUMENTED** (this overlaps with NEW for first-run snapshots — keep them separate categories so the meaning is explicit).
+- For each adopter-audience source item NOT in `DOCUMENTED` and NOT in `DO_NOT_DOCUMENT`, flag as **UNDOCUMENTED** (this overlaps with NEW for first-run snapshots: keep them separate categories so the meaning is explicit).
 
-### Step 7 — Print the report
+### Step 7: Print the report
 
 Markdown only. No preamble. Use this exact structure. Empty sections collapse.
 
 ```
-source-survey — <ISO date>
+source-survey: <ISO date>
 gaia path: ~/Development/gaia-react/gaia
 docs path: ~/Development/gaia-react/docs/src/content/docs
 release-exclude patterns: <count>
@@ -235,8 +205,7 @@ hash rule: frontmatter + first 40 body lines (sha256)
 ## counts by layer
 - commands: <n> (adopter <a>, contributor <c>, mixed <m>)
 - skills: <n> (...)
-- sub-routes: <n> (...)
-- spec-kit-cmds: <n> (...)
+- references: <n> (...)
 - cli-subcommands: <n> (...)
 - hooks: <n> (...)
 - rules: <n> (...)
@@ -246,11 +215,11 @@ hash rule: frontmatter + first 40 body lines (sha256)
 
 ## AUDIENCE-CHANGED (high priority)
 ### adopter → contributor
-- <kind> <name> at <path> — was adopter, now contributor (excluded by release-exclude line <#>)
+- <kind> <name> at <path>: was adopter, now contributor (excluded by release-exclude line <#>)
 ### contributor → adopter
-- <kind> <name> at <path> — was contributor, now adopter
+- <kind> <name> at <path>: was contributor, now adopter
 ### → mixed
-- <kind> <name> at <path> — now contains gaia:maintainer-only block(s) at lines <a>-<b>
+- <kind> <name> at <path>: now contains gaia:maintainer-only block(s) at lines <a>-<b>
 
 ## NEW (in source, not in snapshot, not excluded)
 ### adopter
@@ -293,11 +262,11 @@ hash rule: frontmatter + first 40 body lines (sha256)
 - <one-line description of an item the survey couldn't classify with confidence>
 ```
 
-### Step 8 — Write the snapshot to disk
+### Step 8: Write the snapshot to disk
 
 Write the updated snapshot JSON directly to `~/Development/gaia-react/docs/.claude/audit/source-state.json`. Do NOT print the JSON to chat. Use a script (bash/python) or the Write tool. Confirm to the user with a single line: `snapshot written: N items → docs/.claude/audit/source-state.json`
 
-### Step 9 — Tell the user it's done
+### Step 9: Tell the user it's done
 
 End with one line confirming the file was written and the gaia commit it was captured against.
 
@@ -320,17 +289,15 @@ End with one line confirming the file was written and the gaia commit it was cap
 
 ## Common surface-walk hazards
 
-- `gaia/.claude/skills/gaia/references/forensics/` and `gaia/.claude/skills/gaia/references/wiki/` are sub-namespace folders. Iterate the `.md` files inside; do not treat the folder itself as a sub-route.
-- `gaia/.specify/extensions/gaia/test/` is excluded by `release-exclude`. Do not include test files as spec-kit-cmd records.
+- Folders under `gaia/.claude/skills/gaia/references/` (`spec/`, `plan/`, `cleanse/`, `debt/`, `forensics/`, `wiki/`, `setup/`) are not records; the `.md` files inside are.
 - `gaia/.claude/skills/<name>/` may contain files other than `SKILL.md` (e.g., `references/`, supporting markdown). Only `SKILL.md` is the surface record at Layer 2.
 - The `gaia` binary CLI source is excluded from the adopter tarball, but the binary itself ships. Source-survey reports CLI subcommands by their *invocation* audience (who can run the command) and notes when the consumer of a subcommand is contributor-only (e.g., `release` subcommands).
 - `gaia/wiki/.obsidian/` is not surface; skip it.
 - Files inside a `<!-- gaia:maintainer-only:start --> ... <!-- gaia:maintainer-only:end -->` block are not stripped from the file on disk; they are stripped only at release time by `gaia release scrub`. Source-survey must read both halves to compute `audience: mixed`.
-- `gaia/.gaia/cli/src/_internal-fetch-coaching` does not exist as a file; it is a special-case top-level CLI subcommand handled inline in `gaia/.gaia/cli/src/index.ts`. Capture it as a virtual record with `path = ".gaia/cli/src/index.ts"`.
 
 ## Reading list
 
-- `~/Development/gaia-react/gaia/.gaia/release-exclude` — the path-level adopter / contributor split.
-- `~/Development/gaia-react/gaia/wiki/concepts/Release Workflow.md` — narrative explanation of the distribution boundary (contributor-only file, but readable for context).
-- `~/Development/gaia-react/docs/CLAUDE.md` — the docs project's audience rules.
-- `~/Development/gaia-react/studio/branding/VOICE.md` — voice rules. This skill itself is procedural, but any prose it generates obeys voice rules (no em dashes, no AI tells, no borrowed-field jargon).
+- `~/Development/gaia-react/gaia/.gaia/release-exclude`: the path-level adopter / contributor split.
+- `~/Development/gaia-react/gaia/wiki/concepts/Release Workflow.md`: narrative explanation of the distribution boundary (contributor-only file, but readable for context).
+- `~/Development/gaia-react/docs/CLAUDE.md`: the docs project's audience rules.
+- `~/Development/gaia-react/studio/branding/VOICE.md`: voice rules. This skill itself is procedural, but any prose it generates obeys voice rules (no em dashes, no AI tells, no borrowed-field jargon).

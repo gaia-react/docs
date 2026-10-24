@@ -129,11 +129,15 @@ A SPEC moves through four statuses: `draft`, `ready`, `merged`, and `abandoned`.
 Confirming gate 2 saves the SPEC and locks it. To change a saved SPEC you must formally reopen it, with a written reason and a record of how the UATs change, and the lint enforces this. Get it right before you confirm.
 </Aside>
 
-`/gaia-spec` has no reopen option. When a plan stops because a UAT can no longer hold, ask Claude to reopen the SPEC:
+### Reopening a saved SPEC
 
-```text
-Reopen SPEC-<NNN>. Reason: <why the UAT cannot hold>. Change the UAT about <behavior> to: <new Given/When/Then>. Follow the SPEC reopen steps.
+When a plan stops because a UAT can no longer hold, reopen the SPEC:
+
 ```
+/gaia-spec reopen SPEC-<NNN>
+```
+
+Claude asks why the UAT cannot hold, starting from the change the stopped plan suggested. It then proposes the new UAT text, together with any change to the plan that follows from it, and asks you to confirm. It records your reason and the old UAT text in the SPEC, checks the SPEC with the lint, and offers to discard the stopped phase's unfinished edits so the plan can resume. It ends by giving you the plan's KICKOFF prompt to paste into a fresh session.
 
 ## The SPEC audit
 

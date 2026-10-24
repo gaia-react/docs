@@ -22,13 +22,13 @@ Each merge records the pull request's findings in a comment on it, and the count
 
 ## What counts as recurring
 
-A kind of finding (its finding class) becomes a candidate once it appears on **3 or more different merged pull requests within the last 90 days**, at any severity, and no rule from an earlier run already covers it. Findings the audit could not place in a class are counted too, and surface as their own signal when they recur.
+A kind of finding (its finding class) becomes a candidate once it appears on **3 or more different merged pull requests within the last 90 days**, at any severity, and no rule from an earlier run already covers it. Findings the audit could not place in a class are counted too, and surface as their own signal when they recur. A finding the audit accepted as a residual instead of fixing (listed in the pull request under `## Accepted residuals (recorded, not fixed)`, see [What gets recorded instead of filed](/workflow/tech-debt/#what-gets-recorded-instead-of-filed)) is left out, because the decision not to fix it is already made. Waived and filed findings still count.
 
 The count reads your merged pull requests through `gh`. When it cannot, the run says so ("this is not an all-clear") instead of reporting nothing.
 
 ## Finding classes
 
-Every finding the Code Audit Team records carries a finding class: a fixed name for the kind of problem it is. Recurrence is counted per class, so two findings about the same kind of problem in different files count as one pattern. The lists below are the classes GAIA ships with. A member picks a class only from these lists, plus any classes its own agent definition adds, so a member you add for your own code (see [Covering new code](/workflow/code-audit-team/#covering-new-code)) can bring its own. Claude never invents a class on the fly: a finding that fits none of them is recorded as `holistic/unclassified`.
+Every finding the Code Audit Team records carries a finding class: a fixed name for the kind of problem it is. Recurrence is counted per class, so two findings about the same kind of problem in different files count as one pattern. The lists below are the classes GAIA ships with. A member picks a class only from these lists, plus the classes your project registers (see [Your own finding classes](#your-own-finding-classes)). Claude never invents a class on the fly: a finding that fits none of them is recorded as `holistic/unclassified`.
 
 ### Tool findings
 
@@ -98,9 +98,22 @@ These match GAIA's coding conventions for React and TypeScript.
 | `workflow/unpinned-action` | A third-party action is not pinned to a commit. |
 | `workflow/broad-permissions` | A workflow or job is granted more permissions than it needs. |
 
+### Your own finding classes
+
+A member you add for your own code (see [Adding a member](/workflow/code-audit-team/#adding-a-member)) may need classes of its own. Your project registers them in `.gaia/finding-classes.json`, which ships empty and is yours: `/update-gaia` never merges or overwrites it. It holds two lists, and both must stay in the file even when one is empty, or the file is read as empty:
+
+- **`classes`**: new kinds of problem, each named `<prefix>/<slug>` in lowercase words joined by hyphens, such as `api/missing-rate-limit`. The member's agent file names them as its own.
+- **`oracle_prefixes`**: the prefix of a check tool of your own, such as `ruff`. Any finding id after that prefix is accepted as it is, the way GAIA accepts `axe/<rule>`.
+
+`/gaia-codify` counts a registered class like a built-in one, and `file-tech-debt` files its findings instead of setting them aside as malformed. Register a class before the member uses it: a class in no list is counted as unclassified. Keep each class a real kind of problem the member can assign the same way every time, not a label for "somewhere in this member's files". Ask Claude:
+
+```text
+Register the finding classes my <member> audit member reports in .gaia/finding-classes.json, and name them in its agent file.
+```
+
 ### Unclassified findings
 
-A finding recorded as `holistic/unclassified` is never a candidate, because there is no single kind of problem to write a guard for. When unclassified findings recur on 3 or more pull requests within 90 days, the run shows them as one extra row, marked as not a candidate, and records a suppression on this machine so the signal stays quiet until it rises noticeably. When the same kind of problem keeps landing here, the class list may be missing a class for it, or the cluster needs looking into on its own. `/gaia-codify` points this out but never adds a class itself. A class added later applies only to new findings: the unclassified ones already recorded stay unclassified until they age out of the 90-day window.
+A finding recorded as `holistic/unclassified`, or with a class no list registers, is never a candidate, because there is no single kind of problem to write a guard for. When unclassified findings recur on 3 or more pull requests within 90 days, the run shows them as one extra row, marked as not a candidate, and records a suppression on this machine so the signal stays quiet until it rises noticeably. When the same kind of problem keeps landing here, the class list may be missing a class for it, or the cluster needs looking into on its own. `/gaia-codify` points this out but never adds a class itself. Registering a class later also counts findings that already recorded that exact class. Findings recorded as `holistic/unclassified` stay unclassified until they age out of the 90-day window.
 
 ## How it judges the form
 
@@ -128,7 +141,7 @@ A written rule is the weakest option: it advises instead of enforcing, and Claud
 
 ### Decline and defer
 
-- **Decline** records, on this machine only, that you are not acting on the pattern. It comes back only if the pattern keeps growing noticeably: at least 3 more pull requests, and a clearly larger share of audited pull requests than when you declined. The record lives in `.gaia/local/codify/` and is never shared, so a teammate still sees the nudge.
+- **Decline** records, on this machine only, that you are not acting on the pattern. It comes back only if the pattern keeps growing noticeably: at least 3 more pull requests, and a clearly larger share of audited pull requests than when you declined. It also comes back once after a GAIA update changes how findings are counted, so you can decide again on the new numbers. The record lives in `.gaia/local/codify/` and is never shared, so a teammate still sees the nudge.
 - **Defer** records nothing of its own. The candidate still appears in the next review; the nudge stays quiet until the pattern grows or the counting changes.
 
 ## Promoted rules

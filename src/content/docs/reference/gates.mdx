@@ -34,18 +34,18 @@ The rest of this page lists every gate: what it stops, why, when it runs, who ac
   - **Commit:** work reaches the default branch only through a pull request, where the audit reviews it before it merges.
   - **Plain push:** it would land your local commits on the shared branch without the pull request and audit every change goes through.
   - **Force-push:** the branch's history is shared, so rewriting it pulls commits out from under every clone and branch built on it.
-  - **A push that targets `main`, `master`, or `HEAD`:** stopped from any branch. The refusal tells Claude to name the branch it is pushing and open a pull request, and gives no further reason.
+  - **A push that targets `main`, `master`, or `HEAD`:** stopped from any branch. A `main` or `master` source would land that branch's commits on the remote without the pull request and audit. A bare `HEAD` pushes whatever happens to be checked out, which the guard cannot vouch for. The refusal tells Claude to push the feature branch by its own name and open a pull request.
 - **When:** before the `git` command runs (`block-main-destructive-git`). The hook checks the branch names `main` and `master` themselves, so a default branch with any other name is not covered.
 - **Who acts:** Claude. Nothing for you to do.
 - **Clear it:** Claude creates a feature branch, pushes it by name, and opens a pull request as part of the [work lifecycle](/workflow/work-lifecycle/).
 
 ### Hard reset that drops commits
 
-- **Stops:** Claude running `git reset --hard HEAD~<n>` (any command that starts with `git reset --hard HEAD~`). The rule matches that spelling only: other forms, such as `HEAD^` or a commit hash, are not covered.
-- **Why:** the permission rule states no reason.
-- **When:** before the Bash command runs (a permission deny in `.claude/settings.json`).
-- **Who acts:** You.
-- **Clear it:** Claude is kept from this command by design, and the deny carries no message. Dropping commits is your call: if you mean to, run it yourself in a terminal.
+- **Stops:** Claude running `git reset --hard` to any commit other than the one the branch is on, on any branch and whatever the spelling: `HEAD~1`, `HEAD^`, `@~1`, a commit hash, or a branch name. A plain `git reset --hard`, or one to `HEAD`, discards only uncommitted changes and is allowed.
+- **Why:** the reset moves the branch to that commit, so every commit after it is dropped, and uncommitted work is thrown away with it. Dropping commits is your decision, not Claude's.
+- **When:** before the `git` command runs (`block-main-destructive-git`). A permission deny on `git reset --hard HEAD~*` in `.claude/settings.json` stays as a backstop in case the hook does not run.
+- **Who acts:** You, and only when you really mean to drop commits.
+- **Clear it:** the refusal tells Claude the reset is yours, so Claude asks you instead of running it. To undo a commit and keep the history, Claude can use `git revert <commit>`. If you do want to drop the commits, run the reset yourself in a terminal or with the `!` prefix, since the guard acts only on Claude.
 
 ### Moving another session's checkout
 
@@ -65,11 +65,11 @@ The rest of this page lists every gate: what it stops, why, when it runs, who ac
 
 ### Pre-commit floor
 
-- **Stops:** a commit whose staged files fail typecheck, [lint-staged](https://github.com/lint-staged/lint-staged), or their tests. It also stops a commit when the package registry cannot be read, or when GAIA's generated settings no longer match what they should be.
+- **Stops:** a commit whose staged files fail typecheck, [lint-staged](https://github.com/lint-staged/lint-staged), or their tests. It also stops a commit when the package registry cannot be read, when GAIA's generated settings no longer match what they should be, or when a commit that changes the Code Audit Team roster or a member's agent file fails the [roster check](/workflow/code-audit-team/#the-roster-check).
 - **Why:** it is the fixed, scripted check that keeps code failing typecheck, lint, or its own tests out of history, no matter what the Claude session decided.
 - **When:** at `git commit`, through the native git hook `.githooks/pre-commit`.
 - **Who acts:** Claude, and you only when you commit by hand.
-- **Clear it:** Claude fixes the failures it prints and commits again. If you commit by hand and it stops you, ask Claude to fix what it printed. If no hook runs at all, the clone's git hooks may be switched off, and nothing reports that. Ask Claude:
+- **Clear it:** Claude fixes the failures it prints and commits again. If you commit by hand and it stops you, ask Claude to fix what it printed. If no hook runs at all, the clone's git hooks may be switched off, and nothing reports that at commit time. `/setup-gaia` checks for this on every run and offers to turn them on. Between runs, ask Claude:
 
   ```text
   Check that this clone's git hooks are active, and turn them on if they are not.
@@ -116,8 +116,8 @@ The rest of this page lists every gate: what it stops, why, when it runs, who ac
 - **Stops:** Claude starting work on a GitHub issue already labelled `in-progress`.
 - **Why:** two agents or two people who start the same ticket do the work twice, then fight over the merge.
 - **When:** before a branch or worktree is created for work that closes an issue. This is a rule Claude follows (`.claude/rules/issue-claim.md`), not a hook, so nothing blocks the work mechanically.
-- **Who acts:** Claude, and you only when a claim was left behind by abandoned work.
-- **Clear it:** Claude tells you the issue is taken and picks different work. The label comes off when Claude merges the claiming pull request with `gh pr merge`; a merge on github.com leaves it set. A claim left behind by abandoned work is the one case for you: on a `tech-debt` issue, the next `/gaia-debt` run removes it; on any other issue, it stays until you release it. Ask Claude:
+- **Who acts:** Claude, and you only to tell Claude the work is dropped.
+- **Clear it:** Claude tells you the issue is taken and picks different work. The label comes off when Claude merges the claiming pull request with `gh pr merge`, and Claude also removes it when it closes that pull request without merging. On a `tech-debt` issue, the next `/gaia-debt` run removes a claim left behind. A merge on github.com leaves the label set, and so does work you stop without saying so. Tell Claude when you drop the work:
 
   ```text
   I'm dropping the work on issue #<n>. Release its in-progress claim.
@@ -216,7 +216,7 @@ The rest of this page lists every gate: what it stops, why, when it runs, who ac
 - **Why:** anything Claude reads goes into the session transcript and is sent to the model. Once a secret has been read, it is exposed.
 - **When:** before the tool call runs (`block-sensitive-read`).
 - **Who acts:** Claude, and you only when a file that holds no secret has a secret-like name.
-- **Clear it:** Claude refers to the variable by name, or sets a value for one command with `env NAME=value <cmd>`. The refusal for a `.env` file does not spell this out yet, but Claude works from the variable names (`.env.example` lists them). For a key, certificate, or credential file that holds no secret, Claude asks you to read it out or rename it. Keep real values out of anything Claude reads.
+- **Clear it:** the refusal tells Claude what to do instead. Claude refers to the variable by name, reads `.env.example` for the list of names, and asks you for any value that is not secret. To set a value for one command, Claude uses `env NAME=value <cmd>`. For a key, certificate, or credential file that holds no secret, Claude asks you to read it out or rename it. Keep real values out of anything Claude reads.
 
 When you turn on Claude Code's [sandbox](/getting-started/setup-gaia/#sandbox-decision), its read deny list in `.claude/settings.json` keeps Claude's shell commands away from the same files too.
 
@@ -242,7 +242,7 @@ When you turn on Claude Code's [sandbox](/getting-started/setup-gaia/#sandbox-de
 - **Why:** the file is generated from the root `.claude/settings.json` plus `frontend/.claude/settings.overlay.json`, so a hand edit is overwritten the next time it is generated.
 - **When:** before the Edit runs (a permission rule), and at `git commit` (the pre-commit hook).
 - **Who acts:** Claude. Nothing for you to do.
-- **Clear it:** Claude edits the root settings or the overlay instead, regenerates the frontend settings, and stages the result. The edit deny carries no message, so the step is spelled out only at commit time: if a direct edit slips through, the pre-commit hook names the regenerate step, and Claude runs it and commits again. To change a setting, ask:
+- **Clear it:** Claude edits the root settings or the overlay instead, regenerates the frontend settings, and stages the result. The edit deny itself carries no message, but the `generated-files` [rule](/reference/rules/) loads as soon as Claude reads the file and names the source to change. If a direct edit slips through anyway, the pre-commit hook names the regenerate step, and Claude runs it and commits again. To change a setting, ask:
 
   ```text
   Add <setting> to the root .claude/settings.json and regenerate the frontend settings.
@@ -276,7 +276,7 @@ When you turn on Claude Code's [sandbox](/getting-started/setup-gaia/#sandbox-de
   - **`--no-preserve-root`** switches off rm's own refusal to delete the filesystem root.
 - **When:** before the Bash command runs (`block-rm-rf`).
 - **Who acts:** Claude, and you only when `node_modules` really has to go.
-- **Clear it:** Claude deletes by an explicit relative path, and removes one file under `.claude/` with a plain `rm <file>` (no flags). Claude can never run `rm -r` or `rm -f` on `node_modules`. When it really has to go, delete it yourself in a terminal, then ask Claude to run `pnpm install`. `pnpm store prune`, which the refusal also names, cleans pnpm's shared package store on your machine, not the project's `node_modules`.
+- **Clear it:** Claude deletes by an explicit relative path, and removes one file under `.claude/` with a plain `rm <file>` (no flags). Claude can never run `rm -r` or `rm -f` on `node_modules`. For a broken or stale install, the refusal points Claude to `pnpm install`, which repairs `node_modules` in place. When it really has to go, delete it yourself in a terminal, then ask Claude to run `pnpm install`.
 
 ## Worktrees and parallel work
 
@@ -294,7 +294,7 @@ When you turn on Claude Code's [sandbox](/getting-started/setup-gaia/#sandbox-de
 - **Why:** a linked worktree holds another task's work. These commands set up the clone or create their own branch, and must not write onto another task's branch.
 - **When:** at the start of the command.
 - **Who acts:** You, since you started the command.
-- **Clear it:** open Claude Code in the main checkout the refusal names and run the command there. The commands that change files then make their own worktree.
+- **Clear it:** a session cannot leave its worktree, so the refusal asks you to move it. Open Claude Code in the main checkout the refusal names and run the command there. The commands that change files then make their own worktree.
 
 ### Lagging GAIA version
 
@@ -362,7 +362,7 @@ When you turn on Claude Code's [sandbox](/getting-started/setup-gaia/#sandbox-de
 - **Why:** hand edits often leave the lockfile broken or out of step with itself. [pnpm](https://pnpm.io/) rewrites it correctly.
 - **When:** before the edit runs (a permission deny in `.claude/settings.json`).
 - **Who acts:** Claude. Nothing for you to do.
-- **Clear it:** Claude changes `package.json` or `pnpm-workspace.yaml`, then runs `pnpm install`, `pnpm add`, or `pnpm remove` and lets pnpm rewrite the lockfile.
+- **Clear it:** Claude changes `package.json` or `pnpm-workspace.yaml`, then runs `pnpm install`, `pnpm add`, or `pnpm remove` and lets pnpm rewrite the lockfile. The `generated-files` [rule](/reference/rules/) loads when Claude reads the lockfile, so Claude has this step before it tries an edit.
 
 ## Updates and setup
 
@@ -428,13 +428,13 @@ When you turn on Claude Code's [sandbox](/getting-started/setup-gaia/#sandbox-de
 - **Why:** with no roster, there is no way to work out which members must review the change.
 - **When:** when the audit works out which members to run.
 - **Who acts:** Claude, and you only to confirm members you added yourself.
-- **Clear it:** the refusal tells Claude to restore the block from the GAIA template, and Claude does. If you had added members of your own, check they came back, or ask:
+- **Clear it:** the refusal tells Claude to restore the block from the copy GAIA ships, and Claude does. If you had added members of your own, check they came back, or ask:
 
   ```text
   .gaia/audit-ci.yml has lost its auditors: block. Restore it from the GAIA release this project is on, keeping any members I added.
   ```
 
-Gaps in coverage do not stop the audit: a file no member covers goes to `code-audit-frontend`, the default member. After you change the roster, have Claude run the roster check, which reports files no member covers and patterns that match no file. See [Covering new code](/workflow/code-audit-team/#covering-new-code).
+Gaps in coverage do not stop the audit: a file no member covers goes to `code-audit-frontend`, the default member. A commit that changes the roster runs the roster check, which reports files no member covers and patterns that match no file, and Claude repairs what it finds. See [Covering new code](/workflow/code-audit-team/#covering-new-code).
 
 ### eslint-disable reason
 

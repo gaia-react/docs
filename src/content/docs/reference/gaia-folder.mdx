@@ -30,6 +30,7 @@ You rarely edit anything here by hand. When you want to change a setting, ask Cl
 | `setup-features.json` | The list of setup steps `/setup-gaia` owns | Committed | The release | Merged |
 | `state-registry.json` | What each entry in `.gaia/local/` is and when it is cleaned up | Committed | The release | Merged |
 | `packages.json` | The packages in your workspace that GAIA covers | Committed | The release, then you | Never touched |
+| `finding-classes.json` | Your project's own [audit finding classes](/maintenance/codify/#your-own-finding-classes) | Committed | The release (empty), then you | Never touched |
 | `project.json` | Team settings and project setup decisions | Committed | `/gaia-init`, `/setup-gaia`, `/update-gaia` | Never merged |
 | `update-decisions.json` | Your answers to update conflicts | Committed | `/update-gaia` | Written by the update itself |
 | `audit-residual-dismissals.jsonl` | Audit residuals you dismissed or kept | Committed | `/gaia-residue` | Never touched |
@@ -155,7 +156,7 @@ Because git ignores this folder, leftovers never show up in a diff, so GAIA clea
 - **After a merge.** The work lifecycle's cleanup step removes the merged branch's audit, run, and pull request state. See [Clean up](/workflow/work-lifecycle/#7-clean-up).
 - **A daily sweep.** At most once a day, at session start, a background job applies each entry's cleanup rule from `state-registry.json`. Depending on the entry, that happens once its branch has been merged and deleted, once its worktree is gone, or after a set number of days. Some entries are kept for good: the usage ledger, setup state, and settings. The sweep works only from local information (git branches, the worktree list, the notebook catalog) and makes no network calls. It never leaves `.gaia/local/`, never follows a link, and never blocks a session.
 
-Files that a removed feature left behind have no owner to clean them up. The [leftover-file cleanup](/maintenance/update-gaia/#leftover-file-cleanup) after an update deletes them, and only them.
+Files that a removed feature left behind have no owner to clean them up. The [leftover-file cleanup](/maintenance/update-gaia/#leftover-file-cleanup), which Claude offers once an update merges, deletes them, and only them.
 
 ## Next to .gaia/
 

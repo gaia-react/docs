@@ -27,10 +27,11 @@ The command works out which situation your clone is in (a new project with no Gi
 
 ### Prerequisites (every run)
 
-Three checks run every time:
+Four checks run every time:
 
 - **Worktree links.** Checks that this copy of the repo can share GAIA's local state with [worktrees](/workflow/work-lifecycle/). If that fails (for example, Windows refuses to create a symlink until Developer Mode is on), setup stops and shows why. Fix the cause and run `/setup-gaia` again.
 - **[pnpm](https://pnpm.io/), node_modules, and Chromium.** If `corepack` is available, pnpm is enabled at the pinned version; otherwise it is installed globally with npm. `pnpm install` runs when `node_modules/` is missing. Then setup installs [Chromium](https://www.chromium.org/), the browser the story and hook tests run in, so a fresh clone's first test run and first commit pass. It finishes at once when Chromium is already installed. If it fails, setup stops and shows the command to retry. To install the browsers and the system libraries they need, run `pnpm install:browsers` yourself in a terminal; on Linux it asks for your `sudo` password, which Claude cannot type.
+- **Git hooks.** Checks that the [git hooks](/workflow/git-conventions/#native-git-hooks) are active (git's `core.hooksPath` setting is `.githooks`). A clone where they are not commits with no pre-commit or commit-msg check, and nothing else reports it. When they are off, setup asks to turn them on.
 - **GitHub CLI check (warning only).** If `gh` is missing or not logged in, you get a warning and setup continues. The pull request merge workflow, `/gaia-plan`, and `/gaia-forensics` rely on `gh`, so install it from [cli.github.com](https://cli.github.com/) and run `gh auth login` when you can.
 
 ## Phase: per-machine setup
@@ -75,6 +76,8 @@ Setup looks at the actual repo, branch, and what has been pushed, not just wheth
 - **Use an existing repo.** You already have a GitHub `origin`, so nothing is created and the recommended defaults are applied.
 - **Set one up manually.** The command prints the `git remote add` and `git push` steps and leaves GitHub alone. Re-run `/setup-gaia` once it is pushed.
 
+On **Create** or **Use an existing repo**, if `.github/CODEOWNERS` still holds the placeholder owner from `/gaia-init`, setup replaces it before anything is pushed. It offers the GitHub login you are signed in to, or asks you to type a handle, and commits the change. You can also keep the placeholder for now.
+
 ### Recommended defaults (admin only)
 
 Applied after you create or pick a repo, and only when you are a repo admin and logged in to `gh`. If you are not an admin, setup skips these with a note, and the rest of this machine's setup still finishes:
@@ -116,6 +119,8 @@ On every run, setup also warns when Claude Code is not running GAIA's statusline
 ## Phase: new setup steps from later releases
 
 A later GAIA release can add a setup step. `/setup-gaia` runs any new step this machine has not answered yet, and any new team step when a repo admin runs it, so you never have to set up again from scratch.
+
+One such step catches a machine up to GAIA 2.0.0. The 2.0.0 migration cleans up only the machine that ran it, so on any other clone that was on GAIA 1.x, setup finds what 1.x left behind and fixes it. See [Every other machine](/getting-started/upgrading/#every-other-machine). On a machine that was never on 1.x, the step finds nothing and records that.
 
 ## Finish
 

@@ -15,7 +15,7 @@ The hooks live in `.githooks/`. Git finds them through its `core.hooksPath` sett
 
 | Hook | What it runs |
 |---|---|
-| `pre-commit` | For each package that has staged files: typecheck, [lint-staged](https://github.com/lint-staged/lint-staged) ([ESLint](https://eslint.org/), [Prettier](https://prettier.io/), and [Stylelint](https://stylelint.io/) on the staged files), and the tests for the staged files. When GAIA's generated settings file no longer matches its sources, it stops the commit and names the regenerate step. Claude fixes what fails and commits again. |
+| `pre-commit` | For each package that has staged files: typecheck, [lint-staged](https://github.com/lint-staged/lint-staged) ([ESLint](https://eslint.org/), [Prettier](https://prettier.io/), and [Stylelint](https://stylelint.io/) on the staged files), and the tests for the staged files. When GAIA's generated settings file no longer matches its sources, it stops the commit and names the regenerate step. When the commit changes the Code Audit Team roster or a member's agent file, it runs the [roster check](/workflow/code-audit-team/#the-roster-check). Claude fixes what fails and commits again. |
 | `commit-msg` | Checks the message with [commitlint](https://commitlint.js.org/) against `commitlint.config.mjs`. A message that does not follow Conventional Commits is refused, and so is any commit when commitlint cannot run. Claude reads the refusal, rewrites the message, and commits again. |
 
 Both hooks also run when you commit by hand in your own terminal. Then the failure is yours to see: the hook prints what failed, and you can ask Claude to fix it and commit.
@@ -24,13 +24,13 @@ The test step launches headless Chromium for stories and hook tests. [`/gaia-ini
 
 ### Checking a clone
 
-When a clone's hooks are not active, nothing reports it, so a broken setup looks exactly like a working one. This can happen when `pnpm install` ran with any `CI` environment variable set, even `CI=false`, because the setup step skips itself then. Check each new clone:
+When a clone's hooks are not active, commits go through with no checks and nothing says so, so a broken setup looks exactly like a working one. This can happen when `pnpm install` ran with any `CI` environment variable set, even `CI=false`, because the setup step skips itself then, or when `pnpm install` never ran.
+
+[`/setup-gaia`](/getting-started/setup-gaia/) checks this on every run: when git's `core.hooksPath` setting is not `.githooks`, it asks to turn the hooks on and sets it. To check outside setup, ask:
 
 ```text
 Check that this clone's git hooks are active, and turn them on if they are not.
 ```
-
-Claude checks that git's `core.hooksPath` setting is `.githooks` and sets it if it is not.
 
 **Why:** the pre-commit hook is the minimum check that stops a commit failing typecheck, lint, or its tests from landing. Claude cannot skip it either: if it tries `git commit` or `git push` with `--no-verify`, `-n` on a commit, or `-c core.hooksPath=<path>`, a Claude Code hook sends the command back, and Claude fixes the failures instead. See the [gate reference](/reference/gates/#no-verify).
 
