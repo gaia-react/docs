@@ -24,3 +24,5 @@ pnpm-debug.log*
 
 # Playwright CLI session artifacts
 .playwright-cli/
+# Python bytecode
+__pycache__/
