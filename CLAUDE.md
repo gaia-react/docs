@@ -19,7 +19,7 @@ Be a partner, not a cheerleader: flag flawed ideas, challenge assumptions, ask h
 GAIA has two audiences and the docs must keep them strictly separate:
 
 - **Adopters**: people who ran `npx create-gaia my-app` and got a scaffolded project. They have only what shipped in the release tarball. They never run `/gaia-release`, never edit the CLI source, never see `.gaia/cli/health/`.
-- **Contributors**: people working on the GAIA template repo itself, including the core maintainer (Steven) and any outside contributors. They have the full source, run releases, build the bundled CLI, run health audits, and have access to the full command and tooling surface.
+- **Contributors**: people working on the GAIA source repo itself, including the core maintainer (Steven) and any outside contributors. They have the full source, run releases, build the bundled CLI, run health audits, and have access to the full command and tooling surface.
 
 **Public-facing term is "Contributors."** Internal source uses "maintainer-only" as a literal identifier (`gaia:maintainer-only` markers, `.gaia/release-exclude` comment text); keep that exact phrase when citing those mechanisms, but every user-facing surface (sidebar, URLs, page titles, prose) says "Contributors."
 
