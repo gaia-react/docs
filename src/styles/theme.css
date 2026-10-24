@@ -140,7 +140,15 @@ header.header,
 	white-space: nowrap;
 }
 
-/* Callouts (Asides): Starlight ships stock purple/blue accents that aren't in
+/* Code blocks sit on the elevated surface (DESIGN.md: cards, code blocks),
+   darker than note callouts on surface-raised. :root lifts specificity over
+   Expressive Code's .frame and .frame.is-terminal defaults. */
+:root .expressive-code .frame,
+:root .expressive-code .frame.is-terminal {
+	--code-background: var(--gaia-surface);
+}
+
+/* Callouts (Asides). Starlight ships stock purple/blue accents that aren't in
    the GAIA palette. Re-theme each variant to its palette job: tip = slate teal
    (secondary register), note = neutral warm gray, caution = brand amber
    (semantic warning). danger keeps Starlight's red until a GAIA danger color
