@@ -50,6 +50,12 @@ export default defineConfig({
 			title: 'GAIA Docs',
 			description: 'Documentation for GAIA. Order and focus for Claude Code.',
 			customCss: ['./src/styles/theme.css'],
+			// Claude prompts are ```text blocks; wrap them instead of scrolling sideways.
+			expressiveCode: {
+				defaultProps: {
+					overridesByLang: { text: { wrap: true } },
+				},
+			},
 			// Same icon and social card as gaiareact.com (copied from website/public/).
 			head: [
 				{ tag: 'link', attrs: { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' } },
