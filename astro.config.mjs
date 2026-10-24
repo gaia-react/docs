@@ -6,7 +6,7 @@ import rehypeExternalLinks from 'rehype-external-links';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://docs.gaiareact.com',
+	site: 'https://docs.gaiaharness.com',
 	devToolbar: { enabled: false },
 	// Links to other sites open in a new tab.
 	markdown: {
@@ -65,14 +65,14 @@ export default defineConfig({
 					borderColor: 'var(--gaia-line)',
 				},
 			},
-			// Same icon and social card as gaiareact.com (copied from website/public/).
+			// Same icon and social card as gaiaharness.com (copied from website/public/).
 			head: [
 				{ tag: 'link', attrs: { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' } },
-				{ tag: 'meta', attrs: { property: 'og:image', content: 'https://docs.gaiareact.com/og-image.png' } },
+				{ tag: 'meta', attrs: { property: 'og:image', content: 'https://docs.gaiaharness.com/og-image.png' } },
 				{ tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
 				{ tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
 				{ tag: 'meta', attrs: { property: 'og:image:alt', content: 'GAIA' } },
-				{ tag: 'meta', attrs: { name: 'twitter:image', content: 'https://docs.gaiareact.com/og-image.png' } },
+				{ tag: 'meta', attrs: { name: 'twitter:image', content: 'https://docs.gaiaharness.com/og-image.png' } },
 			],
 			// Keep our bespoke src/pages/404.astro; don't let Starlight inject its own.
 			disable404Route: true,

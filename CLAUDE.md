@@ -1,6 +1,6 @@
 # GAIA Docs
 
-Public technical documentation for GAIA. Starlight (Astro). Served at docs.gaiareact.com. Deployed to GitHub Pages on push to `main`.
+Public technical documentation for GAIA. Starlight (Astro). Served at docs.gaiaharness.com. Deployed to GitHub Pages on push to `main`.
 
 ## Response style
 
@@ -148,7 +148,7 @@ If a claim can't be grounded in the source, don't write it. Open a question inst
 - Frontmatter follows Starlight's `docsSchema()` (`src/content.config.ts`). At minimum: `title`, `description`. Use `sidebar.order` for explicit ordering when needed.
 - Asides: `tip` (green, shield icon) is reserved for safety and privacy callouts. Use `note` for ordinary tips and `caution` for warnings.
 - Images go in `src/assets/` and are imported. Static files (favicon, `CNAME`) go in `public/`.
-- Site config: `astro.config.mjs`. `site` is `https://docs.gaiareact.com`; don't change without coordination.
+- Site config: `astro.config.mjs`. `site` is `https://docs.gaiaharness.com`; don't change without coordination.
 
 ## Local commands
 

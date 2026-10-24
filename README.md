@@ -1,6 +1,6 @@
 # GAIA Docs
 
-Documentation site for [GAIA](https://github.com/gaia-react/gaia), served at [docs.gaiareact.com](https://docs.gaiareact.com).
+Documentation site for [GAIA](https://github.com/gaia-react/gaia), served at [docs.gaiaharness.com](https://docs.gaiaharness.com).
 
 Built with [Starlight](https://starlight.astro.build) on Astro. Deployed to GitHub Pages on every push to `main`.
 
